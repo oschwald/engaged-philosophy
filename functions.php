@@ -318,7 +318,7 @@ function the_bootstrap_print_styles() {
 	if ( is_child_theme() ) {
 		wp_enqueue_style( 'the-bootstrap-child', get_stylesheet_uri(), array( 'the-bootstrap' ) );
 	} else {
-		wp_enqueue_style( 'the-bootstrap' );
+		wp_enqueue_style( 'my-bootstrap' );
 	}
 	
 	if ( 'static' != the_bootstrap_options()->navbar_position ) {
