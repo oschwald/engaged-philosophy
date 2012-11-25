@@ -1,9 +1,9 @@
 <?php
 /** functions.php
  *
- * @author		Konstantin Obenland
- * @package		The Bootstrap
- * @since		1.0.0 - 05.02.2012
+ * @author		Dave Rolsky
+ * @package		My Bootstrap
+ * @since		1.0.0 - 2012-11-25
  */
 
 
