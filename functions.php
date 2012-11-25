@@ -242,16 +242,9 @@ function the_bootstrap_register_scripts_styles() {
 		 * Styles
 		 */
 		wp_register_style(
-			'tw-bootstrap',
-			get_template_directory_uri() . "/css/bootstrap{$suffix}.css",
+			'my-bootstrap',
+			get_template_directory_uri() . "/compiled-style.css",
 			array(),
-			'2.0.3'
-		);
-		
-		wp_register_style(
-			'the-bootstrap',
-			get_template_directory_uri() . "/style{$suffix}.css",
-			array('tw-bootstrap'),
 			$theme_version
 		);
 	}
