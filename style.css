@@ -1,10 +1,9 @@
 /** style.css
  * 
- * Theme Name:	My Bootstrap
- * Description:	Based on the Bootstrap theme by Konstantin Obenland. Let's you override core Bootstrap style (and any other styles) by customizing files in less/my-theme/*.less
- * Author:		Dave Rolsky
- * Author URI:	http://blog.urth.org/
- * Version:		1.0.0
+ * Theme Name:	Engaged Philosophy
+ * Description:	Based on the Bootstrap theme by Konstantin Obenland.
+ * Author:		Greg
+ * Version:		0.2
  * Tags:		black, blue, white, light, custom-background, custom-header, custom-menu, featured-images, flexible-header, flexible-width, full-width-template, left-sidebar, microformats, post-formats, right-sidebar, sticky-post, theme-options, threaded-comments, translation-ready, two-columns
  * Text Domain:	the-bootstrap
  * Domain Path:	/lang
@@ -13,7 +12,7 @@
  * License URI:	http://www.gnu.org/licenses/gpl-3.0.html
  *
  *
- *	Copyright (C) 2012 Dave Rolsky <autarch@urth.org>
+ *	Copyright (C) 2012
  *
  *	This program is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
