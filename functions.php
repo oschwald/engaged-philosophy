@@ -1188,5 +1188,12 @@ function any_ptype_on_cat($request) {
 }
 add_filter('request', 'any_ptype_on_cat');
 
+
+add_action('init', 'custom_taxonomy_flush_rewrite');
+function custom_taxonomy_flush_rewrite() {
+    global $wp_rewrite;
+    $wp_rewrite->flush_rules();
+}
+
 /* End of file functions.php */
 /* Location: ./wp-content/themes/the-bootstrap/functions.php */
