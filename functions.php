@@ -919,7 +919,7 @@ function the_bootstrap_post_gallery( $content, $attr ) {
 	
 	return $output;
 }
-add_filter( 'post_gallery', 'the_bootstrap_post_gallery', 10, 2 );
+//add_filter( 'post_gallery', 'the_bootstrap_post_gallery', 10, 2 );
 
 
 /**
