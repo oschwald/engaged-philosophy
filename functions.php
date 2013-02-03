@@ -1093,6 +1093,11 @@ function project_post_type() {
         'public'        => true,
         'menu_position' => 5,
         'supports'      => array( 'title', 'editor', 'thumbnail', 'excerpt', 'comments' ),
+        'exclude_from_search' => false,
+        'publicly_queryable' => true,
+        'query_var' => true,
+        'rewrite' => true,
+        'can_export'    => true,
         'has_archive'   => true,
         'taxonomies' => array('category','post_tag'),
     );
