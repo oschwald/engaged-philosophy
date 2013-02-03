@@ -1101,7 +1101,13 @@ function project_post_type() {
 
 add_action( 'init', 'project_post_type' );
 
+function any_ptype_on_cat($request) {
+  if ( isset($request['category_name']) || isset($request['tag']) )
+		$request['post_type'] = 'any';
 
+	return $request;
+}
+add_filter('request', 'any_ptype_on_cat');
 
 /* End of file functions.php */
 /* Location: ./wp-content/themes/the-bootstrap/functions.php */
