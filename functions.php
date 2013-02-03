@@ -1069,7 +1069,80 @@ function _the_bootstrap_version() {
 	return $theme_version;
 }
 
+add_action( 'init', 'register_taxonomy_topics' );
 
+function register_taxonomy_topics() {
+
+    $labels = array(
+        'name' => _x( 'Topics', 'topics' ),
+        'singular_name' => _x( 'Topic', 'topics' ),
+        'search_items' => _x( 'Search Topics', 'topics' ),
+        'popular_items' => _x( 'Popular Topics', 'topics' ),
+        'all_items' => _x( 'All Topics', 'topics' ),
+        'parent_item' => _x( 'Parent Topic', 'topics' ),
+        'parent_item_colon' => _x( 'Parent Topic:', 'topics' ),
+        'edit_item' => _x( 'Edit Topic', 'topics' ),
+        'update_item' => _x( 'Update Topic', 'topics' ),
+        'add_new_item' => _x( 'Add New Topic', 'topics' ),
+        'new_item_name' => _x( 'New Topic', 'topics' ),
+        'separate_items_with_commas' => _x( 'Separate topics with commas', 'topics' ),
+        'add_or_remove_items' => _x( 'Add or remove topics', 'topics' ),
+        'choose_from_most_used' => _x( 'Choose from most used topics', 'topics' ),
+        'menu_name' => _x( 'Topics', 'topics' ),
+    );
+
+    $args = array(
+        'labels' => $labels,
+        'public' => true,
+        'show_in_nav_menus' => true,
+        'show_ui' => true,
+        'show_tagcloud' => true,
+        'hierarchical' => false,
+
+        'rewrite' => true,
+        'query_var' => true
+    );
+
+    register_taxonomy( 'topics', array('project'), $args );
+}
+
+
+add_action( 'init', 'register_taxonomy_schools' );
+
+function register_taxonomy_schools() {
+
+    $labels = array(
+        'name' => _x( 'Schools', 'schools' ),
+        'singular_name' => _x( 'School', 'schools' ),
+        'search_items' => _x( 'Search Schools', 'schools' ),
+        'popular_items' => _x( 'Popular Schools', 'schools' ),
+        'all_items' => _x( 'All Schools', 'schools' ),
+        'parent_item' => _x( 'Parent School', 'schools' ),
+        'parent_item_colon' => _x( 'Parent School:', 'schools' ),
+        'edit_item' => _x( 'Edit School', 'schools' ),
+        'update_item' => _x( 'Update School', 'schools' ),
+        'add_new_item' => _x( 'Add New School', 'schools' ),
+        'new_item_name' => _x( 'New School', 'schools' ),
+        'separate_items_with_commas' => _x( 'Separate schools with commas', 'schools' ),
+        'add_or_remove_items' => _x( 'Add or remove schools', 'schools' ),
+        'choose_from_most_used' => _x( 'Choose from the most used schools', 'schools' ),
+        'menu_name' => _x( 'Schools', 'schools' ),
+    );
+
+    $args = array(
+        'labels' => $labels,
+        'public' => true,
+        'show_in_nav_menus' => true,
+        'show_ui' => true,
+        'show_tagcloud' => true,
+        'hierarchical' => true,
+
+        'rewrite' => true,
+        'query_var' => true
+    );
+
+    register_taxonomy( 'schools', array('project'), $args );
+}
 
 function project_post_type() {
     $labels = array(
@@ -1099,12 +1172,13 @@ function project_post_type() {
         'rewrite' => true,
         'can_export'    => true,
         'has_archive'   => true,
-        'taxonomies' => array('category','post_tag'),
+        'taxonomies' => array('schools','topics'),
     );
     register_post_type( 'project', $args );
 }
 
 add_action( 'init', 'project_post_type' );
+
 
 function any_ptype_on_cat($request) {
   if ( isset($request['category_name']) || isset($request['tag']) )
