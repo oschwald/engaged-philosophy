@@ -39,6 +39,7 @@ get_header(); ?>
               the_post();
               ?>
               <div class="item">
+              <a href="<?php echo get_permalink(); ?>">
               <?php the_post_thumbnail(); ?>
               <div class="carousel-caption">
               <h4><?php the_title(); ?></h4>
@@ -46,6 +47,7 @@ get_header(); ?>
               <?php the_excerpt(); ?>
               </p>
               </div>
+              </a>
               </div>
               <?php
 			}
