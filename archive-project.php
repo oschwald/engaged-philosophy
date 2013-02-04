@@ -20,7 +20,7 @@ get_header(); ?>
     $('#projects_carousel').carousel()
       });
 </script>
-<section id="primary" class="span8">
+<section id="primary" class="span12">
 
 	<?php tha_content_before(); ?>
 
