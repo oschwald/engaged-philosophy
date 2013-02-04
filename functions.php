@@ -20,7 +20,7 @@ function the_bootstrap_setup() {
 	global $content_width;
 	
 	if ( ! isset( $content_width ) ) {
-		$content_width = 770;
+		$content_width = 940;
 	}
 	
 	load_theme_textdomain( 'the-bootstrap', get_template_directory() . '/lang' );
