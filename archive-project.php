@@ -58,7 +58,7 @@ get_header(); ?>
 
           </div>
 
-        <?php wp_tag_cloud( array( 'taxonomy' => 'topics' ) ) ?>
+        <?php wp_tag_cloud( array( 'taxonomy' => 'topic' ) ) ?>
 
         <?php
 			the_bootstrap_content_nav();

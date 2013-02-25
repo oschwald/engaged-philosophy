@@ -1069,26 +1069,26 @@ function _the_bootstrap_version() {
 	return $theme_version;
 }
 
-add_action( 'init', 'register_taxonomy_topics' );
+add_action( 'init', 'register_taxonomy_topic' );
 
-function register_taxonomy_topics() {
+function register_taxonomy_topic() {
 
     $labels = array(
-        'name' => _x( 'Topics', 'topics' ),
-        'singular_name' => _x( 'Topic', 'topics' ),
-        'search_items' => _x( 'Search Topics', 'topics' ),
-        'popular_items' => _x( 'Popular Topics', 'topics' ),
-        'all_items' => _x( 'All Topics', 'topics' ),
-        'parent_item' => _x( 'Parent Topic', 'topics' ),
-        'parent_item_colon' => _x( 'Parent Topic:', 'topics' ),
-        'edit_item' => _x( 'Edit Topic', 'topics' ),
-        'update_item' => _x( 'Update Topic', 'topics' ),
-        'add_new_item' => _x( 'Add New Topic', 'topics' ),
-        'new_item_name' => _x( 'New Topic', 'topics' ),
-        'separate_items_with_commas' => _x( 'Separate topics with commas', 'topics' ),
-        'add_or_remove_items' => _x( 'Add or remove topics', 'topics' ),
-        'choose_from_most_used' => _x( 'Choose from most used topics', 'topics' ),
-        'menu_name' => _x( 'Topics', 'topics' ),
+        'name' => _x( 'Topics', 'topic' ),
+        'singular_name' => _x( 'Topic', 'topic' ),
+        'search_items' => _x( 'Search Topics', 'topic' ),
+        'popular_items' => _x( 'Popular Topics', 'topic' ),
+        'all_items' => _x( 'All Topics', 'topic' ),
+        'parent_item' => _x( 'Parent Topic', 'topic' ),
+        'parent_item_colon' => _x( 'Parent Topic:', 'topic' ),
+        'edit_item' => _x( 'Edit Topic', 'topic' ),
+        'update_item' => _x( 'Update Topic', 'topic' ),
+        'add_new_item' => _x( 'Add New Topic', 'topic' ),
+        'new_item_name' => _x( 'New Topic', 'topic' ),
+        'separate_items_with_commas' => _x( 'Separate topics with commas', 'topic' ),
+        'add_or_remove_items' => _x( 'Add or remove topics', 'topic' ),
+        'choose_from_most_used' => _x( 'Choose from most used topics', 'topic' ),
+        'menu_name' => _x( 'Topics', 'topic' ),
     );
 
     $args = array(
@@ -1103,7 +1103,7 @@ function register_taxonomy_topics() {
         'query_var' => true
     );
 
-    register_taxonomy( 'topics', array('project'), $args );
+    register_taxonomy( 'topic', array('project'), $args );
 }
 
 
@@ -1172,7 +1172,7 @@ function project_post_type() {
         'rewrite' => true,
         'can_export'    => true,
         'has_archive'   => true,
-        'taxonomies' => array('schools','topics'),
+        'taxonomies' => array('schools','topic'),
     );
     register_post_type( 'project', $args );
 }
