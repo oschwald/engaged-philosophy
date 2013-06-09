@@ -16,9 +16,9 @@
 get_header(); ?>
 
 <script type="text/javascript">
-  jQuery(document).ready(function ($) {
-    $('#projects_carousel').carousel()
-      });
+jQuery(document).ready(function ($) {
+  $('#projects_carousel').carousel()
+});
 </script>
 <section id="primary" class="span12">
 
@@ -26,49 +26,55 @@ get_header(); ?>
 
 	<div id="content" role="main">
 		<?php tha_content_top();
-		
+
 		if ( have_posts() ) : ?>
 
-			<header class="page-header">
-				<h1 class="page-title">Civic Engagement Projects</h1>
-			</header><!-- .page-header -->
-               <div id="projects_carousel" class="carousel slide">
-               <div class="carousel-inner">
-			<?php
-			while ( have_posts() ) {
-              the_post();
-              ?>
-              <div class="item">
-              <a href="<?php echo get_permalink(); ?>">
-              <?php the_post_thumbnail(); ?>
+   <header class="page-header">
+    <h1 class="page-title">Civic Engagement Projects</h1>
+  </header><!-- .page-header -->
+  <div style="width: 700px">
+    <div id="projects_carousel" class="carousel slide">
+     <div class="carousel-inner">
+       <?php
+       $index = 0;
+       while ( have_posts() ) {
+        the_post();
+        if (has_post_thumbnail()){
+          ?>
+          <div class="item <? if ($index === 0) echo "active" ?>">
+            <a href="<?php echo get_permalink(); ?>">
+              <?php the_post_thumbnail(array(700, 460)); ?>
               <div class="carousel-caption">
-              <h4><?php the_title(); ?></h4>
-              <p>
-              <?php the_excerpt(); ?>
-              </p>
+                <h4><?php the_title(); ?></h4>
+                <p>
+                  <?php the_excerpt(); ?>
+                </p>
               </div>
-              </a>
-              </div>
-              <?php
-			}
-            ?>
+            </a>
           </div>
-                <a class="left carousel-control" href="#projects_carousel" data-slide="prev">&lsaquo;</a>
-                <a class="right carousel-control" href="#projects_carousel" data-slide="next">&rsaquo;</a>
+          <?php
+          $index++;
+        }
+      }
+      ?>
+    </div>
+    <a class="left carousel-control" href="#projects_carousel" data-slide="prev">&lsaquo;</a>
+    <a class="right carousel-control" href="#projects_carousel" data-slide="next">&rsaquo;</a>
 
-          </div>
+  </div>
 
-        <?php wp_tag_cloud( array( 'taxonomy' => 'topic' ) ) ?>
+  <?php wp_tag_cloud( array( 'taxonomy' => 'topic' ) ) ?>
 
-        <?php
-			the_bootstrap_content_nav();
-		else :
-			get_template_part( '/partials/content', 'not-found' );
-		endif;
-		
-		tha_content_bottom(); ?>
-	</div><!-- #content -->
-	<?php tha_content_after(); ?>
+  <?php
+  the_bootstrap_content_nav();
+  else :
+   get_template_part( '/partials/content', 'not-found' );
+ endif;
+
+ tha_content_bottom(); ?>
+</div>
+</div><!-- #content -->
+<?php tha_content_after(); ?>
 </section><!-- #primary -->
 
 <?php
