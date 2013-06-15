@@ -1,6 +1,6 @@
 #!/bin/bash
 
-./node_modules/less/bin/lessc ./less/my-theme.less ./compiled-style.css
+recess --compile less/my-theme.less > ./compiled-style.css
 
 mkdir fonts
 cp ./less/bootstrap/fonts/* fonts/
