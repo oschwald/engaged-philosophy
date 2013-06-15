@@ -30,7 +30,7 @@ foreach ( $attachments as $k => $attachment ) {
 the_post();
 ?>
 
-<section id="primary" class="image-attachment span12">
+<section id="primary" class="image-attachment col-span-12">
 
 	<?php tha_content_before(); ?>
 	<div id="content" role="main">
@@ -81,7 +81,7 @@ the_post();
 							// or, if there's only 1 image, get the URL of the image
 							$next_attachment_url = wp_get_attachment_url();
 						}
-						
+
 						list( $src, $width, $height ) = wp_get_attachment_image_src( $post->ID, 'full' );
 						$link_class = ( $GLOBALS['content_width'] > $width ) ? ' attachment-table' : '';
 					?>
@@ -99,12 +99,12 @@ the_post();
 			<?php tha_entry_bottom(); ?>
 		</article><!-- #post-<?php the_ID(); ?> -->
 		<?php tha_entry_after(); ?>
-		
+
 		<?php tha_content_bottom(); ?>
 	</div><!-- #content -->
 	<?php tha_content_after(); ?>
 </section><!-- #primary -->
-<div id="attachment-comment" class="span8"><?php comments_template(); ?></div>
+<div id="attachment-comment" class="col-span-8"><?php comments_template(); ?></div>
 <?php
 get_sidebar( 'image' );
 get_footer();

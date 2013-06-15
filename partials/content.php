@@ -12,7 +12,7 @@
 tha_entry_before(); ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<?php tha_entry_top(); ?>
-	
+
 	<header class="page-header">
 	<?php if ( is_sticky() AND is_home() ) : ?>
 		<hgroup>
@@ -23,7 +23,7 @@ tha_entry_before(); ?>
 		else :
 			the_title( '<h1 class="entry-title"><a href="' . get_permalink() .'" title="' . sprintf( esc_attr__( 'Permalink to %s', 'the-bootstrap' ), the_title_attribute( 'echo=0' ) ) . '" rel="bookmark">', '</a></h1>' );
 		endif;
-		
+
 		if ( 'post' == get_post_type() ) : ?>
 		<div class="entry-meta">
 			<?php the_bootstrap_posted_on(); ?>
@@ -38,7 +38,7 @@ tha_entry_before(); ?>
 	<?php else : ?>
 	<div class="entry-content clearfix">
 		<?php if ( has_post_thumbnail() ) : ?>
-		<a class="thumbnail post-thumbnail span2" href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>">
+		<a class="thumbnail post-thumbnail col-span-2" href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>">
 			<?php the_post_thumbnail( 'thumbnail' ); ?>
 		</a>
 		<?php endif;
@@ -55,7 +55,7 @@ tha_entry_before(); ?>
 			printf( '<span class="cat-links block">' . __( 'Posted in %1$s.', 'the-bootstrap' ) . '</span>', $categories_list );
 		?>
 	</footer><!-- #entry-meta -->
-	
+
 	<?php tha_entry_bottom(); ?>
 </article><!-- #post-<?php the_ID(); ?> -->
 <?php tha_entry_after();

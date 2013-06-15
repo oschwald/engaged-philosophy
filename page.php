@@ -15,11 +15,11 @@
 
 get_header(); ?>
 
-<div id="primary" class="span8">
+<div id="primary" class="col-span-8">
 	<?php tha_content_before(); ?>
 	<div id="content" role="main">
 		<?php tha_content_top();
-		
+
 		the_post();
 		get_template_part( '/partials/content', 'page' );
 		comments_template();
