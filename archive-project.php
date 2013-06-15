@@ -20,14 +20,14 @@ jQuery(document).ready(function ($) {
   $('#projects_carousel').carousel()
 });
 </script>
-<section id="primary" class="col-span-12">
+<section id="primary" class="span12">
 
   <?php tha_content_before(); ?>
 
   <div id="content" role="main">
     <?php tha_content_top();
 
-if (have_posts()) : ?>
+    if (have_posts()) : ?>
 
     <header class="page-header">
       <h1 class="page-title">Civic Engagement Projects</h1>
@@ -37,9 +37,9 @@ if (have_posts()) : ?>
        <div class="carousel-inner">
          <?php
          $index = 0;
-    while (have_posts()) {
-        the_post();
-        if (has_post_thumbnail()) {
+         while (have_posts()) {
+          the_post();
+          if (has_post_thumbnail()) {
             ?>
             <div class="item <?php if ($index === 0) echo "active" ?>">
               <?php the_post_thumbnail(array(700, 460)); ?>
@@ -52,8 +52,8 @@ if (have_posts()) : ?>
             </div>
             <?php
             $index++;
+          }
         }
-    }
         ?>
       </div>
       <a class="left carousel-control" href="#projects_carousel" data-slide="prev">&lsaquo;</a>
@@ -65,9 +65,9 @@ if (have_posts()) : ?>
 
     <?php
     the_bootstrap_content_nav();
-else :
+    else :
      get_template_part('/partials/content', 'not-found');
-endif;
+   endif;
 
    tha_content_bottom(); ?>
  </div>
