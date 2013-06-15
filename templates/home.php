@@ -16,7 +16,6 @@ jQuery(document).ready(function ($) {
 <section id="primary" class="span12">
   <?php tha_content_before(); ?>
   <div id="content" role="main">
-
     <div class="row">
       <div id="projects_carousel" class="carousel slide span9">
         <div class="carousel-inner">
@@ -28,7 +27,7 @@ jQuery(document).ready(function ($) {
             $index = 0;
           while (have_posts()) {
             the_post();
-            if (has_post_thumbnail()) {
+            if (has_post_thumbnail() && get_field('highlight')) {
               ?>
               <div class="item <?php if ($index === 0) echo "active" ?>">
                 <?php the_post_thumbnail(array(700, 460)); ?>
@@ -56,10 +55,27 @@ jQuery(document).ready(function ($) {
         </div>
       </div>
     </div>
+    <div class="lead">
+      <?php
+      the_post();
+      the_content();
+      ?>
+    </div>
+    <div class="row">
+      <div class="span4">
+        <h2><?php the_field('box-left-title'); ?></h2>
+        <?php the_field('box-left'); ?>
+      </div>
+      <div class="span4">
+        <h2><?php the_field('box-middle-title'); ?></h2>
+        <?php the_field('box-middle'); ?>
+      </div>
+      <div class="span4">
+        <h2><?php the_field('box-right-title'); ?></h2>
+        <?php the_field('box-right'); ?>
+      </div>
+    </div>
 <?php
-    the_post();
-    the_content();
-
     tha_content_bottom();
     ?>
 
