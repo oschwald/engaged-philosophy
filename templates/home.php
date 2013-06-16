@@ -50,16 +50,13 @@ jQuery(document).ready(function ($) {
         <a class="right carousel-control" href="#projects_carousel" data-slide="next">&rsaquo;</a>
       </div>
       <div class="span3">
-        <div class="well">
-          <?php the_field('about'); ?>
+        <div class="well lead lead-home">
+          <?php
+          the_post();
+          the_content();
+          ?>
         </div>
       </div>
-    </div>
-    <div class="lead">
-      <?php
-      the_post();
-      the_content();
-      ?>
     </div>
     <div class="row">
       <div class="span4">
