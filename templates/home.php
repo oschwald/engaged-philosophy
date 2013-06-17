@@ -9,7 +9,9 @@ get_header(); ?>
 
 <script type="text/javascript">
 jQuery(document).ready(function ($) {
-  $('#projects_carousel').carousel()
+  $('#projects_carousel')..carousel({
+    interval: 30000
+  });
 });
 </script>
 
