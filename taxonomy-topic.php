@@ -20,18 +20,20 @@ get_header(); ?>
 
 			<header class="page-header">
 				<h1 class="page-title"><?php
-					printf( __( 'Tag Archives: %s', 'the-bootstrap' ), '<span>' . single_tag_title( '', false ) . '</span>' );
+					printf( __( 'Projec Topic: %s', 'the-bootstrap' ), '<span>' . single_tag_title( '', false ) . '</span>' );
 				?></h1>
 	
 				<?php if ( $tag_description = tag_description() ) {
 					echo apply_filters( 'tag_archive_meta', '<div class="tag-archive-meta">' . $tag_description . '</div>' );
 				} ?>
+
 			</header><!-- .page-header -->
 	
 			<?php
 			while ( have_posts() ) {
 				the_post();
-				get_template_part( '/partials/content', get_post_format() );
+
+				get_template_part( '/partials/content', 'summary' );
 			}
 			the_bootstrap_content_nav();
 		else :
@@ -44,7 +46,6 @@ get_header(); ?>
 </section><!-- #primary -->
 
 <?php
-get_sidebar();
 get_footer();
 
 

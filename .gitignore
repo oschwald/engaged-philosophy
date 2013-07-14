@@ -2,3 +2,4 @@
 *.swp
 /compiled-style.css
 js/bootstrap.*
+node_modules
