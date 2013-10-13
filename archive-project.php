@@ -32,8 +32,11 @@ jQuery(document).ready(function ($) {
     <header class="page-header">
       <h1 class="page-title">Civic Engagement Projects</h1>
     </header><!-- .page-header -->
-    <div class="lead">
+    <p>Click on one of the tags below to find a list of projects that fit that topic.</p>
+    <div class="row">
+    <div class="well well-large span5 lead">
       <?php wp_tag_cloud(array('taxonomy' => 'topic')) ?>
+    </div>
     </div>
     <?php
     else :
@@ -41,7 +44,6 @@ jQuery(document).ready(function ($) {
    endif;
 
    tha_content_bottom(); ?>
- </div>
 </div><!-- #content -->
 <?php tha_content_after(); ?>
 </section><!-- #primary -->
