@@ -36,7 +36,6 @@ jQuery(document).ready(function ($) {
       <?php wp_tag_cloud(array('taxonomy' => 'topic')) ?>
     </div>
     <?php
-    the_bootstrap_content_nav();
     else :
      get_template_part('/partials/content', 'not-found');
    endif;

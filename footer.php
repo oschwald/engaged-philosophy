@@ -20,11 +20,9 @@
                             'walker'			=>	new The_Bootstrap_Nav_Walker,
                         ) );
                         ?>
-                        <div id="site-generator"<?php echo has_nav_menu('footer-menu') ? ' class="footer-nav-menu"' : ''; ?>>
-                            <a	href="<?php echo esc_url( __( 'http://wordpress.org/', 'the-bootstrap' ) ); ?>"
-                                title="<?php esc_attr_e( 'Semantic Personal Publishing Platform', 'the-bootstrap' ); ?>"
-                                target="_blank"
-                                rel="generator"><?php print( '<a href="mailto:info@engagedphilosophy.com">info@engagedphilosophy.com</>' ); ?></a>
+                        <div class="pull-right"<?php echo has_nav_menu('footer-menu') ? ' class="footer-nav-menu"' : ''; ?>>
+                           
+                                <a href="mailto:info@engagedphilosophy.com">info@engagedphilosophy.com</a>
                         </div>
                     </div><!-- #page-footer .well .clearfix -->
                     <?php tha_footer_bottom(); ?>

@@ -19,6 +19,7 @@ tha_entry_before(); ?>
 
 	<div class="entry-content clearfix">
 		<?php
+                echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class'=>'img-polaroid pull-right', 'style' => 'margin-left: 5px'));
 		the_excerpt( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) );
 		the_bootstrap_link_pages(); ?>
 	</div><!-- .entry-content -->

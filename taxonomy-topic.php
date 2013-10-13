@@ -20,7 +20,7 @@ get_header(); ?>
 
 			<header class="page-header">
 				<h1 class="page-title"><?php
-					printf( __( 'Projec Topic: %s', 'the-bootstrap' ), '<span>' . single_tag_title( '', false ) . '</span>' );
+					printf( __( 'Project Topic: %s', 'the-bootstrap' ), '<span>' . single_tag_title( '', false ) . '</span>' );
 				?></h1>
 	
 				<?php if ( $tag_description = tag_description() ) {
