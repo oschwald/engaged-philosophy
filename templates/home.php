@@ -58,7 +58,7 @@ jQuery(document).ready(function ($) {
           the_content();
           ?>
         </div>
-        <div class="survey-box">
+        <div class="well survey-box">
         <!--BEGIN QUALTRICS FEEDBACK LINK-->
 <script type="text/javascript">
 var Qualtrics_SV_01EXpZ4YggB9oYR = {
@@ -86,7 +86,11 @@ var Qualtrics_SV_01EXpZ4YggB9oYR = {
       tip.id='SV_01EXpZ4YggB9oYR'+'_tooltip';
       tip.innerHTML='Let us know what you think about the Engaged Philosophy website';
       document.body.appendChild(tip);
-      if (new_link.addEventListener){new_link.addEventListener('mousemove', Qualtrics_SV_01EXpZ4YggB9oYR.moveTip, false);} elseif (new_link.attachEvent){ new_link.attachEvent('onmousemove', Qualtrics_SV_01EXpZ4YggB9oYR.moveTip);}
+      if (new_link.addEventListener){
+          new_link.addEventListener('mousemove', Qualtrics_SV_01EXpZ4YggB9oYR.moveTip, false);
+      } else if (new_link.attachEvent) {
+        new_link.attachEvent('onmousemove', Qualtrics_SV_01EXpZ4YggB9oYR.moveTip);
+      }
     }
   },
   moveTip:function(e) {
@@ -101,7 +105,11 @@ var Qualtrics_SV_01EXpZ4YggB9oYR = {
   removeTip:function() {
     var tip = document.getElementById('SV_01EXpZ4YggB9oYR'+'_tooltip');tip.parentNode.removeChild(tip);
     var new_link = document.getElementById('SV_01EXpZ4YggB9oYR'+'_feedbacklink');
-    if (new_link.addEventListener){new_link.removeEventListener('mousemove', Qualtrics_SV_01EXpZ4YggB9oYR.moveTip, false);} elseif (new_link.detachEvent){ new_link.detachEvent('onmousemove', Qualtrics_SV_01EXpZ4YggB9oYR.moveTip);}
+    if (new_link.addEventListener){
+       new_link.removeEventListener('mousemove', Qualtrics_SV_01EXpZ4YggB9oYR.moveTip, false);
+    } else if (new_link.detachEvent){
+       new_link.detachEvent('onmousemove', Qualtrics_SV_01EXpZ4YggB9oYR.moveTip);
+    }
   }
 }
 var link=Qualtrics_SV_01EXpZ4YggB9oYR.survey+"&url="+Qualtrics_SV_01EXpZ4YggB9oYR.url;
