@@ -38,20 +38,10 @@
           'fallback_cb'		=>	false,
           'walker'			=>	new The_Bootstrap_Nav_Walker,
           ) ); ?>
-          <div class="page-header">
-            <h1>
-              <a href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
-                <?php bloginfo( 'name' ); ?>
-                <small>
-                  <?php bloginfo( 'description' ); ?>
-                </small>
-              </a>
-            </h1>
-          </div>
 
           <?php if ( get_header_image() ) : ?>
           <a id="header-image" href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
-            <img src="<?php header_image(); ?>" width="<?php echo get_custom_header()->width; ?>" height="<?php echo get_custom_header()->height; ?>" alt="" />
+            <img src="<?php header_image(); ?>" alt="" />
           </a>
         <?php endif; // if ( get_header_image() ) ?>
 

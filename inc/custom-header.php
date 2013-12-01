@@ -23,8 +23,8 @@ function the_bootstrap_custom_header_setup() {
 
 		// The height and width of your custom header.
 		// Add a filter to the_bootstrap_header_image_width and the_bootstrap_header_image_height to change these values.
-		'width'						=>	apply_filters( 'the_bootstrap_header_image_width', 1170 ),
-		'height'					=>	apply_filters( 'the_bootstrap_header_image_height', 250 ),
+		'width'						=>	apply_filters( 'the_bootstrap_header_image_width', 288 ),
+		'height'					=>	apply_filters( 'the_bootstrap_header_image_height', 193 ),
 		'flex-height'				=>	true,
 		
 		// The default header text color
