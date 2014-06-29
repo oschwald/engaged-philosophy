@@ -133,7 +133,7 @@ msgstr "Необходимо <a href=\"%s\">авторизоваться</a>, ч
 #, php-format
 #@ the-bootstrap
 msgid "Logged in as <a href=\"%1$s\">%2$s</a>. <a href=\"%3$s\" title=\"Log out of this account\">Log out?</a>"
-msgstr "лВы вошли как <a href=\"%1$s\">%2$s</a>. <a href=\"%3$s\" title=\"Выйти\">Выйти?</a>"
+msgstr "Вы вошли как <a href=\"%1$s\">%2$s</a>. <a href=\"%3$s\" title=\"Выйти\">Выйти?</a>"
 
 #: functions.php:308
 #, php-format
