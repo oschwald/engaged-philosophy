@@ -11,21 +11,22 @@
 
 tha_entry_before(); ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-	<?php tha_entry_top(); ?>
-	
-	<header class="page-header">
-		<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
-	</header><!-- .entry-header -->
+    <?php tha_entry_top(); ?>
 
-	<div class="entry-content clearfix">
-		<?php
-                echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class'=>'img-polaroid pull-right', 'style' => 'margin-left: 5px'));
-		the_excerpt( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) );
-		the_bootstrap_link_pages(); ?>
-	</div><!-- .entry-content -->
-	<?php edit_post_link( __( 'Edit', 'the-bootstrap' ), '<footer class="entry-meta"><span class="edit-link label">', '</span></footer>' );
-	
-	tha_entry_bottom(); ?>
+    <header class="page-header">
+        <?php the_title( '<h2 class="entry-title">', '</h2>' ); ?>
+    </header><!-- .entry-header -->
+
+    <div class="entry-content clearfix">
+        <?php
+            echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class'=>'img-polaroid pull-right', 'style' => 'margin-left: 5px'));
+            the_excerpt( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) );
+            the_bootstrap_link_pages();
+        ?>
+    </div><!-- .entry-content -->
+    <?php edit_post_link( __( 'Edit', 'the-bootstrap' ), '<footer class="entry-meta"><span class="edit-link label">', '</span></footer>' );
+
+    tha_entry_bottom(); ?>
 </article><!-- #post-<?php the_ID(); ?> -->
 <?php tha_entry_after();
 

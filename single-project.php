@@ -16,8 +16,7 @@ get_header(); ?>
 		<?php tha_content_top();
 		
 		the_post();
-		get_template_part( '/partials/content', 'page' );
-		comments_template( '', true );
+		get_template_part( '/partials/content', 'project' );
 		
 		tha_content_bottom(); ?>
 	</div><!-- #content -->

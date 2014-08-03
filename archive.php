@@ -17,40 +17,40 @@ get_header(); ?>
 
 <section id="primary" class="span8">
 
-	<?php tha_content_before(); ?>
-	<div id="content" role="main">
-		<?php tha_content_top();
-		
-		if ( have_posts() ) : ?>
+    <?php tha_content_before(); ?>
+    <div id="content" role="main">
+        <?php tha_content_top();
 
-			<header class="page-header">
-				<h1 class="page-title">
-					<?php
-					if ( is_day() ) :
-						printf( __( 'Daily Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date() . '</span>' );
-					elseif ( is_month() ) :
-						printf( __( 'Monthly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'F Y' ) . '</span>' );
-					elseif ( is_year() ) :
-						printf( __( 'Yearly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'Y' ) . '</span>' );
-					else :
-						_e( 'Blog Archives', 'the-bootstrap' );
-					endif; ?>
-				</h1>
-			</header><!-- .page-header -->
+        if ( have_posts() ) : ?>
 
-			<?php
-			while ( have_posts() ) {
-				the_post();
-				get_template_part( '/partials/content', get_post_format() );
-			}
-			the_bootstrap_content_nav();
-		else :
-			get_template_part( '/partials/content', 'not-found' );
-		endif;
-		
-		tha_content_bottom(); ?>
-	</div><!-- #content -->
-	<?php tha_content_after(); ?>
+            <header class="page-header">
+                <h1 class="page-title">
+                    <?php
+                    if ( is_day() ) :
+                        printf( __( 'Daily Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date() . '</span>' );
+                    elseif ( is_month() ) :
+                        printf( __( 'Monthly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'F Y' ) . '</span>' );
+                    elseif ( is_year() ) :
+                        printf( __( 'Yearly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'Y' ) . '</span>' );
+                    else :
+                        _e( single_cat_title(), 'the-bootstrap' );
+                    endif; ?>
+                </h1>
+            </header><!-- .page-header -->
+
+            <?php
+            while ( have_posts() ) {
+                the_post();
+                get_template_part( '/partials/content', get_post_format() ?: 'summary');
+            }
+            the_bootstrap_content_nav();
+        else :
+            get_template_part( '/partials/content', 'not-found' );
+        endif;
+
+        tha_content_bottom(); ?>
+    </div><!-- #content -->
+    <?php tha_content_after(); ?>
 </section><!-- #primary -->
 
 <?php
