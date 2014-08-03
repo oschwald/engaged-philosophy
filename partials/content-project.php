@@ -19,25 +19,27 @@ tha_entry_before(); ?>
 
     <div class="entry-content clearfix">
         <div class="row">
-            <div class="span8">
+            <div class="span9">
                 <?php
                     the_content( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) );
                     the_bootstrap_link_pages();
                 ?>
             </div>
-            <div class="span3 well">
-                <dl>
-                    <?php
-                        the_terms( $post->ID, 'schools', '<dt>College</dt><dd>', ', ', '</dd>' );
-                        the_terms( $post->ID, 'professors', '<dt>Professor</dt><dd>', ', ', '</dd>' );
-                        the_terms( $post->ID, 'courses', '<dt>Course</dt><dd>', ', ', '</dd>' );
-                        the_terms( $post->ID, 'semesters', '<dt>Semester</dt><dd>', ', ', '</dd>' );
+            <div class="span3">
+                <div class="well">
+                    <dl>
+                        <?php
+                            the_terms( $post->ID, 'schools', '<dt>College</dt><dd>', ', ', '</dd>' );
+                            the_terms( $post->ID, 'professors', '<dt>Professor</dt><dd>', ', ', '</dd>' );
+                            the_terms( $post->ID, 'courses', '<dt>Courses</dt><dd>', ', ', '</dd>' );
+                            the_terms( $post->ID, 'semesters', '<dt>Semesters</dt><dd>', ', ', '</dd>' );
 
-                    ?>
-                </dl>
+                        ?>
+                    </dl>
+                </div>
             </div>
         </div>
-    </div><!-- .entry-content -->
+    </div>
 
     <?php edit_post_link( __( 'Edit', 'the-bootstrap' ), '<footer class="entry-meta"><span class="edit-link label">', '</span></footer>' );
 
