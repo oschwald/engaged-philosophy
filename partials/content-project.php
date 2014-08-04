@@ -31,8 +31,8 @@ tha_entry_before(); ?>
                         <?php
                             the_terms( $post->ID, 'schools', '<dt>College</dt><dd>', ', ', '</dd>' );
                             the_terms( $post->ID, 'professors', '<dt>Professor</dt><dd>', ', ', '</dd>' );
-                            the_terms( $post->ID, 'courses', '<dt>Courses</dt><dd>', ', ', '</dd>' );
-                            the_terms( $post->ID, 'semesters', '<dt>Semesters</dt><dd>', ', ', '</dd>' );
+                            the_terms( $post->ID, 'courses', '<dt>Course</dt><dd>', ', ', '</dd>' );
+                            the_terms( $post->ID, 'semesters', '<dt>Semester</dt><dd>', ', ', '</dd>' );
 
                         ?>
                     </dl>
