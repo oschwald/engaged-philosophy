@@ -1,7 +1,7 @@
 <?php
 /** 404.php
  *
- * The template for displaying 404 pages (Not Found).
+ * The template for displaying 404 pages (Not Found). test
  *
  * @author		Konstantin Obenland
  * @package		The Bootstrap
