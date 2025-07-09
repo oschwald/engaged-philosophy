@@ -82,11 +82,15 @@
   color: $gray-600;
 }
 
-// Navbar styling to match production site - simple and clean approach
+// Navbar styling to match production site - full width within container
 #access {
   background-color: #d9d9d9; // Light gray background like production
   padding: 0.5rem 0;
   margin-bottom: 0; // Remove gap to connect with content
+  margin-left: -1.5rem; // Extend to full container width
+  margin-right: -1.5rem; // Extend to full container width
+  padding-left: 1.5rem; // Add padding back for content
+  padding-right: 1.5rem; // Add padding back for content
   border-radius: 0;
 }
 
