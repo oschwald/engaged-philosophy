@@ -15,7 +15,7 @@
 
 get_header(); ?>
 
-<section id="primary" class="span8">
+<section id="primary" class="col-lg-8 px-4">
 
     <?php tha_content_before(); ?>
     <div id="content" role="main">
