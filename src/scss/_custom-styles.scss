@@ -82,30 +82,34 @@
   color: $gray-600;
 }
 
-// Navbar styling to match production site
+// Navbar styling to match production site (contained, not full-width)
 .navbar {
-  background-color: #e9ecef !important; // Light gray background similar to production
-  border-bottom: 1px solid #dee2e6;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background-color: transparent !important; // Remove full-width background
+  border: none;
+  box-shadow: none;
   margin-bottom: 0;
+  padding: 0;
 }
 
-// Navbar container consistency - align with main content containers
+// Navbar container with contained background to match production site
 .navbar .container {
   max-width: 1140px; // Match Bootstrap container max-width
-  padding: 0 1.5rem; // Match main container padding
+  padding: 0.5rem 1.5rem; // Match main container padding
   margin: 0 auto; // Center the container
+  background-color: #d9d9d9; // Light gray background like production
+  border-radius: 0;
+  border: 1px solid #bbb;
 }
 
-// Navbar brand and nav links styling
+// Navbar brand and nav links styling to match production site
 .navbar-brand {
   font-weight: 600;
-  color: #495057 !important;
+  color: #333 !important;
 }
 
 .navbar-nav .nav-link {
-  color: #495057 !important;
-  font-weight: 500;
+  color: #333 !important;
+  font-weight: normal;
   padding: 0.5rem 1rem !important;
   transition: all 0.3s ease;
 }
@@ -114,6 +118,12 @@
   color: #fd7e14 !important;
   background-color: rgba(253, 126, 20, 0.1);
   border-radius: 4px;
+}
+
+// Adjust navbar container to look more like production site
+.navbar .container {
+  border-radius: 0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 // Navbar search form
@@ -129,10 +139,22 @@
 }
 
 // Ensure all containers have consistent max-width and centering
+// Responsive approach: wider on large screens, contained on smaller screens
 .container {
   max-width: 1140px;
   margin: 0 auto;
   padding: 0 1.5rem;
+  
+  // Match production site width on large screens
+  @media (min-width: 1400px) {
+    max-width: 1200px;
+  }
+  
+  // Maintain responsive behavior on smaller screens
+  @media (max-width: 768px) {
+    max-width: 100%;
+    padding: 0 1rem;
+  }
 }
 
 // WordPress-specific styles
