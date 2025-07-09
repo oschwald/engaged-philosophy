@@ -19,13 +19,13 @@ tha_entry_before(); ?>
 
     <div class="entry-content clearfix">
         <div class="row">
-            <div class="span9">
+            <div class="col-lg-9">
                 <?php
                     the_content( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) );
                     the_bootstrap_link_pages();
                 ?>
             </div>
-            <div class="span3">
+            <div class="col-lg-3">
                 <div class="well">
                     <dl>
                         <?php

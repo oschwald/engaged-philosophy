@@ -42,7 +42,7 @@ tha_entry_before(); ?>
 			$the_bootstrap_images		=	array_slice( $the_bootstrap_images, 0, 10 );
 		?>
 		
-		<div class="span3">
+		<div class="col-lg-3">
 			<?php the_excerpt(); ?>
 	
 			<p class="gallery-meta">
@@ -55,7 +55,7 @@ tha_entry_before(); ?>
 				</em>
 			</p>
 		</div>
-		<div id="gallery-slider" class="carousel slide span5">
+		<div id="gallery-slider" class="carousel slide col-lg-5">
 
 			<!-- Carousel items -->
 			<div class="carousel-inner">
