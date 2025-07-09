@@ -17,14 +17,14 @@ tha_entry_before(); ?>
         <?php the_title( '<h2 class="entry-title">', '</h2>' ); ?>
     </header><!-- .entry-header -->
 
-    <div class="entry-content clearfix">
+    <div class="entry-content d-flex flex-wrap">
         <?php
-            echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class'=>'img-polaroid pull-right', 'style' => 'margin-left: 5px'));
+            echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class'=>'img-thumbnail float-end', 'style' => 'margin-left: 5px'));
             the_excerpt( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) );
             the_bootstrap_link_pages();
         ?>
     </div><!-- .entry-content -->
-    <?php edit_post_link( __( 'Edit', 'the-bootstrap' ), '<footer class="entry-meta"><span class="edit-link label">', '</span></footer>' );
+    <?php edit_post_link( __( 'Edit', 'the-bootstrap' ), '<footer class="entry-meta"><span class="edit-link badge">', '</span></footer>' );
 
     tha_entry_bottom(); ?>
 </article><!-- #post-<?php the_ID(); ?> -->

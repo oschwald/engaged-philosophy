@@ -44,11 +44,11 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 		$attributes	.=	$item->target		? ' target="' . esc_attr( $item->target     ) .'"' : '';
 		$attributes	.=	$item->xfn			? ' rel="'    . esc_attr( $item->xfn        ) .'"' : '';
 		$attributes	.=	$item->url			? ' href="'   . esc_attr( $item->url        ) .'"' : '';
-		$attributes	.=	$args->has_children	? ' class="dropdown-toggle" data-toggle="dropdown"' : '';
+		$attributes	.=	$args->has_children	? ' class="dropdown-toggle" data-bs-toggle="dropdown"' : '';
 
 		$item_output	=	$args->before . '<a' . $attributes . '>';
 		$item_output	.=	$args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;
-		$item_output	.=	( $args->has_children AND 1 > $depth ) ? ' <b class="caret"></b>' : '';
+		$item_output	.=	( $args->has_children AND 1 > $depth ) ? '' : '';
 		$item_output	.=	'</a>' . $args->after;
 
 		$output .= apply_filters( 'walker_nav_menu_start_el', $item_output, $item, $depth, $args );

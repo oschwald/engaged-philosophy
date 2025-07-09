@@ -1,0 +1,470 @@
+// Custom Styles
+// --------------------------------------------------
+
+// Sidebar card styling - consolidated
+.lead-home {
+  font-size: 100%;
+  line-height: 150%;
+  height: 460px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.carousel-caption {
+  background: rgba(0, 0, 0, 0.8);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5rem;
+  color: white;
+  text-align: left;
+}
+
+.carousel-caption h4 {
+  color: white;
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.carousel-caption p {
+  color: white;
+  margin-bottom: 0;
+}
+
+// Carousel container
+.carousel.slide {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: 460px;
+  object-fit: cover;
+}
+
+// Reduce column gutters with consistent container padding
+#projects_carousel {
+  padding-right: 0.5rem; // Smaller gutter with container padding
+}
+
+// Consistent spacing for sidebar
+.col-lg-3 {
+  padding-left: 0.5rem; // Smaller gutter with container padding
+}
+
+// Carousel controls
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+  height: 50px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  width: 40px;
+  height: 40px;
+}
+
+.fb-like {
+  padding-right: 10px;
+}
+
+.navbar .form-control {
+  color: $gray-600;
+}
+
+// Navbar container consistency
+.navbar .container {
+  padding: 0 1.5rem; // Match main container padding
+}
+
+// WordPress-specific styles
+.card.bg-light {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+}
+
+// Sidebar card specific styling - now handled above
+
+// Sidebar heading styling to match production
+.lead-home h5 {
+  color: $orange;
+  font-weight: bold;
+  margin-bottom: 0.75rem;
+}
+
+// Page layout adjustments - consistent container padding
+body > .container {
+  margin: 18px auto;
+  max-width: 1140px;
+  padding: 0 1.5rem; // Consistent padding throughout
+}
+
+// Use Bootstrap utility classes for padding instead of custom CSS
+
+// Add spacing between main sections  
+#primary {
+  margin-bottom: 1.5rem;
+}
+
+// Improve overall spacing
+.row {
+  margin-bottom: 1.5rem;
+}
+
+// Homepage specific spacing - maintain container padding consistency
+#content .container {
+  padding: 0 1.5rem; // Match main container padding
+}
+
+// Main content row spacing
+#content .row:first-child {
+  margin-bottom: 1.5rem;
+}
+
+// Bottom three-column section spacing
+#content .row:last-child {
+  margin-top: 1.5rem;
+}
+
+// Column spacing for bottom sections - reduced with container padding
+#content .row:last-child .col-md-4 {
+  padding: 0 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+// Match production background styling
+body {
+  background-color: #f5f5f5;
+}
+
+// Project tag cloud styling - natural text-based tag cloud like NN Group examples
+.tag-cloud-projects {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.tag-cloud-projects a {
+  margin: 0.2rem 0.4rem;
+  padding: 0.1rem 0.2rem;
+  color: #fd7e14 !important;
+  font-weight: normal;
+  text-decoration: none !important;
+  transition: all 0.2s ease;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.tag-cloud-projects a:hover {
+  color: #e55100 !important;
+  text-decoration: underline !important;
+}
+
+// Subtle weight variation for larger tags
+.tag-cloud-projects a[style*="font-size: 30px"],
+.tag-cloud-projects a[style*="font-size: 29px"],
+.tag-cloud-projects a[style*="font-size: 28px"],
+.tag-cloud-projects a[style*="font-size: 27px"],
+.tag-cloud-projects a[style*="font-size: 26px"] {
+  font-weight: 600;
+}
+
+.tag-cloud-projects a[style*="font-size: 25px"],
+.tag-cloud-projects a[style*="font-size: 24px"],
+.tag-cloud-projects a[style*="font-size: 23px"] {
+  font-weight: 500;
+}
+
+// Footer spacing consistency using Bootstrap utilities + minimal custom CSS
+#page-footer {
+  padding: 1rem 1.5rem; // Match container padding system
+  margin: 0 1.5rem; // Add space between footer box and container edges
+}
+
+#page {
+  background-color: #ffffff;
+  padding: 0;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+// Classes
+.assistive-text,
+.visually-hidden {
+  clip: rect(1px, 1px, 1px, 1px);
+  position: absolute !important;
+}
+
+body > .container {
+  margin: 18px auto;
+}
+
+// Right Content
+.sidebar-content #primary,
+.sidebar-content #attachment-comment {
+  float: right;
+  margin: 0 20px 0 0;
+}
+
+.block {
+  display: block;
+}
+
+// Page
+#page {
+  background-color: #ffffff;
+  margin-right: -20px;
+  padding: 14px 0 0;
+}
+
+#header-image {
+  display: block;
+}
+
+#menu-alert {
+  margin: 4px 0 0;
+  padding: 6px 35px 6px 14px;
+  position: absolute;
+}
+
+#branding hgroup,
+#header-image,
+.entry-content {
+  margin-bottom: 18px;
+}
+
+.entry-attachment {
+  margin-bottom: 36px;
+}
+
+.single #author-info,
+.author #author-info,
+.single article.post,
+.single article.page {
+  margin-bottom: 54px;
+}
+
+#author-info,
+article.post,
+article.page {
+  margin-bottom: 72px;
+}
+
+.page-header,
+.entry-content {
+  word-wrap: break-word;
+}
+
+.post-password-form legend {
+  font-size: inherit;
+}
+
+.entry-content .twitter-tweet-rendered {
+  max-width: 100% !important;
+}
+
+// Comments
+#comments-title {
+  border-bottom: 1px solid #eeeeee;
+  font-size: 19.5px;
+  margin: 0 0 27px;
+}
+
+#comment,
+.entry-content iframe,
+.entry-content embed {
+  max-width: 100%;
+}
+
+.commentlist > li {
+  margin-bottom: 36px;
+}
+
+.commentlist ul.children {
+  margin: 10px 0 18px;
+  list-style: none;
+}
+
+#reply-title {
+  position: relative;
+}
+
+#reply-title small {
+  position: absolute;
+  right: 0;
+  top: 7px;
+}
+
+// Sidebar
+.search-form {
+  margin: 0;
+}
+
+.widget {
+  word-wrap: break-word;
+}
+
+.widget .wp-caption {
+  display: inline-block;
+}
+
+// Images
+.entry-content .post-thumbnail {
+  margin: 0 20px 20px 0;
+}
+
+.entry-attachment .thumbnail.attachment-table {
+  display: table;
+  margin: 0 auto;
+}
+
+.thumbnail > img {
+  width: auto\9; // Cure IE8 max-width bug
+}
+
+img.wp-smiley {
+  border: none;
+  margin-bottom: 0;
+  margin-top: 0;
+  padding: 0;
+}
+
+.gallery-columns-3.thumbnails [class*="span"] {
+  width: 29.3%;
+}
+.gallery-columns-5.thumbnails [class*="span"] {
+  width: 15.9%;
+}
+.gallery-columns-6.thumbnails [class*="span"] {
+  width: 12.6%;
+}
+.gallery-columns-7.thumbnails [class*="span"] {
+  width: 10.2%;
+}
+
+// Footer
+#colophon .credits {
+  margin: 0;
+}
+
+#site-generator {
+  float: right;
+  font-family: Georgia, "Bitstream Charter", serif;
+  font-style: italic;
+}
+
+#site-generator a {
+  background: url("../../img/wordpress.png") no-repeat scroll left center transparent;
+  color: #787878;
+  display: inline-block;
+  line-height: 16px;
+  padding-left: 20px;
+  text-decoration: none;
+}
+
+#site-generator.footer-nav-menu a {
+  margin-top: 10px;
+}
+
+table .label {
+  background-color: transparent;
+  border-radius: none;
+  color: inherit;
+  font-size: inherit;
+  text-transform: inherit;
+}
+
+// Jetpack Support
+.comment-subscription-form > input[type=checkbox] {
+  position: absolute;
+}
+
+.comment-subscription-form > label {
+  min-height: 18px;
+  padding-left: 18px;
+}
+
+// Bootstrap Adjustments
+.navbar-fixed-top,
+.navbar-fixed-bottom {
+  position: fixed;
+}
+
+#comment,
+.thumbnail {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.label .post-edit-link,
+.label .comment-edit-link {
+  color: #ffffff;
+}
+
+.navbar .form-control {
+  height: auto;
+}
+
+.pagination span {
+  background-color: #f5f5f5;
+  color: #999999;
+  cursor: default;
+}
+
+.pagination span.dots {
+  background-color: #ffffff;
+}
+
+// WordPress Core
+.aligncenter {
+  display: block;
+  margin: 0 auto 20px;
+}
+
+.alignright {
+  float: right;
+  margin: 0 0 20px 20px;
+}
+
+.alignleft {
+  float: left;
+  margin: 0 20px 20px 0;
+}
+
+.wp-caption {
+  max-width: 100%;
+}
+
+.wp-caption .wp-caption-text,
+.gallery-caption,
+.entry-caption {
+  padding: 0 9px 9px;
+  text-align: center;
+}
+
+.wp-caption .wp-caption-text {
+  padding-top: 9px;
+}
+
+.wp-caption.alignnone {
+  margin: 5px 20px 20px 0;
+}
+
+.wp-caption.alignleft {
+  margin: 5px 20px 20px 0;
+}
+
+.wp-caption.alignright {
+  margin: 5px 0 20px 20px;
+}
+
+.sticky {}
+.bypostauthor {}

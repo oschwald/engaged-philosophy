@@ -7,20 +7,20 @@
  */
 
                 tha_footer_before(); ?>
-                <footer id="colophon" role="contentinfo" class="span12">
+                <footer id="colophon" role="contentinfo" class="col-12">
                     <?php tha_footer_top(); ?>
-                    <div id="page-footer" class="well clearfix">
+                    <div id="page-footer" class="card card-body bg-light d-flex align-items-center justify-content-between">
                         <?php wp_nav_menu( array(
                             'container'			=>	'nav',
                             'container_class'	=>	'subnav',
                             'theme_location'	=>	'footer-menu',
-                            'menu_class'		=>	'credits nav nav-pills pull-left',
+                            'menu_class'		=>	'credits nav nav-pills',
                             'depth'				=>	3,
                             'fallback_cb'		=>	'the_bootstrap_credits',
                             'walker'			=>	new The_Bootstrap_Nav_Walker,
                         ) );
                         ?>
-                        <div class="pull-right"<?php echo has_nav_menu('footer-menu') ? ' class="footer-nav-menu"' : ''; ?>>
+                        <div class="d-flex align-items-center gap-2"<?php echo has_nav_menu('footer-menu') ? ' class="footer-nav-menu"' : ''; ?>>
                                 <div class="fb-like" data-href="https://www.facebook.com/engagedphilosophy" data-width="200" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div> 
                                 <a href="mailto:info@engagedphilosophy.com">info@engagedphilosophy.com</a>
                         </div>

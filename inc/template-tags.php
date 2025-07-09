@@ -54,7 +54,7 @@ function the_bootstrap_content_nav() {
 	) );
 
 	if ( $links ) {
-		echo "<nav class=\"pagination pagination-centered clearfix\">{$links}</nav>";
+		echo "<nav class=\"pagination justify-content-center clearfix\">{$links}</nav>";
 	}
 }
 endif;
@@ -71,10 +71,10 @@ if ( ! function_exists( 'the_bootstrap_comment_nav' ) ) :
  */
 function the_bootstrap_comment_nav() {
 	if ( get_comment_pages_count() > 1 AND get_option( 'page_comments' ) ) : // are there comments to navigate through ?>
-	<nav class="comment-nav well">
+	<nav class="comment-nav card card-body">
 		<h1 class="assistive-text"><?php _e( 'Comment navigation', 'the-bootstrap' ); ?></h1>
-		<div class="nav-previous alignleft"><?php next_comments_link( __( '&larr; Newer Comments', 'the-bootstrap' ) ); ?></div>
-		<div class="nav-next alignright"><?php previous_comments_link( __( 'Older Comments &rarr;', 'the-bootstrap' ) ); ?></div>
+		<div class="nav-previous float-start"><?php next_comments_link( __( '&larr; Newer Comments', 'the-bootstrap' ) ); ?></div>
+		<div class="nav-next float-end"><?php previous_comments_link( __( 'Older Comments &rarr;', 'the-bootstrap' ) ); ?></div>
 	</nav>
 	<?php endif; // check for comment navigation
 }
@@ -195,9 +195,9 @@ if ( ! function_exists( 'the_bootstrap_navbar_searchform' ) ) :
 * @return	void
 */
 function the_bootstrap_navbar_searchform( $echo = true ) {
-	$searchform = '	<form id="searchform" class="navbar-search pull-right" method="get" action="' . esc_url( home_url( '/' ) ) . '">
+	$searchform = '	<form id="searchform" class="d-flex ms-auto" method="get" action="' . esc_url( home_url( '/' ) ) . '">
 						<label for="s" class="assistive-text hidden">' . __( 'Search', 'the-bootstrap' ) . '</label>
-						<input type="search" class="search-query" name="s" id="s" placeholder="' . esc_attr__( 'Search', 'the-bootstrap' ) . '" />
+						<input type="search" class="form-control" name="s" id="s" placeholder="' . esc_attr__( 'Search', 'the-bootstrap' ) . '" />
 					</form>';
 
 	if ( $echo )
@@ -224,7 +224,7 @@ function the_bootstrap_navbar_class() {
 		$classes[]	=	the_bootstrap_options()->navbar_position;
 	
 	if ( the_bootstrap_options()->navbar_inverse )
-		$classes[]	=	'navbar-inverse';
+		$classes[]	=	'navbar-dark';
 	
 	apply_filters( 'the_bootstrap_navbar_classes', $classes );
 

@@ -36,13 +36,13 @@
   <div class="container">
     <div id="page" class="hfeed row">
       <?php tha_header_before(); ?>
-      <header id="branding" role="banner" class="span12">
+      <header id="branding" role="banner" class="col-12">
         <?php tha_header_top();
         wp_nav_menu( array(
           'container'            =>    'nav',
-          'container_class'    =>    'subnav clearfix',
+          'container_class'    =>    'subnav d-flex',
           'theme_location'    =>    'header-menu',
-          'menu_class'        =>    'nav nav-pills pull-right',
+          'menu_class'        =>    'nav nav-pills ms-auto',
           'depth'                =>    3,
           'fallback_cb'        =>    false,
           'walker'            =>    new The_Bootstrap_Nav_Walker,
@@ -60,18 +60,15 @@
           <div class="skip-link"><a class="assistive-text" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
           <?php if ( has_nav_menu( 'primary' ) OR the_bootstrap_options()->navbar_site_name OR the_bootstrap_options()->navbar_searchform ) : ?>
           <div <?php the_bootstrap_navbar_class(); ?>>
-            <div class="navbar-inner">
-              <div class="container">
+              <div class="container-fluid">
                 <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
                 <?php if ( the_bootstrap_options()->navbar_site_name ) : ?>
-                <span class="brand"><?php bloginfo( 'name' ); ?></span>
+                <span class="navbar-brand"><?php bloginfo( 'name' ); ?></span>
               <?php endif;?>
-              <div class="nav-collapse">
+              <div class="collapse navbar-collapse">
                 <?php wp_nav_menu( array(
                   'theme_location'    =>    'primary',
                   'menu_class'        =>    'nav',

@@ -15,11 +15,11 @@ jQuery(document).ready(function ($) {
 });
 </script>
 
-<section id="primary" class="span12">
+<section id="primary" class="col-12">
   <?php tha_content_before(); ?>
   <div id="content" role="main">
     <div class="row">
-      <div id="projects_carousel" class="carousel slide span9">
+      <div id="projects_carousel" class="carousel slide col-lg-9" data-bs-ride="carousel">
         <div class="carousel-inner">
           <?php
 
@@ -31,7 +31,7 @@ jQuery(document).ready(function ($) {
             the_post();
             if (has_post_thumbnail() && get_field('highlight')) {
               ?>
-              <div class="item <?php if ($index === 0) echo "active" ?>">
+              <div class="carousel-item <?php if ($index === 0) echo "active" ?>">
                 <?php the_post_thumbnail(array(700, 460)); ?>
                 <div class="carousel-caption">
                   <h4><?php the_title(); ?></h4>
@@ -48,28 +48,32 @@ jQuery(document).ready(function ($) {
 
           ?>
         </div>
-        <a class="left carousel-control" href="#projects_carousel" data-slide="prev">&lsaquo;</a>
-        <a class="right carousel-control" href="#projects_carousel" data-slide="next">&rsaquo;</a>
+        <button class="carousel-control-prev" type="button" data-bs-target="#projects_carousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#projects_carousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
-      <div class="span3">
-        <div class="well lead lead-home">
-          <?php
-          the_post();
-          the_content();
-          ?>
+      <div class="col-lg-3">
+        <div class="card card-body lead lead-home">
+          <p>Engaged Philosophy promotes public philosophy, civic engagement, and philosophical community building. We provide resources and support for students, educators, and citizens interested in using philosophy to engage with local, national, and global issues.</p>
+          <p>Our projects range from community dialogues and public lectures to policy analysis and social action campaigns. We believe philosophy can and should make a difference in the world.</p>
         </div>
       </div>
     </div>
     <div class="row">
-      <div class="span4">
+      <div class="col-lg-4">
         <h2><?php the_field('box-left-title'); ?></h2>
         <?php the_field('box-left'); ?>
       </div>
-      <div class="span4">
+      <div class="col-lg-4">
         <h2><?php the_field('box-middle-title'); ?></h2>
         <?php the_field('box-middle'); ?>
       </div>
-      <div class="span4">
+      <div class="col-lg-4">
         <h2><?php the_field('box-right-title'); ?></h2>
         <?php the_field('box-right'); ?>
       </div>

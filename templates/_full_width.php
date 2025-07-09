@@ -10,7 +10,7 @@
 
 get_header(); ?>
 
-<section id="primary" class="span12">
+<section id="primary" class="col-12 px-4">
 	<?php tha_content_before(); ?>
 	<div id="content" role="main">
 		<?php tha_content_top();

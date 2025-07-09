@@ -20,7 +20,7 @@ jQuery(document).ready(function ($) {
   $('#projects_carousel').carousel()
 });
 </script>
-<section id="primary" class="span12">
+<section id="primary" class="col-12 px-4">
 
   <?php tha_content_before(); ?>
 
@@ -39,8 +39,30 @@ jQuery(document).ready(function ($) {
         The bigger the the word is below, the more examples you will see.
     </p>
     <div class="row">
-    <div class="well well-large span5 lead">
-      <?php wp_tag_cloud(array('taxonomy' => 'topic')) ?>
+    <div class="card card-body col-lg-6 lead">
+      <?php 
+        // Generate tag cloud with fixed randomization
+        $tag_cloud = wp_tag_cloud(array(
+          'taxonomy' => 'topic',
+          'smallest' => 13,
+          'largest' => 32,
+          'unit' => 'px',
+          'format' => 'flat',
+          'separator' => ' ',
+          'orderby' => 'RAND',
+          'number' => 40,
+          'echo' => false
+        ));
+        
+        // Parse and shuffle with fixed seed for consistency
+        if ($tag_cloud) {
+          $tags = explode(' ', $tag_cloud);
+          // Use a seed based on the current date to shuffle consistently per day
+          mt_srand(date('Ymd'));
+          shuffle($tags);
+          echo implode(' ', $tags);
+        }
+      ?>
     </div>
     </div>
     <?php
