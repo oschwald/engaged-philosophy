@@ -227,17 +227,9 @@ function the_bootstrap_register_scripts_styles()
          * Scripts
          */
         wp_register_script(
-            'tw-bootstrap',
-            get_template_directory_uri() . "/js/bootstrap{$suffix}.js",
-            array('jquery'),
-            '2.0.3',
-            true
-        );
-
-        wp_register_script(
             'the-bootstrap',
-            get_template_directory_uri() . "/js/the-bootstrap{$suffix}.js",
-            array('tw-bootstrap'),
+            get_template_directory_uri() . "/build/theme-scripts.js",
+            array('jquery'),
             $theme_version,
             true
         );
@@ -247,7 +239,7 @@ function the_bootstrap_register_scripts_styles()
          */
         wp_register_style(
             'my-bootstrap',
-            get_template_directory_uri() . "/compiled-style.css",
+            get_template_directory_uri() . "/build/style-style.css",
             array(),
             $theme_version
         );
