@@ -95,5 +95,7 @@
     }
     tha_header_bottom(); ?>
 
-    /* End of file header.php */
-    /* Location: ./wp-content/themes/the-bootstrap/header.php */
+<?php
+/* End of file header.php */
+/* Location: ./wp-content/themes/the-bootstrap/header.php */
+?>

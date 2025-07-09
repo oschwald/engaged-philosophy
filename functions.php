@@ -120,7 +120,7 @@ function the_bootstrap_get_default_theme_options()
         'theme_layout'		=>	'content-sidebar',
         'navbar_site_name'	=>	false,
         'navbar_searchform'	=>	true,
-        'navbar_inverse'	=>	true,
+        'navbar_inverse'	=>	false,
         'navbar_position'	=>	'static',
     );
 

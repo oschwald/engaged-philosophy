@@ -82,9 +82,42 @@
   color: $gray-600;
 }
 
+// Navbar styling to match production site
+.navbar {
+  background-color: #e9ecef !important; // Light gray background similar to production
+  border-bottom: 1px solid #dee2e6;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-bottom: 0;
+}
+
 // Navbar container consistency
 .navbar .container {
   padding: 0 1.5rem; // Match main container padding
+}
+
+// Navbar brand and nav links styling
+.navbar-brand {
+  font-weight: 600;
+  color: #495057 !important;
+}
+
+.navbar-nav .nav-link {
+  color: #495057 !important;
+  font-weight: 500;
+  padding: 0.5rem 1rem !important;
+  transition: all 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #fd7e14 !important;
+  background-color: rgba(253, 126, 20, 0.1);
+  border-radius: 4px;
+}
+
+// Navbar search form
+.navbar .form-control {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
 }
 
 // WordPress-specific styles
