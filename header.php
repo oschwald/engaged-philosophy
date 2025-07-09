@@ -33,44 +33,46 @@
   fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));</script>
 
-  <!-- Header logo section with consistent container -->
-  <div class="container">
-    <?php tha_header_before(); ?>
-    <header id="branding" role="banner" class="text-center py-3">
-      <?php tha_header_top();
-      wp_nav_menu( array(
-        'container'            =>    'nav',
-        'container_class'    =>    'subnav d-flex',
-        'theme_location'    =>    'header-menu',
-        'menu_class'        =>    'nav nav-pills ms-auto',
-        'depth'                =>    3,
-        'fallback_cb'        =>    false,
-        'walker'            =>    new The_Bootstrap_Nav_Walker,
-        ) ); ?>
+<!-- Main content container with unified header -->
+<div class="container">
+  <!-- Header logo section -->
+  <?php tha_header_before(); ?>
+  <header id="branding" role="banner" class="text-center py-3">
+    <?php tha_header_top();
+    wp_nav_menu( array(
+      'container'            =>    'nav',
+      'container_class'    =>    'subnav d-flex',
+      'theme_location'    =>    'header-menu',
+      'menu_class'        =>    'nav nav-pills ms-auto',
+      'depth'                =>    3,
+      'fallback_cb'        =>    false,
+      'walker'            =>    new The_Bootstrap_Nav_Walker,
+      ) ); ?>
 
-        <?php if ( get_header_image() ) : ?>
-        <a id="header-image" href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
-          <img src="<?php header_image(); ?>" alt="" />
-        </a>
-      <?php endif; // if ( get_header_image() ) ?>
+      <?php if ( get_header_image() ) : ?>
+      <a id="header-image" href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
+        <img src="<?php header_image(); ?>" alt="" />
+      </a>
+    <?php endif; // if ( get_header_image() ) ?>
 
   </header><!-- #branding -->
   <?php tha_header_after(); ?>
-</div><!-- .container -->
 
-<nav id="access" role="navigation">
-  <h3 class="assistive-text"><?php _e( 'Main menu', 'the-bootstrap' ); ?></h3>
-  <div class="skip-link"><a class="assistive-text" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
-  <div class="skip-link"><a class="assistive-text" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
-  <div <?php the_bootstrap_navbar_class(); ?>>
-    <div class="container">
-      <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+  <!-- Navigation bar - full width of container -->
+  <nav id="access" role="navigation">
+    <h3 class="assistive-text"><?php _e( 'Main menu', 'the-bootstrap' ); ?></h3>
+    <div class="skip-link"><a class="assistive-text" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
+    <div class="skip-link"><a class="assistive-text" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
+    <div <?php the_bootstrap_navbar_class(); ?>>
+      <!-- Mobile toggle button -->
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
+      
       <?php if ( the_bootstrap_options()->navbar_site_name ) : ?>
       <span class="navbar-brand"><?php bloginfo( 'name' ); ?></span>
       <?php endif;?>
+      
       <div class="collapse navbar-collapse" id="navbarNav">
         <?php wp_nav_menu( array(
           'theme_location'    =>    'primary',
@@ -84,11 +86,8 @@
         } ?>
       </div>
     </div>
-  </div>
-</nav><!-- #access -->
+  </nav><!-- #access -->
 
-<!-- Main content container -->
-<div class="container">
   <div id="page" class="hfeed row">
     <?php if ( function_exists( 'yoast_breadcrumb' ) ) {
       yoast_breadcrumb( '<nav id="breadcrumb" class="breadcrumb">', '</nav>' );
