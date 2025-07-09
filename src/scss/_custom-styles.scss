@@ -90,9 +90,11 @@
   margin-bottom: 0;
 }
 
-// Navbar container consistency
+// Navbar container consistency - align with main content containers
 .navbar .container {
+  max-width: 1140px; // Match Bootstrap container max-width
   padding: 0 1.5rem; // Match main container padding
+  margin: 0 auto; // Center the container
 }
 
 // Navbar brand and nav links styling
@@ -118,6 +120,19 @@
 .navbar .form-control {
   border: 1px solid #ced4da;
   border-radius: 4px;
+}
+
+// Header logo section styling for consistent container alignment
+#branding {
+  background-color: #ffffff;
+  border-bottom: 1px solid #dee2e6;
+}
+
+// Ensure all containers have consistent max-width and centering
+.container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
 }
 
 // WordPress-specific styles

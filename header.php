@@ -33,30 +33,29 @@
   fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));</script>
 
+  <!-- Header logo section with consistent container -->
   <div class="container">
-    <div id="page" class="hfeed row">
-      <?php tha_header_before(); ?>
-      <header id="branding" role="banner" class="col-12">
-        <?php tha_header_top();
-        wp_nav_menu( array(
-          'container'            =>    'nav',
-          'container_class'    =>    'subnav d-flex',
-          'theme_location'    =>    'header-menu',
-          'menu_class'        =>    'nav nav-pills ms-auto',
-          'depth'                =>    3,
-          'fallback_cb'        =>    false,
-          'walker'            =>    new The_Bootstrap_Nav_Walker,
-          ) ); ?>
+    <?php tha_header_before(); ?>
+    <header id="branding" role="banner" class="text-center py-3">
+      <?php tha_header_top();
+      wp_nav_menu( array(
+        'container'            =>    'nav',
+        'container_class'    =>    'subnav d-flex',
+        'theme_location'    =>    'header-menu',
+        'menu_class'        =>    'nav nav-pills ms-auto',
+        'depth'                =>    3,
+        'fallback_cb'        =>    false,
+        'walker'            =>    new The_Bootstrap_Nav_Walker,
+        ) ); ?>
 
-          <?php if ( get_header_image() ) : ?>
-          <a id="header-image" href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
-            <img src="<?php header_image(); ?>" alt="" />
-          </a>
-        <?php endif; // if ( get_header_image() ) ?>
+        <?php if ( get_header_image() ) : ?>
+        <a id="header-image" href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
+          <img src="<?php header_image(); ?>" alt="" />
+        </a>
+      <?php endif; // if ( get_header_image() ) ?>
 
-    </header><!-- #branding -->
-    <?php tha_header_after(); ?>
-  </div><!-- #page -->
+  </header><!-- #branding -->
+  <?php tha_header_after(); ?>
 </div><!-- .container -->
 
 <nav id="access" role="navigation">
@@ -88,6 +87,7 @@
   </div>
 </nav><!-- #access -->
 
+<!-- Main content container -->
 <div class="container">
   <div id="page" class="hfeed row">
     <?php if ( function_exists( 'yoast_breadcrumb' ) ) {
