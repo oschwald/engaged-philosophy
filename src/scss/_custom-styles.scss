@@ -149,8 +149,10 @@
   padding-top: 1rem;
 }
 
-// Remove any Bootstrap default margins that might create gaps
-.row {
+// Fix Bootstrap row margins that extend beyond container
+#page.row {
+  margin-left: 0;
+  margin-right: 0;
   margin-bottom: 0;
 }
 
