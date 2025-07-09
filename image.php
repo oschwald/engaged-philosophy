@@ -30,7 +30,7 @@ foreach ( $attachments as $k => $attachment ) {
 the_post();
 ?>
 
-<section id="primary" class="image-attachment span12">
+<section id="primary" class="image-attachment col-12 px-4">
 
 	<?php tha_content_before(); ?>
 	<div id="content" role="main">
@@ -104,7 +104,7 @@ the_post();
 	</div><!-- #content -->
 	<?php tha_content_after(); ?>
 </section><!-- #primary -->
-<div id="attachment-comment" class="span8"><?php comments_template(); ?></div>
+<div id="attachment-comment" class="col-lg-8"><?php comments_template(); ?></div>
 <?php
 get_sidebar( 'image' );
 get_footer();
