@@ -218,7 +218,7 @@ if ( ! function_exists( 'the_bootstrap_navbar_class' ) ) :
  * @return	void
  */
 function the_bootstrap_navbar_class() {
-	$classes	=	array( 'navbar' );
+	$classes	=	array( 'navbar', 'navbar-expand-lg' );
 
 	if ( 'static' != the_bootstrap_options()->navbar_position )
 		$classes[]	=	the_bootstrap_options()->navbar_position;
