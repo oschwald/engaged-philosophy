@@ -54,43 +54,48 @@
           </a>
         <?php endif; // if ( get_header_image() ) ?>
 
-        <nav id="access" role="navigation">
-          <h3 class="assistive-text"><?php _e( 'Main menu', 'the-bootstrap' ); ?></h3>
-          <div class="skip-link"><a class="assistive-text" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
-          <div class="skip-link"><a class="assistive-text" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
-          <?php if ( has_nav_menu( 'primary' ) OR the_bootstrap_options()->navbar_site_name OR the_bootstrap_options()->navbar_searchform ) : ?>
-          <div <?php the_bootstrap_navbar_class(); ?>>
-              <div class="container-fluid">
-                <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
-                  <span class="navbar-toggler-icon"></span>
-                </button>
-                <?php if ( the_bootstrap_options()->navbar_site_name ) : ?>
-                <span class="navbar-brand"><?php bloginfo( 'name' ); ?></span>
-              <?php endif;?>
-              <div class="collapse navbar-collapse">
-                <?php wp_nav_menu( array(
-                  'theme_location'    =>    'primary',
-                  'menu_class'        =>    'nav',
-                  'depth'                =>    3,
-                  'fallback_cb'        =>    false,
-                  'walker'            =>    new The_Bootstrap_Nav_Walker,
-                  ) );
-                if ( the_bootstrap_options()->navbar_searchform ) {
-                  the_bootstrap_navbar_searchform();
-                } ?>
-              </div>
-            </div>
-          </div>
-        </div>
-      <?php endif; ?>
-    </nav><!-- #access -->
+    </header><!-- #branding -->
+    <?php tha_header_after(); ?>
+  </div><!-- #page -->
+</div><!-- .container -->
+
+<nav id="access" role="navigation">
+  <h3 class="assistive-text"><?php _e( 'Main menu', 'the-bootstrap' ); ?></h3>
+  <div class="skip-link"><a class="assistive-text" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
+  <div class="skip-link"><a class="assistive-text" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
+  <?php if ( has_nav_menu( 'primary' ) OR the_bootstrap_options()->navbar_site_name OR the_bootstrap_options()->navbar_searchform ) : ?>
+  <div <?php the_bootstrap_navbar_class(); ?>>
+    <div class="container">
+      <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <?php if ( the_bootstrap_options()->navbar_site_name ) : ?>
+      <span class="navbar-brand"><?php bloginfo( 'name' ); ?></span>
+      <?php endif;?>
+      <div class="collapse navbar-collapse">
+        <?php wp_nav_menu( array(
+          'theme_location'    =>    'primary',
+          'menu_class'        =>    'nav',
+          'depth'                =>    3,
+          'fallback_cb'        =>    false,
+          'walker'            =>    new The_Bootstrap_Nav_Walker,
+          ) );
+        if ( the_bootstrap_options()->navbar_searchform ) {
+          the_bootstrap_navbar_searchform();
+        } ?>
+      </div>
+    </div>
+  </div>
+  <?php endif; ?>
+</nav><!-- #access -->
+
+<div class="container">
+  <div id="page" class="hfeed row">
     <?php if ( function_exists( 'yoast_breadcrumb' ) ) {
       yoast_breadcrumb( '<nav id="breadcrumb" class="breadcrumb">', '</nav>' );
     }
     tha_header_bottom(); ?>
-    </header><!-- #branding --><?php
-    tha_header_after();
 
     /* End of file header.php */
     /* Location: ./wp-content/themes/the-bootstrap/header.php */
