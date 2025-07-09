@@ -15,10 +15,12 @@ jQuery(document).ready(function ($) {
 });
 </script>
 
-<section id="primary" class="col-12">
-  <?php tha_content_before(); ?>
-  <div id="content" role="main">
-    <div class="row">
+<div class="container">
+  <div class="row">
+    <section id="primary" class="col-12">
+      <?php tha_content_before(); ?>
+      <div id="content" role="main">
+        <div class="row">
       <div id="projects_carousel" class="carousel slide col-lg-9" data-bs-ride="carousel">
         <div class="carousel-inner">
           <?php
@@ -64,16 +66,16 @@ jQuery(document).ready(function ($) {
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-lg-4">
+    <div class="row mt-4">
+      <div class="col-lg-4 mb-4">
         <h2><?php the_field('box-left-title'); ?></h2>
         <?php the_field('box-left'); ?>
       </div>
-      <div class="col-lg-4">
+      <div class="col-lg-4 mb-4">
         <h2><?php the_field('box-middle-title'); ?></h2>
         <?php the_field('box-middle'); ?>
       </div>
-      <div class="col-lg-4">
+      <div class="col-lg-4 mb-4">
         <h2><?php the_field('box-right-title'); ?></h2>
         <?php the_field('box-right'); ?>
       </div>
@@ -82,9 +84,11 @@ jQuery(document).ready(function ($) {
     tha_content_bottom();
     ?>
 
-  </div><!-- #content -->
-  <?php tha_content_after(); ?>
-</section><!-- #primary -->
+      </div><!-- #content -->
+      <?php tha_content_after(); ?>
+    </section><!-- #primary -->
+  </div><!-- .row -->
+</div><!-- .container -->
 
 <?php
 get_footer();
