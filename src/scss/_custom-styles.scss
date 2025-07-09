@@ -86,7 +86,7 @@
 #access {
   background-color: #d9d9d9; // Light gray background like production
   padding: 0.5rem 0;
-  margin-bottom: 1rem;
+  margin-bottom: 0; // Remove gap to connect with content
   border-radius: 0;
 }
 
@@ -129,11 +129,29 @@
   border-bottom: 1px solid #dee2e6;
 }
 
+// Main content area styling for better visual flow
+#page {
+  background-color: #ffffff;
+  padding-top: 1rem; // Add some top padding for visual breathing room
+  margin-top: 0; // Remove any top margin that might create gaps
+}
+
 // Simple container styling - let Bootstrap handle responsiveness
 .container {
   max-width: 1140px;
   margin: 0 auto;
   padding: 0 1.5rem;
+}
+
+// Ensure smooth visual flow from navbar to content
+.container #page {
+  margin-top: 0;
+  padding-top: 1rem;
+}
+
+// Remove any Bootstrap default margins that might create gaps
+.row {
+  margin-bottom: 0;
 }
 
 // WordPress-specific styles
