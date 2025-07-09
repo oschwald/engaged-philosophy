@@ -223,8 +223,13 @@ function the_bootstrap_navbar_class() {
 	if ( 'static' != the_bootstrap_options()->navbar_position )
 		$classes[]	=	the_bootstrap_options()->navbar_position;
 	
-	if ( the_bootstrap_options()->navbar_inverse )
+	if ( the_bootstrap_options()->navbar_inverse ) {
 		$classes[]	=	'navbar-dark';
+		$classes[]	=	'bg-dark';
+	} else {
+		$classes[]	=	'navbar-light';
+		$classes[]	=	'bg-light';
+	}
 	
 	apply_filters( 'the_bootstrap_navbar_classes', $classes );
 

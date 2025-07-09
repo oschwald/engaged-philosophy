@@ -27,6 +27,7 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 		$li_attributes = $class_names = $value = '';
 		$classes = empty( $item->classes ) ? array() : (array) $item->classes;
 		$classes[] = 'menu-item-' . $item->ID;
+		$classes[] = 'nav-item';
 
 		if ( $args->has_children ) {
 			$classes[] = ( 1 > $depth) ? 'dropdown': 'dropdown-submenu';
@@ -45,7 +46,7 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 		$attributes	.=	$item->target		? ' target="' . esc_attr( $item->target     ) .'"' : '';
 		$attributes	.=	$item->xfn			? ' rel="'    . esc_attr( $item->xfn        ) .'"' : '';
 		$attributes	.=	$item->url			? ' href="'   . esc_attr( $item->url        ) .'"' : '';
-		$attributes	.=	$args->has_children	? ' class="dropdown-toggle" data-bs-toggle="dropdown"' : '';
+		$attributes	.=	$args->has_children	? ' class="nav-link dropdown-toggle" data-bs-toggle="dropdown"' : ' class="nav-link"';
 
 		$item_output	=	$args->before . '<a' . $attributes . '>';
 		$item_output	.=	$args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;

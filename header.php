@@ -63,22 +63,21 @@
   <h3 class="assistive-text"><?php _e( 'Main menu', 'the-bootstrap' ); ?></h3>
   <div class="skip-link"><a class="assistive-text" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
   <div class="skip-link"><a class="assistive-text" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
-  <?php if ( has_nav_menu( 'primary' ) OR the_bootstrap_options()->navbar_site_name OR the_bootstrap_options()->navbar_searchform ) : ?>
   <div <?php the_bootstrap_navbar_class(); ?>>
     <div class="container">
       <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
         <span class="navbar-toggler-icon"></span>
       </button>
       <?php if ( the_bootstrap_options()->navbar_site_name ) : ?>
       <span class="navbar-brand"><?php bloginfo( 'name' ); ?></span>
       <?php endif;?>
-      <div class="collapse navbar-collapse">
+      <div class="collapse navbar-collapse" id="navbarNav">
         <?php wp_nav_menu( array(
           'theme_location'    =>    'primary',
-          'menu_class'        =>    'nav',
+          'menu_class'        =>    'navbar-nav ms-auto',
           'depth'                =>    3,
-          'fallback_cb'        =>    false,
+          'fallback_cb'        =>    'wp_page_menu',
           'walker'            =>    new The_Bootstrap_Nav_Walker,
           ) );
         if ( the_bootstrap_options()->navbar_searchform ) {
@@ -87,7 +86,6 @@
       </div>
     </div>
   </div>
-  <?php endif; ?>
 </nav><!-- #access -->
 
 <div class="container">
