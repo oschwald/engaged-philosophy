@@ -46,6 +46,7 @@ function the_bootstrap_setup()
     // Add theme support for custom logo and favicon
     add_theme_support( 'custom-logo' );
     add_theme_support( 'site-icon' );
+    add_theme_support( 'title-tag' );
 
     // Theme Customizer
     require_once( get_template_directory() . '/inc/theme-customizer.php' );

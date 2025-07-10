@@ -13,11 +13,10 @@
 <html class="no-js" <?php language_attributes(); ?>>
 <head>
   <?php tha_head_top(); ?>
-  <link rel="profile" href="http://gmpg.org/xfn/11" />
+  <link rel="profile" href="https://gmpg.org/xfn/11" />
   <meta charset="<?php bloginfo( 'charset' ); ?>" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title><?php wp_title( '&laquo;', true, 'right' ); ?></title>
 
   <?php tha_head_bottom(); ?>
   <?php wp_head(); ?>
@@ -51,7 +50,7 @@
 
       <?php if ( get_header_image() ) : ?>
       <a id="header-image" href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
-        <img src="<?php header_image(); ?>" alt="" />
+        <img src="<?php header_image(); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?> Logo" />
       </a>
     <?php endif; // if ( get_header_image() ) ?>
 

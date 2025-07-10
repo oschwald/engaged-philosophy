@@ -32,7 +32,11 @@ jQuery(document).ready(function ($) {
             if (has_post_thumbnail() && get_field('highlight')) {
               ?>
               <div class="carousel-item <?php if ($index === 0) echo "active" ?>">
-                <?php the_post_thumbnail(array(700, 460)); ?>
+                <?php 
+                if (has_post_thumbnail()) {
+                  the_post_thumbnail(array(700, 460), array('alt' => get_the_title() . ' project image'));
+                }
+                ?>
                 <div class="carousel-caption">
                   <h4><?php the_title(); ?></h4>
                   <?php the_excerpt(); ?>
