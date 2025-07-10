@@ -99,7 +99,7 @@
 // Navbar styling to match production site - simple and clean approach
 #access {
   background-color: #d9d9d9; // Light gray background like production
-  padding: 0.5rem 0;
+  padding: 0.5rem 0.8rem;
   margin-bottom: 0; // Remove gap to connect with content
 }
 
@@ -130,11 +130,6 @@
   border-radius: 4px;
 }
 
-// Navbar search form
-.navbar .form-control {
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-}
 
 // Header logo section styling for consistent container alignment
 #branding {
