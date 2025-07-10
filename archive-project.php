@@ -39,7 +39,8 @@ jQuery(document).ready(function ($) {
         The bigger the the word is below, the more examples you will see.
     </p>
     <div class="row">
-    <div class="card card-body col-lg-6 lead tag-cloud-projects">
+    <div class="col-lg-6">
+      <div class="card card-body tag-cloud-projects">
       <?php 
         // Generate tag cloud with fixed randomization
         $tag_cloud = wp_tag_cloud(array(
@@ -56,13 +57,17 @@ jQuery(document).ready(function ($) {
         
         // Parse and shuffle with fixed seed for consistency
         if ($tag_cloud) {
-          $tags = explode(' ', $tag_cloud);
+          // Use regex to extract complete <a> tags instead of splitting on spaces
+          preg_match_all('/<a[^>]*>.*?<\/a>/', $tag_cloud, $matches);
+          $tags = $matches[0];
+          
           // Use a seed based on the current date to shuffle consistently per day
           mt_srand(date('Ymd'));
           shuffle($tags);
           echo implode(' ', $tags);
         }
       ?>
+      </div>
     </div>
     </div>
     <?php
