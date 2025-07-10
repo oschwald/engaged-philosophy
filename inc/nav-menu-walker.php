@@ -30,8 +30,10 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 		$classes[] = 'nav-item';
 
 		if ( $args->has_children ) {
-			$classes[] = ( 1 > $depth) ? 'dropdown': 'dropdown-submenu';
-			$li_attributes .= ' data-dropdown="dropdown"';
+			$classes[] = 'dropdown';
+			if ( $depth > 0 ) {
+				$classes[] = 'dropend';
+			}
 		}
 
 		$class_names = join( ' ', apply_filters( 'nav_menu_css_class', array_filter( $classes ), $item, $args ) );
@@ -46,7 +48,15 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 		$attributes	.=	$item->target		? ' target="' . esc_attr( $item->target     ) .'"' : '';
 		$attributes	.=	$item->xfn			? ' rel="'    . esc_attr( $item->xfn        ) .'"' : '';
 		$attributes	.=	$item->url			? ' href="'   . esc_attr( $item->url        ) .'"' : '';
-		$attributes	.=	$args->has_children	? ' class="nav-link dropdown-toggle" data-bs-toggle="dropdown"' : ' class="nav-link"';
+		if ( $args->has_children ) {
+			if ( $depth > 0 ) {
+				$attributes .= ' class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown"';
+			} else {
+				$attributes .= ' class="nav-link dropdown-toggle" data-bs-toggle="dropdown"';
+			}
+		} else {
+			$attributes .= ( $depth > 0 ) ? ' class="dropdown-item"' : ' class="nav-link"';
+		}
 
 		$item_output	=	$args->before . '<a' . $attributes . '>';
 		$item_output	.=	$args->link_before . apply_filters( 'the_title', $item->title, $item->ID ) . $args->link_after;

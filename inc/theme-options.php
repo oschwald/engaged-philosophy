@@ -97,11 +97,11 @@ function the_bootstrap_theme_options_init() {
 				'description'	=>	__( 'Static.', 'the-bootstrap' )
 			),
 			(object) array(
-				'value'			=>	'navbar-fixed-top',
+				'value'			=>	'fixed-top',
 				'description'	=>	__( 'Fixed on top.', 'the-bootstrap' )
 			),
 			(object) array(
-				'value'			=>	'navbar-fixed-bottom',
+				'value'			=>	'fixed-bottom',
 				'description'	=>	__( 'Fixed at bottom.', 'the-bootstrap' )
 			),
 		)
@@ -292,7 +292,7 @@ function the_bootstrap_theme_options_validate( $input ) {
 	if ( isset( $input['theme_layout'] ) && array_key_exists( $input['theme_layout'], the_bootstrap_layouts() ) )
 		$output['theme_layout']		=	$input['theme_layout'];
 	
-	if ( isset( $input['navbar_position'] ) && in_array( $input['navbar_position'], array('static', 'navbar-fixed-top', 'navbar-fixed-bottom') ) )
+	if ( isset( $input['navbar_position'] ) && in_array( $input['navbar_position'], array('static', 'fixed-top', 'fixed-bottom') ) )
 		$output['navbar_position']	=	$input['navbar_position'];
 	
 	$output['navbar_site_name']		=	isset( $input['navbar_site_name'] ) && $input['navbar_site_name'];

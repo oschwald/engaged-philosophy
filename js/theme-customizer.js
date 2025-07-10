@@ -16,16 +16,16 @@ jQuery( function( $ ) {
 	});
 	wp.customize( 'the_bootstrap_theme_options[navbar_site_name]', function( value ) {
 		value.bind( function( to ) {
-			$( 'span.brand' ).remove();
+			$( 'span.navbar-brand' ).remove();
 			if ( to )
-				$( '<span>' ).addClass( 'brand' ).text( the_bootstrap_customize.sitename ).insertBefore( '.nav-collapse' );
+				$( '<span>' ).addClass( 'navbar-brand' ).text( the_bootstrap_customize.sitename ).insertBefore( '.navbar-collapse' );
 		});
 	});
 	wp.customize( 'the_bootstrap_theme_options[navbar_searchform]', function( value ) {
 		value.bind( function( to ) {
 			$( '.navbar-search').remove();
 			if ( to )
-				$( '.nav-collapse' ).append( the_bootstrap_customize.searchform );
+				$( '.navbar-collapse' ).append( the_bootstrap_customize.searchform );
 		});
 	});
 	wp.customize( 'the_bootstrap_theme_options[navbar_inverse]', function( value ) {
@@ -37,11 +37,11 @@ jQuery( function( $ ) {
 	});
 	wp.customize( 'the_bootstrap_theme_options[navbar_position]', function( value ) {
 		value.bind( function( to ) {
-			$( '.navbar' ).removeClass( 'navbar-fixed-top navbar-fixed-bottom' );
+			$( '.navbar' ).removeClass( 'fixed-top fixed-bottom' );
 			$( 'body > .container' ).css( 'margin', '18px auto' );
 			if ( 'static' != to ) {
 				jQuery( '.navbar' ).addClass( to );
-				var margin = ( 'navbar-fixed-top' == to ) ? 'margin-top' : 'margin-bottom';
+				var margin = ( 'fixed-top' == to ) ? 'margin-top' : 'margin-bottom';
 				$( 'body > .container' ).css( margin, '58px' );
 			}
 		});

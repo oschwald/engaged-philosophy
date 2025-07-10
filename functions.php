@@ -532,14 +532,14 @@ add_action( 'comment_form_comments_closed', 'the_bootstrap_comments_closed' );
 function the_bootstrap_comment_form_defaults( $defaults )
 {
     return wp_parse_args( array(
-        'comment_field'			=>	'<div class="comment-form-comment control-group"><label class="control-label" for="comment">' . _x( 'Comment', 'noun', 'the-bootstrap' ) . '</label><div class="controls"><textarea class="form-control" id="comment" name="comment" rows="8" aria-required="true"></textarea></div></div>',
+        'comment_field'			=>	'<div class="comment-form-comment mb-3"><label class="form-label" for="comment">' . _x( 'Comment', 'noun', 'the-bootstrap' ) . '</label><textarea class="form-control" id="comment" name="comment" rows="8" aria-required="true"></textarea></div>',
         'comment_notes_before'	=>	'',
-        'comment_notes_after'	=>	'<div class="form-allowed-tags control-group"><label class="control-label">' . sprintf( __( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: %s', 'the-bootstrap' ), '</label><div class="controls"><pre>' . allowed_tags() . '</pre></div>' ) . '</div>
-                                     <div class="form-actions">',
+        'comment_notes_after'	=>	'<div class="form-allowed-tags mb-3"><label class="form-label">' . sprintf( __( 'You may use these <abbr title="HyperText Markup Language">HTML</abbr> tags and attributes: %s', 'the-bootstrap' ), '<pre>' . allowed_tags() . '</pre>' ) . '</label></div>
+                                     <div class="d-flex gap-2">',
         'title_reply'			=>	'<legend>' . __( 'Leave a reply', 'the-bootstrap' ) . '</legend>',
         'title_reply_to'		=>	'<legend>' . __( 'Leave a reply to %s', 'the-bootstrap' ). '</legend>',
-        'must_log_in'			=>	'<div class="must-log-in control-group controls">' . sprintf( __( 'You must be <a href="%s">logged in</a> to post a comment.', 'the-bootstrap' ), esc_url( wp_login_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) ) . '</div>',
-        'logged_in_as'			=>	'<div class="logged-in-as control-group controls">' . sprintf( __( 'Logged in as <a href="%1$s">%2$s</a>. <a href="%3$s" title="Log out of this account">Log out?</a>', 'the-bootstrap' ), esc_url( admin_url( 'profile.php' ) ), esc_html( wp_get_current_user()->display_name ), esc_url( wp_logout_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) ) . '</div>',
+        'must_log_in'			=>	'<div class="must-log-in mb-3">' . sprintf( __( 'You must be <a href="%s">logged in</a> to post a comment.', 'the-bootstrap' ), esc_url( wp_login_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) ) . '</div>',
+        'logged_in_as'			=>	'<div class="logged-in-as mb-3">' . sprintf( __( 'Logged in as <a href="%1$s">%2$s</a>. <a href="%3$s" title="Log out of this account">Log out?</a>', 'the-bootstrap' ), esc_url( admin_url( 'profile.php' ) ), esc_html( wp_get_current_user()->display_name ), esc_url( wp_logout_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) ) . '</div>',
     ), $defaults );
 }
 add_filter( 'comment_form_defaults', 'the_bootstrap_comment_form_defaults' );
@@ -605,7 +605,7 @@ function the_bootstrap_comment( $comment, $args, $depth )
 
                 </footer><!-- .comment-meta -->
 
-                <div class="comment-content span<?php echo $span; ?>">
+                <div class="comment-content col-lg-<?php echo $span; ?>">
                     <?php
                     comment_text();
                     comment_reply_link( array_merge( $args, array(
@@ -634,7 +634,7 @@ endif; // ends check for the_bootstrap_comment()
  */
 function the_bootstrap_comment_form_top()
 {
-    echo '<div class="form-horizontal">';
+    echo '<div class="mb-3">';
 }
 add_action( 'comment_form_top', 'the_bootstrap_comment_form_top' );
 
@@ -673,12 +673,10 @@ function the_bootstrap_comment_form_field_author( $html )
     $req		=	get_option( 'require_name_email' );
     $aria_req	=	( $req ? " aria-required='true'" : '' );
 
-    return	'<div class="comment-form-author control-group">
-                <label for="author" class="control-label">' . __( 'Name', 'the-bootstrap' ) . '</label>
-                <div class="controls">
-                    <input id="author" name="author" type="text" value="' . esc_attr(  $commenter['comment_author'] ) . '" size="30"' . $aria_req . ' />
-                    ' . ( $req ? '<p class="help-inline"><span class="required">' . __('required', 'the-bootstrap') . '</span></p>' : '' ) . '
-                </div>
+    return	'<div class="comment-form-author mb-3">
+                <label for="author" class="form-label">' . esc_html__( 'Name', 'the-bootstrap' ) . '</label>
+                <input class="form-control" id="author" name="author" type="text" value="' . esc_attr(  $commenter['comment_author'] ) . '" size="30"' . $aria_req . ' />
+                ' . ( $req ? '<div class="form-text"><span class="text-danger">' . esc_html__('required', 'the-bootstrap') . '</span></div>' : '' ) . '
             </div>';
 }
 add_filter( 'comment_form_field_author', 'the_bootstrap_comment_form_field_author');
@@ -700,12 +698,10 @@ function the_bootstrap_comment_form_field_email( $html )
     $req		=	get_option( 'require_name_email' );
     $aria_req	=	( $req ? " aria-required='true'" : '' );
 
-    return	'<div class="comment-form-email control-group">
-                <label for="email" class="control-label">' . __( 'Email', 'the-bootstrap' ) . '</label>
-                <div class="controls">
-                    <input id="email" name="email" type="email" value="' . esc_attr(  $commenter['comment_author_email'] ) . '" size="30"' . $aria_req . ' />
-                    <p class="help-inline">' . ( $req ? '<span class="required">' . __('required', 'the-bootstrap') . '</span>, ' : '' ) . __( 'will not be published', 'the-bootstrap' ) . '</p>
-                </div>
+    return	'<div class="comment-form-email mb-3">
+                <label for="email" class="form-label">' . esc_html__( 'Email', 'the-bootstrap' ) . '</label>
+                <input class="form-control" id="email" name="email" type="email" value="' . esc_attr(  $commenter['comment_author_email'] ) . '" size="30"' . $aria_req . ' />
+                <div class="form-text">' . ( $req ? '<span class="text-danger">' . esc_html__('required', 'the-bootstrap') . '</span>, ' : '' ) . esc_html__( 'will not be published', 'the-bootstrap' ) . '</div>
             </div>';
 }
 add_filter( 'comment_form_field_email', 'the_bootstrap_comment_form_field_email');
@@ -725,11 +721,9 @@ function the_bootstrap_comment_form_field_url( $html )
 {
     $commenter	=	wp_get_current_commenter();
 
-    return	'<div class="comment-form-url control-group">
-                <label for="url" class="control-label">' . __( 'Website', 'the-bootstrap' ) . '</label>
-                <div class="controls">
-                    <input id="url" name="url" type="url" value="' . esc_attr(  $commenter['comment_author_url'] ) . '" size="30" />
-                </div>
+    return	'<div class="comment-form-url mb-3">
+                <label for="url" class="form-label">' . esc_html__( 'Website', 'the-bootstrap' ) . '</label>
+                <input class="form-control" id="url" name="url" type="url" value="' . esc_attr(  $commenter['comment_author_url'] ) . '" size="30" />
             </div>';
 }
 add_filter( 'comment_form_field_url', 'the_bootstrap_comment_form_field_url');
@@ -753,7 +747,7 @@ add_filter( 'comment_form_field_url', 'the_bootstrap_comment_form_field_url');
  */
 function the_bootstrap_get_attachment_link( $link, $id, $size, $permalink, $icon, $text )
 {
-    return ( ! $text ) ? str_replace( '<a ', '<a class="thumbnail" ', $link ) : $link;
+    return ( ! $text ) ? str_replace( '<a ', '<a class="d-inline-block border rounded" ', $link ) : $link;
 }
 add_filter( 'wp_get_attachment_link', 'the_bootstrap_get_attachment_link', 10, 6 );
 
@@ -879,7 +873,7 @@ function the_bootstrap_post_gallery( $content, $attr )
 
     $selector	=	"gallery-{$instance}";
     $size_class	=	sanitize_html_class( $size );
-    $output		=	"<ul id='$selector' class='gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size_class} thumbnails'>";
+    $output		=	"<ul id='$selector' class='gallery galleryid-{$id} gallery-columns-{$columns} gallery-size-{$size_class} list-unstyled d-flex flex-wrap'>";
 
     $i = 0;
     foreach ( $attachments as $id => $attachment ) {
@@ -892,9 +886,9 @@ function the_bootstrap_post_gallery( $content, $attr )
 
         $link = wp_get_attachment_link( $id, $size, ! ( isset( $attr['link'] ) && 'file' == $attr['link'] ) );
         $clear_class = ( 0 == $i++ % $columns ) ? ' clear' : '';
-        $span = 'span' . floor( 8 / $columns );
+        $col_class = 'col-' . floor( 12 / $columns );
 
-        $output .= '<li class="' . esc_attr( $span . $clear_class ) . '"><' . esc_html( $itemtag ) . ' class="gallery-item">';
+        $output .= '<li class="' . esc_attr( $col_class . $clear_class . ' mb-3' ) . '"><' . esc_html( $itemtag ) . ' class="gallery-item">';
         $output .= "<{$icontag} class='gallery-icon'>{$link}</{$icontag}>\n";
 
         if ( $captiontag && ( 0 < $comments || trim( $attachment->post_excerpt ) ) ) {
@@ -941,9 +935,9 @@ function the_bootstrap_img_caption_shortcode( $empty, $attr, $content )
         $id = 'id="' . $id . '" ';
     }
 
-    return '<figure ' . $id . 'class="wp-caption thumbnail ' . $align . '" style="width: '.$width.'px;">
-                ' . do_shortcode( str_replace( 'class="thumbnail', 'class="', $content ) ) . '
-                <figcaption class="wp-caption-text">' . $caption . '</figcaption>
+    return '<figure ' . $id . 'class="wp-caption figure ' . $align . '" style="width: '.$width.'px;">
+                ' . do_shortcode( str_replace( 'class="figure', 'class="figure-img img-fluid"', $content ) ) . '
+                <figcaption class="wp-caption-text figure-caption">' . $caption . '</figcaption>
             </figure>';
 }
 add_filter( 'img_caption_shortcode', 'the_bootstrap_img_caption_shortcode', 10, 3 );
@@ -961,7 +955,7 @@ add_filter( 'img_caption_shortcode', 'the_bootstrap_img_caption_shortcode', 10, 
  */
 function the_bootstrap_the_password_form( $form )
 {
-    return '<form class="post-password-form form-horizontal" action="' . home_url( 'wp-pass.php' ) . '" method="post"><legend>'. __( 'This post is password protected. To view it please enter your password below:', 'the-bootstrap' ) . '</legend><div class="control-group"><label class="control-label" for="post-password-' . get_the_ID() . '">' . __( 'Password:', 'the-bootstrap' ) .'</label><div class="controls"><input name="post_password" id="post-password-' . get_the_ID() . '" type="password" size="20" /></div></div><div class="form-actions"><button type="submit" class="post-password-submit submit btn btn-primary">' . __( 'Submit', 'the-bootstrap' ) . '</button></div></form>';
+    return '<form class="post-password-form" action="' . esc_url( home_url( 'wp-pass.php' ) ) . '" method="post"><h4 class="mb-3">'. esc_html__( 'This post is password protected. To view it please enter your password below:', 'the-bootstrap' ) . '</h4><div class="mb-3"><label class="form-label" for="post-password-' . get_the_ID() . '">' . esc_html__( 'Password:', 'the-bootstrap' ) .'</label><input class="form-control" name="post_password" id="post-password-' . get_the_ID() . '" type="password" size="20" /></div><div class="mb-3"><button type="submit" class="post-password-submit submit btn btn-primary">' . esc_html__( 'Submit', 'the-bootstrap' ) . '</button></div></form>';
 }
 add_filter( 'the_password_form', 'the_bootstrap_the_password_form' );
 

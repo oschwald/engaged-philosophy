@@ -427,13 +427,13 @@ article.page {
   margin: 0 20px 20px 0;
 }
 
-.entry-attachment .thumbnail.attachment-table {
+.entry-attachment .figure.attachment-table {
   display: table;
   margin: 0 auto;
 }
 
-.thumbnail > img {
-  width: auto\9; // Cure IE8 max-width bug
+.figure > img {
+  width: auto; // Remove IE8-specific CSS
 }
 
 img.wp-smiley {
@@ -443,17 +443,17 @@ img.wp-smiley {
   padding: 0;
 }
 
-.gallery-columns-3.thumbnails [class*="span"] {
-  width: 29.3%;
+.gallery-columns-3 > li {
+  width: calc(33.333% - 0.5rem);
 }
-.gallery-columns-5.thumbnails [class*="span"] {
-  width: 15.9%;
+.gallery-columns-5 > li {
+  width: calc(20% - 0.5rem);
 }
-.gallery-columns-6.thumbnails [class*="span"] {
-  width: 12.6%;
+.gallery-columns-6 > li {
+  width: calc(16.666% - 0.5rem);
 }
-.gallery-columns-7.thumbnails [class*="span"] {
-  width: 10.2%;
+.gallery-columns-7 > li {
+  width: calc(14.285% - 0.5rem);
 }
 
 // Footer
@@ -499,15 +499,13 @@ table .label {
 }
 
 // Bootstrap Adjustments
-.navbar-fixed-top,
-.navbar-fixed-bottom {
+.fixed-top,
+.fixed-bottom {
   position: fixed;
 }
 
 #comment,
-.thumbnail {
-  -moz-box-sizing: border-box;
-  -webkit-box-sizing: border-box;
+.figure {
   box-sizing: border-box;
 }
 
