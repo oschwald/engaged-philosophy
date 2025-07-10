@@ -99,7 +99,7 @@ function the_bootstrap_posted_on() {
 			esc_html( get_the_date() ),
 			esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
 			esc_attr( sprintf( __( 'View all posts by %s', 'the-bootstrap' ), get_the_author() ) ),
-			get_the_author()
+			esc_html( get_the_author() )
 	);
 	if ( comments_open() AND ! post_password_required() ) { ?>
 		<span class="sep"> | </span>
@@ -233,7 +233,7 @@ function the_bootstrap_navbar_class() {
 	
 	apply_filters( 'the_bootstrap_navbar_classes', $classes );
 
-	echo 'class="' . join( ' ', $classes ) . '"';
+	echo 'class="' . esc_attr( join( ' ', $classes ) ) . '"';
 }
 endif;
 

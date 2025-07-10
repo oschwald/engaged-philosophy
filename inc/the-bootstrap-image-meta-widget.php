@@ -100,7 +100,7 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 				
 				if ( trim( $image_meta['image_meta']['camera'], '<,>' ) ) : ?>
 				<dt><?php _e( 'Camera:', 'the-bootstrap' ); ?></dt>
-				<dd><?php echo trim( $image_meta['image_meta']['camera'], '<,>' ); ?></dd>
+				<dd><?php echo esc_html( trim( $image_meta['image_meta']['camera'], '<,>' ) ); ?></dd>
 				<?php endif; ?>
 				
 			</dl>

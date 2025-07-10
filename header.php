@@ -70,7 +70,7 @@
       </button>
       
       <?php if ( the_bootstrap_options()->navbar_site_name ) : ?>
-      <span class="navbar-brand"><?php bloginfo( 'name' ); ?></span>
+      <span class="navbar-brand"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></span>
       <?php endif;?>
       
       <div class="collapse navbar-collapse" id="navbarNav">

@@ -321,9 +321,9 @@ function the_bootstrap_credits()
 {
     printf(
         '<span class="credits alignleft">' . __( '&copy; %1$s <a href="%2$s">%3$s</a>, all rights reserved.', 'the-bootstrap' ) . '</span>',
-        date( 'Y' ),
-        home_url( '/' ),
-        get_bloginfo( 'name' )
+        esc_html( date( 'Y' ) ),
+        esc_url( home_url( '/' ) ),
+        esc_html( get_bloginfo( 'name' ) )
     );
 }
 endif;
@@ -534,8 +534,8 @@ function the_bootstrap_comment_form_defaults( $defaults )
                                      <div class="form-actions">',
         'title_reply'			=>	'<legend>' . __( 'Leave a reply', 'the-bootstrap' ) . '</legend>',
         'title_reply_to'		=>	'<legend>' . __( 'Leave a reply to %s', 'the-bootstrap' ). '</legend>',
-        'must_log_in'			=>	'<div class="must-log-in control-group controls">' . sprintf( __( 'You must be <a href="%s">logged in</a> to post a comment.', 'the-bootstrap' ), wp_login_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) . '</div>',
-        'logged_in_as'			=>	'<div class="logged-in-as control-group controls">' . sprintf( __( 'Logged in as <a href="%1$s">%2$s</a>. <a href="%3$s" title="Log out of this account">Log out?</a>', 'the-bootstrap' ), admin_url( 'profile.php' ), wp_get_current_user()->display_name, wp_logout_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) . '</div>',
+        'must_log_in'			=>	'<div class="must-log-in control-group controls">' . sprintf( __( 'You must be <a href="%s">logged in</a> to post a comment.', 'the-bootstrap' ), esc_url( wp_login_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) ) . '</div>',
+        'logged_in_as'			=>	'<div class="logged-in-as control-group controls">' . sprintf( __( 'Logged in as <a href="%1$s">%2$s</a>. <a href="%3$s" title="Log out of this account">Log out?</a>', 'the-bootstrap' ), esc_url( admin_url( 'profile.php' ) ), esc_html( wp_get_current_user()->display_name ), esc_url( wp_logout_url( apply_filters( 'the_permalink', get_permalink( get_the_ID() ) ) ) ) ) . '</div>',
     ), $defaults );
 }
 add_filter( 'comment_form_defaults', 'the_bootstrap_comment_form_defaults' );
@@ -886,11 +886,11 @@ function the_bootstrap_post_gallery( $content, $attr )
             'status'	=>	'approve'
         ) );
 
-        $link = wp_get_attachment_link( $id, $size, ! ( isset( $attr['link'] ) AND 'file' == $attr['link'] ) );
+        $link = wp_get_attachment_link( $id, $size, ! ( isset( $attr['link'] ) && 'file' == $attr['link'] ) );
         $clear_class = ( 0 == $i++ % $columns ) ? ' clear' : '';
         $span = 'span' . floor( 8 / $columns );
 
-        $output .= "<li class='{$span}{$clear_class}'><{$itemtag} class='gallery-item'>";
+        $output .= '<li class="' . esc_attr( $span . $clear_class ) . '"><' . esc_html( $itemtag ) . ' class="gallery-item">';
         $output .= "<{$icontag} class='gallery-icon'>{$link}</{$icontag}>\n";
 
         if ( $captiontag && ( 0 < $comments || trim( $attachment->post_excerpt ) ) ) {

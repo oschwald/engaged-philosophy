@@ -62,7 +62,7 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 		echo   str_replace( 'well ', '', $before_widget );
 		
 		if ( $title = get_the_title( $instance['post_id'] ) )
-			echo $before_title . '<a href="' . get_permalink( $instance['post_id'] ) . '" title="' . sprintf( esc_attr__( 'Permalink to %s', 'the-bootstrap' ), strip_tags( $title ) ) . '" rel="bookmark">' . $title . '</a>' . $after_title;
+			echo $before_title . '<a href="' . esc_url( get_permalink( $instance['post_id'] ) ) . '" title="' . sprintf( esc_attr__( 'Permalink to %s', 'the-bootstrap' ), esc_attr( strip_tags( $title ) ) ) . '" rel="bookmark">' . esc_html( $title ) . '</a>' . $after_title;
 		?>
 		<div id="sidebar-gallery-slider" class="carousel slide">
 
@@ -73,7 +73,7 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 					<?php echo wp_get_attachment_image( $attachment->ID, array( 370, 278 ) ); 
 					if ( has_excerpt( $attachment->ID ) ) : ?>
 					<figcaption class="carousel-caption">
-						<h4><?php echo get_the_title( $attachment->ID ); ?></h4>
+						<h4><?php echo esc_html( get_the_title( $attachment->ID ) ); ?></h4>
 						<p><?php echo apply_filters( 'get_the_excerpt', $attachment->post_excerpt ); ?></p>
 					</figcaption>
 					<?php endif; ?>
