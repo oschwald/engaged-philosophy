@@ -71,8 +71,26 @@ This is "Engaged Philosophy" - a WordPress theme modernized with Bootstrap 5. It
 - Keep custom CSS minimal, well-documented, and scoped to specific components
 - Always check Bootstrap documentation for existing utility classes before writing custom styles
 
+## Testing and Development Tools
+
+### Site Testing Scripts (Not Committed)
+Several development testing scripts are available but excluded from the repository via .gitignore:
+- **spider-test.js**: Comprehensive URL testing with response validation
+- **debug-check.js**: PHP error and warning detection across all pages  
+- **performance-check.js**: Response time and asset loading analysis
+- **Other dev tools**: build-modern.sh, dev-watch.sh, comparison tools
+
+These scripts can be created as needed for development and testing but should not be committed to the repository.
+
+### Docker Development Environment
+- **Setup**: `docker-compose up -d` to start WordPress + MySQL containers
+- **Site URL**: http://localhost:8080
+- **Testing**: Use the testing scripts above to validate theme functionality
+- **Logs**: `docker logs engaged-philosophy-wp` to monitor WordPress container
+
 ## Getting Started
 1. **Install dependencies**: `npm install`
 2. **Development**: `npm run start` or `./dev-watch.sh`
 3. **Production build**: `npm run build` or `./build-modern.sh`
 4. **Code linting**: `npm run lint:css` and `npm run lint:js`
+5. **Local testing**: `docker-compose up -d` and test at http://localhost:8080

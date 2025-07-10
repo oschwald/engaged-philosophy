@@ -67,6 +67,9 @@ dev-watch.sh
 compare-screenshots.js
 comparison.html
 navbar-inspect.js
+spider-test.js
+debug-check.js
+performance-check.js
 
 # Logs
 *.log
