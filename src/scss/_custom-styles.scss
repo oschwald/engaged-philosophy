@@ -281,8 +281,8 @@ body {
 .footer-custom {
   background-color: #e0e0e0; // Light gray background like production
   border: none;
-  margin: 0;
-  padding: 1rem 1.5rem !important; // Match container padding system
+  margin: 0 -12px -12px -12px; // Extend to edges with specific pixel values
+  padding: 1rem 1.5rem !important; // Keep original padding
 }
 
 // Ensure footer links use proper colors
