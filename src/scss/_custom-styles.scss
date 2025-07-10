@@ -125,7 +125,7 @@
 }
 
 .navbar-nav .nav-link:hover {
-  color: #fd7e14 !important;
+  color: $orange !important;
   background-color: rgba(253, 126, 20, 0.1);
   border-radius: 4px;
 }
@@ -241,7 +241,7 @@ body {
 .tag-cloud-projects a {
   margin: 0.2rem 0.4rem 0.2rem 0;
   padding: 0.2rem 0.4rem;
-  color: #fd7e14 !important;
+  color: $orange !important;
   font-weight: normal;
   text-decoration: none !important;
   transition: all 0.2s ease;
@@ -251,7 +251,7 @@ body {
 }
 
 .tag-cloud-projects a:hover {
-  color: #e55100 !important;
+  color: $orange-dark !important;
   text-decoration: underline !important;
   background-color: rgba(253, 126, 20, 0.1);
 }
@@ -287,12 +287,12 @@ body {
 
 // Ensure footer links use proper colors
 .footer-custom a {
-  color: #fd7e14; // Orange color for links
+  color: $orange; // Orange color for links
   text-decoration: none;
 }
 
 .footer-custom a:hover {
-  color: #e55100; // Darker orange on hover
+  color: $orange-dark; // Darker orange on hover
   text-decoration: underline;
 }
 

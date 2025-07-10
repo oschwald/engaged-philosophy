@@ -26,7 +26,22 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// Bootstrap variable overrides - must come before Bootstrap import
+// Bootstrap functions and variable imports (required for overrides)
+@import "~bootstrap/scss/functions";
+
+// Custom variable overrides - must come before Bootstrap variables
+$orange: #fd7e14; // Production site orange
+$orange-dark: #e55100; // Darker shade for hover states
+
+// Override Bootstrap theme colors
+$primary: $orange;
+$link-color: $orange;
+$link-hover-color: $orange-dark;
+
+// Heading colors
+$headings-color: $orange;
+
+// Border radius overrides
 $border-radius: 0;
 $border-radius-sm: 0;
 $border-radius-lg: 0;
@@ -37,7 +52,9 @@ $border-radius-pill: 0;
 // Import Bootstrap with our overrides
 @import "~bootstrap/scss/bootstrap";
 
+// Import our custom variables after Bootstrap for internal use
+@import "variables";
+
 // Import custom styles after Bootstrap
 @import "typography";
 @import "custom-styles";
-@import "responsive";

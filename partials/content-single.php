@@ -18,7 +18,7 @@ tha_entry_before(); ?>
 		<div class="entry-meta"><?php the_bootstrap_posted_on(); ?></div><!-- .entry-meta -->
 	</header><!-- .entry-header -->
 
-	<div class="entry-content clearfix">
+	<div class="entry-content">
 		<?php
 		the_content();
 		the_bootstrap_link_pages(); ?>

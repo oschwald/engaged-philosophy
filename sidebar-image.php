@@ -13,7 +13,7 @@ tha_sidebars_before(); ?>
 	
 	if ( ! dynamic_sidebar( 'image' ) ) {
 		the_widget( 'The_Bootstrap_Image_Meta_Widget', array(), array(
-			'before_widget'	=>	'<aside id="the-bootstrap-image-meta" class="widget well the-bootstrap-image-meta">',
+			'before_widget'	=>	'<aside id="the-bootstrap-image-meta" class="widget card the-bootstrap-image-meta">',
 			'after_widget'	=>	'</aside>',
 			'before_title'	=>	'<h3 class="widget-title">',
 			'after_title'	=>	'</h3>',

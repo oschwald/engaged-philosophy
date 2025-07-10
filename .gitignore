@@ -61,6 +61,13 @@ comparison*.js
 *-test*.sh
 docker-compose.override.yml
 
+# Development scripts and tools
+build-modern.sh
+dev-watch.sh
+compare-screenshots.js
+comparison.html
+navbar-inspect.js
+
 # Logs
 *.log
 logs/

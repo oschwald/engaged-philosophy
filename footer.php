@@ -24,7 +24,7 @@
                                 <div class="fb-like" data-href="https://www.facebook.com/engagedphilosophy" data-width="200" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div> 
                                 <a href="mailto:info@engagedphilosophy.com">info@engagedphilosophy.com</a>
                         </div>
-                    </div><!-- #page-footer .well .clearfix -->
+                    </div><!-- #page-footer -->
                     <?php tha_footer_bottom(); ?>
                 </footer><!-- #colophon -->
                 <?php tha_footer_after(); ?>

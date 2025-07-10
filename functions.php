@@ -43,12 +43,8 @@ function the_bootstrap_setup()
 
     add_theme_support( 'tha_hooks', array( 'all' ) );
 
-    if ( version_compare( get_bloginfo( 'version' ), '3.4', '<' ) )
-        // Custom Theme Options
-        require_once( get_template_directory() . '/inc/theme-options.php' );
-    else
-        // Implement the Theme Customizer script
-        require_once( get_template_directory() . '/inc/theme-customizer.php' );
+    // Theme Customizer
+    require_once( get_template_directory() . '/inc/theme-customizer.php' );
 
     /**
      * Custom template tags for this theme.
@@ -161,12 +157,6 @@ function the_bootstrap_custom_background_setup()
     ) );
 
     add_theme_support( 'custom-background', $args );
-
-    if ( ! function_exists( 'wp_get_theme' ) ) {
-        // Compat: Versions of WordPress prior to 3.4.
-        define( 'BACKGROUND_COLOR', $args['default-color'] );
-        add_custom_background();
-    }
 }
 add_action( 'after_setup_theme', 'the_bootstrap_custom_background_setup' );
 
@@ -184,7 +174,7 @@ function the_bootstrap_widgets_init()
     register_sidebar( array(
         'name'			=>	__( 'Main Sidebar', 'the-bootstrap' ),
         'id'			=>	'main',
-        'before_widget'	=>	'<aside id="%1$s" class="widget well %2$s">',
+        'before_widget'	=>	'<aside id="%1$s" class="widget card %2$s">',
         'after_widget'	=>	'</aside>',
         'before_title'	=>	'<h2 class="widget-title">',
         'after_title'	=>	'</h2>',
@@ -194,7 +184,7 @@ function the_bootstrap_widgets_init()
         'name'			=>	__( 'Image Sidebar', 'the-bootstrap' ),
         'description'	=>	__( 'Shown on image attachment pages.', 'the-bootstrap' ),
         'id'			=>	'image',
-        'before_widget'	=>	'<aside id="%1$s" class="widget well %2$s">',
+        'before_widget'	=>	'<aside id="%1$s" class="widget card %2$s">',
         'after_widget'	=>	'</aside>',
         'before_title'	=>	'<h2 class="widget-title">',
         'after_title'	=>	'</h2>',
@@ -263,26 +253,6 @@ function the_bootstrap_print_scripts()
 add_action( 'wp_enqueue_scripts', 'the_bootstrap_print_scripts' );
 
 
-/**
- * Adds IE specific scripts
- *
- * Respond.js has to be loaded after Theme styles
- *
- * @author	Konstantin Obenland
- * @since	1.7.0 - 11.06.2012
- *
- * @return	void
- */
-function the_bootstrap_print_ie_scripts()
-{
-    ?>
-    <!--[if lt IE 9]>
-        <script src="<?php echo get_template_directory_uri(); ?>/js/html5shiv.min.js" type="text/javascript"></script>
-        <script src="<?php echo get_template_directory_uri(); ?>/js/respond.min.js" type="text/javascript"></script>
-    <![endif]-->
-    <?php
-}
-add_action( 'wp_head', 'the_bootstrap_print_ie_scripts', 11 );
 
 
 /**
@@ -514,7 +484,7 @@ function the_bootstrap_comments_list()
 
             <?php the_bootstrap_comment_nav(); ?>
 
-            <ol class="commentlist unstyled">
+            <ol class="commentlist list-unstyled">
                 <?php wp_list_comments( array( 'callback' => 'the_bootstrap_comment' ) ); ?>
             </ol><!-- .commentlist .unstyled -->
 
@@ -592,7 +562,7 @@ if ( ! function_exists( 'the_bootstrap_comment' ) ) :
 function the_bootstrap_comment( $comment, $args, $depth )
 {
     $GLOBALS['comment'] = $comment;
-    if ( 'pingback' == $comment->comment_type OR 'trackback' == $comment->comment_type ) : ?>
+    if ( 'pingback' == $comment->comment_type || 'trackback' == $comment->comment_type ) : ?>
 
         <li id="li-comment-<?php comment_ID(); ?>" <?php comment_class(); ?>>
             <p class="row">
@@ -797,7 +767,7 @@ add_filter( 'wp_get_attachment_link', 'the_bootstrap_get_attachment_link', 10, 6
 function the_bootstrap_post_classes( $classes )
 {
     if ( is_sticky() AND is_home() ) {
-        $classes[] = 'hero-unit';
+        $classes[] = 'p-5 mb-4 bg-light rounded-3'; // Bootstrap 5 jumbotron equivalent
     }
 
     return $classes;
@@ -923,7 +893,7 @@ function the_bootstrap_post_gallery( $content, $attr )
         $output .= "<li class='{$span}{$clear_class}'><{$itemtag} class='gallery-item'>";
         $output .= "<{$icontag} class='gallery-icon'>{$link}</{$icontag}>\n";
 
-        if ( $captiontag AND ( 0 < $comments OR trim( $attachment->post_excerpt ) ) ) {
+        if ( $captiontag && ( 0 < $comments || trim( $attachment->post_excerpt ) ) ) {
             $comments	=	( 0 < $comments ) ? sprintf( _n('%d comment', '%d comments', $comments, 'the-bootstrap'), $comments ) : '';
             $excerpt	=	wptexturize( $attachment->post_excerpt );
             $out		=	($comments AND $excerpt) ? " $excerpt <br /> $comments " : " $excerpt$comments ";
@@ -959,7 +929,7 @@ function the_bootstrap_img_caption_shortcode( $empty, $attr, $content )
         'caption'	=>	''
     ), $attr ) );
 
-    if ( 1 > (int) $width OR empty( $caption ) ) {
+    if ( 1 > (int) $width || empty( $caption ) ) {
         return $content;
     }
 
@@ -1078,254 +1048,248 @@ add_action( 'template_redirect', 'the_bootstrap_content_width' );
  */
 function _the_bootstrap_version()
 {
-    if ( function_exists( 'wp_get_theme' ) ) {
-        $theme_version	=	wp_get_theme()->get( 'Version' );
-    } else {
-        $theme_data		=	get_theme_data( get_template_directory() . '/style.css' );
-        $theme_version	=	$theme_data['Version'];
-    }
-
-    return $theme_version;
+    return wp_get_theme()->get( 'Version' );
 }
 
-add_action( 'init', 'register_taxonomy_topic' );
-
-function register_taxonomy_topic()
-{
-    $labels = array(
-        'name' => _x( 'Topics', 'topic' ),
-        'singular_name' => _x( 'Topic', 'topic' ),
-        'search_items' => _x( 'Search Topics', 'topic' ),
-        'popular_items' => _x( 'Popular Topics', 'topic' ),
-        'all_items' => _x( 'All Topics', 'topic' ),
-        'parent_item' => _x( 'Parent Topic', 'topic' ),
-        'parent_item_colon' => _x( 'Parent Topic:', 'topic' ),
-        'edit_item' => _x( 'Edit Topic', 'topic' ),
-        'update_item' => _x( 'Update Topic', 'topic' ),
-        'add_new_item' => _x( 'Add New Topic', 'topic' ),
-        'new_item_name' => _x( 'New Topic', 'topic' ),
-        'separate_items_with_commas' => _x( 'Separate topics with commas', 'topic' ),
-        'add_or_remove_items' => _x( 'Add or remove topics', 'topic' ),
-        'choose_from_most_used' => _x( 'Choose from most used topics', 'topic' ),
-        'menu_name' => _x( 'Topics', 'topic' ),
-    );
-
-    $args = array(
-        'labels' => $labels,
+/**
+ * Register custom taxonomies for projects
+ *
+ * @since 1.0.0
+ */
+function the_bootstrap_register_project_taxonomies() {
+    // Topics taxonomy
+    register_taxonomy( 'topic', array( 'project' ), array(
+        'labels' => array(
+            'name' => _x( 'Topics', 'taxonomy general name', 'the-bootstrap' ),
+            'singular_name' => _x( 'Topic', 'taxonomy singular name', 'the-bootstrap' ),
+            'search_items' => __( 'Search Topics', 'the-bootstrap' ),
+            'popular_items' => __( 'Popular Topics', 'the-bootstrap' ),
+            'all_items' => __( 'All Topics', 'the-bootstrap' ),
+            'edit_item' => __( 'Edit Topic', 'the-bootstrap' ),
+            'update_item' => __( 'Update Topic', 'the-bootstrap' ),
+            'add_new_item' => __( 'Add New Topic', 'the-bootstrap' ),
+            'new_item_name' => __( 'New Topic Name', 'the-bootstrap' ),
+            'separate_items_with_commas' => __( 'Separate topics with commas', 'the-bootstrap' ),
+            'add_or_remove_items' => __( 'Add or remove topics', 'the-bootstrap' ),
+            'choose_from_most_used' => __( 'Choose from most used topics', 'the-bootstrap' ),
+            'menu_name' => __( 'Topics', 'the-bootstrap' ),
+        ),
         'public' => true,
-        'show_in_nav_menus' => true,
-        'show_ui' => true,
-        'show_tagcloud' => true,
         'hierarchical' => false,
-
-        'rewrite' => true,
-        'query_var' => true
-    );
-
-    register_taxonomy( 'topic', array('project'), $args );
-}
-
-
-add_action( 'init', 'register_taxonomy_schools' );
-
-function register_taxonomy_schools()
-{
-    $labels = array(
-        'name' => _x( 'Schools', 'schools' ),
-        'singular_name' => _x( 'School', 'schools' ),
-        'search_items' => _x( 'Search Schools', 'schools' ),
-        'popular_items' => _x( 'Popular Schools', 'schools' ),
-        'all_items' => _x( 'All Schools', 'schools' ),
-        'parent_item' => _x( 'Parent School', 'schools' ),
-        'parent_item_colon' => _x( 'Parent School:', 'schools' ),
-        'edit_item' => _x( 'Edit School', 'schools' ),
-        'update_item' => _x( 'Update School', 'schools' ),
-        'add_new_item' => _x( 'Add New School', 'schools' ),
-        'new_item_name' => _x( 'New School', 'schools' ),
-        'separate_items_with_commas' => _x( 'Separate schools with commas', 'schools' ),
-        'add_or_remove_items' => _x( 'Add or remove schools', 'schools' ),
-        'choose_from_most_used' => _x( 'Choose from the most used schools', 'schools' ),
-        'menu_name' => _x( 'Schools', 'schools' ),
-    );
-
-    $args = array(
-        'labels' => $labels,
-        'public' => true,
-        'show_in_nav_menus' => true,
         'show_ui' => true,
-        'show_tagcloud' => true,
-        'hierarchical' => true,
-
-        'rewrite' => true,
-        'query_var' => true
-    );
-
-    register_taxonomy( 'schools', array('project'), $args );
-}
-
-add_action( 'init', 'register_taxonomy_professors' );
-
-function register_taxonomy_professors()
-{
-    $labels = array(
-        'name' => _x( 'Professors', 'professors' ),
-        'singular_name' => _x( 'Professor', 'professor' ),
-        'search_items' => _x( 'Search Professors', 'professors' ),
-        'popular_items' => _x( 'Popular Professors', 'professors' ),
-        'all_items' => _x( 'All Professors', 'professors' ),
-        'parent_item' => _x( 'Parent Professors', 'professors' ),
-        'parent_item_colon' => _x( 'Parent Professors:', 'professors' ),
-        'edit_item' => _x( 'Edit Professor', 'professors' ),
-        'update_item' => _x( 'Update Professor', 'professors' ),
-        'add_new_item' => _x( 'Add New Professor', 'professors' ),
-        'new_item_name' => _x( 'New Professor', 'professors' ),
-        'separate_items_with_commas' => _x( 'Separate professors with commas', 'professors' ),
-        'add_or_remove_items' => _x( 'Add or remove professors', 'professors' ),
-        'choose_from_most_used' => _x( 'Choose from the most used professors', 'professors' ),
-        'menu_name' => _x( 'Professors', 'professors' ),
-    );
-
-    $args = array(
-        'labels' => $labels,
-        'public' => true,
+        'show_admin_column' => true,
         'show_in_nav_menus' => true,
-        'show_ui' => true,
         'show_tagcloud' => true,
-        'hierarchical' => true,
-
-        'rewrite' => true,
-        'query_var' => true
-    );
-
-    register_taxonomy( 'professors', array('project'), $args );
-}
-
-add_action( 'init', 'register_taxonomy_courses' );
-
-function register_taxonomy_courses()
-{
-    $labels = array(
-        'name' => _x( 'Courses', 'courses' ),
-        'singular_name' => _x( 'Course', 'course' ),
-        'search_items' => _x( 'Search Courses', 'courses' ),
-        'popular_items' => _x( 'Popular Courses', 'courses' ),
-        'all_items' => _x( 'All Courses', 'courses' ),
-        'parent_item' => _x( 'Parent Courses', 'courses' ),
-        'parent_item_colon' => _x( 'Parent Courses:', 'courses' ),
-        'edit_item' => _x( 'Edit Courses', 'courses' ),
-        'update_item' => _x( 'Update Course', 'courses' ),
-        'add_new_item' => _x( 'Add New Course', 'courses' ),
-        'new_item_name' => _x( 'New Course', 'courses' ),
-        'separate_items_with_commas' => _x( 'Separate courses with commas', 'courses' ),
-        'add_or_remove_items' => _x( 'Add or remove courses', 'courses' ),
-        'choose_from_most_used' => _x( 'Choose from the most used courses', 'courses' ),
-        'menu_name' => _x( 'Courses', 'courses' ),
-    );
-
-    $args = array(
-        'labels' => $labels,
+        'show_in_rest' => true, // Enable block editor support
+        'rewrite' => array(
+            'slug' => 'topic',
+            'with_front' => false,
+        ),
+    ) );
+    
+    // Schools taxonomy
+    register_taxonomy( 'schools', array( 'project' ), array(
+        'labels' => array(
+            'name' => _x( 'Schools', 'taxonomy general name', 'the-bootstrap' ),
+            'singular_name' => _x( 'School', 'taxonomy singular name', 'the-bootstrap' ),
+            'search_items' => __( 'Search Schools', 'the-bootstrap' ),
+            'all_items' => __( 'All Schools', 'the-bootstrap' ),
+            'parent_item' => __( 'Parent School', 'the-bootstrap' ),
+            'parent_item_colon' => __( 'Parent School:', 'the-bootstrap' ),
+            'edit_item' => __( 'Edit School', 'the-bootstrap' ),
+            'update_item' => __( 'Update School', 'the-bootstrap' ),
+            'add_new_item' => __( 'Add New School', 'the-bootstrap' ),
+            'new_item_name' => __( 'New School Name', 'the-bootstrap' ),
+            'menu_name' => __( 'Schools', 'the-bootstrap' ),
+        ),
         'public' => true,
-        'show_in_nav_menus' => true,
-        'show_ui' => true,
-        'show_tagcloud' => true,
         'hierarchical' => true,
-
-        'rewrite' => true,
-        'query_var' => true
-    );
-
-    register_taxonomy( 'courses', array('project'), $args );
-}
-
-add_action( 'init', 'register_taxonomy_semesters' );
-
-function register_taxonomy_semesters()
-{
-    $labels = array(
-        'name' => _x( 'Semesters', 'semesters' ),
-        'singular_name' => _x( 'Semester', 'semester' ),
-        'search_items' => _x( 'Search Semesters', 'semesters' ),
-        'popular_items' => _x( 'Popular Semesters', 'semesters' ),
-        'all_items' => _x( 'All Semesters', 'semesters' ),
-        'parent_item' => _x( 'Parent Semesters', 'semesters' ),
-        'parent_item_colon' => _x( 'Parent Semesters:', 'semesters' ),
-        'edit_item' => _x( 'Edit Semester', 'semesters' ),
-        'update_item' => _x( 'Update Semester', 'semesters' ),
-        'add_new_item' => _x( 'Add New Semester', 'semesters' ),
-        'new_item_name' => _x( 'New Semester', 'semesters' ),
-        'separate_items_with_commas' => _x( 'Separate semesters with commas', 'semesters' ),
-        'add_or_remove_items' => _x( 'Add or remove semesters', 'semesters' ),
-        'choose_from_most_used' => _x( 'Choose from the most used semesters', 'semesters' ),
-        'menu_name' => _x( 'Semesters', 'semesters' ),
-    );
-
-    $args = array(
-        'labels' => $labels,
+        'show_ui' => true,
+        'show_admin_column' => true,
+        'show_in_nav_menus' => true,
+        'show_tagcloud' => true,
+        'show_in_rest' => true,
+        'rewrite' => array(
+            'slug' => 'school',
+            'with_front' => false,
+        ),
+    ) );
+    
+    // Professors taxonomy
+    register_taxonomy( 'professors', array( 'project' ), array(
+        'labels' => array(
+            'name' => _x( 'Professors', 'taxonomy general name', 'the-bootstrap' ),
+            'singular_name' => _x( 'Professor', 'taxonomy singular name', 'the-bootstrap' ),
+            'search_items' => __( 'Search Professors', 'the-bootstrap' ),
+            'all_items' => __( 'All Professors', 'the-bootstrap' ),
+            'edit_item' => __( 'Edit Professor', 'the-bootstrap' ),
+            'update_item' => __( 'Update Professor', 'the-bootstrap' ),
+            'add_new_item' => __( 'Add New Professor', 'the-bootstrap' ),
+            'new_item_name' => __( 'New Professor Name', 'the-bootstrap' ),
+            'menu_name' => __( 'Professors', 'the-bootstrap' ),
+        ),
         'public' => true,
-        'show_in_nav_menus' => true,
-        'show_ui' => true,
-        'show_tagcloud' => true,
         'hierarchical' => true,
-
-        'rewrite' => true,
-        'query_var' => true
-    );
-
-    register_taxonomy( 'semesters', array('project'), $args );
+        'show_ui' => true,
+        'show_admin_column' => true,
+        'show_in_nav_menus' => true,
+        'show_tagcloud' => true,
+        'show_in_rest' => true,
+        'rewrite' => array(
+            'slug' => 'professor',
+            'with_front' => false,
+        ),
+    ) );
+    
+    // Courses taxonomy
+    register_taxonomy( 'courses', array( 'project' ), array(
+        'labels' => array(
+            'name' => _x( 'Courses', 'taxonomy general name', 'the-bootstrap' ),
+            'singular_name' => _x( 'Course', 'taxonomy singular name', 'the-bootstrap' ),
+            'search_items' => __( 'Search Courses', 'the-bootstrap' ),
+            'all_items' => __( 'All Courses', 'the-bootstrap' ),
+            'edit_item' => __( 'Edit Course', 'the-bootstrap' ),
+            'update_item' => __( 'Update Course', 'the-bootstrap' ),
+            'add_new_item' => __( 'Add New Course', 'the-bootstrap' ),
+            'new_item_name' => __( 'New Course Name', 'the-bootstrap' ),
+            'menu_name' => __( 'Courses', 'the-bootstrap' ),
+        ),
+        'public' => true,
+        'hierarchical' => true,
+        'show_ui' => true,
+        'show_admin_column' => true,
+        'show_in_nav_menus' => true,
+        'show_tagcloud' => true,
+        'show_in_rest' => true,
+        'rewrite' => array(
+            'slug' => 'course',
+            'with_front' => false,
+        ),
+    ) );
+    
+    // Semesters taxonomy
+    register_taxonomy( 'semesters', array( 'project' ), array(
+        'labels' => array(
+            'name' => _x( 'Semesters', 'taxonomy general name', 'the-bootstrap' ),
+            'singular_name' => _x( 'Semester', 'taxonomy singular name', 'the-bootstrap' ),
+            'search_items' => __( 'Search Semesters', 'the-bootstrap' ),
+            'all_items' => __( 'All Semesters', 'the-bootstrap' ),
+            'edit_item' => __( 'Edit Semester', 'the-bootstrap' ),
+            'update_item' => __( 'Update Semester', 'the-bootstrap' ),
+            'add_new_item' => __( 'Add New Semester', 'the-bootstrap' ),
+            'new_item_name' => __( 'New Semester Name', 'the-bootstrap' ),
+            'menu_name' => __( 'Semesters', 'the-bootstrap' ),
+        ),
+        'public' => true,
+        'hierarchical' => true,
+        'show_ui' => true,
+        'show_admin_column' => true,
+        'show_in_nav_menus' => true,
+        'show_tagcloud' => true,
+        'show_in_rest' => true,
+        'rewrite' => array(
+            'slug' => 'semester',
+            'with_front' => false,
+        ),
+    ) );
 }
-function project_post_type()
-{
-    $labels = array(
-        'name'               => _x( 'Projects', 'post type general name' ),
-        'singular_name'      => _x( 'Project', 'post type singular name' ),
-        'add_new'            => _x( 'Add New', 'book' ),
-        'add_new_item'       => __( 'Add New Project' ),
-        'edit_item'          => __( 'Edit Project' ),
-        'new_item'           => __( 'New Project' ),
-        'all_items'          => __( 'All Projects' ),
-        'view_item'          => __( 'View Project' ),
-        'search_items'       => __( 'Search Projects' ),
-        'not_found'          => __( 'No projects found' ),
-        'not_found_in_trash' => __( 'No projects found in the Trash' ),
-        'parent_item_colon'  => '',
-        'menu_name'          => 'Projects'
-    );
-    $args = array(
-        'labels'        => $labels,
-        'description'   => 'Holds our projects and project specific data',
-        'public'        => true,
-        'menu_position' => 5,
-        'supports'      => array( 'title', 'editor', 'thumbnail', 'excerpt', 'comments' ),
-        'exclude_from_search' => false,
-        'publicly_queryable' => true,
-        'query_var' => true,
-        'rewrite' => true,
-        'can_export'    => true,
-        'has_archive'   => true,
-        'taxonomies' => array('schools','topic'),
-    );
-    register_post_type( 'project', $args );
+add_action( 'init', 'the_bootstrap_register_project_taxonomies' );
+
+/**
+ * Register the Project custom post type
+ *
+ * @since 1.0.0
+ */
+function the_bootstrap_register_project_post_type() {
+    register_post_type( 'project', array(
+        'labels' => array(
+            'name'               => _x( 'Projects', 'post type general name', 'the-bootstrap' ),
+            'singular_name'      => _x( 'Project', 'post type singular name', 'the-bootstrap' ),
+            'add_new'            => _x( 'Add New', 'project', 'the-bootstrap' ),
+            'add_new_item'       => __( 'Add New Project', 'the-bootstrap' ),
+            'edit_item'          => __( 'Edit Project', 'the-bootstrap' ),
+            'new_item'           => __( 'New Project', 'the-bootstrap' ),
+            'all_items'          => __( 'All Projects', 'the-bootstrap' ),
+            'view_item'          => __( 'View Project', 'the-bootstrap' ),
+            'view_items'         => __( 'View Projects', 'the-bootstrap' ),
+            'search_items'       => __( 'Search Projects', 'the-bootstrap' ),
+            'not_found'          => __( 'No projects found', 'the-bootstrap' ),
+            'not_found_in_trash' => __( 'No projects found in Trash', 'the-bootstrap' ),
+            'featured_image'     => __( 'Project Featured Image', 'the-bootstrap' ),
+            'set_featured_image' => __( 'Set project featured image', 'the-bootstrap' ),
+            'remove_featured_image' => __( 'Remove project featured image', 'the-bootstrap' ),
+            'use_featured_image' => __( 'Use as project featured image', 'the-bootstrap' ),
+            'archives'           => __( 'Project Archives', 'the-bootstrap' ),
+            'insert_into_item'   => __( 'Insert into project', 'the-bootstrap' ),
+            'uploaded_to_this_item' => __( 'Uploaded to this project', 'the-bootstrap' ),
+            'filter_items_list'  => __( 'Filter projects list', 'the-bootstrap' ),
+            'items_list_navigation' => __( 'Projects list navigation', 'the-bootstrap' ),
+            'items_list'         => __( 'Projects list', 'the-bootstrap' ),
+            'menu_name'          => __( 'Projects', 'the-bootstrap' ),
+        ),
+        'description'         => __( 'Student civic engagement projects', 'the-bootstrap' ),
+        'public'              => true,
+        'publicly_queryable'  => true,
+        'show_ui'             => true,
+        'show_in_menu'        => true,
+        'show_in_nav_menus'   => true,
+        'show_in_admin_bar'   => true,
+        'show_in_rest'        => true, // Enable block editor support
+        'rest_base'           => 'projects',
+        'rest_controller_class' => 'WP_REST_Posts_Controller',
+        'menu_position'       => 5,
+        'menu_icon'           => 'dashicons-portfolio',
+        'capability_type'     => 'post',
+        'hierarchical'        => false,
+        'supports'            => array(
+            'title',
+            'editor',
+            'thumbnail',
+            'excerpt',
+            'comments',
+            'custom-fields',
+            'revisions',
+        ),
+        'has_archive'         => true,
+        'rewrite'             => array(
+            'slug'       => 'projects',
+            'with_front' => false,
+        ),
+        'query_var'           => true,
+        'can_export'          => true,
+        'delete_with_user'    => false,
+    ) );
 }
+add_action( 'init', 'the_bootstrap_register_project_post_type' );
 
-add_action( 'init', 'project_post_type' );
-
-
-function any_ptype_on_cat($request)
-{
-  if ( isset($request['category_name']) || isset($request['tag']) )
+/**
+ * Include custom post types in category and tag archives
+ *
+ * @since 1.0.0
+ * @param array $request The query request
+ * @return array Modified request
+ */
+function the_bootstrap_include_custom_post_types_in_archives( $request ) {
+    if ( isset( $request['category_name'] ) || isset( $request['tag'] ) ) {
         $request['post_type'] = 'any';
-
+    }
     return $request;
 }
-add_filter('request', 'any_ptype_on_cat');
+add_filter( 'request', 'the_bootstrap_include_custom_post_types_in_archives' );
 
 
-add_action('init', 'custom_taxonomy_flush_rewrite');
-function custom_taxonomy_flush_rewrite()
-{
-    global $wp_rewrite;
-    $wp_rewrite->flush_rules();
+/**
+ * Flush rewrite rules when theme is activated
+ * This replaces the performance-killing flush on every page load
+ *
+ * @since 1.0.0
+ */
+function the_bootstrap_flush_rewrite_rules_on_activation() {
+    the_bootstrap_register_project_post_type();
+    the_bootstrap_register_project_taxonomies();
+    flush_rewrite_rules();
 }
+add_action( 'after_switch_theme', 'the_bootstrap_flush_rewrite_rules_on_activation' );
 
 /* End of file functions.php */
 /* Location: ./wp-content/themes/the-bootstrap/functions.php */

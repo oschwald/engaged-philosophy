@@ -36,8 +36,8 @@ the_post();
 	<div id="content" role="main">
 		<?php tha_content_top(); ?>
 
-		<nav id="nav-single" class="well clearfix">
-			<span class="gallery-link pull-left">
+		<nav id="nav-single" class="well d-flex justify-content-between">
+			<span class="gallery-link">
 				<a href="<?php echo get_permalink( $post->post_parent ); ?>">
 				<?php printf(
 					_x( '&laquo; %1$s (%2$s)', 'Post title, amount of images', 'the-bootstrap' ),
@@ -49,7 +49,7 @@ the_post();
 				); ?>
 				</a>
 			</span>
-			<span class="nav-links pull-right">
+			<span class="nav-links">
 				<?php
 				edit_post_link( __( 'Edit', 'the-bootstrap' ), ' <span class="edit-link label">', '</span><span class="sep">&nbsp;</span>' );
 				the_bootstrap_comments_link( __( 'Leave a comment', 'the-bootstrap' ) );

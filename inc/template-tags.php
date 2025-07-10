@@ -54,7 +54,7 @@ function the_bootstrap_content_nav() {
 	) );
 
 	if ( $links ) {
-		echo "<nav class=\"pagination justify-content-center clearfix\">{$links}</nav>";
+		echo "<nav class=\"pagination justify-content-center\">{$links}</nav>";
 	}
 }
 endif;
@@ -147,28 +147,28 @@ function the_bootstrap_link_pages( $args = array() ) {
 	$output = '';
 	if ( $multipage ) {
 		if ( 'number' == $next_or_number ) {
-			$output .= '<nav class="pagination clear"><ul><li><span class="dots">' . __('Pages:', 'the-bootstrap') . '</span></li>';
+			$output .= '<nav class="pagination"><ul class="pagination"><li class="page-item"><span class="page-link">' . __('Pages:', 'the-bootstrap') . '</span></li>';
 			for ( $i = 1; $i < ($numpages + 1); $i++ ) {
 				$j = str_replace( '%', $i, $pagelink );
 				if ( ($i != $page) || ((!$more) && ($page!=1)) ) {
-					$output .= '<li>' . _wp_link_page($i) . $j . '</a></li>';
+					$output .= '<li class="page-item">' . _wp_link_page($i) . '<span class="page-link">' . $j . '</span></a></li>';
 				}
 				if ($i == $page) {
-					$output .= '<li class="current"><span>' . $j . '</span></li>';
+					$output .= '<li class="page-item active"><span class="page-link">' . $j . '</span></li>';
 				}
 				
 			}
 			$output .= '</ul></nav>';
 		} else {
 			if ( $more ) {
-				$output .= '<nav class="pagination clear"><ul><li><span class="dots">' . __('Pages:', 'the-bootstrap') . '</span></li>';
+				$output .= '<nav class="pagination"><ul class="pagination"><li class="page-item"><span class="page-link">' . __('Pages:', 'the-bootstrap') . '</span></li>';
 				$i = $page - 1;
 				if ( $i && $more ) {
-					$output .= '<li>' . _wp_link_page( $i ) . $previouspagelink. '</a></li>';
+					$output .= '<li class="page-item">' . _wp_link_page( $i ) . '<span class="page-link">' . $previouspagelink. '</span></a></li>';
 				}
 				$i = $page + 1;
 				if ( $i <= $numpages && $more ) {
-					$output .= '<li>' . _wp_link_page( $i ) . $nextpagelink. '</a></li>';
+					$output .= '<li class="page-item">' . _wp_link_page( $i ) . '<span class="page-link">' . $nextpagelink. '</span></a></li>';
 				}
 				$output .= '</ul></nav>';
 			}

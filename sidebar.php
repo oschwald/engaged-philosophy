@@ -15,13 +15,13 @@ tha_sidebars_before(); ?>
 			'count'		=>	0,
 			'dropdown'	=>	0
 		), array(
-			'before_widget'	=>	'<aside id="archives" class="widget well widget_archives">',
+			'before_widget'	=>	'<aside id="archives" class="widget card widget_archives">',
 			'after_widget'	=>	'</aside>',
 			'before_title'	=>	'<h3 class="widget-title">',
 			'after_title'	=>	'</h3>',
 		) );
 		the_widget( 'WP_Widget_Meta', array(), array(
-			'before_widget'	=>	'<aside id="meta" class="widget well widget_meta">',
+			'before_widget'	=>	'<aside id="meta" class="widget card widget_meta">',
 			'after_widget'	=>	'</aside>',
 			'before_title'	=>	'<h3 class="widget-title">',
 			'after_title'	=>	'</h3>',

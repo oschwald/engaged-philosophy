@@ -17,7 +17,7 @@ tha_entry_before(); ?>
         <?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
     </header><!-- .entry-header -->
 
-    <div class="entry-content clearfix">
+    <div class="entry-content">
         <div class="row">
             <div class="col-lg-9">
                 <?php
