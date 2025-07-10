@@ -39,7 +39,7 @@ jQuery(document).ready(function ($) {
         The bigger the the word is below, the more examples you will see.
     </p>
     <div class="row">
-    <div class="col-lg-6">
+    <div class="col-lg-8 offset-lg-2">
       <div class="card card-body tag-cloud-projects">
       <?php 
         // Generate tag cloud with fixed randomization
