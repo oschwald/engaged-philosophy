@@ -15,12 +15,10 @@ jQuery(document).ready(function ($) {
 });
 </script>
 
-<div class="container">
-  <div class="row">
-    <section id="primary" class="col-12">
-      <?php tha_content_before(); ?>
-      <div id="content" role="main">
-        <div class="row">
+<section id="primary" class="col-12">
+  <?php tha_content_before(); ?>
+  <div id="content" role="main">
+    <div class="row">
       <div id="projects_carousel" class="carousel slide col-lg-9" data-bs-ride="carousel">
         <div class="carousel-inner">
           <?php
@@ -60,9 +58,11 @@ jQuery(document).ready(function ($) {
         </button>
       </div>
       <div class="col-lg-3">
-        <div class="card card-body lead lead-home">
-          <p>Engaged Philosophy promotes public philosophy, civic engagement, and philosophical community building. We provide resources and support for students, educators, and citizens interested in using philosophy to engage with local, national, and global issues.</p>
-          <p>Our projects range from community dialogues and public lectures to policy analysis and social action campaigns. We believe philosophy can and should make a difference in the world.</p>
+        <div class="lead-home">
+          <?php
+          the_post();
+          the_content();
+          ?>
         </div>
       </div>
     </div>
@@ -84,11 +84,9 @@ jQuery(document).ready(function ($) {
     tha_content_bottom();
     ?>
 
-      </div><!-- #content -->
-      <?php tha_content_after(); ?>
-    </section><!-- #primary -->
-  </div><!-- .row -->
-</div><!-- .container -->
+  </div><!-- #content -->
+  <?php tha_content_after(); ?>
+</section><!-- #primary -->
 
 <?php
 get_footer();

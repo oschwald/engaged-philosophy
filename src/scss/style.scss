@@ -26,7 +26,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// Import Bootstrap first
+// Bootstrap variable overrides - must come before Bootstrap import
+$border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
+$border-radius-xl: 0;
+$border-radius-xxl: 0;
+$border-radius-pill: 0;
+
+// Import Bootstrap with our overrides
 @import "~bootstrap/scss/bootstrap";
 
 // Import custom styles after Bootstrap

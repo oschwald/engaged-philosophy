@@ -9,7 +9,7 @@
                 tha_footer_before(); ?>
                 <footer id="colophon" role="contentinfo" class="col-12">
                     <?php tha_footer_top(); ?>
-                    <div id="page-footer" class="card card-body bg-light d-flex align-items-center justify-content-between px-3 py-3">
+                    <div id="page-footer" class="footer-custom d-flex align-items-center justify-content-between px-3 py-3">
                         <?php wp_nav_menu( array(
                             'container'			=>	'nav',
                             'container_class'	=>	'subnav',

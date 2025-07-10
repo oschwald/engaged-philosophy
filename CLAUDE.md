@@ -65,9 +65,11 @@ This is "Engaged Philosophy" - a WordPress theme modernized with Bootstrap 5. It
 
 ## Styling Guidelines
 - **Prefer Bootstrap 5 utility classes** over custom CSS whenever possible
-- Use classes like `px-4`, `py-3`, `mb-4`, `text-center`, etc. instead of writing custom CSS
-- Only add custom CSS when Bootstrap utilities are insufficient
-- Keep custom CSS minimal and well-documented
+- Use classes like `px-4`, `py-3`, `mb-4`, `text-center`, `bg-light`, `border`, etc. instead of writing custom CSS
+- Bootstrap provides extensive utility classes for spacing, colors, borders, typography, and layout
+- Only add custom CSS when Bootstrap utilities are insufficient for the specific requirement
+- Keep custom CSS minimal, well-documented, and scoped to specific components
+- Always check Bootstrap documentation for existing utility classes before writing custom styles
 
 ## Getting Started
 1. **Install dependencies**: `npm install`
