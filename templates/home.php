@@ -8,10 +8,14 @@
 get_header(); ?>
 
 <script>
-jQuery(document).ready(function ($) {
-  $('#projects_carousel').carousel({
-    interval: 30000
-  });
+document.addEventListener('DOMContentLoaded', function() {
+  const carousel = document.getElementById('projects_carousel');
+  if (carousel) {
+    // Initialize Bootstrap 5 carousel with custom interval
+    new bootstrap.Carousel(carousel, {
+      interval: 30000
+    });
+  }
 });
 </script>
 

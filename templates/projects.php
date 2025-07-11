@@ -6,8 +6,12 @@
 get_header(); ?>
 
 <script type="text/javascript">
-jQuery(document).ready(function ($) {
-  $('#projects_carousel').carousel()
+document.addEventListener('DOMContentLoaded', function() {
+  const carousel = document.getElementById('projects_carousel');
+  if (carousel) {
+    // Bootstrap 5 carousel auto-initializes, no manual initialization needed
+    // If custom options are needed, use: new bootstrap.Carousel(carousel, options)
+  }
 });
 </script>
 <section id="primary" class="col-12">

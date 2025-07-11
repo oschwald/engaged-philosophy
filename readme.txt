@@ -18,7 +18,7 @@ Please note:
 
 Due to design restrictions in Bootstrap, the navigation menu can "only" be three levels deep, while parent menu items only serves as a headline for the child menu items and can not be accessed over the navigation menu.
 The Footer Menu is best suitable for short menues with just a few links. It replaces the credits section, once a menu has been assigned to the location.
-To take advantage of all the possibilites Bootstrap has to offer, Bootstrap requires jQuery 1.7, which does not come with WordPress versions prior to 3.3.0. Consider adding a plugin that provides the lates version of jQuery, if you want to use this Theme with WordPress 3.2.1 or lower.
+This theme uses Bootstrap 5 with vanilla JavaScript, eliminating the need for jQuery. All interactive features are implemented using modern JavaScript and Bootstrap 5 components.
 
 = License =
 Unless otherwise specified, all the theme files, scripts and images are licensed under GNU General Public Licemse.
@@ -172,7 +172,7 @@ THIS IS A MAJOR RELEASE, BREAKING BACKWARD COMPATIBILITY IN SOME PLACES
 
 = 1.2.2 =
 * Added image carousel for the first ten images of a gallery post-format
-* Added default support for Bootstrap jQuery plugins Tooltip, Popover, Alert and Carousel
+* Added default support for Bootstrap 5 components including Tooltip, Popover, Alert and Carousel
 * Added tow more menu locations, nav pills style (props Benfarhat)
 * Define $content_width earlier, so embeds work how they are supposed to
 * Removed a misplaced character in Title title-attributes

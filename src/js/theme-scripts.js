@@ -62,5 +62,10 @@ function initTheme() {
   initFacebookSDK();
 }
 
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+  initTheme();
+});
+
 // Export for use in main index.js
 export { initTheme };

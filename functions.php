@@ -224,7 +224,7 @@ function the_bootstrap_register_scripts_styles()
         wp_register_script(
             'the-bootstrap',
             get_template_directory_uri() . "/build/theme-scripts.js",
-            array('jquery'),
+            array(),
             $theme_version,
             true
         );
