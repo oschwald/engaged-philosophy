@@ -12,6 +12,64 @@
     padding: 0 10px;
   }
   
+  // Fix logo text truncation on mobile
+  #branding img {
+    max-width: 100% !important;
+    height: auto !important;
+    width: auto !important;
+  }
+  
+  // Ensure logo container has enough space
+  #branding .navbar-brand img,
+  #branding a img {
+    max-width: 320px !important; // Allow wider logo on mobile
+    height: auto !important;
+  }
+  
+  // Mobile navigation improvements
+  .navbar-toggler {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .navbar-collapse {
+    margin-top: 0.5rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 1rem;
+  }
+  
+  // Improve mobile carousel layout - single project per slide
+  .carousel-item .row {
+    flex-direction: column;
+  }
+  
+  .carousel-item .col-md-6 {
+    width: 100% !important;
+    margin-bottom: 1rem;
+  }
+  
+  // Better mobile spacing
+  .lead-home {
+    height: auto !important;
+    margin-bottom: 1rem;
+    padding: 1rem;
+  }
+  
+  // Mobile footer improvements
+  .footer-custom {
+    text-align: center;
+    padding: 1rem !important;
+  }
+  
+  // Improve mobile text readability
+  .tag-cloud-projects {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  
   #page {
     margin: 0;
     padding: 10px;
@@ -84,10 +142,30 @@
   }
 }
 
-// Medium devices (tablets, 768px to 778px)
-@media (min-width: 768px) and (max-width: 778px) {
+// Medium devices (tablets, 768px to 1199px)
+@media (min-width: 768px) and (max-width: 1199px) {
   #page {
     margin-right: -15px;
+  }
+  
+  // Better tablet carousel layout
+  .carousel-item img {
+    height: 400px;
+  }
+  
+  .lead-home {
+    height: 400px;
+    font-size: 105%;
+  }
+  
+  // Improved navigation spacing on tablets
+  .navbar-nav .nav-link {
+    padding: 0.5rem 0.8rem !important;
+  }
+  
+  // Better footer layout on tablets
+  .footer-custom {
+    padding: 1.5rem !important;
   }
 }
 
