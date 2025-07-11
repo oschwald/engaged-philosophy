@@ -55,13 +55,13 @@ tha_entry_before(); ?>
 				</em>
 			</p>
 		</div>
-		<div id="gallery-slider" class="carousel slide col-lg-5">
+		<div id="gallery-slider" class="carousel slide col-lg-5" data-bs-ride="carousel">
 
 			<!-- Carousel items -->
 			<div class="carousel-inner">
-				<?php foreach ( $the_bootstrap_images as $the_bootstrap_image ) : ?>
-				<figure class="item">
-					<?php echo wp_get_attachment_image( $the_bootstrap_image->ID, array( 470, 353 ) );
+				<?php $first = true; foreach ( $the_bootstrap_images as $the_bootstrap_image ) : ?>
+				<figure class="carousel-item<?php if($first) { echo ' active'; $first = false; } ?>">
+					<?php echo wp_get_attachment_image( $the_bootstrap_image->ID, array( 470, 353 ), false, array('class' => 'd-block w-100') );
 					if ( has_excerpt( $the_bootstrap_image->ID ) ) :?>
 					<figcaption class="carousel-caption">
 						<h4><?php echo get_the_title( $the_bootstrap_image->ID ); ?></h4>
@@ -73,8 +73,14 @@ tha_entry_before(); ?>
 			</div>
 
 			<!-- Carousel nav -->
-			<a class="carousel-control left" href="#gallery-slider" data-slide="prev"><?php _ex( '&lsaquo;', 'carousel-control', 'the-bootstrap' ); ?></a>
-			<a class="carousel-control right" href="#gallery-slider" data-slide="next"><?php _ex( '&rsaquo;', 'carousel-control', 'the-bootstrap' ); ?></a>
+			<button class="carousel-control-prev" type="button" data-bs-target="#gallery-slider" data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Previous</span>
+			</button>
+			<button class="carousel-control-next" type="button" data-bs-target="#gallery-slider" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Next</span>
+			</button>
 		</div><!-- #gallery-slider -->
 
 		<?php endif; /* if images */ ?>

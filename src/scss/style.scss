@@ -41,14 +41,6 @@ $link-hover-color: $orange-dark;
 // Heading colors
 $headings-color: $orange;
 
-// Border radius overrides
-$border-radius: 0;
-$border-radius-sm: 0;
-$border-radius-lg: 0;
-$border-radius-xl: 0;
-$border-radius-xxl: 0;
-$border-radius-pill: 0;
-
 // Import Bootstrap with our overrides
 @import "~bootstrap/scss/bootstrap";
 

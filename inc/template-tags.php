@@ -49,12 +49,24 @@ function the_bootstrap_content_nav() {
 		'total'		=>	$wp_query->max_num_pages,
 		'current'	=>	$paged,
 		'mid_size'	=>	3,
-		'type'		=>	'list',
+		'type'		=>	'array',
+		'prev_text'	=>	'&laquo; Previous',
+		'next_text'	=>	'Next &raquo;',
 		'add_args'	=>	array_map( 'urlencode', $query_args )
 	) );
 
 	if ( $links ) {
-		echo "<nav class=\"pagination justify-content-center\">{$links}</nav>";
+		echo '<nav aria-label="Page navigation"><ul class="pagination justify-content-center">';
+		foreach ( $links as $link ) {
+			if ( strpos( $link, 'current' ) !== false ) {
+				echo '<li class="page-item active">' . str_replace( 'page-numbers current', 'page-link', $link ) . '</li>';
+			} elseif ( strpos( $link, 'dots' ) !== false ) {
+				echo '<li class="page-item disabled"><span class="page-link">' . strip_tags( $link ) . '</span></li>';
+			} else {
+				echo '<li class="page-item">' . str_replace( 'page-numbers', 'page-link', $link ) . '</li>';
+			}
+		}
+		echo '</ul></nav>';
 	}
 }
 endif;

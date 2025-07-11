@@ -10,16 +10,16 @@
 
 
 tha_entry_before(); ?>
-<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+<article id="post-<?php the_ID(); ?>" <?php post_class('mb-5 pb-4 border-bottom'); ?>>
     <?php tha_entry_top(); ?>
 
-    <header class="page-header">
-        <?php the_title( '<h2 class="entry-title">', '</h2>' ); ?>
+    <header class="page-header mb-3">
+        <?php the_title( '<h2 class="entry-title h4 mb-0">', '</h2>' ); ?>
     </header><!-- .entry-header -->
 
-    <div class="entry-content">
+    <div class="entry-content text-muted lh-base">
         <?php
-            echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class'=>'img-thumbnail float-end', 'style' => 'margin-left: 5px'));
+            echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class'=>'img-thumbnail float-end ms-3'));
             the_excerpt( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) );
             the_bootstrap_link_pages();
         ?>

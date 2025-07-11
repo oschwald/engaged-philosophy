@@ -1,6 +1,17 @@
 // Custom Styles
 // --------------------------------------------------
 
+// Force all border-radius CSS custom properties to 0 (override Bootstrap defaults)
+:root {
+  --bs-border-radius: 0 !important;
+  --bs-border-radius-sm: 0 !important;
+  --bs-border-radius-lg: 0 !important;
+  --bs-border-radius-xl: 0 !important;
+  --bs-border-radius-xxl: 0 !important;
+  --bs-border-radius-2xl: 0 !important;
+  --bs-border-radius-pill: 0 !important;
+}
+
 // Sidebar content styling - simplified
 .lead-home {
   font-size: 112%; // Fine-tuned text size for optimal readability and fit
@@ -10,7 +21,6 @@
   margin-bottom: 1.5rem;
   background-color: #f8f9fa; // Light background
   border: 1px solid #dee2e6; // Subtle border
-  border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
@@ -39,7 +49,6 @@
   padding: 2rem 1.5rem 1.5rem;
   color: white;
   text-align: left;
-  border-radius: 0 0 8px 8px;
 }
 
 .carousel-caption h4 {
@@ -53,35 +62,38 @@
   margin-bottom: 0;
 }
 
-// Carousel container
+// Carousel container - remove all padding and borders
 .carousel.slide {
   position: relative;
   margin-bottom: 1.5rem;
-  border-radius: 8px;
-  overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0 !important; // Remove any Bootstrap padding
+  border: none !important; // Remove any borders
+}
+
+// Bootstrap utility classes handle the carousel spacing in the template
+
+.carousel-inner {
+  padding: 0 !important; // Remove any inner padding
+  border: none !important; // Remove any inner borders
+}
+
+.carousel-item {
+  padding: 0 !important; // Remove any item padding
+  border: none !important; // Remove any item borders
+  transition: transform 0.8s ease-in-out;
 }
 
 .carousel-item img {
   width: 100%;
   height: 460px;
   object-fit: cover;
+  padding: 0 !important; // Remove any image padding
+  border: none !important; // Remove any image borders
+  margin: 0 !important; // Remove any image margins
 }
 
-// Improve carousel transition
-.carousel-item {
-  transition: transform 0.8s ease-in-out;
-}
-
-// Reduce column gutters with consistent container padding
-#projects_carousel {
-  padding-right: 0.5rem; // Smaller gutter with container padding
-}
-
-// Consistent spacing for sidebar
-.col-lg-3 {
-  padding-left: 0.5rem; // Smaller gutter with container padding
-}
+// Let Bootstrap handle column spacing
 
 // Carousel controls
 .carousel-control-prev,
@@ -139,7 +151,6 @@
 .navbar-nav .nav-link:hover {
   color: $orange !important;
   background-color: rgba(253, 126, 20, 0.1);
-  border-radius: 4px;
 }
 
 
@@ -198,6 +209,132 @@
 // WordPress-specific styles
 .card.bg-light {
   border: 1px solid #dee2e6;
+}
+
+// Sidebar widget styling to match production site
+.widget-area {
+  padding: 0 1rem 0 1.5rem; // Better spacing from main content
+}
+
+.widget.card {
+  border: 1px solid #dee2e6;
+  background-color: #f8f9fa; // Light gray background like production
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.widget .card-header {
+  background-color: #e9ecef; // Slightly darker gray for header
+  border-bottom: 1px solid #dee2e6;
+  padding: 1.5rem 1.5rem; // Much more padding to prevent headings from touching edges
+  margin-bottom: 0;
+}
+
+.widget .card-header h3.widget-title {
+  color: $orange;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0;
+  text-transform: none;
+}
+
+// Fix h2 heading padding in widgets - add more specific styling
+.widget h2.widget-title {
+  color: $orange;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0;
+  padding: 1.5rem 1.5rem; // Generous padding to prevent touching edges
+  background-color: #e9ecef; // Darker gray for header
+  border-bottom: 1px solid #dee2e6;
+}
+
+// Ensure all widget headings have consistent styling
+.widget-title {
+  color: $orange !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 0 !important;
+  padding: 1.5rem 1.5rem !important; // Force proper padding
+  background-color: #e9ecef !important; // Force header background
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+.widget .card-body {
+  padding: 1.5rem; // Match header padding
+  background-color: #f8f9fa; // Match widget background
+}
+
+// Widget content styling
+.widget ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0;
+}
+
+.widget ul li {
+  padding: 0.75rem 1.5rem; // More padding to match header spacing
+  border-bottom: 1px solid #e9ecef;
+}
+
+.widget ul li:last-child {
+  border-bottom: none;
+}
+
+.widget ul li a {
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.widget ul li a:hover {
+  color: $orange;
+  text-decoration: underline;
+}
+
+// Direct targeting of search page sidebar elements
+#secondary {
+  // Target the first search widget that has no proper wrapper
+  > *:first-child {
+    border: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  // All h2 headings in sidebar
+  h2 {
+    background-color: #e9ecef;
+    color: #fd7e14;
+    padding: 1.5rem;
+    margin: 0;
+    border-bottom: 1px solid #dee2e6;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+// Recent comments widget styling  
+.widget_recent_comments ul li {
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+}
+
+.widget_recent_comments .comment-author-link {
+  font-weight: 500;
+}
+
+// Archives widget styling
+.widget_archive ul li {
+  display: flex;
+  justify-content: space-between;
+}
+
+// Categories widget styling  
+.widget_categories ul li {
+  display: flex;
+  justify-content: space-between;
 }
 
 // Sidebar card specific styling - now handled above
@@ -260,7 +397,6 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background-color: #f8f9fa;
   border: 1px solid #dee2e6;
-  border-radius: 8px;
   padding: 1.5rem;
   line-height: 1.4;
   text-align: left;
@@ -278,7 +414,6 @@ body {
   transition: all 0.2s ease;
   line-height: 1.3;
   white-space: nowrap;
-  border-radius: 4px;
 }
 
 .tag-cloud-projects a:hover {
@@ -513,7 +648,6 @@ img.wp-smiley {
 
 table .label {
   background-color: transparent;
-  border-radius: none;
   color: inherit;
   font-size: inherit;
   text-transform: inherit;
@@ -549,14 +683,40 @@ table .label {
   height: auto;
 }
 
-.pagination span {
-  background-color: #f5f5f5;
-  color: #999999;
-  cursor: default;
+// Use Bootstrap pagination with custom colors
+.pagination {
+  margin: 2rem 0;
 }
 
-.pagination span.dots {
-  background-color: #ffffff;
+.pagination .page-link {
+  color: #333;
+}
+
+.pagination .page-link:hover {
+  color: $orange;
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: $orange;
+  border-color: $orange;
+}
+
+.pagination .page-item.disabled .page-link {
+  color: #6c757d;
+}
+
+// Minimal custom styles - let Bootstrap handle most spacing and layout
+
+// Article title hover effect
+article .entry-title a:hover {
+  color: $orange;
+}
+
+// Widget title styling
+.widget h2 {
+  color: $orange;
 }
 
 // WordPress Core

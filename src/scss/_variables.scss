@@ -73,7 +73,7 @@ $navbar-nav-link-padding-x: 0.5rem;
 $navbar-toggler-padding-y: 0.25rem;
 $navbar-toggler-padding-x: 0.75rem;
 $navbar-toggler-font-size: 1.25rem;
-$navbar-toggler-border-radius: 0.25rem;
+$navbar-toggler-border-radius: 0;
 
 // Override Bootstrap variables as needed
 $primary: $orange;
@@ -84,3 +84,12 @@ $warning: $yellow;
 $danger: $red;
 $light: $gray-lightest;
 $dark: $gray-dark;
+
+// Disable rounded corners globally
+$border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
+$border-radius-xl: 0;
+$border-radius-xxl: 0;
+$border-radius-2xl: 0;
+$border-radius-pill: 0;

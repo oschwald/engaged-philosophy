@@ -64,13 +64,13 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 		if ( $title = get_the_title( $instance['post_id'] ) )
 			echo $before_title . '<a href="' . esc_url( get_permalink( $instance['post_id'] ) ) . '" title="' . sprintf( esc_attr__( 'Permalink to %s', 'the-bootstrap' ), esc_attr( strip_tags( $title ) ) ) . '" rel="bookmark">' . esc_html( $title ) . '</a>' . $after_title;
 		?>
-		<div id="sidebar-gallery-slider" class="carousel slide">
+		<div id="sidebar-gallery-slider" class="carousel slide" data-bs-ride="carousel">
 
 			<!-- Carousel items -->
 			<div class="carousel-inner">
-				<?php foreach ( $attachments as $attachment ) : ?>
-				<figure class="item">
-					<?php echo wp_get_attachment_image( $attachment->ID, array( 370, 278 ) );
+				<?php $first = true; foreach ( $attachments as $attachment ) : ?>
+				<figure class="carousel-item<?php if($first) { echo ' active'; $first = false; } ?>">
+					<?php echo wp_get_attachment_image( $attachment->ID, array( 370, 278 ), false, array('class' => 'd-block w-100') );
 					if ( has_excerpt( $attachment->ID ) ) : ?>
 					<figcaption class="carousel-caption">
 						<h4><?php echo esc_html( get_the_title( $attachment->ID ) ); ?></h4>
@@ -82,8 +82,14 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 			</div><!-- .carousel-inner -->
 
 			<!-- Carousel nav -->
-			<a class="carousel-control left" href="#sidebar-gallery-slider" data-slide="prev"><?php _ex( '&lsaquo;', 'carousel-control', 'the-bootstrap' ); ?></a>
-			<a class="carousel-control right" href="#sidebar-gallery-slider" data-slide="next"><?php _ex( '&rsaquo;', 'carousel-control', 'the-bootstrap' ); ?></a>
+			<button class="carousel-control-prev" type="button" data-bs-target="#sidebar-gallery-slider" data-bs-slide="prev">
+				<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Previous</span>
+			</button>
+			<button class="carousel-control-next" type="button" data-bs-target="#sidebar-gallery-slider" data-bs-slide="next">
+				<span class="carousel-control-next-icon" aria-hidden="true"></span>
+				<span class="visually-hidden">Next</span>
+			</button>
 		</div><!-- #sidebar-gallery-slider .carousel .slide -->
 		<?php
 

@@ -179,9 +179,9 @@ function the_bootstrap_widgets_init()
     register_sidebar( array(
         'name'			=>	__( 'Main Sidebar', 'the-bootstrap' ),
         'id'			=>	'main',
-        'before_widget'	=>	'<aside id="%1$s" class="widget card %2$s">',
+        'before_widget'	=>	'<aside id="%1$s" class="widget card mb-4 %2$s">',
         'after_widget'	=>	'</aside>',
-        'before_title'	=>	'<h2 class="widget-title">',
+        'before_title'	=>	'<h2 class="widget-title card-header h5 mb-0">',
         'after_title'	=>	'</h2>',
     ) );
 
@@ -189,9 +189,9 @@ function the_bootstrap_widgets_init()
         'name'			=>	__( 'Image Sidebar', 'the-bootstrap' ),
         'description'	=>	__( 'Shown on image attachment pages.', 'the-bootstrap' ),
         'id'			=>	'image',
-        'before_widget'	=>	'<aside id="%1$s" class="widget card %2$s">',
+        'before_widget'	=>	'<aside id="%1$s" class="widget card mb-4 %2$s">',
         'after_widget'	=>	'</aside>',
-        'before_title'	=>	'<h2 class="widget-title">',
+        'before_title'	=>	'<h2 class="widget-title card-header h5 mb-0">',
         'after_title'	=>	'</h2>',
     ) );
 
@@ -936,7 +936,7 @@ function the_bootstrap_img_caption_shortcode( $empty, $attr, $content )
         $id = 'id="' . $id . '" ';
     }
 
-    return '<figure ' . $id . 'class="wp-caption figure ' . $align . '" style="width: '.$width.'px;">
+    return '<figure ' . $id . 'class="wp-caption figure ' . $align . '">
                 ' . do_shortcode( str_replace( 'class="figure', 'class="figure-img img-fluid"', $content ) ) . '
                 <figcaption class="wp-caption-text figure-caption">' . $caption . '</figcaption>
             </figure>';

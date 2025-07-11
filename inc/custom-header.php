@@ -140,10 +140,10 @@ if ( ! function_exists( 'the_bootstrap_admin_header_image' ) ) :
  */
 function the_bootstrap_admin_header_image() { ?>
 	<div id="headimg">
-		<?php $style = ( 'blank' == get_header_textcolor() OR ! get_header_textcolor() ) ? ' style="display:none;"' : ''; ?>
+		<?php $class = ( 'blank' == get_header_textcolor() OR ! get_header_textcolor() ) ? ' class="d-none"' : ''; ?>
 
-		<h1<?php echo $style; ?>><a id="name" onclick="return false;" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a></h1>
-		<div id="desc"<?php echo $style; ?>><?php bloginfo( 'description' ); ?></div>
+		<h1<?php echo $class; ?>><a id="name" onclick="return false;" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a></h1>
+		<div id="desc"<?php echo $class; ?>><?php bloginfo( 'description' ); ?></div>
 		<?php if ( get_header_image() ) : ?>
 			<img src="<?php echo esc_url( get_header_image() ); ?>" alt="" />
 		<?php endif; ?>

@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
   <?php tha_content_before(); ?>
   <main id="content">
     <div class="row">
-      <div id="projects_carousel" class="carousel slide col-lg-9" data-bs-ride="carousel">
+      <div id="projects_carousel" class="carousel slide col-lg-9 ps-3 pe-0" data-bs-ride="carousel">
         <div class="carousel-inner">
           <?php
 
