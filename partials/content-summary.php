@@ -17,7 +17,7 @@ tha_entry_before(); ?>
         <?php the_title( '<h2 class="entry-title">', '</h2>' ); ?>
     </header><!-- .entry-header -->
 
-    <div class="entry-content d-flex flex-wrap">
+    <div class="entry-content">
         <?php
             echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class'=>'img-thumbnail float-end', 'style' => 'margin-left: 5px'));
             the_excerpt( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) );
