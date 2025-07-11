@@ -22,13 +22,22 @@ jQuery(document).ready(function ($) {
       <div id="projects_carousel" class="carousel slide col-lg-9" data-bs-ride="carousel">
         <div class="carousel-inner">
           <?php
+          
+          $carousel_query = new WP_Query(array(
+            'post_type' => 'project',
+            'posts_per_page' => -1,
+            'meta_query' => array(
+              array(
+                'key' => 'highlight',
+                'compare' => 'EXISTS'
+              )
+            )
+          ));
 
-          query_posts(array ( 'post_type' => 'project', 'posts_per_page' => -1 ));
-
-          if (have_posts()):
+          if ($carousel_query->have_posts()):
             $index = 0;
-          while (have_posts()) {
-            the_post();
+          while ($carousel_query->have_posts()) {
+            $carousel_query->the_post();
             if (has_post_thumbnail() && get_field('highlight')) {
               ?>
               <div class="carousel-item <?php if ($index === 0) echo "active" ?>">
@@ -47,7 +56,6 @@ jQuery(document).ready(function ($) {
             }
           }
           endif;
-          wp_reset_query();
           wp_reset_postdata();
 
           ?>
