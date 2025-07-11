@@ -50,9 +50,9 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 		$attributes	.=	$item->url			? ' href="'   . esc_attr( $item->url        ) .'"' : '';
 		if ( $args->has_children ) {
 			if ( $depth > 0 ) {
-				$attributes .= ' class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown"';
+				$attributes .= ' class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"';
 			} else {
-				$attributes .= ' class="nav-link dropdown-toggle" data-bs-toggle="dropdown"';
+				$attributes .= ' class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"';
 			}
 		} else {
 			$attributes .= ( $depth > 0 ) ? ' class="dropdown-item"' : ' class="nav-link"';

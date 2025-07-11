@@ -195,9 +195,9 @@ if ( ! function_exists( 'the_bootstrap_navbar_searchform' ) ) :
 * @return	void
 */
 function the_bootstrap_navbar_searchform( $echo = true ) {
-	$searchform = '	<form id="searchform" class="d-flex ms-auto" method="get" action="' . esc_url( home_url( '/' ) ) . '">
-						<label for="s" class="assistive-text hidden">' . __( 'Search', 'the-bootstrap' ) . '</label>
-						<input type="search" class="form-control" name="s" id="s" placeholder="' . esc_attr__( 'Search', 'the-bootstrap' ) . '" />
+	$searchform = '	<form id="searchform" class="d-flex ms-auto" method="get" action="' . esc_url( home_url( '/' ) ) . '" role="search" aria-label="' . esc_attr__( 'Search the site', 'the-bootstrap' ) . '">
+						<label for="s" class="visually-hidden">' . __( 'Search', 'the-bootstrap' ) . '</label>
+						<input type="search" class="form-control" name="s" id="s" placeholder="' . esc_attr__( 'Search', 'the-bootstrap' ) . '" aria-label="' . esc_attr__( 'Search the site', 'the-bootstrap' ) . '" />
 					</form>';
 
 	if ( $echo )

@@ -28,7 +28,7 @@
   var js, fjs = d.getElementsByTagName(s)[0];
   if (d.getElementById(id)) return;
   js = d.createElement(s); js.id = id;
-  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
+  js.src = "https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0";
   fjs.parentNode.insertBefore(js, fjs);
   }(document, 'script', 'facebook-jssdk'));</script>
 
@@ -58,13 +58,13 @@
   <?php tha_header_after(); ?>
 
   <!-- Navigation bar - full width of container -->
-  <nav id="access" role="navigation">
-    <h3 class="assistive-text"><?php _e( 'Main menu', 'the-bootstrap' ); ?></h3>
-    <div class="skip-link"><a class="assistive-text" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
-    <div class="skip-link"><a class="assistive-text" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
+  <nav id="access" role="navigation" aria-label="Main navigation">
+    <h3 class="visually-hidden"><?php _e( 'Main menu', 'the-bootstrap' ); ?></h3>
+    <div class="skip-link"><a class="visually-hidden" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
+    <div class="skip-link"><a class="visually-hidden" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
     <div <?php the_bootstrap_navbar_class(); ?>>
       <!-- Mobile toggle button -->
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'the-bootstrap' ); ?>">
         <span class="navbar-toggler-icon"></span>
       </button>
       
