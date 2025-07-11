@@ -147,7 +147,7 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 			<label for="<?php echo $this->get_field_id( 'post_id' ); ?>"><?php _e( 'Select Gallery:', 'the-bootstrap' ); ?></label>
 			<select name="<?php echo $this->get_field_name( 'post_id' ); ?>" id="<?php echo $this->get_field_id( 'post_id' ); ?>" class="widefat">
 				<?php foreach ( $gallery_posts as $gallery_post ) {
-					echo '<option value="' . $gallery_post->ID . '"' . selected( $instance['post_id'], $gallery_post->ID ) .'>' . $gallery_post->post_title . '</option>';
+					echo '<option value="' . $gallery_post->ID . '"' . selected( $instance['post_id'], $gallery_post->ID ) .'>' . esc_html( $gallery_post->post_title ) . '</option>';
 				} ?>
 			</select>
 		</p>

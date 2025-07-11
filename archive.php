@@ -33,7 +33,7 @@ get_header(); ?>
                     elseif ( is_year() ) :
                         printf( __( 'Yearly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'Y' ) . '</span>' );
                     else :
-                        _e( single_cat_title(), 'the-bootstrap' );
+                        echo esc_html( single_cat_title() );
                     endif; ?>
                 </h1>
             </header><!-- .page-header -->

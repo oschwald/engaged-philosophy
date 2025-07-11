@@ -232,7 +232,7 @@ function the_bootstrap_settings_field_radio( $args ) {
 	foreach ( (array) $options as $o ) : ?>
 		<label for="<?php echo sanitize_title_with_dashes( $o->value ); ?>">
 			<input type="radio" name="the_bootstrap_theme_options[<?php echo esc_attr( $name ); ?>]" id="<?php echo sanitize_title_with_dashes( $o->value ); ?>" value="<?php echo esc_attr( $o->value ); ?>" <?php checked( $o->value, the_bootstrap_options()->$name ); ?> />
-			<?php if ( isset( $o->description ) ) echo $o->description; ?>
+			<?php if ( isset( $o->description ) ) echo esc_html( $o->description ); ?>
 		</label><br />
 	<?php endforeach;
 
@@ -250,7 +250,6 @@ function the_bootstrap_settings_field_radio( $args ) {
 function the_bootstrap_theme_options_render_page() {
 	?>
 	<div class="wrap">
-		<?php screen_icon(); ?>
 		<h2><?php esc_html_e( 'The Bootstrap Theme Options', 'the-bootstrap' ); ?></h2>
 		<?php settings_errors(); ?>
 
@@ -365,7 +364,7 @@ add_action( 'the_bootstrap_side_info_column', 'the_bootstrap_donate_box', 1 );
  * @return		void
  */
 function the_bootstrap_feed_box() {
-	$rss_items = _the_bootstrap_fetch_feed( 'http://en.wp.obenland.it/feed/' );
+	$rss_items = _the_bootstrap_fetch_feed( 'https://en.wp.obenland.it/feed/' );
 	?>
 	<div id="formatdiv" class="postbox">
 		<h3 class="hndle"><span><?php esc_html_e( 'News from Konstantin', 'the-bootstrap' ); ?></span></h3>
@@ -378,8 +377,8 @@ function the_bootstrap_feed_box() {
 				$url = preg_replace( '/#.*/', '#utm_source=wordpress&utm_medium=sidebannerpostbox&utm_term=rssitem&utm_campaign=the-bootstrap',  $item->get_permalink() ); ?>
 			<li><a class="rsswidget" href="<?php echo esc_url( $url ); ?>"><?php echo esc_html( $item->get_title() ); ?></a></li>
 			<?php endforeach; endif; ?>
-				<li class="twitter"><a href="http://twitter.com/obenland"><?php _e( 'Follow Konstantin on Twitter', 'the-bootstrap' ); ?></a></li>
-				<li class="rss"><a href="http://en.wp.obenland.it/feed/"><?php _e( 'Subscribe via RSS', 'the-bootstrap' ); ?></a></li>
+				<li class="twitter"><a href="https://twitter.com/obenland"><?php _e( 'Follow Konstantin on Twitter', 'the-bootstrap' ); ?></a></li>
+				<li class="rss"><a href="https://en.wp.obenland.it/feed/"><?php _e( 'Subscribe via RSS', 'the-bootstrap' ); ?></a></li>
 			</ul>
 		</div>
 	</div>

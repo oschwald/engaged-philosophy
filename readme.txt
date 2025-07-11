@@ -1,18 +1,18 @@
-=== The Bootstrap ===
-Contributors:		kobenland
-Tags:				black, blue, white, light, two-columns, left-sidebar, right-sidebar, flexible-width, custom-header, custom-background, threaded-comments, translation-ready, microformats, custom-menu, post-formats, sticky-posts
-Donate link:		https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=542W6XT4PLT4L
-Requires at least:	3.3.0
-Tested up to:		3.4.1
-Stable tag:			2.0.0
+=== Engaged Philosophy ===
+Contributors:		greg
+Tags:				education, philosophy, bootstrap, responsive, two-columns, left-sidebar, right-sidebar, custom-header, custom-background, threaded-comments, translation-ready, custom-menu, post-formats, sticky-posts
+Requires at least:	5.0
+Tested up to:		6.8
+Requires PHP:		7.4
+Stable tag:			1.0.0
 
-A WordPress Theme based on Bootstrap, from Twitter
+A WordPress Theme for Educational Philosophy Content, built with Bootstrap 5
 
 == Description ==
 
-The Theme is 100% responsive - you do not need a seperate mobile-Theme with this layout.
-It has a seperate Sidebar just for image pages, to make it a special place to show your pictures!
-The Bootstrap is fully compatible with WordPress SEO by Yoast!
+Engaged Philosophy is a modern WordPress theme designed for philosophy educators and students. It provides tools for implementing activist or service projects in philosophy classes with assignment guidelines, sample projects, and testimonials.
+
+The theme is 100% responsive and built with Bootstrap 5, ensuring optimal display on all devices. Features include a project showcase carousel, custom post types for projects, and specialized layouts for educational content.
 
 Please note:
 

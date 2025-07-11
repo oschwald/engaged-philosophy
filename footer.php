@@ -30,10 +30,7 @@
                 <?php tha_footer_after(); ?>
             </div><!-- #page -->
         </div><!-- .container -->
-    <?php if ( WP_DEBUG && current_user_can( 'manage_options' ) ) : ?>
-    <!-- <?php printf( __( '%d queries. %s seconds.', 'the-bootstrap' ), absint( get_num_queries() ), esc_html( timer_stop(0, 3) ) ); ?> -->
-    <?php endif; ?>
-    <?php wp_footer(); ?>
+        <?php wp_footer(); ?>
     </body>
 </html>
 <?php
