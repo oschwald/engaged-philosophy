@@ -1290,5 +1290,23 @@ function the_bootstrap_flush_rewrite_rules_on_activation() {
 }
 add_action( 'after_switch_theme', 'the_bootstrap_flush_rewrite_rules_on_activation' );
 
+
+/**
+ * Add custom favicon and app icons
+ *
+ * @since 1.0.0
+ */
+function the_bootstrap_add_favicon() {
+    $template_url = get_template_directory_uri();
+    
+    echo '<!-- Favicon and App Icons -->' . "\n";
+    echo '<link rel="icon" type="image/svg+xml" href="' . esc_url( $template_url . '/favicon.svg' ) . '">' . "\n";
+    echo '<link rel="alternate icon" type="image/svg+xml" href="' . esc_url( $template_url . '/favicon-simple.svg' ) . '">' . "\n";
+    echo '<link rel="manifest" href="' . esc_url( $template_url . '/site.webmanifest' ) . '">' . "\n";
+    echo '<meta name="theme-color" content="#fd7e14">' . "\n";
+    echo '<meta name="msapplication-TileColor" content="#fd7e14">' . "\n";
+}
+add_action( 'wp_head', 'the_bootstrap_add_favicon', 1 );
+
 /* End of file functions.php */
 /* Location: ./wp-content/themes/the-bootstrap/functions.php */
