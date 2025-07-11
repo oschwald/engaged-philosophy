@@ -306,7 +306,7 @@ function the_bootstrap_print_styles()
         if ( function_exists( 'wp_add_inline_style' ) )
             wp_add_inline_style( 'the-bootstrap', $css );
         else
-            echo "<style type='text/css'>\n{$css}\n</style>\n";
+            echo "<style>\n{$css}\n</style>\n";
     }
 }
 add_action( 'wp_enqueue_scripts', 'the_bootstrap_print_styles' );
@@ -1085,7 +1085,7 @@ function the_bootstrap_register_project_taxonomies() {
             'with_front' => false,
         ),
     ) );
-    
+
     // Schools taxonomy
     register_taxonomy( 'schools', array( 'project' ), array(
         'labels' => array(
@@ -1113,7 +1113,7 @@ function the_bootstrap_register_project_taxonomies() {
             'with_front' => false,
         ),
     ) );
-    
+
     // Professors taxonomy
     register_taxonomy( 'professors', array( 'project' ), array(
         'labels' => array(
@@ -1139,7 +1139,7 @@ function the_bootstrap_register_project_taxonomies() {
             'with_front' => false,
         ),
     ) );
-    
+
     // Courses taxonomy
     register_taxonomy( 'courses', array( 'project' ), array(
         'labels' => array(
@@ -1165,7 +1165,7 @@ function the_bootstrap_register_project_taxonomies() {
             'with_front' => false,
         ),
     ) );
-    
+
     // Semesters taxonomy
     register_taxonomy( 'semesters', array( 'project' ), array(
         'labels' => array(

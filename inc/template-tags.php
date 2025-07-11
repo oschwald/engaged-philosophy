@@ -1,9 +1,9 @@
 <?php
 /** template-tags.php
- * 
+ *
  * Implementation of the Custom Header feature
  * http://codex.wordpress.org/Custom_Headers
- * 
+ *
  * @author		Konstantin Obenland
  * @package		The Bootstrap
  * @since		1.2.4 - 07.04.2012
@@ -33,16 +33,16 @@ function the_bootstrap_content_nav() {
 	$pagenum_link	=	html_entity_decode( get_pagenum_link() );
 	$query_args		=	array();
 	$url_parts		=	explode( '?', $pagenum_link );
-	
+
 	if ( isset( $url_parts[1] ) ) {
 		wp_parse_str( $url_parts[1], $query_args );
 	}
 	$pagenum_link	=	remove_query_arg( array_keys( $query_args ), $pagenum_link );
 	$pagenum_link	=	trailingslashit( $pagenum_link ) . '%_%';
-	
+
 	$format			=	( $wp_rewrite->using_index_permalinks() AND ! strpos( $pagenum_link, 'index.php' ) ) ? 'index.php/' : '';
 	$format			.=	$wp_rewrite->using_permalinks() ? user_trailingslashit( 'page/%#%', 'paged' ) : '?paged=%#%';
-	
+
 	$links	=	paginate_links( array(
 		'base'		=>	$pagenum_link,
 		'format'	=>	$format,
@@ -156,7 +156,7 @@ function the_bootstrap_link_pages( $args = array() ) {
 				if ($i == $page) {
 					$output .= '<li class="page-item active"><span class="page-link">' . $j . '</span></li>';
 				}
-				
+
 			}
 			$output .= '</ul></nav>';
 		} else {
@@ -189,7 +189,7 @@ if ( ! function_exists( 'the_bootstrap_navbar_searchform' ) ) :
 *
 * @author	Konstantin Obenland
 * @since	1.5,0 - 14.05.2012
-* 
+*
 * @param	bool	$echo	Optional. Whether to echo the form
 *
 * @return	void
@@ -197,7 +197,8 @@ if ( ! function_exists( 'the_bootstrap_navbar_searchform' ) ) :
 function the_bootstrap_navbar_searchform( $echo = true ) {
 	$searchform = '	<form id="searchform" class="d-flex ms-auto" method="get" action="' . esc_url( home_url( '/' ) ) . '" role="search" aria-label="' . esc_attr__( 'Search the site', 'the-bootstrap' ) . '">
 						<label for="s" class="visually-hidden">' . __( 'Search', 'the-bootstrap' ) . '</label>
-						<input type="search" class="form-control" name="s" id="s" placeholder="' . esc_attr__( 'Search', 'the-bootstrap' ) . '" aria-label="' . esc_attr__( 'Search the site', 'the-bootstrap' ) . '" />
+						<input type="search" class="form-control" name="s" id="s" placeholder="' . esc_attr__( 'Search', 'the-bootstrap' ) . '" aria-label="' . esc_attr__( 'Search the site', 'the-bootstrap' ) . '">
+						<button type="submit" class="btn btn-outline-secondary ms-1" aria-label="' . esc_attr__( 'Submit search', 'the-bootstrap' ) . '">' . __( 'Search', 'the-bootstrap' ) . '</button>
 					</form>';
 
 	if ( $echo )
@@ -222,7 +223,7 @@ function the_bootstrap_navbar_class() {
 
 	if ( 'static' != the_bootstrap_options()->navbar_position )
 		$classes[]	=	the_bootstrap_options()->navbar_position;
-	
+
 	if ( the_bootstrap_options()->navbar_inverse ) {
 		$classes[]	=	'navbar-dark';
 		$classes[]	=	'bg-dark';
@@ -230,7 +231,7 @@ function the_bootstrap_navbar_class() {
 		$classes[]	=	'navbar-light';
 		$classes[]	=	'bg-light';
 	}
-	
+
 	apply_filters( 'the_bootstrap_navbar_classes', $classes );
 
 	echo 'class="' . esc_attr( join( ' ', $classes ) ) . '"';
@@ -252,13 +253,13 @@ if ( ! function_exists( 'the_bootstrap_comments_link' ) ) :
  * @param	string	$more		The string to display when there are more than one comment
  * @param	string	$css_class	The CSS class to use for comments
  * @param	string	$none		The string to display when comments have been turned off
- * 
+ *
  * @return	void
  */
 function the_bootstrap_comments_link( $zero = false, $one = false, $more = false, $css_class = '', $none = false ) {
 	$number = get_comments_number();
 	$class  = empty( $css_class ) ? '' : ' class="' . esc_attr( $css_class ) . '"';
-	
+
 	if ( false === $zero ) $zero = __( 'No Comments' );
 	if ( false === $one  ) $one  = __( '1 Comment' );
 	if ( false === $more ) $more = __( '% Comments' );
@@ -273,12 +274,12 @@ function the_bootstrap_comments_link( $zero = false, $one = false, $more = false
 		echo '<span' . $class . '>' . __( 'Enter your password to view comments.' ) . '</span>';
 		return;
 	}
-	
+
 	if ( 1 < $number )
 		$comments_number = str_replace( '%', number_format_i18n( $number ), $more );
 	else
 		$comments_number = ( 0 == $number ) ? $zero : $one;
-	
+
 	$link = sprintf( '<a href="%1$s"%2$s%3s title="%4$s">%5$s</a>',
 		( 0 == $number ) ? '#respond' : '#comments',
 		$class,
@@ -286,7 +287,7 @@ function the_bootstrap_comments_link( $zero = false, $one = false, $more = false
 		esc_attr( sprintf( __( 'Comment on %s' ), the_title_attribute( array('echo' => 0 ) ) ) ),
 		apply_filters( 'comments_number', $comments_number, $number )
 	);
-	
+
 	echo apply_filters( 'the_bootstrap_comments_link', $link, $zero, $one, $more, $css_class, $none );
 }
 endif;

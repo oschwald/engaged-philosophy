@@ -15,7 +15,7 @@ get_header(); ?>
 	<?php tha_content_before(); ?>
 	<div id="content" role="main">
 		<?php tha_content_top(); ?>
-		
+
 		<?php tha_entry_before(); ?>
 		<article id="post-0" class="post error404 not-found">
 			<?php tha_entry_top(); ?>
@@ -28,13 +28,13 @@ get_header(); ?>
 
 				<?php
 				get_search_form();
-				
+
 				the_widget( 'WP_Widget_Recent_Posts', array( 'number' => 10 ), array( 'widget_id' => '404' ) );
-				
+
 				the_widget( 'WP_Widget_Categories', array(
 					'title'	=>	__( 'Most Used Categories', 'the-bootstrap' ),
 				) );
-				
+
 				$archive_content = sprintf( _x( 'Try looking in the monthly archives. %1$s', '%1$s: smilie', 'the-bootstrap' ), convert_smilies( ':)' ) );
 				the_widget( 'WP_Widget_Archives', array(
 					'count'		=>	0,
@@ -42,14 +42,14 @@ get_header(); ?>
 				), array(
 					'after_title'	=>	"</h2><p>{$archive_content}</p>"
 				) );
-				
+
 				the_widget( 'WP_Widget_Tag_Cloud' ); ?>
 
 			</div><!-- .entry-content -->
 			<?php tha_entry_bottom(); ?>
 		</article><!-- #post-0 .post .error404 .not-found -->
 		<?php tha_entry_after(); ?>
-		
+
 		<?php tha_content_bottom(); ?>
 	</div><!-- #content -->
 	<?php tha_content_after(); ?>

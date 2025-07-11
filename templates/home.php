@@ -7,7 +7,7 @@
 
 get_header(); ?>
 
-<script type="text/javascript">
+<script>
 jQuery(document).ready(function ($) {
   $('#projects_carousel').carousel({
     interval: 30000
@@ -17,12 +17,12 @@ jQuery(document).ready(function ($) {
 
 <section id="primary" class="col-12">
   <?php tha_content_before(); ?>
-  <div id="content" role="main">
+  <main id="content">
     <div class="row">
       <div id="projects_carousel" class="carousel slide col-lg-9" data-bs-ride="carousel">
         <div class="carousel-inner">
           <?php
-          
+
           $carousel_query = new WP_Query(array(
             'post_type' => 'project',
             'posts_per_page' => -1,
@@ -41,7 +41,7 @@ jQuery(document).ready(function ($) {
             if (has_post_thumbnail() && get_field('highlight')) {
               ?>
               <div class="carousel-item <?php if ($index === 0) echo "active" ?>">
-                <?php 
+                <?php
                 if (has_post_thumbnail()) {
                   the_post_thumbnail(array(700, 460), array('alt' => get_the_title() . ' project image'));
                 }
@@ -96,7 +96,7 @@ jQuery(document).ready(function ($) {
     tha_content_bottom();
     ?>
 
-  </div><!-- #content -->
+  </main><!-- #content -->
   <?php tha_content_after(); ?>
 </section><!-- #primary -->
 

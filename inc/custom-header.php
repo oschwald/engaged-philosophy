@@ -1,9 +1,9 @@
 <?php
 /** custom-header.php
- * 
+ *
  * Implementation of the Custom Header feature
  * http://codex.wordpress.org/Custom_Headers
- * 
+ *
  * @author		Automattic, Konstantin Obenland
  * @package		The Bootstrap
  * @since		1.2.0 - 05.04.2012
@@ -11,10 +11,10 @@
 
 /**
  * Adds Custom Header support
- * 
+ *
  * @author	Automattic
  * @since	1.2.0 - 05.04.2012
- * 
+ *
  * @return	void
  */
 function the_bootstrap_custom_header_setup() {
@@ -26,18 +26,18 @@ function the_bootstrap_custom_header_setup() {
 		'width'						=>	apply_filters( 'the_bootstrap_header_image_width', 481 ),
 		'height'					=>	apply_filters( 'the_bootstrap_header_image_height', 102 ),
 		'flex-height'				=>	true,
-		
+
 		// The default header text color
 		'default-text-color'		=>	'333333',
-			
+
 		// Add a way for the custom header to be styled in the admin panel that controls custom headers
 		'wp-head-callback'			=>	'the_bootstrap_header_style',
 		'admin-head-callback'		=>	'the_bootstrap_admin_header_style',
 		'admin-preview-callback'	=>	'the_bootstrap_admin_header_image',
 	) );
-	
+
 	add_theme_support( 'custom-header', $args );
-	
+
 	if ( ! function_exists( 'wp_get_theme' ) ) {
 		// Compat: Versions of WordPress prior to 3.4.
 		define( 'HEADER_TEXTCOLOR',		$args['default-text-color'] );
@@ -56,7 +56,7 @@ if ( ! function_exists( 'the_bootstrap_header_style' ) ) :
  *
  * @author	Automattic
  * @since	1.2.0 - 05.04.2012
- * 
+ *
  * @return	void
  */
 function the_bootstrap_header_style() {
@@ -65,7 +65,7 @@ function the_bootstrap_header_style() {
 	// get_header_textcolor() options: get_theme_support( 'custom-header', 'default-text-color' ) is default, hide text (returns 'blank') or any hex value
 	if ( get_theme_support( 'custom-header', 'default-text-color' ) != get_header_textcolor() ) :
 	?>
-	<style type="text/css">
+	<style>
 		<?php if ( 'blank' == get_header_textcolor() ) : ?>
 		#branding hgroup {
 			position: absolute !important;
@@ -90,12 +90,12 @@ if ( ! function_exists( 'the_bootstrap_admin_header_style' ) ) :
  *
  * @author	Automattic
  * @since	1.2.0 - 05.04.2012
- * 
+ *
  * @return	void
  */
 function the_bootstrap_admin_header_style() {
 ?>
-	<style type="text/css">
+	<style>
 	.appearance_page_custom-header #headimg {
 		border: none;
 	}
@@ -135,13 +135,13 @@ if ( ! function_exists( 'the_bootstrap_admin_header_image' ) ) :
  *
  * @author	Automattic
  * @since	1.2.0 - 05.04.2012
- * 
+ *
  * @return	void
  */
 function the_bootstrap_admin_header_image() { ?>
 	<div id="headimg">
 		<?php $style = ( 'blank' == get_header_textcolor() OR ! get_header_textcolor() ) ? ' style="display:none;"' : ''; ?>
-		
+
 		<h1<?php echo $style; ?>><a id="name" onclick="return false;" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a></h1>
 		<div id="desc"<?php echo $style; ?>><?php bloginfo( 'description' ); ?></div>
 		<?php if ( get_header_image() ) : ?>

@@ -22,12 +22,12 @@ get_header(); ?>
 				<h1 class="page-title"><?php
 					printf( __( 'Category Archives: %s', 'the-bootstrap' ), '<span>' . single_cat_title( '', false ) . '</span>' );
 				?></h1>
-	
+
 				<?php if ( $category_description = category_description() ) {
 					echo apply_filters( 'category_archive_meta', '<div class="category-archive-meta">' . $category_description . '</div>' );
 				} ?>
 			</header><!-- .page-header -->
-	
+
 			<?php
 			while ( have_posts() ) {
 				the_post();
@@ -37,7 +37,7 @@ get_header(); ?>
 		else :
 			get_template_part( '/partials/content', 'not-found' );
 		endif;
-		
+
 		tha_content_bottom(); ?>
 	</div><!-- #content -->
 	<?php tha_content_after(); ?>

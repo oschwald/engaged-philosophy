@@ -12,7 +12,7 @@
 tha_entry_before(); ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
 	<?php tha_entry_top(); ?>
-	
+
 	<header class="page-header">
 		<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
 	</header><!-- .entry-header -->
@@ -23,7 +23,7 @@ tha_entry_before(); ?>
 		the_bootstrap_link_pages(); ?>
 	</div><!-- .entry-content -->
 	<?php edit_post_link( __( 'Edit', 'the-bootstrap' ), '<footer class="entry-meta"><span class="edit-link label">', '</span></footer>' );
-	
+
 	tha_entry_bottom(); ?>
 </article><!-- #post-<?php the_ID(); ?> -->
 <?php tha_entry_after();

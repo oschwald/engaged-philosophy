@@ -15,7 +15,7 @@
 
 get_header(); ?>
 
-<script type="text/javascript">
+<script>
 jQuery(document).ready(function ($) {
   $('#projects_carousel').carousel()
 });
@@ -24,7 +24,7 @@ jQuery(document).ready(function ($) {
 
   <?php tha_content_before(); ?>
 
-  <div id="content" role="main">
+  <main id="content">
     <?php tha_content_top();
 
     if (have_posts()) : ?>
@@ -41,7 +41,7 @@ jQuery(document).ready(function ($) {
     <div class="row">
     <div class="col-lg-8 offset-lg-2">
       <div class="card card-body tag-cloud-projects">
-      <?php 
+      <?php
         // Generate tag cloud with fixed randomization
         $tag_cloud = wp_tag_cloud(array(
           'taxonomy' => 'topic',
@@ -54,13 +54,13 @@ jQuery(document).ready(function ($) {
           'number' => 40,
           'echo' => false
         ));
-        
+
         // Parse and shuffle with fixed seed for consistency
         if ($tag_cloud) {
           // Use regex to extract complete <a> tags instead of splitting on spaces
           preg_match_all('/<a[^>]*>.*?<\/a>/', $tag_cloud, $matches);
           $tags = $matches[0];
-          
+
           // Use a seed based on the current date to shuffle consistently per day
           mt_srand(date('Ymd'));
           shuffle($tags);
@@ -76,7 +76,7 @@ jQuery(document).ready(function ($) {
    endif;
 
    tha_content_bottom(); ?>
-</div><!-- #content -->
+</main><!-- #content -->
 <?php tha_content_after(); ?>
 </section><!-- #primary -->
 

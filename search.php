@@ -14,13 +14,13 @@ get_header(); ?>
 	<?php tha_content_before(); ?>
 	<div id="content" role="main">
 		<?php tha_content_top();
-		
+
 		if ( have_posts() ) : ?>
-	
+
 			<header class="page-header">
 				<h1 class="page-title"><?php printf( __( 'Search Results for: %s', 'the-bootstrap' ), '<span>' . get_search_query() . '</span>' ); ?></h1>
 			</header>
-	
+
 			<?php
 			while ( have_posts() ) {
 				the_post();
@@ -29,8 +29,8 @@ get_header(); ?>
 			the_bootstrap_content_nav();
 		else :
 			get_template_part( '/partials/content', 'not-found' );
-		endif; 
-	
+		endif;
+
 		tha_content_bottom(); ?>
 	</div><!-- #content -->
 	<?php tha_content_after(); ?>

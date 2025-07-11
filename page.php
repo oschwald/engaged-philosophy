@@ -19,7 +19,7 @@ get_header(); ?>
 	<?php tha_content_before(); ?>
 	<div id="content" role="main">
 		<?php tha_content_top();
-		
+
 		the_post();
 		get_template_part( '/partials/content', 'page' );
 		comments_template();

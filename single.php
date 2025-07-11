@@ -11,7 +11,7 @@
 get_header(); ?>
 
 <section id="primary" class="col-lg-8 px-4">
-	
+
 	<?php tha_content_before(); ?>
 	<div id="content" role="main">
 		<?php tha_content_top();
@@ -21,13 +21,13 @@ get_header(); ?>
 			get_template_part( '/partials/content', 'single' );
 			comments_template();
 		} ?>
-		
+
 		<nav id="nav-single" class="pagination">
 			<h3 class="assistive-text"><?php _e( 'Post navigation', 'the-bootstrap' ); ?></h3>
 			<span class="next"><?php next_post_link( '%link', sprintf( '%1$s <span class="meta-nav">&rarr;</span>', __( 'Next Post', 'the-bootstrap' ) ) ); ?></span>
 			<span class="previous"><?php previous_post_link( '%link', sprintf( '<span class="meta-nav">&larr;</span> %1$s', __( 'Previous Post', 'the-bootstrap' ) ) ); ?></span>
 		</nav><!-- #nav-single -->
-		
+
 		<?php tha_content_bottom(); ?>
 	</div><!-- #content -->
 	<?php tha_content_after(); ?>

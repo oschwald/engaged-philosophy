@@ -10,7 +10,7 @@ tha_sidebars_before(); ?>
 <section id="secondary" class="widget-area col-lg-4" role="complementary">
 	<?php
 	tha_sidebar_top();
-	
+
 	if ( ! dynamic_sidebar( 'image' ) ) {
 		the_widget( 'The_Bootstrap_Image_Meta_Widget', array(), array(
 			'before_widget'	=>	'<aside id="the-bootstrap-image-meta" class="widget card the-bootstrap-image-meta">',
@@ -19,7 +19,7 @@ tha_sidebars_before(); ?>
 			'after_title'	=>	'</h3>',
 		) );
 	}
-	
+
 	tha_sidebar_bottom(); ?>
 </section><!-- #secondary .widget-area -->
 <?php tha_sidebars_after();

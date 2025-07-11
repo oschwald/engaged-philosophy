@@ -22,7 +22,7 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 	function start_el( &$output, $data_object, $depth = 0, $args = null, $current_object_id = 0 ) {
 		global $wp_query;
 		$item = $data_object;
-		
+
 		$indent = ( $depth ) ? str_repeat( "\t", $depth ) : '';
 		$li_attributes = $class_names = $value = '';
 		$classes = empty( $item->classes ) ? array() : (array) $item->classes;

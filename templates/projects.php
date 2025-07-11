@@ -74,7 +74,7 @@ jQuery(document).ready(function ($) {
 
     <?php else : ?>
         <p>No projects found.</p>
-    <?php endif; 
+    <?php endif;
     wp_reset_postdata(); ?>
 
     <?php tha_content_bottom(); ?>

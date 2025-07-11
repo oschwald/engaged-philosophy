@@ -11,23 +11,23 @@
 get_header(); ?>
 
 <section id="primary" class="col-lg-8 px-4">
-	
+
 	<?php tha_content_before(); ?>
 	<div id="content" role="main">
 		<?php tha_content_top();
-		
+
 		if ( have_posts() ) : ?>
 
 			<header class="page-header">
 				<h1 class="page-title"><?php
 					printf( __( 'Tag Archives: %s', 'the-bootstrap' ), '<span>' . single_tag_title( '', false ) . '</span>' );
 				?></h1>
-	
+
 				<?php if ( $tag_description = tag_description() ) {
 					echo apply_filters( 'tag_archive_meta', '<div class="tag-archive-meta">' . $tag_description . '</div>' );
 				} ?>
 			</header><!-- .page-header -->
-	
+
 			<?php
 			while ( have_posts() ) {
 				the_post();
@@ -37,7 +37,7 @@ get_header(); ?>
 		else :
 			get_template_part( '/partials/content', 'not-found' );
 		endif;
-		
+
 		tha_content_bottom(); ?>
 	</div><!-- #content -->
 	<?php tha_content_after(); ?>

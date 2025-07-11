@@ -9,7 +9,7 @@
 tha_sidebars_before(); ?>
 <section id="secondary" class="widget-area col-lg-4" role="complementary">
 	<?php tha_sidebar_top();
-	
+
 	if ( ! dynamic_sidebar( 'main' ) ) {
 		the_widget( 'WP_Widget_Archives', array(
 			'count'		=>	0,
@@ -27,7 +27,7 @@ tha_sidebars_before(); ?>
 			'after_title'	=>	'</h3>',
 		) );
 	} // end sidebar widget area
-	
+
 	tha_sidebar_bottom(); ?>
 </section><!-- #secondary .widget-area -->
 <?php tha_sidebars_after();

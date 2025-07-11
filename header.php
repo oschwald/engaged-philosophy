@@ -13,9 +13,9 @@
 <html class="no-js" <?php language_attributes(); ?>>
 <head>
   <?php tha_head_top(); ?>
-  <link rel="profile" href="https://gmpg.org/xfn/11" />
-  <meta charset="<?php bloginfo( 'charset' ); ?>" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="profile" href="https://gmpg.org/xfn/11">
+  <meta charset="<?php bloginfo( 'charset' ); ?>">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 
   <?php tha_head_bottom(); ?>
@@ -29,7 +29,7 @@
 <div class="container">
   <!-- Header logo section -->
   <?php tha_header_before(); ?>
-  <header id="branding" role="banner" class="text-center py-3">
+  <header id="branding" class="text-center py-3">
     <?php tha_header_top();
     wp_nav_menu( array(
       'container'            =>    'nav',
@@ -43,7 +43,7 @@
 
       <?php if ( get_header_image() ) : ?>
       <a id="header-image" href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
-        <img src="<?php header_image(); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?> Logo" />
+        <img src="<?php header_image(); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?> Logo">
       </a>
     <?php endif; // if ( get_header_image() ) ?>
 
@@ -51,7 +51,7 @@
   <?php tha_header_after(); ?>
 
   <!-- Navigation bar - full width of container -->
-  <nav id="access" role="navigation" aria-label="Main navigation">
+  <nav id="access" aria-label="Main navigation">
     <h3 class="visually-hidden"><?php _e( 'Main menu', 'the-bootstrap' ); ?></h3>
     <div class="skip-link"><a class="visually-hidden" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
     <div class="skip-link"><a class="visually-hidden" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
@@ -60,11 +60,11 @@
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'the-bootstrap' ); ?>">
         <span class="navbar-toggler-icon"></span>
       </button>
-      
+
       <?php if ( the_bootstrap_options()->navbar_site_name ) : ?>
       <span class="navbar-brand"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></span>
       <?php endif;?>
-      
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <?php wp_nav_menu( array(
           'theme_location'    =>    'primary',

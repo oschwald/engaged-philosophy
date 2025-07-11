@@ -1,6 +1,6 @@
 <?php
 /** theme-options.php
- * 
+ *
  * The Bootstrap Theme Options
  *
  * @author		Automattic, Konstantin Obenland
@@ -32,10 +32,10 @@ add_action( 'admin_menu', 'the_bootstrap_theme_options_add_page' );
 
 /**
  * Properly enqueue styles for theme options page.
- * 
+ *
  * @author	Automattic
  * @since	1.3.0 - 06.04.2012
- * 
+ *
  * @return	void
  */
 function the_bootstrap_admin_enqueue_scripts( $hook_suffix ) {
@@ -56,7 +56,7 @@ function the_bootstrap_admin_enqueue_scripts( $hook_suffix ) {
  *
  * @author	Automattic
  * @since	1.3.0 - 06.04.2012
- * 
+ *
  * @return	void
  */
 function the_bootstrap_theme_options_init() {
@@ -118,9 +118,9 @@ add_action( 'admin_init', 'the_bootstrap_theme_options_init' );
  *
  * @author	Automattic
  * @since	1.3.0 - 06.04.2012
- * 
+ *
  * @param	string	$capability	The capability used for the page, which is manage_options by default.
- * 
+ *
  * @return	string	The capability to actually use.
  */
 function the_bootstrap_option_page_capability( $capability ) {
@@ -134,7 +134,7 @@ add_filter( 'option_page_capability_the_bootstrap_options', 'the_bootstrap_optio
  *
  * @author	Konstantin Obenland
  * @since	1.3.0 - 06.04.2012
- * 
+ *
  * @param	WP_Admin_Bar	$wp_admin_bar
  *
  * @return	void
@@ -157,7 +157,7 @@ add_action( 'admin_bar_menu', 'the_bootstrap_admin_bar_menu', 61 ); //Appearance
  *
  * @author	WordPress.org
  * @since	1.3.0 - 06.04.2012
- * 
+ *
  * @return	void
  */
 function the_bootstrap_layouts() {
@@ -181,7 +181,7 @@ function the_bootstrap_layouts() {
  *
  * @author	WordPress.org
  * @since	1.3.0 - 06.04.2012
- * 
+ *
  * @return	void
  */
 function the_bootstrap_settings_field_layout() {
@@ -244,7 +244,7 @@ function the_bootstrap_settings_field_radio( $args ) {
  *
  * @author	Automattic
  * @since	1.3.0 - 06.04.2012
- * 
+ *
  * @return	void
  */
 function the_bootstrap_theme_options_render_page() {
@@ -282,25 +282,25 @@ function the_bootstrap_theme_options_render_page() {
  *
  * @author	Automattic
  * @since	1.3.0 - 06.04.2012
- * 
+ *
  * @return	void
  */
 function the_bootstrap_theme_options_validate( $input ) {
 	$output	= $defaults = the_bootstrap_get_default_theme_options();
-	
+
 	if ( isset( $input['theme_layout'] ) && array_key_exists( $input['theme_layout'], the_bootstrap_layouts() ) )
 		$output['theme_layout']		=	$input['theme_layout'];
-	
+
 	if ( isset( $input['navbar_position'] ) && in_array( $input['navbar_position'], array('static', 'fixed-top', 'fixed-bottom') ) )
 		$output['navbar_position']	=	$input['navbar_position'];
-	
+
 	$output['navbar_site_name']		=	isset( $input['navbar_site_name'] ) && $input['navbar_site_name'];
 	$output['navbar_searchform']	=	isset( $input['navbar_searchform'] ) && $input['navbar_searchform'];
-	
+
 	if ( ! get_settings_errors() ) {
 		add_settings_error( 'the-bootstrap-options', 'settings_updated', sprintf( __( 'Settings saved. <a href="%s">Visit your site</a> to see how it looks.', 'the-bootstrap' ), home_url( '/' ) ), 'updated' );
 	}
-	
+
 	return apply_filters( 'the_bootstrap_theme_options_validate', $output, $input, $defaults );
 }
 
@@ -311,10 +311,10 @@ function the_bootstrap_theme_options_validate( $input ) {
 
 /**
  * Displays a box with a donate button and call to action links
- * 
+ *
  * Props Joost de Valk, as this is almost entirely from his awesome WordPress
  * SEO Plugin
- * 
+ *
  * @link		http://plugins.trac.wordpress.org/browser/wordpress-seo/trunk/admin/class-config.php#L82
  * @copyright	Joost de Valk
  * @license		GPLv2 or later
@@ -350,14 +350,14 @@ add_action( 'the_bootstrap_side_info_column', 'the_bootstrap_donate_box', 1 );
 
 /**
  * Displays a box with feed items and social media links
- * 
+ *
  * Props Joost de Valk, as this is almost entirely from his awesome WordPress
  * SEO Plugin
- * 
+ *
  * @link		http://plugins.trac.wordpress.org/browser/wordpress-seo/trunk/admin/yst_plugin_tools.php#L375
  * @copyright	Joost de Valk
  * @license		GPLv2 or later
- * 
+ *
  * @author		Joost de Valk, Konstantin Obenland
  * @since		1.3.0 - 06.04.2012
  *
@@ -389,33 +389,33 @@ add_action( 'the_bootstrap_side_info_column', 'the_bootstrap_feed_box' );
 
 /**
  * Callback function to get feed items
- * 
+ *
  * Props Joost de Valk, as this is almost entirely from his awesome WordPress
  * SEO Plugin
- * 
+ *
  * @link		http://plugins.trac.wordpress.org/browser/wordpress-seo/trunk/admin/yst_plugin_tools.php#L353
  * @copyright	Joost de Valk
  * @license		GPLv2 or later
- * 
+ *
  * @author	Joost de Valk, Konstantin Obenland
  * @since	1.3.0 - 06.04.2012
  * @access	private
- * 
+ *
  * @param	string		$feed_url
- * 
+ *
  * @return	bool|array	Array with feed items on success
  */
 function _the_bootstrap_fetch_feed( $feed_url ) {
 	include_once( ABSPATH . WPINC . '/feed.php' );
 	$rss = fetch_feed( $feed_url );
-	
+
 	// Bail if feed doesn't work
 	if ( is_wp_error( $rss ) ) {
 		return false;
 	}
-	
+
 	$rss_items = $rss->get_items( 0, $rss->get_item_quantity( 5 ) );
-	
+
 	// If the feed was erroneously
 	if ( ! $rss_items ) {
 		$md5 = md5( $feed_url );
