@@ -210,7 +210,7 @@ function the_bootstrap_navbar_searchform( $echo = true ) {
 	$searchform = '	<form id="searchform" class="d-flex ms-auto" method="get" action="' . esc_url( home_url( '/' ) ) . '" role="search" aria-label="' . esc_attr__( 'Search the site', 'the-bootstrap' ) . '">
 						<label for="s" class="visually-hidden">' . __( 'Search', 'the-bootstrap' ) . '</label>
 						<input type="search" class="form-control" name="s" id="s" placeholder="' . esc_attr__( 'Search', 'the-bootstrap' ) . '" aria-label="' . esc_attr__( 'Search the site', 'the-bootstrap' ) . '">
-						<button type="submit" class="btn btn-outline-secondary ms-1" aria-label="' . esc_attr__( 'Submit search', 'the-bootstrap' ) . '">' . __( 'Search', 'the-bootstrap' ) . '</button>
+						<button type="submit" class="btn btn-outline-secondary ms-1" aria-label="' . esc_attr__( 'Submit search', 'the-bootstrap' ) . '"><i class="bi bi-search"></i></button>
 					</form>';
 
 	if ( $echo )

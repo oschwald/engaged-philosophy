@@ -12,7 +12,7 @@
 	<label for="s" class="visually-hidden"><?php _e( 'Search', 'the-bootstrap' ); ?></label>
 	<div class="input-group">
 		<input id="s" class="form-control" type="search" name="s" placeholder="<?php esc_attr_e( 'Search', 'the-bootstrap' ); ?>">
-		<button class="btn btn-primary" name="submit" id="searchsubmit" type="submit"><?php _e( 'Go', 'the-bootstrap' ); ?></button>
+		<button class="btn btn-primary" name="submit" id="searchsubmit" type="submit" aria-label="<?php esc_attr_e( 'Submit search', 'the-bootstrap' ); ?>"><i class="bi bi-search"></i></button>
    	</div>
 </form>
 <?php
