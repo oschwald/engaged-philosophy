@@ -3,9 +3,9 @@
  *
  * Template Name: Full Width
  *
- * @author 	Konstantin Obenland
+ * @author  Konstantin Obenland
  * @package The Bootstrap
- * @since	1.3.0	- 29.04.2012
+ * @since   1.3.0   - 29.04.2012
  */
 
 get_header(); ?>
@@ -13,12 +13,14 @@ get_header(); ?>
 <section id="primary" class="col-12 px-4">
 	<?php tha_content_before(); ?>
 	<main id="content">
-		<?php tha_content_top();
+		<?php
+		tha_content_top();
 
 		the_post();
 		get_template_part( '/partials/content', 'project' );
 
-		tha_content_bottom(); ?>
+		tha_content_bottom();
+		?>
 	</main><!-- #content -->
 	<?php tha_content_after(); ?>
 </section><!-- #primary -->
@@ -27,5 +29,7 @@ get_header(); ?>
 get_footer();
 
 
-/* End of file _full_width.php */
+/*
+End of file _full_width.php
+*/
 /* Location: ./wp-content/themes/the-bootstrap/_full_width.php */

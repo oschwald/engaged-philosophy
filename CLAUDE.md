@@ -88,9 +88,62 @@ These scripts can be created as needed for development and testing but should no
 - **Testing**: Use the testing scripts above to validate theme functionality
 - **Logs**: `docker logs engaged-philosophy-wp` to monitor WordPress container
 
+## Code Quality and Static Analysis
+
+### PHPStan Static Analysis
+This project uses PHPStan for comprehensive PHP code quality analysis and maintains **Level 5 compliance** (maximum level).
+
+**Setup:**
+- **Install dependencies**: `composer install` (installs PHPStan with WordPress extensions)
+- **Configuration**: `phpstan.neon` (configured for WordPress with Level 5 + strict checks)
+
+**Usage:**
+- **Run analysis**: `./vendor/bin/phpstan analyse`
+- **With memory limit**: `./vendor/bin/phpstan analyse --memory-limit=2G`
+
+**IMPORTANT: Always run PHPStan after making PHP changes**
+- The theme maintains Level 5 PHPStan compliance with zero errors
+- All PHP modifications should be validated with `./vendor/bin/phpstan analyse` before committing
+- This ensures production-ready code quality, type safety, and PHP 8.0+ compatibility
+- If PHPStan reports errors, they must be fixed to maintain the high code quality standard
+
+### PHPStan Configuration Details
+- **Analysis Level**: 5 (maximum standard level)
+- **WordPress Integration**: Uses `szepeviktor/phpstan-wordpress` for WordPress-specific analysis
+- **Strict Checks**: Enabled callable signature and uninitialized property checks
+- **WordPress Functions**: Proper stubs loaded for WordPress core functions
+- **Exclusions**: Ignores build artifacts, node_modules, and development scripts
+
+### PHP_CodeSniffer (PHPCS) WordPress Coding Standards
+This project uses PHPCS to enforce WordPress coding standards and maintain consistent code style.
+
+**Setup:**
+- **Install dependencies**: `composer install` (installs PHPCS with WordPress standards)
+- **Configuration**: `phpcs.xml` (configured for WordPress with theme-specific customizations)
+
+**Usage:**
+- **Run analysis**: `./vendor/bin/phpcs` or `./vendor/bin/phpcs --report=summary`
+- **Auto-fix issues**: `./vendor/bin/phpcbf` (fixes formatting violations automatically)
+- **Specific files**: `./vendor/bin/phpcs path/to/file.php`
+
+**IMPORTANT: Run PHPCS after making PHP changes**
+- Maintains WordPress coding standards compliance
+- Enforces consistent formatting, naming conventions, and best practices
+- Auto-fixer (PHPCBF) can resolve most formatting issues automatically
+- Manual review required for complex violations and security/performance issues
+
+### PHPCS Configuration Details
+- **WordPress Standards**: Uses WordPress core coding standards with theme-specific customizations
+- **PHP Compatibility**: Checks for PHP 7.4+ compatibility using PHPCompatibilityWP
+- **WordPress Version**: Minimum WordPress 5.0 support
+- **Exclusions**: Ignores build artifacts, node_modules, vendor directories, and source files
+- **Theme Customizations**: Allows array short syntax and theme-specific naming conventions
+
 ## Getting Started
-1. **Install dependencies**: `npm install`
+1. **Install dependencies**: `npm install` and `composer install`
 2. **Development**: `npm run start` or `./dev-watch.sh`
 3. **Production build**: `npm run build` or `./build-modern.sh`
 4. **Code linting**: `npm run lint:css` and `npm run lint:js`
-5. **Local testing**: `docker-compose up -d` and test at http://localhost:8080
+5. **PHP static analysis**: `./vendor/bin/phpstan analyse` (Level 5 compliance required)
+6. **PHP coding standards**: `./vendor/bin/phpcs` and `./vendor/bin/phpcbf` (WordPress standards compliance)
+7. **Local testing**: `docker-compose up -d` and test at http://localhost:8080

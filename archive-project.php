@@ -8,75 +8,82 @@
  *
  * Learn more: http://codex.wordpress.org/Template_Hierarchy
  *
- * @author		Konstantin Obenland
- * @package		The Bootstrap
- * @since		1.0.0 - 07.02.2012
+ * @author      Konstantin Obenland
+ * @package     The Bootstrap
+ * @since       1.0.0 - 07.02.2012
  */
 
 get_header(); ?>
 
 
 <div class="container-fluid">
-  <section id="primary" class="p-4">
-    <?php tha_content_before(); ?>
-    <main id="content">
-  <?php tha_content_top();
+	<section id="primary" class="p-4">
+	<?php tha_content_before(); ?>
+	<main id="content">
+	<?php
+	tha_content_top();
 
-  if (have_posts()) : ?>
+	if ( have_posts() ) :
+		?>
 
-  <header class="page-header mb-4 pb-3 border-bottom">
-    <h1 class="page-title h2 mb-0">Civic Engagement Projects</h1>
-  </header><!-- .page-header -->
-  <p>
-      This page provides a list of examples of completed student projects
-      organized by broad themes such as "animals" and "art." Click on one of
-      the themes below to find a list of projects that fit under that theme.
-      The bigger the the word is below, the more examples you will see.
-  </p>
-  <div class="row">
-    <div class="col-12">
-      <div class="tag-cloud-projects">
-    <?php
-      // Generate tag cloud with fixed randomization
-      $tag_cloud = wp_tag_cloud(array(
-        'taxonomy' => 'topic',
-        'smallest' => 13,
-        'largest' => 32,
-        'unit' => 'px',
-        'format' => 'flat',
-        'separator' => ' ',
-        'orderby' => 'RAND',
-        'number' => 40,
-        'echo' => false
-      ));
+	<header class="page-header mb-4 pb-3 border-bottom">
+	<h1 class="page-title h2 mb-0">Civic Engagement Projects</h1>
+	</header><!-- .page-header -->
+	<p>
+		This page provides a list of examples of completed student projects
+		organized by broad themes such as "animals" and "art." Click on one of
+		the themes below to find a list of projects that fit under that theme.
+		The bigger the the word is below, the more examples you will see.
+	</p>
+	<div class="row">
+	<div class="col-12">
+		<div class="tag-cloud-projects">
+		<?php
+		// Generate tag cloud with fixed randomization.
+		$tag_cloud = wp_tag_cloud(
+			array(
+				'taxonomy'  => 'topic',
+				'smallest'  => 13,
+				'largest'   => 32,
+				'unit'      => 'px',
+				'format'    => 'flat',
+				'separator' => ' ',
+				'orderby'   => 'RAND',
+				'number'    => 40,
+				'echo'      => false,
+			)
+		);
 
-      // Parse and shuffle with fixed seed for consistency
-      if ($tag_cloud) {
-        // Use regex to extract complete <a> tags instead of splitting on spaces
-        preg_match_all('/<a[^>]*>.*?<\/a>/', $tag_cloud, $matches);
-        $tags = $matches[0];
+		// Parse and shuffle with fixed seed for consistency.
+		if ( $tag_cloud ) {
+			// Use regex to extract complete <a> tags instead of splitting on spaces.
+			preg_match_all( '/<a[^>]*>.*?<\/a>/', $tag_cloud, $matches );
+			$tags = $matches[0];
 
-        // Use a seed based on the current date to shuffle consistently per day
-        mt_srand((int)date('Ymd'));
-        shuffle($tags);
-        echo implode(' ', $tags);
-      }
-      ?>
-      </div>
-    </div>
-  </div>
-  <?php
-  else :
-   get_template_part('/partials/content', 'not-found');
- endif;
+			// Use a seed based on the current date to shuffle consistently per day.
+			mt_srand( (int) date( 'Ymd' ) );
+			shuffle( $tags );
+			echo implode( ' ', $tags );
+		}
+		?>
+		</div>
+	</div>
+	</div>
+		<?php
+	else :
+		get_template_part( '/partials/content', 'not-found' );
+endif;
 
-    tha_content_bottom(); ?>
-    </main><!-- #content -->
-    <?php tha_content_after(); ?>
-  </section><!-- #primary -->
+	tha_content_bottom();
+	?>
+	</main><!-- #content -->
+	<?php tha_content_after(); ?>
+	</section><!-- #primary -->
 </div><!-- .container-fluid -->
 
-<?php get_footer();
+<?php
+get_footer();
 
-/* End of file archive.php */
+/*
+End of file archive.php */
 /* Location: ./wp-content/themes/the-bootstrap/archive.php */
