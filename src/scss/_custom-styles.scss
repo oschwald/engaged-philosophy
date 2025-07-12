@@ -113,6 +113,8 @@
 
 .fb-like {
   padding-right: 10px;
+  // Fix vertical alignment with other footer elements
+  transform: translateY(5px);
 }
 
 .navbar .form-control {
