@@ -82,6 +82,35 @@ Several development testing scripts are available but excluded from the reposito
 
 These scripts can be created as needed for development and testing but should not be committed to the repository.
 
+### Debug Script Naming Guidelines
+When creating temporary development/debugging scripts, use these naming patterns that are automatically ignored by .gitignore:
+
+**Recommended naming patterns:**
+- `debug-*.js` - For debugging specific issues (e.g., `debug-css.js`, `debug-layout.js`)
+- `test-*.js` - For testing functionality (e.g., `test-mobile.js`, `test-performance.js`)
+- `measure-*.js` - For measurement/analysis scripts (e.g., `measure-height.js`)
+- `find-*.js` - For discovery/investigation scripts (e.g., `find-selectors.js`)
+- `inspect-*.js` - For inspection tools (e.g., `inspect-styles.js`)
+- `claude-*.js` - For Claude-specific development tools
+
+**Examples of properly named debug scripts:**
+```
+debug-carousel-issue.js     ✅ Ignored by .gitignore
+test-mobile-layout.js       ✅ Ignored by .gitignore  
+measure-page-load.js        ✅ Ignored by .gitignore
+find-unused-css.js          ✅ Ignored by .gitignore
+inspect-dom-changes.js      ✅ Ignored by .gitignore
+```
+
+**Avoid these patterns:**
+```
+carousel-debug.js           ❌ Will be committed
+mobile-test.js              ❌ Will be committed
+analyze-layout.js           ❌ Will be committed
+```
+
+This ensures development tools remain local and don't clutter the repository or cause linting issues.
+
 ### Docker Development Environment
 - **Setup**: `docker-compose up -d` to start WordPress + MySQL containers
 - **Site URL**: http://localhost:8080
