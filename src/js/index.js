@@ -7,9 +7,11 @@ window.bootstrap = bootstrap;
 
 // Import custom JavaScript modules
 import './theme-scripts.js';
+import './carousel.js';
+import './custom-header.js';
 
 // Initialize theme functionality
-document.addEventListener('DOMContentLoaded', function() {
-  // Initialize any theme-specific JavaScript here
-  console.log('Engaged Philosophy theme loaded');
-});
+document.addEventListener( 'DOMContentLoaded', function () {
+	// Initialize any theme-specific JavaScript here
+	console.log( 'Engaged Philosophy theme loaded' );
+} );

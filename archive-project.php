@@ -15,15 +15,6 @@
 
 get_header(); ?>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const carousel = document.getElementById('projects_carousel');
-  if (carousel) {
-    // Bootstrap 5 carousel auto-initializes, no manual initialization needed
-    // If custom options are needed, use: new bootstrap.Carousel(carousel, options)
-  }
-});
-</script>
 
 <div class="container-fluid">
   <section id="primary" class="p-4">

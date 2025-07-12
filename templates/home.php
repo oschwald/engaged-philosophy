@@ -7,17 +7,6 @@
 
 get_header(); ?>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const carousel = document.getElementById('projects_carousel');
-  if (carousel) {
-    // Initialize Bootstrap 5 carousel with custom interval
-    new bootstrap.Carousel(carousel, {
-      interval: 30000
-    });
-  }
-});
-</script>
 
 <section id="primary" class="col-12">
   <?php tha_content_before(); ?>
