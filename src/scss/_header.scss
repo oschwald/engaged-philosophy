@@ -1,0 +1,30 @@
+// Header Styles
+// --------------------------------------------------
+
+// Header branding section
+#branding {
+	background-color: #fff;
+	border-bottom: 1px solid #dee2e6;
+	padding: 1rem 0;
+}
+
+#branding .container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+#branding a {
+	display: inline-block;
+	text-decoration: none;
+}
+
+#branding img {
+	max-height: 80px;
+	width: auto;
+}
+
+// Header image
+#header-image {
+	display: block;
+}

@@ -1,0 +1,40 @@
+// Utility Classes
+// --------------------------------------------------
+
+// Bootstrap overrides
+:root {
+	--bs-border-radius: 0 !important;
+	--bs-border-radius-sm: 0 !important;
+	--bs-border-radius-lg: 0 !important;
+	--bs-border-radius-xl: 0 !important;
+	--bs-border-radius-xxl: 0 !important;
+	--bs-border-radius-2xl: 0 !important;
+	--bs-border-radius-pill: 0 !important;
+}
+
+// Cards and components
+.card.bg-light {
+	border: 1px solid #dee2e6;
+}
+
+// Bootstrap positioning classes
+.fixed-top,
+.fixed-bottom {
+	position: fixed;
+}
+
+// Table styling
+table .label {
+	background-color: transparent;
+	color: inherit;
+	font-size: inherit;
+	text-transform: inherit;
+}
+
+// Edit links
+.label .post-edit-link,
+.label .comment-edit-link {
+	color: #fff;
+}
+
+// WordPress post classes - required by WordPress but no custom styling needed

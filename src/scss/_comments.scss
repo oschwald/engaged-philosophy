@@ -1,0 +1,45 @@
+// Comments Styles
+// --------------------------------------------------
+
+// Comments title and form
+#comments-title {
+	border-bottom: 1px solid #eee;
+	font-size: 19.5px;
+	margin: 0 0 27px;
+}
+
+#comment {
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+// Comment list
+.commentlist > li {
+	margin-bottom: 36px;
+}
+
+.commentlist ul.children {
+	margin: 10px 0 18px;
+	list-style: none;
+}
+
+// Reply form
+#reply-title {
+	position: relative;
+}
+
+#reply-title small {
+	position: absolute;
+	right: 0;
+	top: 7px;
+}
+
+// Jetpack support
+.comment-subscription-form > input[type="checkbox"] {
+	position: absolute;
+}
+
+.comment-subscription-form > label {
+	min-height: 18px;
+	padding-left: 18px;
+}

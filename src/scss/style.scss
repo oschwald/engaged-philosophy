@@ -47,7 +47,16 @@ $headings-color: $orange;
 // Import our custom variables after Bootstrap for internal use
 @import "variables";
 
-// Import custom styles after Bootstrap
+// Import custom styles after Bootstrap - organized by component
 @import "typography";
-@import "custom-styles";
+@import "layout";
+@import "header";
+@import "navigation";
+@import "content";
+@import "sidebar";
+@import "carousel";
+@import "comments";
+@import "images";
+@import "footer";
+@import "utilities";
 @import "responsive";

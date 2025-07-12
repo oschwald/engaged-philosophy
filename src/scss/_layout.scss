@@ -1,0 +1,114 @@
+// Layout and Container Styles
+// --------------------------------------------------
+
+// Base layout
+body {
+	background-color: #f5f5f5;
+}
+
+.container {
+	max-width: 1140px;
+	margin: 0 auto;
+	padding: 0 1.5rem;
+}
+
+body > .container {
+	margin: 18px auto;
+	max-width: 1140px;
+	padding: 0 1.5rem;
+}
+
+// Page wrapper
+#page {
+	background-color: #fff;
+	padding: 0;
+	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+// Content areas
+#primary {
+	margin-bottom: 1.5rem;
+}
+
+#content .container {
+	padding: 0 1.5rem;
+}
+
+#content .row:last-child .col-md-4 {
+	padding: 0 0.75rem;
+	margin-bottom: 1.5rem;
+}
+
+.container #page {
+	margin-top: 0;
+	padding-top: 1rem;
+}
+
+// Bootstrap row adjustments
+.row {
+	margin-bottom: 1.5rem;
+}
+
+#content .row:first-child {
+	margin-bottom: 1.5rem;
+}
+
+#content .row:last-child {
+	margin-top: 1.5rem;
+}
+
+#page.row {
+	margin-left: 0;
+	margin-right: 0;
+	margin-bottom: 0;
+}
+
+// Assistive text
+.assistive-text,
+.visually-hidden {
+	clip: rect(1px, 1px, 1px, 1px);
+	position: absolute !important;
+}
+
+.block {
+	display: block;
+}
+
+// Sidebar layout
+.sidebar-content #primary,
+.sidebar-content #attachment-comment {
+	float: right;
+	margin: 0 20px 0 0;
+}
+
+// Spacing utilities
+.entry-content,
+.page-header {
+	word-wrap: break-word;
+}
+
+#branding hgroup,
+#header-image,
+.entry-content {
+	margin-bottom: 18px;
+}
+
+.entry-attachment {
+	margin-bottom: 36px;
+}
+
+article.post,
+article.page {
+	margin-bottom: 72px;
+}
+
+#author-info {
+	margin-bottom: 72px;
+}
+
+.single article.post,
+.single article.page,
+.single #author-info,
+.author #author-info {
+	margin-bottom: 54px;
+}

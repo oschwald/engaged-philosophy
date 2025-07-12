@@ -20,7 +20,7 @@
 		width: auto !important;
 	}
 
-	// Scale logo appropriately on mobile
+	// Scale logo appropriately on mobile - general first
 	#branding img,
 	#header-image img {
 		max-width: 90% !important;
@@ -28,10 +28,14 @@
 		max-height: 60px !important;
 	}
 
-	// Ensure logo container has enough space
-	#branding .navbar-brand img,
+	// More specific selectors come after - order by specificity
 	#branding a img {
-		max-width: 320px !important; // Allow wider logo on mobile
+		max-width: 320px !important;
+		height: auto !important;
+	}
+
+	#branding .navbar-brand img {
+		max-width: 320px !important;
 		height: auto !important;
 	}
 
@@ -108,9 +112,7 @@
 		display: table;
 	}
 
-	.carousel .carousel-item > img {
-		width: 100%;
-	}
+	// Mobile carousel styling moved to _carousel.scss partial
 
 	.gallery > li {
 		flex: 0 0 auto;
@@ -195,10 +197,6 @@
 	// Better footer layout on tablets - only if not mobile
 	.footer-custom {
 		padding: 1.5rem !important;
-	}
-
-	// Ensure footer stacking doesn't apply on tablet and larger
-	.footer-custom {
 		flex-direction: row !important;
 		text-align: left !important;
 		gap: 0 !important;

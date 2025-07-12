@@ -1,0 +1,101 @@
+// Content Styles
+// --------------------------------------------------
+
+// Article and content
+.entry-content .post-thumbnail {
+	margin: 0 20px 20px 0;
+}
+
+.entry-content iframe,
+.entry-content embed {
+	max-width: 100%;
+}
+
+.entry-content .twitter-tweet-rendered {
+	max-width: 100% !important;
+}
+
+// Post formats and meta
+.post-password-form legend {
+	font-size: inherit;
+}
+
+// Tag cloud styling - general selectors before specific ones
+.tag-cloud-projects {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	background-color: #f8f9fa;
+	border: 1px solid #dee2e6;
+	padding: 1.5rem;
+	line-height: 1.4;
+	text-align: left;
+	font-size: 1.1rem;
+	font-weight: 200;
+	display: block;
+}
+
+.tag-cloud-projects a {
+	margin: 0.2rem 0.4rem 0.2rem 0;
+	padding: 0.2rem 0.4rem;
+	color: $orange !important;
+	font-weight: 400;
+	text-decoration: none !important;
+	transition: all 0.2s ease;
+	line-height: 1.3;
+	white-space: nowrap;
+}
+
+.tag-cloud-projects a:hover {
+	color: $orange-dark !important;
+	text-decoration: underline !important;
+	background-color: rgba(253, 126, 20, 0.1);
+}
+
+// Tag cloud weight variations
+.tag-cloud-projects a[style*="font-size: 32px"],
+.tag-cloud-projects a[style*="font-size: 31px"],
+.tag-cloud-projects a[style*="font-size: 30px"],
+.tag-cloud-projects a[style*="font-size: 29px"] {
+	font-weight: 600;
+}
+
+.tag-cloud-projects a[style*="font-size: 28px"],
+.tag-cloud-projects a[style*="font-size: 27px"],
+.tag-cloud-projects a[style*="font-size: 26px"],
+.tag-cloud-projects a[style*="font-size: 25px"] {
+	font-weight: 500;
+}
+
+.tag-cloud-projects a[style*="font-size: 24px"],
+.tag-cloud-projects a[style*="font-size: 23px"],
+.tag-cloud-projects a[style*="font-size: 22px"] {
+	font-weight: 450;
+}
+
+// Pagination
+.pagination {
+	margin: 2rem 0;
+}
+
+.pagination .page-link {
+	color: #333;
+}
+
+.pagination .page-link:hover {
+	color: $orange;
+	background-color: #f8f9fa;
+	border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+	background-color: $orange;
+	border-color: $orange;
+}
+
+.pagination .page-item.disabled .page-link {
+	color: #6c757d;
+}
+
+// Article hover effects - more specific selectors come last
+article .entry-title a:hover {
+	color: $orange;
+}
