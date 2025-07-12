@@ -43,7 +43,7 @@ This is "Engaged Philosophy" - a WordPress theme modernized with Bootstrap 5. It
 ### Key Components
 - **SCSS compilation**: 
   - Main file: `src/scss/style.scss`
-  - Custom theme styles: `src/scss/` directory with partials
+  - Modular SCSS architecture with 10 semantic partials (see SCSS Architecture below)
   - Bootstrap 5: Integrated from npm package
 - **JavaScript**: Modern ES6 modules with Bootstrap 5 components
 - **Localization**: Multi-language support in `lang/` directory
@@ -63,6 +63,70 @@ This is "Engaged Philosophy" - a WordPress theme modernized with Bootstrap 5. It
 - Node.js 16+ (for build tooling)
 - Custom post formats support: aside, chat, link, gallery, status, quote, image, video
 
+## SCSS Architecture
+
+### Modular Structure
+The theme uses a **clean, modular SCSS architecture** with 10 semantic partials organized by component responsibility:
+
+**Core Partials:**
+- `_layout.scss` - Containers, grid system, page structure, spacing utilities
+- `_header.scss` - Branding section, logo styling, header elements
+- `_navigation.scss` - Navbar styling, menu components, mobile navigation
+- `_content.scss` - Article styling, pagination, tag clouds, post content
+- `_sidebar.scss` - Widget styling, sidebar components, search functionality
+- `_carousel.scss` - Image carousel styling and responsive behavior
+- `_comments.scss` - Comment system styling and form elements
+- `_images.scss` - WordPress image classes, galleries, captions
+- `_footer.scss` - Footer components and site generator
+- `_utilities.scss` - Bootstrap overrides and utility classes
+
+**Import Order in `style.scss`:**
+```scss
+// 1. Bootstrap functions and variables
+@import "~bootstrap/scss/functions";
+
+// 2. Theme variable overrides  
+$orange: #fd7e14;
+$primary: $orange;
+
+// 3. Bootstrap core
+@import "~bootstrap/scss/bootstrap";
+
+// 4. Theme partials (organized by component)
+@import "variables";
+@import "typography";
+@import "layout";
+@import "header";
+@import "navigation";
+@import "content";
+@import "sidebar";
+@import "carousel";
+@import "comments";
+@import "images";
+@import "footer";
+@import "utilities";
+@import "responsive";
+```
+
+### SCSS Best Practices
+
+**CRITICAL: Maintain CSS specificity ordering**
+- Order selectors from **least specific to most specific** within each partial
+- General selectors (`.widget ul li`) must come before specific ones (`.widget_recent_comments ul li`)
+- This prevents CSS linting errors and ensures predictable styling
+
+**Code Quality Requirements:**
+- **100% CSS lint compliance** is required (`npm run lint:css` must pass)
+- **No duplicate selectors** across partials
+- **No empty CSS blocks** (use comments instead of empty rules)
+- **Proper newlines** at end of all SCSS files
+
+**Organizational Guidelines:**
+- Keep partials **focused and cohesive** (single responsibility)
+- Use **semantic naming** that matches the component's purpose
+- Add **clear section comments** within partials for complex styling
+- Group related selectors together with explanatory comments
+
 ## Styling Guidelines
 - **Prefer Bootstrap 5 utility classes** over custom CSS whenever possible
 - Use classes like `px-4`, `py-3`, `mb-4`, `text-center`, `bg-light`, `border`, etc. instead of writing custom CSS
@@ -70,6 +134,8 @@ This is "Engaged Philosophy" - a WordPress theme modernized with Bootstrap 5. It
 - Only add custom CSS when Bootstrap utilities are insufficient for the specific requirement
 - Keep custom CSS minimal, well-documented, and scoped to specific components
 - Always check Bootstrap documentation for existing utility classes before writing custom styles
+- **When adding custom CSS**: Place it in the appropriate semantic partial, not in a monolithic file
+- **Before committing**: Always run `npm run lint:css` to ensure code quality compliance
 
 ## Testing and Development Tools
 
@@ -168,11 +234,42 @@ This project uses PHPCS to enforce WordPress coding standards and maintain consi
 - **Exclusions**: Ignores build artifacts, node_modules, vendor directories, and source files
 - **Theme Customizations**: Allows array short syntax and theme-specific naming conventions
 
+## CSS/SCSS Development Workflow
+
+### Before Making Changes
+1. **Understand the architecture**: Review the 10 SCSS partials above
+2. **Identify the correct partial**: Place new styles in the appropriate component file
+3. **Check Bootstrap utilities**: Use Bootstrap classes when possible instead of custom CSS
+
+### While Making Changes
+1. **Maintain specificity order**: General selectors before specific ones within each partial
+2. **Add meaningful comments**: Document complex styling decisions
+3. **Test incrementally**: Run `npm run build` to check for compilation errors
+
+### Before Committing
+1. **Run CSS linting**: `npm run lint:css` must pass with 0 errors
+2. **Run JS linting**: `npm run lint:js` must pass with 0 errors  
+3. **Test the build**: `npm run build` must complete successfully
+4. **Visual verification**: Check layout integrity at different breakpoints
+
+### Troubleshooting CSS Issues
+**Common linting errors and fixes:**
+- `no-descending-specificity`: Reorder selectors from least to most specific
+- `no-duplicate-selectors`: Consolidate duplicate rules into single declarations
+- `block-no-empty`: Remove empty CSS blocks or add meaningful content
+- `no-missing-end-of-source-newline`: Add newline at end of SCSS files
+
+**Architecture violations to avoid:**
+- ❌ Adding styles to wrong partial (e.g., navigation styles in sidebar partial)
+- ❌ Creating new monolithic SCSS files 
+- ❌ Mixing component concerns in single partial
+- ❌ Ignoring CSS linting errors
+
 ## Getting Started
 1. **Install dependencies**: `npm install` and `composer install`
 2. **Development**: `npm run start` or `./dev-watch.sh`
 3. **Production build**: `npm run build` or `./build-modern.sh`
-4. **Code linting**: `npm run lint:css` and `npm run lint:js`
+4. **Code linting**: `npm run lint:css` and `npm run lint:js` (both must pass)
 5. **PHP static analysis**: `./vendor/bin/phpstan analyse` (Level 5 compliance required)
 6. **PHP coding standards**: `./vendor/bin/phpcs` and `./vendor/bin/phpcbf` (WordPress standards compliance)
 7. **Local testing**: `docker-compose up -d` and test at http://localhost:8080
