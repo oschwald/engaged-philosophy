@@ -1,5 +1,5 @@
 <?php
-/** index.php
+/** Main template file
  *
  * The main template file.
  *
@@ -42,7 +42,10 @@ get_header(); ?>
 get_sidebar();
 get_footer();
 
+/*
+End of file index.php
+*/
 
 /*
-End of file index.php */
-/* Location: ./wp-content/themes/the-bootstrap/index.php */
+Location: ./wp-content/themes/the-bootstrap/index.php
+*/

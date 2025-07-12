@@ -1,5 +1,5 @@
 <?php
-/** content-gallery.php
+/** Content gallery template
  *
  * The template for displaying posts in the Gallery Post Format on index and archive pages
  *
@@ -9,7 +9,6 @@
  * @package     The Bootstrap
  * @since       1.0.0 - 07.02.2012
  */
-
 
 tha_entry_before(); ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -36,7 +35,7 @@ tha_entry_before(); ?>
 				'post_mime_type' => 'image',
 				'orderby'        => 'menu_order',
 				'order'          => 'ASC',
-				'numberposts'    => 999,
+				'numberposts'    => 50, // Reasonable limit for gallery images.
 			)
 		);
 		if ( $the_bootstrap_images ) :
@@ -75,7 +74,7 @@ tha_entry_before(); ?>
 					if ( has_excerpt( $the_bootstrap_image->ID ) ) :
 						?>
 					<figcaption class="carousel-caption">
-						<h4><?php echo get_the_title( $the_bootstrap_image->ID ); ?></h4>
+						<h4><?php echo esc_html( get_the_title( $the_bootstrap_image->ID ) ); ?></h4>
 						<p><?php echo apply_filters( 'get_the_excerpt', $the_bootstrap_image->post_excerpt ); ?></p>
 					</figcaption>
 					<?php endif; ?>
@@ -94,7 +93,13 @@ tha_entry_before(); ?>
 			</button>
 		</div><!-- #gallery-slider -->
 
-		<?php endif; /* if images */ ?>
+			<?php
+		endif;
+
+		/*
+		 * If images.
+		 */
+		?>
 	</div><!-- .entry-content -->
 
 	<?php tha_entry_bottom(); ?>
@@ -102,7 +107,10 @@ tha_entry_before(); ?>
 <?php
 tha_entry_after();
 
+/*
+End of file content-gallery.php
+*/
 
 /*
-End of file content-gallery.php */
-/* Location: ./wp-content/themes/the-bootstrap/partials/content-gallery.php */
+Location: ./wp-content/themes/the-bootstrap/partials/content-gallery.php
+*/

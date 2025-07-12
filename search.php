@@ -1,5 +1,5 @@
 <?php
-/** search.php
+/** Search results template
  *
  * The template for displaying Search Results pages.
  *
@@ -22,7 +22,7 @@ get_header(); ?>
 			?>
 
 			<header class="page-header mb-4 pb-3 border-bottom">
-				<h1 class="page-title h2 mb-0"><?php printf( __( 'Search Results for: %s', 'the-bootstrap' ), '<span>' . get_search_query() . '</span>' ); ?></h1>
+				<h1 class="page-title h2 mb-0"><?php printf( __( 'Search Results for: %s', 'the-bootstrap' ), '<span>' . esc_html( get_search_query() ) . '</span>' ); ?></h1>
 			</header>
 
 			<?php
@@ -48,7 +48,10 @@ get_header(); ?>
 <?php
 get_footer();
 
+/*
+End of file search.php
+*/
 
 /*
-End of file search.php */
-/* Location: ./wp-content/themes/the-bootstrap/search.php */
+Location: ./wp-content/themes/the-bootstrap/search.php
+*/

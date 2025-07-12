@@ -65,7 +65,8 @@ if ( ! function_exists( 'the_bootstrap_setup' ) ) :
 		/**
 		 * Custom Nav Menu handler for the Navbar.
 		 */
-		require_once get_template_directory() . '/inc/nav-menu-walker.php';
+		require_once get_template_directory() . '/inc/class-the-bootstrap-nav-walker.php';
+		require_once get_template_directory() . '/inc/nav-menu-functions.php';
 
 		/**
 		 * Theme Hook Alliance
@@ -73,7 +74,7 @@ if ( ! function_exists( 'the_bootstrap_setup' ) ) :
 		require_if_theme_supports( 'tha_hooks', get_template_directory() . '/inc/tha-theme-hooks.php' );
 
 		/**
-		 * including three menu (header-menu, primary and footer-menu).
+		 * Including three menu (header-menu, primary and footer-menu).
 		 * Primary is wrapping in a navbar containing div (wich support responsive variation).
 		 * Header-menu and Footer-menu are inside pills dropdown menu
 		 *
@@ -201,10 +202,10 @@ function the_bootstrap_widgets_init() {
 		)
 	);
 
-	include_once 'inc/the-bootstrap-image-meta-widget.php';
+	include_once 'inc/class-the-bootstrap-image-meta-widget.php';
 	register_widget( 'The_Bootstrap_Image_Meta_Widget' );
 
-	include_once 'inc/the-bootstrap-gallery-widget.php';
+	include_once 'inc/class-the-bootstrap-gallery-widget.php';
 	register_widget( 'The_Bootstrap_Gallery_Widget' );
 }
 add_action( 'widgets_init', 'the_bootstrap_widgets_init' );
@@ -291,7 +292,7 @@ add_action( 'comment_form_before', 'the_bootstrap_comment_reply' );
 /**
  * Properly enqueue frontend styles.
  *
- * since 'tw-bootstrap' was registered as a dependency, it'll get enqueued
+ * Since 'tw-bootstrap' was registered as a dependency, it'll get enqueued
  * automatically.
  *
  * @author  Konstantin Obenland
@@ -301,7 +302,7 @@ add_action( 'comment_form_before', 'the_bootstrap_comment_reply' );
  */
 function the_bootstrap_print_styles() {
 	if ( is_child_theme() ) {
-		wp_enqueue_style( 'the-bootstrap-child', get_stylesheet_uri(), array( 'the-bootstrap' ) );
+		wp_enqueue_style( 'the-bootstrap-child', get_stylesheet_uri(), array( 'the-bootstrap' ), wp_get_theme()->get( 'Version' ) );
 	} else {
 		wp_enqueue_style( 'my-bootstrap' );
 	}
@@ -389,17 +390,17 @@ function the_bootstrap_continue_reading_link() {
 /**
  * Replaces "[...]" (appended to automatically generated excerpts) with an ellipsis and the_bootstrap_continue_reading_link().
  *
- * to override this in a child theme, remove the filter and add your own
+ * To override this in a child theme, remove the filter and add your own
  * function tied to the excerpt_more filter hook.
  *
  * @author  WordPress.org
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $more The "more" string.
+ * @param   string $_more The "more" string.
  *
  * @return  string The modified "more" string.
  */
-function the_bootstrap_auto_excerpt_more( $more ) {
+function the_bootstrap_auto_excerpt_more( $_more ) {
 	return '&hellip;' . the_bootstrap_continue_reading_link();
 }
 add_filter( 'excerpt_more', 'the_bootstrap_auto_excerpt_more' );
@@ -408,7 +409,7 @@ add_filter( 'excerpt_more', 'the_bootstrap_auto_excerpt_more' );
 /**
  * Adds a pretty "Continue Reading" link to custom post excerpts.
  *
- * to override this link in a child theme, remove the filter and add your own
+ * To override this link in a child theme, remove the filter and add your own
  * function tied to the get_the_excerpt filter hook.
  *
  * @author  WordPress.org
@@ -491,7 +492,8 @@ function the_bootstrap_comments_list() {
 			<h2 id="comments-title">
 				<?php
 				printf(
-					_n( 'One thought on &ldquo;%2$s&rdquo;', '%1$s thoughts on &ldquo;%2$s&rdquo;', get_comments_number(), 'the-bootstrap' ),
+					/* translators: 1: comment count number, 2: title. */
+					_n( '%1$s thought on &ldquo;%2$s&rdquo;', '%1$s thoughts on &ldquo;%2$s&rdquo;', get_comments_number(), 'the-bootstrap' ),
 					number_format_i18n( get_comments_number() ),
 					'<span>' . get_the_title() . '</span>'
 				);
@@ -580,6 +582,7 @@ if ( ! function_exists( 'the_bootstrap_comment' ) ) :
 	 * @return  void
 	 */
 	function the_bootstrap_comment( $comment, $args, $depth ) {
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		$GLOBALS['comment'] = $comment;
 		if ( 'pingback' === $comment->comment_type || 'trackback' === $comment->comment_type ) :
 			?>
@@ -615,8 +618,8 @@ if ( ! function_exists( 'the_bootstrap_comment' ) ) :
 					<p class="comment-author vcard">
 						<?php
 							/*
-							translators: 1: comment author, 2: date and time
-							*/
+							 * Translators: 1: comment author, 2: date and time
+							 */
 							printf(
 								__( '%1$s <span class="says">said</span> on %2$s:', 'the-bootstrap' ),
 								sprintf( '<span class="fn">%s</span>', get_comment_author_link() ),
@@ -624,9 +627,7 @@ if ( ! function_exists( 'the_bootstrap_comment' ) ) :
 									'<a href="%1$s"><time pubdate datetime="%2$s">%3$s</time></a>',
 									esc_url( get_comment_link( $comment->comment_ID ) ),
 									get_comment_time( 'c' ),
-									/*
-									translators: 1: date, 2: time
-									*/
+									/* translators: 1: date, 2: time */
 									sprintf( __( '%1$s at %2$s', 'the-bootstrap' ), get_comment_date(), get_comment_time() )
 								)
 							);
@@ -697,11 +698,11 @@ add_action( 'comment_form', 'the_bootstrap_comment_form' );
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $html The original HTML for the author field.
+ * @param   string $_html The original HTML for the author field.
  *
  * @return  string The modified HTML for the author field.
  */
-function the_bootstrap_comment_form_field_author( $html ) {
+function the_bootstrap_comment_form_field_author( $_html ) {
 	$commenter = wp_get_current_commenter();
 	$req       = get_option( 'require_name_email' );
 	$aria_req  = ( $req ? " aria-required='true'" : '' );
@@ -721,11 +722,11 @@ add_filter( 'comment_form_field_author', 'the_bootstrap_comment_form_field_autho
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $html The original HTML for the email field.
+ * @param   string $_html The original HTML for the email field.
  *
  * @return  string The modified HTML for the email field.
  */
-function the_bootstrap_comment_form_field_email( $html ) {
+function the_bootstrap_comment_form_field_email( $_html ) {
 	$commenter = wp_get_current_commenter();
 	$req       = get_option( 'require_name_email' );
 	$aria_req  = ( $req ? " aria-required='true'" : '' );
@@ -745,11 +746,11 @@ add_filter( 'comment_form_field_email', 'the_bootstrap_comment_form_field_email'
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $html The original HTML for the URL field.
+ * @param   string $_html The original HTML for the URL field.
  *
  * @return  string The modified HTML for the URL field.
  */
-function the_bootstrap_comment_form_field_url( $html ) {
+function the_bootstrap_comment_form_field_url( $_html ) {
 	$commenter = wp_get_current_commenter();
 
 	return '<div class="comment-form-url mb-3">
@@ -825,23 +826,32 @@ function the_bootstrap_post_gallery( $content, $attr ) {
 		}
 	}
 
-	extract(
-		shortcode_atts(
-			array(
-				'order'      => 'ASC',
-				'orderby'    => 'menu_order ID',
-				'id'         => $post->ID,
-				'itemtag'    => 'figure',
-				'icontag'    => 'div',
-				'captiontag' => 'figcaption',
-				'columns'    => 3,
-				'size'       => 'thumbnail',
-				'include'    => '',
-				'exclude'    => '',
-			),
-			$attr
-		)
+	$shortcode_attrs = shortcode_atts(
+		array(
+			'order'      => 'ASC',
+			'orderby'    => 'menu_order ID',
+			'id'         => $post->ID,
+			'itemtag'    => 'figure',
+			'icontag'    => 'div',
+			'captiontag' => 'figcaption',
+			'columns'    => 3,
+			'size'       => 'thumbnail',
+			'include'    => '',
+			'exclude'    => '',
+		),
+		$attr
 	);
+
+	$order      = $shortcode_attrs['order'];
+	$orderby    = $shortcode_attrs['orderby'];
+	$id         = $shortcode_attrs['id'];
+	$itemtag    = $shortcode_attrs['itemtag'];
+	$icontag    = $shortcode_attrs['icontag'];
+	$captiontag = $shortcode_attrs['captiontag'];
+	$columns    = $shortcode_attrs['columns'];
+	$size       = $shortcode_attrs['size'];
+	$include    = $shortcode_attrs['include'];
+	$exclude    = $shortcode_attrs['exclude'];
 
 	$id = intval( $id );
 	if ( 'RAND' === $order ) {
@@ -929,8 +939,9 @@ function the_bootstrap_post_gallery( $content, $attr ) {
 		);
 
 		$link        = wp_get_attachment_link( $id, $size, ! ( isset( $attr['link'] ) && 'file' === $attr['link'] ) );
-		$clear_class = ( 0 === $i++ % $columns ) ? ' clear' : '';
-		$col_class   = 'col-' . floor( 12 / $columns );
+		$clear_class = ( 0 === $i % $columns ) ? ' clear' : '';
+		++$i;
+		$col_class = 'col-' . floor( 12 / $columns );
 
 		$output .= '<li class="' . esc_attr( $col_class . $clear_class . ' mb-3' ) . '"><' . esc_html( $itemtag ) . ' class="gallery-item">';
 		$output .= "<{$icontag} class='gallery-icon'>{$link}</{$icontag}>\n";
@@ -947,7 +958,6 @@ function the_bootstrap_post_gallery( $content, $attr ) {
 
 	return $output;
 }
-// Add_filter( 'post_gallery', 'the_bootstrap_post_gallery', 10, 2 ).
 
 
 /**
@@ -956,24 +966,27 @@ function the_bootstrap_post_gallery( $content, $attr ) {
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $empty   Empty parameter (not used).
+ * @param   string $output   Output parameter.
  * @param   array  $attr    The caption shortcode attributes.
  * @param   string $content The caption shortcode content.
  *
  * @return  string The caption HTML.
  */
-function the_bootstrap_img_caption_shortcode( $empty, $attr, $content ) {
-	extract(
-		shortcode_atts(
-			array(
-				'id'      => '',
-				'align'   => 'alignnone',
-				'width'   => '',
-				'caption' => '',
-			),
-			$attr
-		)
+function the_bootstrap_img_caption_shortcode( $output, $attr, $content ) {
+	$shortcode_attrs = shortcode_atts(
+		array(
+			'id'      => '',
+			'align'   => 'alignnone',
+			'width'   => '',
+			'caption' => '',
+		),
+		$attr
 	);
+
+	$id      = $shortcode_attrs['id'];
+	$align   = $shortcode_attrs['align'];
+	$width   = $shortcode_attrs['width'];
+	$caption = $shortcode_attrs['caption'];
 
 	if ( 1 > (int) $width || empty( $caption ) ) {
 		return $content;
@@ -997,11 +1010,11 @@ add_filter( 'img_caption_shortcode', 'the_bootstrap_img_caption_shortcode', 10, 
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $form The original password form HTML.
+ * @param   string $_form The original password form HTML.
  *
  * @return  string The Bootstrap-styled password form.
  */
-function the_bootstrap_the_password_form( $form ) {
+function the_bootstrap_the_password_form( $_form ) {
 	return '<form class="post-password-form" action="' . esc_url( home_url( 'wp-pass.php' ) ) . '" method="post"><h4 class="mb-3">' . esc_html__( 'This post is password protected. To view it please enter your password below:', 'the-bootstrap' ) . '</h4><div class="mb-3"><label class="form-label" for="post-password-' . get_the_ID() . '">' . esc_html__( 'Password:', 'the-bootstrap' ) . '</label><input class="form-control" name="post_password" id="post-password-' . get_the_ID() . '" type="password" size="20" /></div><div class="mb-3"><button type="submit" class="post-password-submit submit btn btn-primary">' . esc_html__( 'Submit', 'the-bootstrap' ) . '</button></div></form>';
 }
 add_filter( 'the_password_form', 'the_bootstrap_the_password_form' );
@@ -1047,12 +1060,12 @@ add_filter( 'widget_categories_dropdown_args', 'the_bootstrap_widget_categories_
  * @param   string $title   The image title.
  * @param   string $align   The image alignment.
  * @param   string $url     The image URL.
- * @param   string $size    The image size.
- * @param   string $alt     The image alt text.
+ * @param   string $_size   The image size.
+ * @param   string $_alt    The image alt text.
  *
  * @return  string The modified image HTML.
  */
-function the_bootstrap_image_send_to_editor( $html, $id, $caption, $title, $align, $url, $size, $alt ) {
+function the_bootstrap_image_send_to_editor( $html, $id, $caption, $title, $align, $url, $_size, $_alt ) {
 	if ( $url ) {
 		$html = str_replace( '<a ', '<a class="thumbnail" ', $html );
 	} else {

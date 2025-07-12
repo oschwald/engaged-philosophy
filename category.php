@@ -1,5 +1,5 @@
 <?php
-/** category.php
+/** Category archive template
  *
  * The template for displaying Category Archive pages.
  *
@@ -23,12 +23,13 @@ get_header(); ?>
 			<header class="page-header">
 				<h1 class="page-title">
 				<?php
-					printf( __( 'Category Archives: %s', 'the-bootstrap' ), '<span>' . single_cat_title( '', false ) . '</span>' );
+					printf( __( 'Category Archives: %s', 'the-bootstrap' ), '<span>' . esc_html( single_cat_title( '', false ) ) . '</span>' );
 				?>
 				</h1>
 
 				<?php
-				if ( $category_description = category_description() ) {
+				$category_description = category_description();
+				if ( $category_description ) {
 					echo apply_filters( 'category_archive_meta', '<div class="category-archive-meta">' . $category_description . '</div>' );
 				}
 				?>
@@ -54,7 +55,10 @@ get_header(); ?>
 get_sidebar();
 get_footer();
 
+/*
+End of file index.php
+*/
 
 /*
-End of file index.php */
-/* Location: ./wp-content/themes/the-bootstrap/category.php */
+Location: ./wp-content/themes/the-bootstrap/category.php
+*/

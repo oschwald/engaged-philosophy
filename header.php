@@ -1,5 +1,5 @@
 <?php
-/** header.php
+/** Header template file
  *
  * Displays all of the <head> section and everything up till </header>
  *
@@ -49,16 +49,16 @@
 		<a id="header-image" href="<?php echo esc_url( home_url( '/' ) ); ?>" title="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?>" rel="home">
 		<img src="<?php header_image(); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name', 'display' ) ); ?> Logo">
 		</a>
-	<?php endif; // If ( get_header_image() ). ?>
+	<?php endif; // End header image check. ?>
 
 	</header><!-- #branding -->
 	<?php tha_header_after(); ?>
 
 	<!-- Navigation bar - full width of container -->
 	<nav id="access" aria-label="Main navigation">
-	<h3 class="visually-hidden"><?php _e( 'Main menu', 'the-bootstrap' ); ?></h3>
-	<div class="skip-link"><a class="visually-hidden" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
-	<div class="skip-link"><a class="visually-hidden" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php _e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
+	<h3 class="visually-hidden"><?php esc_html_e( 'Main menu', 'the-bootstrap' ); ?></h3>
+	<div class="skip-link"><a class="visually-hidden" href="#content" title="<?php esc_attr_e( 'Skip to primary content', 'the-bootstrap' ); ?>"><?php esc_html_e( 'Skip to primary content', 'the-bootstrap' ); ?></a></div>
+	<div class="skip-link"><a class="visually-hidden" href="#secondary" title="<?php esc_attr_e( 'Skip to secondary content', 'the-bootstrap' ); ?>"><?php esc_html_e( 'Skip to secondary content', 'the-bootstrap' ); ?></a></div>
 	<div <?php the_bootstrap_navbar_class(); ?>>
 		<!-- Mobile toggle button -->
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="<?php esc_attr_e( 'Toggle navigation', 'the-bootstrap' ); ?>">
@@ -98,6 +98,10 @@
 
 <?php
 /*
-End of file header.php */
-/* Location: ./wp-content/themes/the-bootstrap/header.php */
+End of file header.php
+*/
+
+/*
+Location: ./wp-content/themes/the-bootstrap/header.php
+*/
 ?>

@@ -1,5 +1,5 @@
 <?php
-/** theme-options.php
+/** Theme options functionality
  *
  * The Bootstrap Theme Options
  *
@@ -7,7 +7,6 @@
  * @package     The Bootstrap
  * @since       1.3.0 - 06.04.2012
  */
-
 
 /**
  * Add theme options page to the admin menu.
@@ -36,11 +35,11 @@ add_action( 'admin_menu', 'the_bootstrap_theme_options_add_page' );
  * @author  Automattic
  * @since   1.3.0 - 06.04.2012
  *
- * @param   string $hook_suffix The hook suffix.
+ * @param   string $_hook_suffix The hook suffix.
  *
  * @return  void
  */
-function the_bootstrap_admin_enqueue_scripts( $hook_suffix ) {
+function the_bootstrap_admin_enqueue_scripts( $_hook_suffix ) {
 	wp_enqueue_style( 'the-bootstrap-theme-options', get_template_directory_uri() . '/css/theme-options.css', array(), _the_bootstrap_version() );
 }
 
@@ -137,11 +136,11 @@ add_action( 'admin_init', 'the_bootstrap_theme_options_init' );
  * @author  Automattic
  * @since   1.3.0 - 06.04.2012
  *
- * @param   string $capability The capability used for the page, which is manage_options by default.
+ * @param   string $_capability The capability used for the page, which is manage_options by default.
  *
  * @return  string  The capability to actually use.
  */
-function the_bootstrap_option_page_capability( $capability ) {
+function the_bootstrap_option_page_capability( $_capability ) {
 	return 'edit_theme_options';
 }
 add_filter( 'option_page_capability_the_bootstrap_options', 'the_bootstrap_option_page_capability' );
@@ -251,15 +250,16 @@ function the_bootstrap_settings_field_checkbox( $options ) {
  * @return  void
  */
 function the_bootstrap_settings_field_radio( $args ) {
-	extract(
-		wp_parse_args(
-			$args,
-			array(
-				'name'    => null,
-				'options' => array(),
-			)
+	$parsed_args = wp_parse_args(
+		$args,
+		array(
+			'name'    => null,
+			'options' => array(),
 		)
 	);
+
+	$name    = $parsed_args['name'];
+	$options = $parsed_args['options'];
 
 	foreach ( (array) $options as $o ) :
 		?>
@@ -267,7 +267,8 @@ function the_bootstrap_settings_field_radio( $args ) {
 			<input type="radio" name="the_bootstrap_theme_options[<?php echo esc_attr( $name ); ?>]" id="<?php echo sanitize_title_with_dashes( $o->value ); ?>" value="<?php echo esc_attr( $o->value ); ?>" <?php checked( $o->value, the_bootstrap_options()->$name ); ?> />
 			<?php
 			if ( isset( $o->description ) ) {
-				echo esc_html( $o->description );}
+				echo esc_html( $o->description );
+			}
 			?>
 		</label><br />
 		<?php
@@ -325,13 +326,14 @@ function the_bootstrap_theme_options_render_page() {
  * @return  array Sanitized and validated data.
  */
 function the_bootstrap_theme_options_validate( $input ) {
-	$output = $defaults = the_bootstrap_get_default_theme_options();
+	$defaults = the_bootstrap_get_default_theme_options();
+	$output   = $defaults;
 
 	if ( isset( $input['theme_layout'] ) && array_key_exists( $input['theme_layout'], the_bootstrap_layouts() ) ) {
 		$output['theme_layout'] = $input['theme_layout'];
 	}
 
-	if ( isset( $input['navbar_position'] ) && in_array( $input['navbar_position'], array( 'static', 'fixed-top', 'fixed-bottom' ) ) ) {
+	if ( isset( $input['navbar_position'] ) && in_array( $input['navbar_position'], array( 'static', 'fixed-top', 'fixed-bottom' ), true ) ) {
 		$output['navbar_position'] = $input['navbar_position'];
 	}
 

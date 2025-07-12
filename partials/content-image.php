@@ -1,5 +1,5 @@
 <?php
-/** content-image.php
+/** Content image template
  *
  * The template for displaying posts in the Image Post Format on index and archive pages
  *
@@ -9,7 +9,6 @@
  * @package     The Bootstrap
  * @since       1.0.0 - 07.02.2012
  */
-
 
 tha_entry_before(); ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
@@ -31,7 +30,10 @@ tha_entry_before(); ?>
 <?php
 tha_entry_after();
 
+/*
+End of file content-image.php
+*/
 
 /*
-End of file content-image.php */
-/* Location: ./wp-content/themes/the-bootstrap/partials/content-image.php */
+Location: ./wp-content/themes/the-bootstrap/partials/content-image.php
+*/

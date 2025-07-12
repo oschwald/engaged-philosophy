@@ -1,5 +1,5 @@
 <?php
-/** content-link.php
+/** Content link template
  *
  * The template for displaying posts in the Link Post Format on index and archive pages
  *
@@ -12,7 +12,10 @@
 
 get_template_part( '/partials/content', 'aside' );
 
+/*
+End of file content-link.php
+*/
 
 /*
-End of file content-link.php */
-/* Location: ./wp-content/themes/the-bootstrap/partials/content-link.php */
+Location: ./wp-content/themes/the-bootstrap/partials/content-link.php
+*/

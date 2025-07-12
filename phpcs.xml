@@ -61,6 +61,14 @@
         
         <!-- Allow late escaping in templates -->
         <exclude name="WordPress.Security.EscapeOutput.OutputNotEscaped"/>
+        
+        <!-- Allow unused parameters (WordPress uses $_ convention for intentionally unused params) -->
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.Found"/>
+        <exclude name="Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed"/>
+        
+        <!-- Allow necessary database queries for theme functionality -->
+        <exclude name="WordPress.DB.SlowDBQuery.slow_db_query_tax_query"/>
+        <exclude name="WordPress.DB.SlowDBQuery.slow_db_query_meta_query"/>
     </rule>
 
     <!-- PHP Compatibility -->

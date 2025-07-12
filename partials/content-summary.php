@@ -1,5 +1,5 @@
 <?php
-/** content-page.php
+/** Content summary template
  *
  * The template for displaying page content in the page.php template
  *
@@ -7,7 +7,6 @@
  * @package     The Bootstrap
  * @since       1.0.0 - 07.02.2012
  */
-
 
 tha_entry_before(); ?>
 <article id="post-<?php the_ID(); ?>" <?php post_class( 'mb-5 pb-4 border-bottom' ); ?>>
@@ -33,7 +32,10 @@ tha_entry_before(); ?>
 <?php
 tha_entry_after();
 
+/*
+End of file content-page.php
+*/
 
 /*
-End of file content-page.php */
-/* Location: ./wp-content/themes/the-bootstrap/partials/content-page.php */
+Location: ./wp-content/themes/the-bootstrap/partials/content-page.php
+*/

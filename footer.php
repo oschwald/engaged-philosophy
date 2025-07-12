@@ -1,5 +1,5 @@
 <?php
-/** footer.php
+/** Footer template
  *
  * @author      Konstantin Obenland
  * @package     The Bootstrap
@@ -37,8 +37,10 @@
 	</body>
 </html>
 <?php
-
+/*
+End of file footer.php
+*/
 
 /*
-End of file footer.php */
-/* Location: ./wp-content/themes/the-bootstrap/footer.php */
+Location: ./wp-content/themes/the-bootstrap/footer.php
+*/

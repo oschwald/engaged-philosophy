@@ -1,7 +1,9 @@
 <?php
-/** home.php
+/** Home page template
  *
  * Template Name: Home
+ *
+ * @package The Bootstrap
  */
 
 get_header(); ?>
@@ -36,7 +38,7 @@ get_header(); ?>
 						?>
 				<div class="carousel-item 
 						<?php
-						if ( $index === 0 ) {
+						if ( 0 === $index ) {
 							echo 'active';}
 						?>
 				">
@@ -100,7 +102,10 @@ get_header(); ?>
 <?php
 get_footer();
 
+/*
+End of file _full_width.php
+*/
 
 /*
-End of file _full_width.php */
-/* Location: ./wp-content/themes/the-bootstrap/_full_width.php */
+Location: ./wp-content/themes/the-bootstrap/_full_width.php
+*/

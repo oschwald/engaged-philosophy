@@ -1,12 +1,19 @@
 <?php
-/** the-bootstrap-image-meta-widget.php
+/**
+ * Bootstrap image meta widget file
  *
  * @author  Konstantin Obenland
  * @package The Bootstrap
  * @since   1.1.0 - 08.03.2012
  */
 
-
+/**
+ * The Bootstrap Image Meta Widget class
+ *
+ * @author  Konstantin Obenland
+ * @package The Bootstrap
+ * @since   1.1.0 - 08.03.2012
+ */
 class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 
 
@@ -21,7 +28,7 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 	 * @since   1.1.0 - 08.03.2012
 	 * @access  public
 	 *
-	 * @return  The_Bootstrap_Image_Meta_Widget
+	 * @return  void
 	 */
 	public function __construct() {
 
@@ -51,7 +58,10 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 	public function widget( $args, $instance ) {
 
 		if ( is_attachment() ) {
-			extract( $args );
+			$before_widget = $args['before_widget'];
+			$before_title  = $args['before_title'];
+			$after_title   = $args['after_title'];
+			$after_widget  = $args['after_widget'];
 
 			$title      = apply_filters( 'widget_title', empty( $instance['title'] ) ? __( 'Info', 'the-bootstrap' ) : $instance['title'] );
 			$image_meta = wp_get_attachment_metadata();
@@ -138,7 +148,7 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 	public function update( $new_instance, $old_instance ) {
 
 		$instance          = $old_instance;
-		$instance['title'] = strip_tags( $new_instance['title'] );
+		$instance['title'] = wp_strip_all_tags( $new_instance['title'] );
 
 		return $instance;
 	}

@@ -1,5 +1,5 @@
 <?php
-/** comments.php
+/** Comments template
  *
  * The template for displaying Comments.
  *
@@ -18,7 +18,10 @@ comment_form();
 
 tha_comments_after();
 
+/*
+End of file comments.php
+*/
 
 /*
-End of file comments.php */
-/* Location: ./wp-content/themes/the-bootstrap/comments.php */
+Location: ./wp-content/themes/the-bootstrap/comments.php
+*/

@@ -1,5 +1,5 @@
 <?php
-/** template-tags.php
+/** Template tags and functions
  *
  * Implementation of the Custom Header feature
  * http://codex.wordpress.org/Custom_Headers
@@ -9,15 +9,14 @@
  * @since       1.2.4 - 07.04.2012
  */
 
-
 if ( ! function_exists( 'the_bootstrap_content_nav' ) ) :
 	/**
-	 * Display navigation to next/previous pages when applicable
+	 * Display navigation to next/previous pages when applicable.
 	 *
 	 * To be honest - I'm pretty proud of this function. Through a lot of trial and
-	 * error, I was able to user a core WordPress function (paginate_links()) and
-	 * adjust it in a way, that the end result is a legitimate pagination.
-	 * A pagination many developers buy (code) expensively with Plugins like
+	 * error, I was able to use a core WordPress function (paginate_links()) and
+	 * adjust it in a way that the end result is a legitimate pagination.
+	 * a pagination many developers buy (code) expensively with plugins like
 	 * WP Pagenavi. No need! WordPress has it all!
 	 *
 	 * @author  Konstantin Obenland
@@ -40,7 +39,7 @@ if ( ! function_exists( 'the_bootstrap_content_nav' ) ) :
 		$pagenum_link = remove_query_arg( array_keys( $query_args ), $pagenum_link );
 		$pagenum_link = trailingslashit( $pagenum_link ) . '%_%';
 
-		$format  = ( $wp_rewrite->using_index_permalinks() and ! strpos( $pagenum_link, 'index.php' ) ) ? 'index.php/' : '';
+		$format  = ( $wp_rewrite->using_index_permalinks() && ! strpos( $pagenum_link, 'index.php' ) ) ? 'index.php/' : '';
 		$format .= $wp_rewrite->using_permalinks() ? user_trailingslashit( 'page/%#%', 'paged' ) : '?paged=%#%';
 
 		$links = paginate_links(
@@ -63,7 +62,7 @@ if ( ! function_exists( 'the_bootstrap_content_nav' ) ) :
 				if ( strpos( $link, 'current' ) !== false ) {
 					echo '<li class="page-item active">' . str_replace( 'page-numbers current', 'page-link', $link ) . '</li>';
 				} elseif ( strpos( $link, 'dots' ) !== false ) {
-					echo '<li class="page-item disabled"><span class="page-link">' . strip_tags( $link ) . '</span></li>';
+					echo '<li class="page-item disabled"><span class="page-link">' . wp_strip_all_tags( $link ) . '</span></li>';
 				} else {
 					echo '<li class="page-item">' . str_replace( 'page-numbers', 'page-link', $link ) . '</li>';
 				}
@@ -76,7 +75,7 @@ endif;
 
 if ( ! function_exists( 'the_bootstrap_comment_nav' ) ) :
 	/**
-	 * Display navigation to next/previous comments pages when applicable
+	 * Display navigation to next/previous comments pages when applicable.
 	 *
 	 * @author  Konstantin Obenland
 	 * @since   1.5.0 - 19.05.2012
@@ -84,14 +83,15 @@ if ( ! function_exists( 'the_bootstrap_comment_nav' ) ) :
 	 * @return  void
 	 */
 	function the_bootstrap_comment_nav() {
-		if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // Are there comments to navigate through?>
+		if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : // Are there comments to navigate through?
+			?>
 	<nav class="comment-nav card card-body">
-		<h1 class="assistive-text"><?php _e( 'Comment navigation', 'the-bootstrap' ); ?></h1>
+		<h1 class="assistive-text"><?php esc_html_e( 'Comment navigation', 'the-bootstrap' ); ?></h1>
 		<div class="nav-previous float-start"><?php next_comments_link( __( '&larr; Newer Comments', 'the-bootstrap' ) ); ?></div>
 		<div class="nav-next float-end"><?php previous_comments_link( __( 'Older Comments &rarr;', 'the-bootstrap' ) ); ?></div>
 	</nav>
 			<?php
-	endif; // Check for comment navigation.
+		endif; // Check for comment navigation.
 	}
 endif;
 
@@ -99,12 +99,12 @@ endif;
 if ( ! function_exists( 'the_bootstrap_posted_on' ) ) :
 	/**
 	 * Prints HTML with meta information for the current post-date/time and author,
-	comment and edit link
-
-	@author   Konstantin Obenland
-	@since    1.0.0 - 05.02.2012
-
-	@return   void
+	 * comment and edit link.
+	 *
+	 * @author  Konstantin Obenland
+	 * @since   1.0.0 - 05.02.2012
+	 *
+	 * @return  void
 	 */
 	function the_bootstrap_posted_on() {
 		printf(
@@ -117,13 +117,13 @@ if ( ! function_exists( 'the_bootstrap_posted_on' ) ) :
 			esc_attr( sprintf( __( 'View all posts by %s', 'the-bootstrap' ), get_the_author() ) ),
 			esc_html( get_the_author() )
 		);
-		if ( comments_open() and ! post_password_required() ) {
+		if ( comments_open() && ! post_password_required() ) {
 			?>
 		<span class="sep"> | </span>
 		<span class="comments-link">
 				<?php comments_popup_link( '<span class="leave-reply">' . __( 'Leave a reply', 'the-bootstrap' ) . '</span>', __( '<strong>1</strong> Reply', 'the-bootstrap' ), __( '<strong>%</strong> Replies', 'the-bootstrap' ) ); ?>
 		</span>
-			<?php
+				<?php
 		}
 		edit_post_link( __( 'Edit', 'the-bootstrap' ), '<span class="sep">&nbsp;</span><span class="edit-link label">', '</span>' );
 	}
@@ -132,9 +132,9 @@ endif;
 
 if ( ! function_exists( 'the_bootstrap_link_pages' ) ) :
 	/**
-	 * Displays page links for paginated posts
+	 * Displays page links for paginated posts.
 	 *
-	 * It's basically the wp_link_pages() function, altered to fit to the Bootstrap
+	 * It's basically the wp_link_pages() function, altered to fit the Bootstrap
 	 * markup needs for paginations (unordered list).
 	 *
 	 * @see     wp_link_pages()
@@ -142,9 +142,9 @@ if ( ! function_exists( 'the_bootstrap_link_pages' ) ) :
 	 * @author  Konstantin Obenland
 	 * @since   1.1.0 - 09.03.2012
 	 *
-	 * @param   array $args
+	 * @param   array $args Optional. Array of arguments for the pagination.
 	 *
-	 * @return  string
+	 * @return  string The pagination HTML markup.
 	 */
 	function the_bootstrap_link_pages( $args = array() ) {
 		wp_link_pages( array( 'echo' => 0 ) );
@@ -158,7 +158,12 @@ if ( ! function_exists( 'the_bootstrap_link_pages' ) ) :
 
 		$r = wp_parse_args( $args, $defaults );
 		$r = apply_filters( 'the_bootstrap_link_pages_args', $r );
-		extract( $r, EXTR_SKIP );
+
+		$next_or_number   = $r['next_or_number'];
+		$nextpagelink     = $r['nextpagelink'];
+		$previouspagelink = $r['previouspagelink'];
+		$pagelink         = $r['pagelink'];
+		$echo             = $r['echo'];
 
 		global $page, $numpages, $multipage, $more, $pagenow;
 
@@ -168,7 +173,7 @@ if ( ! function_exists( 'the_bootstrap_link_pages' ) ) :
 				$output .= '<nav class="pagination"><ul class="pagination"><li class="page-item"><span class="page-link">' . __( 'Pages:', 'the-bootstrap' ) . '</span></li>';
 				for ( $i = 1; $i < ( $numpages + 1 ); $i++ ) {
 					$j = str_replace( '%', (string) $i, $pagelink );
-					if ( ( $i !== $page ) || ( ( ! $more ) && ( $page !== 1 ) ) ) {
+					if ( ( $page !== $i ) || ( ( ! $more ) && ( 1 !== $page ) ) ) {
 						$output .= '<li class="page-item">' . _wp_link_page( $i ) . '<span class="page-link">' . $j . '</span></a></li>';
 					}
 					if ( $i === $page ) {
@@ -201,23 +206,23 @@ endif;
 
 if ( ! function_exists( 'the_bootstrap_navbar_searchform' ) ) :
 	/**
-	 * Returns or echoes searchform mark up, specifically for the navbar.
-
-	@author   Konstantin Obenland
-	@since    1.5,0 - 14.05.2012
-
-	@param    bool $echo   Optional. Whether to echo the form
-
-	@return   string  Returns form HTML, echoes when $echo is true
+	 * Returns or echoes searchform markup, specifically for the navbar.
+	 *
+	 * @author  Konstantin Obenland
+	 * @since   1.5.0 - 14.05.2012
+	 *
+	 * @param   bool $output Optional. Whether to echo the form. Default true.
+	 *
+	 * @return  string Returns form HTML, echoes when $output is true.
 	 */
-	function the_bootstrap_navbar_searchform( $echo = true ) {
+	function the_bootstrap_navbar_searchform( $output = true ) {
 		$searchform = '	<form id="searchform" class="d-flex ms-auto" method="get" action="' . esc_url( home_url( '/' ) ) . '" role="search" aria-label="' . esc_attr__( 'Search the site', 'the-bootstrap' ) . '">
 						<label for="s" class="visually-hidden">' . __( 'Search', 'the-bootstrap' ) . '</label>
 						<input type="search" class="form-control" name="s" id="s" placeholder="' . esc_attr__( 'Search', 'the-bootstrap' ) . '" aria-label="' . esc_attr__( 'Search the site', 'the-bootstrap' ) . '">
 						<button type="submit" class="btn btn-outline-secondary ms-1" aria-label="' . esc_attr__( 'Submit search', 'the-bootstrap' ) . '"><i class="bi bi-search"></i></button>
 					</form>';
 
-		if ( $echo ) {
+		if ( $output ) {
 			echo $searchform;
 		}
 
@@ -228,7 +233,7 @@ endif;
 
 if ( ! function_exists( 'the_bootstrap_navbar_class' ) ) :
 	/**
-	 * Adds The Bootstrap navbar classes
+	 * Adds The Bootstrap navbar classes.
 	 *
 	 * @author  WordPress.org
 	 * @since   1.4.0 - 12.05.2012
@@ -261,16 +266,16 @@ if ( ! function_exists( 'the_bootstrap_comments_link' ) ) :
 	/**
 	 * Displays the link to the comments popup window for the current post ID.
 	 *
-	 * Is not meant to be displayed on single posts and pages. Should be used on the
-	 * lists of posts
+	 * Is not meant to be displayed on single posts and pages. Should be used on
+	 * lists of posts.
 	 *
 	 * @since   2.0.0 - 01.09.2012
 	 *
-	 * @param   string|false $zero       The string to display when no comments
-	 * @param   string|false $one        The string to display when only one comment is available
-	 * @param   string|false $more       The string to display when there are more than one comment
-	 * @param   string       $css_class  The CSS class to use for comments
-	 * @param   string|false $none       The string to display when comments have been turned off
+	 * @param   string|false $zero      The string to display when no comments. Default false.
+	 * @param   string|false $one       The string to display when only one comment is available. Default false.
+	 * @param   string|false $more      The string to display when there are more than one comment. Default false.
+	 * @param   string       $css_class The CSS class to use for comments. Default empty string.
+	 * @param   string|false $none      The string to display when comments have been turned off. Default false.
 	 *
 	 * @return  void
 	 */
@@ -320,7 +325,10 @@ if ( ! function_exists( 'the_bootstrap_comments_link' ) ) :
 	}
 endif;
 
+/*
+End of file template-tags.php
+*/
 
 /*
-End of file template-tags.php */
-/* Location: ./wp-content/themes/the-bootstrap/inc/template-tags.php */
+Location: ./wp-content/themes/the-bootstrap/inc/template-tags.php
+*/

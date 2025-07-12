@@ -1,5 +1,5 @@
 <?php
-/** page.php
+/** Page template
  *
  * The template for displaying all pages.
  *
@@ -36,7 +36,10 @@ get_header(); ?>
 <?php
 get_footer();
 
+/*
+End of file page.php
+*/
 
 /*
-End of file page.php */
-/* Location: ./wp-content/themes/the-bootstrap/page.php */
+Location: ./wp-content/themes/the-bootstrap/page.php
+*/

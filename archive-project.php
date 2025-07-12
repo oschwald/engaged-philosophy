@@ -1,10 +1,10 @@
 <?php
-/** archive.php
+/** Project archive template
  *
  * The template for displaying Archive pages.
  *
  * Used to display archive-type pages if nothing more specific matches a query.
- * For example, puts together date-based pages if no date.php file exists.
+ * for example, puts together date-based pages if no date.php file exists.
  *
  * Learn more: http://codex.wordpress.org/Template_Hierarchy
  *
@@ -60,9 +60,21 @@ get_header(); ?>
 			preg_match_all( '/<a[^>]*>.*?<\/a>/', $tag_cloud, $matches );
 			$tags = $matches[0];
 
-			// Use a seed based on the current date to shuffle consistently per day.
-			mt_srand( (int) date( 'Ymd' ) );
-			shuffle( $tags );
+			// Create a deterministic shuffle based on current date for consistent daily order.
+			$date_seed     = (int) gmdate( 'Ymd' );
+			$shuffled_tags = array();
+			$tag_count     = count( $tags );
+
+			// Create deterministic pseudo-random order based on date.
+			for ( $i = 0; $i < $tag_count; $i++ ) {
+				$pseudo_random = ( $date_seed + $i * 31 ) % $tag_count;
+				while ( isset( $shuffled_tags[ $pseudo_random ] ) ) {
+					$pseudo_random = ( ++$pseudo_random ) % $tag_count;
+				}
+				$shuffled_tags[ $pseudo_random ] = $tags[ $i ];
+			}
+			ksort( $shuffled_tags );
+			$tags = array_values( $shuffled_tags );
 			echo implode( ' ', $tags );
 		}
 		?>
@@ -85,5 +97,9 @@ endif;
 get_footer();
 
 /*
-End of file archive.php */
-/* Location: ./wp-content/themes/the-bootstrap/archive.php */
+End of file archive.php
+*/
+
+/*
+Location: ./wp-content/themes/the-bootstrap/archive.php
+*/

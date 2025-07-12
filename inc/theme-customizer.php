@@ -1,5 +1,5 @@
 <?php
-/** theme-customizer.php
+/** Theme customizer settings
  *
  * Implementation of the Theme Customizer for Themes
  *
@@ -10,14 +10,13 @@
  * @since       1.4.0 - 05.05.2012
  */
 
-
 /**
  * Registers the theme setting controls with the Theme Customizer
  *
  * @author  Konstantin Obenland
  * @since   1.4.0 - 05.05.2012
  *
- * @param   WP_Customize_Manager $wp_customize
+ * @param   WP_Customize_Manager $wp_customize Theme Customizer object.
  *
  * @return  void
  */
@@ -140,7 +139,10 @@ function the_bootstrap_customize_enqueue_scripts() {
 }
 add_action( 'customize_preview_init', 'the_bootstrap_customize_enqueue_scripts' );
 
+/*
+End of file theme-customizer.php
+*/
 
 /*
-End of file theme-customizer.php */
-/* Location: ./wp-content/themes/the-bootstrap/inc/theme-customizer.php */
+Location: ./wp-content/themes/the-bootstrap/inc/theme-customizer.php
+*/

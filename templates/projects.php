@@ -1,6 +1,8 @@
 <?php
 /**
  * Template Name: Projects
+ *
+ * @package The Bootstrap
  */
 
 get_header(); ?>

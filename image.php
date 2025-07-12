@@ -1,5 +1,5 @@
 <?php
-/** image.php
+/** Image attachment template
  *
  * The template for displaying image attachments.
  *
@@ -93,7 +93,7 @@ the_post();
 						list( $src, $width, $height ) = wp_get_attachment_image_src( $post->ID, 'full' );
 						$link_class                   = ( $GLOBALS['content_width'] > $width ) ? ' attachment-table' : '';
 					?>
-					<a href="<?php echo $next_attachment_url; ?>" title="<?php the_title_attribute(); ?>" rel="attachment" class="thumbnail<?php echo $link_class; ?>">
+					<a href="<?php echo esc_url( $next_attachment_url ); ?>" title="<?php the_title_attribute(); ?>" rel="attachment" class="thumbnail<?php echo esc_attr( $link_class ); ?>">
 						<?php echo wp_get_attachment_image( $post->ID, 'full' ); ?>
 					</a>
 
@@ -117,7 +117,10 @@ the_post();
 get_sidebar( 'image' );
 get_footer();
 
+/*
+End of file image.php
+*/
 
 /*
-End of file image.php */
-/* Location: ./wp-content/themes/the-bootstrap/image.php */
+Location: ./wp-content/themes/the-bootstrap/image.php
+*/

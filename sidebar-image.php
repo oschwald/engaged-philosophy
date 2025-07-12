@@ -1,5 +1,5 @@
 <?php
-/** sidebar-image.php
+/** Image sidebar template
  *
  * @author      Konstantin Obenland
  * @package     The Bootstrap
@@ -30,7 +30,10 @@ tha_sidebars_before(); ?>
 <?php
 tha_sidebars_after();
 
+/*
+End of file sidebar-image.php
+*/
 
 /*
-End of file sidebar-image.php */
-/* Location: ./wp-content/themes/the-bootstrap/sidebar-image.php */
+Location: ./wp-content/themes/the-bootstrap/sidebar-image.php
+*/

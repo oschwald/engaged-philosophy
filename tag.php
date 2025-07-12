@@ -1,5 +1,5 @@
 <?php
-/** tag.php
+/** Tag archive template
  *
  * The template used to display Tag Archive pages
  *
@@ -23,12 +23,13 @@ get_header(); ?>
 			<header class="page-header">
 				<h1 class="page-title">
 				<?php
-					printf( __( 'Tag Archives: %s', 'the-bootstrap' ), '<span>' . single_tag_title( '', false ) . '</span>' );
+					printf( __( 'Tag Archives: %s', 'the-bootstrap' ), '<span>' . esc_html( single_tag_title( '', false ) ) . '</span>' );
 				?>
 				</h1>
 
 				<?php
-				if ( $tag_description = tag_description() ) {
+				$tag_description = tag_description();
+				if ( $tag_description ) {
 					echo apply_filters( 'tag_archive_meta', '<div class="tag-archive-meta">' . $tag_description . '</div>' );
 				}
 				?>
@@ -54,7 +55,10 @@ get_header(); ?>
 get_sidebar();
 get_footer();
 
+/*
+End of file index.php
+*/
 
 /*
-End of file index.php */
-/* Location: ./wp-content/themes/the-bootstrap/tag.php */
+Location: ./wp-content/themes/the-bootstrap/tag.php
+*/

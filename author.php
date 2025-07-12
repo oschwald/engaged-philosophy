@@ -1,5 +1,5 @@
 <?php
-/** author.php
+/** Author archive template
  *
  * The template for displaying Author Archive pages.
  *
@@ -22,7 +22,7 @@ get_header(); ?>
 			?>
 
 			<header class="page-header">
-				<h1 class="page-title author"><?php printf( __( 'Author Archives: %s', 'the-bootstrap' ), '<span class="vcard"><a class="url fn n" href="' . esc_url( get_author_posts_url( (int) get_the_author_meta( 'ID' ) ) ) . '" title="' . esc_attr( get_the_author() ) . '" rel="me">' . get_the_author() . '</a></span>' ); ?></h1>
+				<h1 class="page-title author"><?php printf( __( 'Author Archives: %s', 'the-bootstrap' ), '<span class="vcard"><a class="url fn n" href="' . esc_url( get_author_posts_url( (int) get_the_author_meta( 'ID' ) ) ) . '" title="' . esc_attr( get_the_author() ) . '" rel="me">' . esc_html( get_the_author() ) . '</a></span>' ); ?></h1>
 			</header><!-- .page-header -->
 
 			<?php
@@ -31,9 +31,9 @@ get_header(); ?>
 			if ( get_the_author_meta( 'description' ) ) :
 				?>
 			<div id="author-info" class="row">
-				<h2 class="col-lg-8"><?php printf( __( 'About %s', 'the-bootstrap' ), get_the_author() ); ?></h2>
+				<h2 class="col-lg-8"><?php printf( __( 'About %s', 'the-bootstrap' ), esc_html( get_the_author() ) ); ?></h2>
 				<div id="author-avatar" class="col-lg-1">
-					<?php echo get_avatar( get_the_author_meta( 'user_email' ), apply_filters( 'the-bootstrap_author_bio_avatar_size', 70 ) ); ?>
+					<?php echo get_avatar( get_the_author_meta( 'user_email' ), apply_filters( 'the_bootstrap_author_bio_avatar_size', 70 ) ); ?>
 				</div><!-- #author-avatar -->
 				<div id="author-description" class="col-lg-7">
 					<?php the_author_meta( 'description' ); ?>
@@ -61,7 +61,10 @@ get_header(); ?>
 get_sidebar();
 get_footer();
 
+/*
+End of file author.php
+*/
 
 /*
-End of file author.php */
-/* Location: ./wp-content/themes/the-bootstrap/author.php */
+Location: ./wp-content/themes/the-bootstrap/author.php
+*/

@@ -1,10 +1,10 @@
 <?php
-/** archive.php
+/** Archive template
  *
  * The template for displaying Archive pages.
  *
  * Used to display archive-type pages if nothing more specific matches a query.
- * For example, puts together date-based pages if no date.php file exists.
+ * for example, puts together date-based pages if no date.php file exists.
  *
  * Learn more: http://codex.wordpress.org/Template_Hierarchy
  *
@@ -29,11 +29,11 @@ get_header(); ?>
 				<h1 class="page-title">
 					<?php
 					if ( is_day() ) :
-						printf( __( 'Daily Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date() . '</span>' );
+						printf( __( 'Daily Archives: %s', 'the-bootstrap' ), '<span>' . esc_html( get_the_date() ) . '</span>' );
 					elseif ( is_month() ) :
-						printf( __( 'Monthly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'F Y' ) . '</span>' );
+						printf( __( 'Monthly Archives: %s', 'the-bootstrap' ), '<span>' . esc_html( get_the_date( 'F Y' ) ) . '</span>' );
 					elseif ( is_year() ) :
-						printf( __( 'Yearly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'Y' ) . '</span>' );
+						printf( __( 'Yearly Archives: %s', 'the-bootstrap' ), '<span>' . esc_html( get_the_date( 'Y' ) ) . '</span>' );
 					else :
 						single_cat_title();
 					endif;
@@ -44,7 +44,7 @@ get_header(); ?>
 			<?php
 			while ( have_posts() ) {
 				the_post();
-				get_template_part( '/partials/content', get_post_format() ?: 'summary' );
+				get_template_part( '/partials/content', get_post_format() ? get_post_format() : 'summary' );
 			}
 			the_bootstrap_content_nav();
 		else :
@@ -61,7 +61,10 @@ get_header(); ?>
 get_sidebar();
 get_footer();
 
+/*
+End of file archive.php
+*/
 
 /*
-End of file archive.php */
-/* Location: ./wp-content/themes/the-bootstrap/archive.php */
+Location: ./wp-content/themes/the-bootstrap/archive.php
+*/

@@ -1,5 +1,5 @@
 <?php
-/** single.php
+/** Single post template
  *
  * The Template for displaying all single posts.
  *
@@ -25,7 +25,7 @@ get_header(); ?>
 		?>
 
 		<nav id="nav-single" class="pagination">
-			<h3 class="assistive-text"><?php _e( 'Post navigation', 'the-bootstrap' ); ?></h3>
+			<h3 class="assistive-text"><?php esc_html_e( 'Post navigation', 'the-bootstrap' ); ?></h3>
 			<span class="next"><?php next_post_link( '%link', sprintf( '%1$s <span class="meta-nav">&rarr;</span>', __( 'Next Post', 'the-bootstrap' ) ) ); ?></span>
 			<span class="previous"><?php previous_post_link( '%link', sprintf( '<span class="meta-nav">&larr;</span> %1$s', __( 'Previous Post', 'the-bootstrap' ) ) ); ?></span>
 		</nav><!-- #nav-single -->
@@ -39,7 +39,10 @@ get_header(); ?>
 get_sidebar();
 get_footer();
 
+/*
+End of file index.php
+*/
 
 /*
-End of file index.php */
-/* Location: ./wp-content/themes/the-bootstrap/single.php */
+Location: ./wp-content/themes/the-bootstrap/single.php
+*/

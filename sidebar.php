@@ -1,5 +1,5 @@
 <?php
-/** sidebar.php
+/** Sidebar template
  *
  * @author      Konstantin Obenland
  * @package     The Bootstrap
@@ -43,7 +43,10 @@ tha_sidebars_before(); ?>
 <?php
 tha_sidebars_after();
 
+/*
+End of file sidebar.php
+*/
 
 /*
-End of file sidebar.php */
-/* Location: ./wp-content/themes/the-bootstrap/sidebar.php */
+Location: ./wp-content/themes/the-bootstrap/sidebar.php
+*/

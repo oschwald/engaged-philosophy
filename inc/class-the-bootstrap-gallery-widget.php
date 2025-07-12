@@ -1,12 +1,19 @@
 <?php
-/** the-bootstrap-gallery-widget.php
+/**
+ * Bootstrap gallery widget file
  *
  * @author  Konstantin Obenland
  * @package The Bootstrap
  * @since   1.1.0 - 08.03.2012
  */
 
-
+/**
+ * The Bootstrap Gallery Widget class
+ *
+ * @author  Konstantin Obenland
+ * @package The Bootstrap
+ * @since   1.1.0 - 08.03.2012
+ */
 class The_Bootstrap_Gallery_Widget extends WP_Widget {
 
 
@@ -21,7 +28,7 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 	 * @since   1.1.0 - 08.03.2012
 	 * @access  public
 	 *
-	 * @return  The_Bootstrap_Gallery_Widget
+	 * @return  void
 	 */
 	public function __construct() {
 
@@ -67,12 +74,16 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 			return;
 		}
 
-		extract( $args );
+		$before_widget = $args['before_widget'];
+		$before_title  = $args['before_title'];
+		$after_title   = $args['after_title'];
+		$after_widget  = $args['after_widget'];
 
 		echo str_replace( 'well ', '', $before_widget );
 
-		if ( $title = get_the_title( $instance['post_id'] ) ) {
-			echo $before_title . '<a href="' . esc_url( get_permalink( $instance['post_id'] ) ) . '" title="' . sprintf( esc_attr__( 'Permalink to %s', 'the-bootstrap' ), esc_attr( strip_tags( $title ) ) ) . '" rel="bookmark">' . esc_html( $title ) . '</a>' . $after_title;
+		$title = get_the_title( $instance['post_id'] );
+		if ( $title ) {
+			echo $before_title . '<a href="' . esc_url( get_permalink( $instance['post_id'] ) ) . '" title="' . sprintf( esc_attr__( 'Permalink to %s', 'the-bootstrap' ), esc_attr( wp_strip_all_tags( $title ) ) ) . '" rel="bookmark">' . esc_html( $title ) . '</a>' . $after_title;
 		}
 		?>
 		<div id="sidebar-gallery-slider" class="carousel slide" data-bs-ride="carousel">
@@ -157,7 +168,7 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 		);
 		$gallery_posts = get_posts(
 			array(
-				'numberposts' => -1,
+				'numberposts' => 20, // Reasonable limit for gallery widget.
 				'tax_query'   => array(
 					array(
 						'taxonomy' => 'post_format',

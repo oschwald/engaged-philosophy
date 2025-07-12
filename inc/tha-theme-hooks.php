@@ -53,7 +53,7 @@ add_theme_support(
 		 * Please make sure you then actually reference all the hooks in this type
 		 * family.
 		 *
-		 * when the 'all' parameter was set, specific hook types do not need to be
+		 * When the 'all' parameter was set, specific hook types do not need to be
 		 * added explicitly.
 		 */
 		'head',
@@ -86,14 +86,14 @@ add_theme_support(
  *          add_action( 'tha_head_top', 'prefix_header_top' );
  * </code>
  *
- * @param bool  $bool true
- * @param array $args The hook type being checked
- * @param array $registered All registered hook types
+ * @param bool  $supported true.
+ * @param array $args The hook type being checked.
+ * @param array $registered All registered hook types.
  *
  * @return bool
  */
-function tha_current_theme_supports( $bool, $args, $registered ) {
-	return in_array( $args[0], $registered[0] ) || in_array( 'all', $registered[0] );
+function tha_current_theme_supports( $supported, $args, $registered ) {
+	return in_array( $args[0], $registered[0], true ) || in_array( 'all', $registered[0], true );
 }
 add_filter( 'current_theme_supports-tha_hooks', 'tha_current_theme_supports', 10, 3 );
 

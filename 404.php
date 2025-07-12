@@ -1,5 +1,5 @@
 <?php
-/** 404.php
+/** Error 404 template
  *
  * The template for displaying 404 pages (Not Found).
  *
@@ -20,11 +20,11 @@ get_header(); ?>
 		<article id="post-0" class="post error404 not-found">
 			<?php tha_entry_top(); ?>
 			<header class="page-header">
-				<h1 class="entry-title"><?php _e( 'This is somewhat embarrassing, isn&rsquo;t it?', 'the-bootstrap' ); ?></h1>
+				<h1 class="entry-title"><?php esc_html_e( 'This is somewhat embarrassing, isn&rsquo;t it?', 'the-bootstrap' ); ?></h1>
 			</header><!-- .page-header -->
 
 			<div class="entry-content">
-				<p><?php _e( 'It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching, or one of the links below, can help.', 'the-bootstrap' ); ?></p>
+				<p><?php esc_html_e( 'It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching, or one of the links below, can help.', 'the-bootstrap' ); ?></p>
 
 				<?php
 				get_search_form();
@@ -67,7 +67,10 @@ get_header(); ?>
 get_sidebar();
 get_footer();
 
+/*
+End of file 404.php
+*/
 
 /*
-End of file 404.php */
-/* Location: ./wp-content/themes/the-bootstrap/404.php */
+Location: ./wp-content/themes/the-bootstrap/404.php
+*/

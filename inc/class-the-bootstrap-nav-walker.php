@@ -1,12 +1,19 @@
 <?php
-/** nav-menu-walker.php
+/**
+ * Navigation menu walker class file
  *
  * @author      Konstantin Obenland
  * @package     The Bootstrap
  * @since       1.5.0 - 15.05.2012
  */
 
-
+/**
+ * The Bootstrap Nav Walker class
+ *
+ * @author      Konstantin Obenland
+ * @package     The Bootstrap
+ * @since       1.5.0 - 15.05.2012
+ */
 class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 
 	/**
@@ -21,7 +28,7 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 	 *
 	 * @return void
 	 */
-	function start_lvl( &$output, $depth = 0, $args = null ) {
+	public function start_lvl( &$output, $depth = 0, $args = null ) {
 		$output .= "\n<ul class=\"dropdown-menu\">\n";
 	}
 
@@ -39,12 +46,14 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 	 *
 	 * @return void
 	 */
-	function start_el( &$output, $data_object, $depth = 0, $args = null, $current_object_id = 0 ) {
+	public function start_el( &$output, $data_object, $depth = 0, $args = null, $current_object_id = 0 ) {
 		global $wp_query;
 		$item = $data_object;
 
 		$indent        = ( $depth ) ? str_repeat( "\t", $depth ) : '';
-		$li_attributes = $class_names = $value = '';
+		$li_attributes = '';
+		$class_names   = '';
+		$value         = '';
 		$classes       = empty( $item->classes ) ? array() : (array) $item->classes;
 		$classes[]     = 'menu-item-' . $item->ID;
 		$classes[]     = 'nav-item';
@@ -105,7 +114,7 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 	 *
 	 * @return void
 	 */
-	function display_element( $element, &$children_elements, $max_depth, $depth, $args, &$output ) {
+	public function display_element( $element, &$children_elements, $max_depth, $depth, $args, &$output ) {
 
 		if ( ! $element ) {
 			return;
@@ -126,7 +135,7 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 		$id = $element->$id_field;
 
 		// Descend only when the depth is right and there are childrens for this element.
-		if ( ( $max_depth === 0 || $max_depth > $depth + 1 ) && isset( $children_elements[ $id ] ) ) {
+		if ( ( 0 === $max_depth || $max_depth > $depth + 1 ) && isset( $children_elements[ $id ] ) ) {
 
 			foreach ( $children_elements[ $id ] as $child ) {
 
@@ -152,31 +161,3 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 		call_user_func_array( array( $this, 'end_el' ), $cb_args );
 	}
 }
-
-
-/**
- * Adds the active CSS class.
- *
- * @author  Konstantin Obenland
- * @since   1.5.0 - 15.05.2012
- *
- * @param   array $classes The default CSS class names for the menu item.
- *
- * @return  array The modified CSS class names.
- */
-function the_bootstrap_nav_menu_css_class( $classes ) {
-	if ( in_array( 'current-menu-item', $classes ) || in_array( 'current-menu-ancestor', $classes ) ) {
-		$classes[] = 'active';
-	}
-
-	return $classes;
-}
-add_filter( 'nav_menu_css_class', 'the_bootstrap_nav_menu_css_class' );
-
-/*
-End of file nav-menu-walker.php
-*/
-
-/*
-Location: ./wp-content/themes/the-bootstrap/inc/nav-menu-walker.php
-*/

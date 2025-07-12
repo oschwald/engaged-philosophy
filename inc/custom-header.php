@@ -1,5 +1,5 @@
 <?php
-/** custom-header.php
+/** Custom header implementation
  *
  * Implementation of the Custom Header feature
  * http://codex.wordpress.org/Custom_Headers
@@ -40,15 +40,6 @@ function the_bootstrap_custom_header_setup() {
 	);
 
 	add_theme_support( 'custom-header', $args );
-
-	if ( ! function_exists( 'wp_get_theme' ) ) {
-		// Compat: Versions of WordPress prior to 3.4.
-		define( 'HEADER_TEXTCOLOR', $args['default-text-color'] );
-		define( 'HEADER_IMAGE', $args['default-image'] );
-		define( 'HEADER_IMAGE_WIDTH', $args['width'] );
-		define( 'HEADER_IMAGE_HEIGHT', $args['height'] );
-		add_custom_image_header( $args['wp-head-callback'], $args['admin-head-callback'], $args['admin-preview-callback'] );
-	}
 }
 add_action( 'after_setup_theme', 'the_bootstrap_custom_header_setup', 11 );
 
@@ -147,8 +138,8 @@ if ( ! function_exists( 'the_bootstrap_admin_header_image' ) ) :
 	<div id="headimg">
 			<?php $class = ( 'blank' === get_header_textcolor() || ! get_header_textcolor() ) ? ' class="d-none"' : ''; ?>
 
-		<h1<?php echo $class; ?>><a id="name" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a></h1>
-		<div id="desc"<?php echo $class; ?>><?php bloginfo( 'description' ); ?></div>
+		<h1<?php echo esc_attr( $class ); ?>><a id="name" href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php bloginfo( 'name' ); ?></a></h1>
+		<div id="desc"<?php echo esc_attr( $class ); ?>><?php bloginfo( 'description' ); ?></div>
 			<?php if ( get_header_image() ) : ?>
 			<img src="<?php echo esc_url( get_header_image() ); ?>" alt="" />
 		<?php endif; ?>
@@ -178,7 +169,10 @@ if ( ! function_exists( 'get_custom_header' ) ) :
 	}
 endif; // Get_custom_header.
 
+/*
+End of file custom-header.php
+*/
 
 /*
-End of file custom-header.php */
-/* Location: ./wp-content/themes/the-bootstrap/inc/custom-header.php */
+Location: ./wp-content/themes/the-bootstrap/inc/custom-header.php
+*/
