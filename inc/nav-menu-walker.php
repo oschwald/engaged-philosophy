@@ -47,14 +47,18 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 		$attributes	=	$item->attr_title	? ' title="'  . esc_attr( $item->attr_title ) .'"' : '';
 		$attributes	.=	$item->target		? ' target="' . esc_attr( $item->target     ) .'"' : '';
 		$attributes	.=	$item->xfn			? ' rel="'    . esc_attr( $item->xfn        ) .'"' : '';
-		$attributes	.=	$item->url			? ' href="'   . esc_attr( $item->url        ) .'"' : '';
+		
 		if ( $args->has_children ) {
+			// For dropdown toggles, use # to prevent navigation
+			$attributes .= ' href="#"';
 			if ( $depth > 0 ) {
 				$attributes .= ' class="dropdown-item dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"';
 			} else {
 				$attributes .= ' class="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"';
 			}
 		} else {
+			// For regular menu items, use the actual URL
+			$attributes .= $item->url ? ' href="' . esc_attr( $item->url ) . '"' : '';
 			$attributes .= ( $depth > 0 ) ? ' class="dropdown-item"' : ' class="nav-link"';
 		}
 
