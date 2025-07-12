@@ -39,12 +39,12 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 	/**
 	 * Displays the widget content
 	 *
-	 * @author  Konstantin Obeland
+	 * @author  Konstantin Obenland
 	 * @since   1.1.0 - 08.03.2012
 	 * @access  public
 	 *
-	 * @param   array $args
-	 * @param   array $instance
+	 * @param   array $args     The widget arguments.
+	 * @param   array $instance The widget instance settings.
 	 *
 	 * @return  void
 	 */
@@ -61,36 +61,36 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 			?>
 			<dl class="dl-horizontal">
 				<?php if ( $image_meta['image_meta']['created_timestamp'] ) : ?>
-				<dt><?php _e( 'Created:', 'the-bootstrap' ); ?></dt>
+				<dt><?php esc_html_e( 'Created:', 'the-bootstrap' ); ?></dt>
 				<dd><?php echo date_i18n( get_option( 'date_format' ), $image_meta['image_meta']['created_timestamp'] ); ?></dd>
 				<?php endif; ?>
 
-				<dt><?php _e( 'Full size:', 'the-bootstrap' ); ?></dt>
+				<dt><?php esc_html_e( 'Full size:', 'the-bootstrap' ); ?></dt>
 				<dd><?php echo wp_get_attachment_link( get_the_ID(), 'full', false, false, sprintf( __( '%s pixels', 'the-bootstrap' ), $image_meta['width'] . ' &times; ' . $image_meta['height'] ) ); ?></dd>
 
 				<?php if ( $image_meta['image_meta']['aperture'] ) : ?>
-				<dt><?php _e( 'Aperture:', 'the-bootstrap' ); ?></dt>
-				<dd>f/<?php echo $image_meta['image_meta']['aperture']; ?></dd>
+				<dt><?php esc_html_e( 'Aperture:', 'the-bootstrap' ); ?></dt>
+				<dd>f/<?php echo esc_html( $image_meta['image_meta']['aperture'] ); ?></dd>
 					<?php
 				endif;
 
 				if ( $image_meta['image_meta']['focal_length'] ) :
 					?>
-				<dt><?php _e( 'Focal length:', 'the-bootstrap' ); ?></dt>
-				<dd><?php echo $image_meta['image_meta']['focal_length']; ?> mm</dd>
+				<dt><?php esc_html_e( 'Focal length:', 'the-bootstrap' ); ?></dt>
+				<dd><?php echo esc_html( $image_meta['image_meta']['focal_length'] ); ?> mm</dd>
 					<?php
 				endif;
 
 				if ( $image_meta['image_meta']['iso'] ) :
 					?>
-				<dt><?php _e( 'Iso:', 'the-bootstrap' ); ?></dt>
-				<dd><?php echo $image_meta['image_meta']['iso']; ?></dd>
+				<dt><?php esc_html_e( 'Iso:', 'the-bootstrap' ); ?></dt>
+				<dd><?php echo esc_html( $image_meta['image_meta']['iso'] ); ?></dd>
 					<?php
 				endif;
 
 				if ( $image_meta['image_meta']['shutter_speed'] ) :
 					?>
-				<dt><?php _e( 'Shutter:', 'the-bootstrap' ); ?></dt>
+				<dt><?php esc_html_e( 'Shutter:', 'the-bootstrap' ); ?></dt>
 				<dd>
 					<?php
 					// Shutter speed handler.
@@ -111,7 +111,7 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 
 				if ( trim( $image_meta['image_meta']['camera'], '<,>' ) ) :
 					?>
-				<dt><?php _e( 'Camera:', 'the-bootstrap' ); ?></dt>
+				<dt><?php esc_html_e( 'Camera:', 'the-bootstrap' ); ?></dt>
 				<dd><?php echo esc_html( trim( $image_meta['image_meta']['camera'], '<,>' ) ); ?></dd>
 				<?php endif; ?>
 
@@ -130,10 +130,10 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 	 * @since   1.1.0 - 08.03.2012
 	 * @access  public
 	 *
-	 * @param   array $new_instance
-	 * @param   array $old_instance
+	 * @param   array $new_instance The new widget settings.
+	 * @param   array $old_instance The previous widget settings.
 	 *
-	 * @return  array
+	 * @return  array The updated widget settings.
 	 */
 	public function update( $new_instance, $old_instance ) {
 
@@ -151,7 +151,7 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 	 * @since   1.1.0 - 08.03.2012
 	 * @access  public
 	 *
-	 * @param   array $instance
+	 * @param   array $instance The current widget settings.
 	 *
 	 * @return  void
 	 */
@@ -163,15 +163,17 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 			)
 		);
 		?>
-		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Title:', 'the-bootstrap' ); ?>
+		<p><label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php esc_html_e( 'Title:', 'the-bootstrap' ); ?>
 			<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php echo esc_attr( $instance['title'] ); ?>" />
 		</label></p>
 		<?php
 	}
 } // End of class The_Bootstrap_Image_Meta_Widget.
 
-
+/*
+End of file the-bootstrap-image-meta-widget.php
+*/
 
 /*
-End of file the-bootstrap-image-meta-widget.php */
-/* Location: ./wp-content/themes/the-bootstrap/the-bootstrap-image-meta-widget.php */
+Location: ./wp-content/themes/the-bootstrap/the-bootstrap-image-meta-widget.php
+*/

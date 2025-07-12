@@ -36,6 +36,8 @@ add_action( 'admin_menu', 'the_bootstrap_theme_options_add_page' );
  * @author  Automattic
  * @since   1.3.0 - 06.04.2012
  *
+ * @param   string $hook_suffix The hook suffix.
+ *
  * @return  void
  */
 function the_bootstrap_admin_enqueue_scripts( $hook_suffix ) {
@@ -151,7 +153,7 @@ add_filter( 'option_page_capability_the_bootstrap_options', 'the_bootstrap_optio
  * @author  Konstantin Obenland
  * @since   1.3.0 - 06.04.2012
  *
- * @param   WP_Admin_Bar $wp_admin_bar
+ * @param   WP_Admin_Bar $wp_admin_bar The admin bar instance.
  *
  * @return  void
  */
@@ -171,12 +173,12 @@ add_action( 'admin_bar_menu', 'the_bootstrap_admin_bar_menu', 61 ); // Appearanc
 
 
 /**
- * Returns an array of layout options registered for Twenty Eleven.
+ * Returns an array of layout options registered for The Bootstrap.
  *
  * @author  WordPress.org
  * @since   1.3.0 - 06.04.2012
  *
- * @return  array
+ * @return  array The available layout options.
  */
 function the_bootstrap_layouts() {
 	$layout_options = array(
@@ -208,7 +210,7 @@ function the_bootstrap_settings_field_layout() {
 			<input type="radio" name="the_bootstrap_theme_options[theme_layout]" value="<?php echo esc_attr( $value ); ?>" <?php checked( the_bootstrap_options()->theme_layout, $value ); ?> />
 			<span class="image-radio-label">
 				<img src="<?php echo esc_url( $layout['thumbnail'] ); ?>" width="136" height="122" alt="" />
-				<span class="description"><?php echo $layout['label']; ?></span>
+				<span class="description"><?php echo esc_html( $layout['label'] ); ?></span>
 			</span>
 		</label>
 		<?php
@@ -221,6 +223,8 @@ function the_bootstrap_settings_field_layout() {
  *
  * @author  WordPress.org
  * @since   1.3.0 - 06.04.2012
+ *
+ * @param   array $options Array of checkbox options.
  *
  * @return  void
  */
@@ -241,6 +245,8 @@ function the_bootstrap_settings_field_checkbox( $options ) {
  *
  * @author  Konstantin Obenland
  * @since   1.4.0 - 12.05.2012
+ *
+ * @param   array $args Radio button arguments.
  *
  * @return  void
  */
@@ -314,7 +320,9 @@ function the_bootstrap_theme_options_render_page() {
  * @author  Automattic
  * @since   1.3.0 - 06.04.2012
  *
- * @return  array
+ * @param   array $input Raw input data from the form.
+ *
+ * @return  array Sanitized and validated data.
  */
 function the_bootstrap_theme_options_validate( $input ) {
 	$output = $defaults = the_bootstrap_get_default_theme_options();
@@ -369,10 +377,10 @@ function the_bootstrap_donate_box() {
 				<input type="image" src="https://www.paypalobjects.com/<?php echo get_locale(); ?>/i/btn/btn_donate_LG.gif" name="submit" alt="PayPal">
 				<img alt="" border="0" src="https://www.paypalobjects.com/de_DE/i/scr/pixel.gif" width="1" height="1">
 			</form>
-			<p><?php _e( 'Or you could:', 'the-bootstrap' ); ?></p>
+			<p><?php esc_html_e( 'Or you could:', 'the-bootstrap' ); ?></p>
 			<ul>
-				<li><a href="http://wordpress.org/extend/themes/the-bootstrap"><?php _e( 'Rate the Theme 5&#9733; on WordPress.org', 'the-bootstrap' ); ?></a></li>
-				<li><a href="http://en.wp.obenland.it/the-bootstrap/"><?php _e( 'Blog about it &amp; link to the Theme page', 'the-bootstrap' ); ?></a></li>
+				<li><a href="http://wordpress.org/extend/themes/the-bootstrap"><?php esc_html_e( 'Rate the Theme 5&#9733; on WordPress.org', 'the-bootstrap' ); ?></a></li>
+				<li><a href="http://en.wp.obenland.it/the-bootstrap/"><?php esc_html_e( 'Blog about it &amp; link to the Theme page', 'the-bootstrap' ); ?></a></li>
 			</ul>
 		</div>
 	</div>
@@ -404,7 +412,7 @@ function the_bootstrap_feed_box() {
 		<div class="inside">
 			<ul>
 			<?php if ( ! $rss_items ) : ?>
-			<li><?php _e( 'No news items, feed might be broken...', 'the-bootstrap' ); ?></li>
+			<li><?php esc_html_e( 'No news items, feed might be broken...', 'the-bootstrap' ); ?></li>
 				<?php
 			else :
 				foreach ( $rss_items as $item ) :
@@ -415,8 +423,8 @@ function the_bootstrap_feed_box() {
 				endforeach;
 endif;
 			?>
-				<li class="twitter"><a href="https://twitter.com/obenland"><?php _e( 'Follow Konstantin on Twitter', 'the-bootstrap' ); ?></a></li>
-				<li class="rss"><a href="https://en.wp.obenland.it/feed/"><?php _e( 'Subscribe via RSS', 'the-bootstrap' ); ?></a></li>
+				<li class="twitter"><a href="https://twitter.com/obenland"><?php esc_html_e( 'Follow Konstantin on Twitter', 'the-bootstrap' ); ?></a></li>
+				<li class="rss"><a href="https://en.wp.obenland.it/feed/"><?php esc_html_e( 'Subscribe via RSS', 'the-bootstrap' ); ?></a></li>
 			</ul>
 		</div>
 	</div>
@@ -426,7 +434,7 @@ add_action( 'the_bootstrap_side_info_column', 'the_bootstrap_feed_box' );
 
 
 /**
- * Callback function to get feed items
+ * Callback function to get feed items.
  *
  * Props Joost de Valk, as this is almost entirely from his awesome WordPress
  * SEO Plugin
@@ -439,9 +447,9 @@ add_action( 'the_bootstrap_side_info_column', 'the_bootstrap_feed_box' );
  * @since   1.3.0 - 06.04.2012
  * @access  private
  *
- * @param   string $feed_url
+ * @param   string $feed_url The URL of the RSS feed to fetch.
  *
- * @return  bool|array  Array with feed items on success
+ * @return  bool|array Array with feed items on success, false on failure.
  */
 function _the_bootstrap_fetch_feed( $feed_url ) {
 	include_once ABSPATH . 'wp-includes/feed.php';
@@ -465,7 +473,10 @@ function _the_bootstrap_fetch_feed( $feed_url ) {
 	return $rss_items;
 }
 
+/*
+End of file theme-options.php
+*/
 
 /*
-End of file theme-options.php */
-/* Location: ./wp-content/themes/the-bootstrap/inc/theme-options.php */
+Location: ./wp-content/themes/the-bootstrap/inc/theme-options.php
+*/

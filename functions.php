@@ -73,8 +73,8 @@ if ( ! function_exists( 'the_bootstrap_setup' ) ) :
 		require_if_theme_supports( 'tha_hooks', get_template_directory() . '/inc/tha-theme-hooks.php' );
 
 		/**
-		 * Including three menu (header-menu, primary and footer-menu).
-		 * Primary is wrapping in a navbar containing div (wich support responsive variation)
+		 * including three menu (header-menu, primary and footer-menu).
+		 * Primary is wrapping in a navbar containing div (wich support responsive variation).
 		 * Header-menu and Footer-menu are inside pills dropdown menu
 		 *
 		 * @since   1.2.2 - 07.04.2012
@@ -135,7 +135,9 @@ function the_bootstrap_get_default_theme_options() {
  * @author  WordPress.org
  * @since   1.3.0 - 06.04.2012
  *
- * @return  array
+ * @param   array $existing_classes Existing body classes.
+ *
+ * @return  array Modified array of body classes.
  */
 function the_bootstrap_layout_classes( $existing_classes ) {
 	$classes = array( the_bootstrap_options()->theme_layout );
@@ -147,7 +149,7 @@ add_filter( 'body_class', 'the_bootstrap_layout_classes' );
 
 
 /**
- * Adds Custom Background support
+ * Adds Custom Background support.
  *
  * @author  Konstantin Obenland
  * @since   1.2.5 - 11.04.2012
@@ -209,7 +211,7 @@ add_action( 'widgets_init', 'the_bootstrap_widgets_init' );
 
 
 /**
- * Registration of theme scripts and styles
+ * Registration of theme scripts and styles.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
@@ -255,7 +257,7 @@ add_action( 'init', 'the_bootstrap_register_scripts_styles' );
 
 
 /**
- * Properly enqueue frontend scripts
+ * Properly enqueue frontend scripts.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
@@ -271,7 +273,7 @@ add_action( 'wp_enqueue_scripts', 'the_bootstrap_print_scripts' );
 
 
 /**
- * Properly enqueue comment-reply script
+ * Properly enqueue comment-reply script.
  *
  * @author  Konstantin Obenland
  * @since   1.4.0 - 08.05.2012
@@ -287,10 +289,10 @@ add_action( 'comment_form_before', 'the_bootstrap_comment_reply' );
 
 
 /**
- * Properly enqueue frontend styles
+ * Properly enqueue frontend styles.
  *
- * Since 'tw-bootstrap' was registered as a dependency, it'll get enqueued
- * Automatically
+ * since 'tw-bootstrap' was registered as a dependency, it'll get enqueued
+ * automatically.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
@@ -328,7 +330,7 @@ add_action( 'wp_enqueue_scripts', 'the_bootstrap_print_styles' );
 if ( ! function_exists( 'the_bootstrap_credits' ) ) :
 	/**
 	 * Prints HTML with meta information for the current post-date/time and author,
-	 * Comment and edit link
+	 * comment and edit link.
 	 *
 	 * @author  Konstantin Obenland
 	 * @since   1.2.2 - 07.04.2012
@@ -352,10 +354,10 @@ endif;
  * @author  Konstantin Obenland
  * @since   1.1.0 - 18.03.2012
  *
- * @param   string $title
- * @param   string $sep
+ * @param   string $title The current page title.
+ * @param   string $sep   The separator character.
  *
- * @return  string
+ * @return  string The modified page title.
  */
 function the_bootstrap_wp_title( $title, $sep ) {
 	if ( ! is_feed() ) {
@@ -372,12 +374,12 @@ add_filter( 'wp_title', 'the_bootstrap_wp_title', 1, 2 );
 
 
 /**
- * Returns a "Continue Reading" link for excerpts
+ * Returns a "Continue Reading" link for excerpts.
  *
  * @author  WordPress.org
  * @since   1.0.0 - 05.02.2012
  *
- * @return  string
+ * @return  string The continue reading link HTML.
  */
 function the_bootstrap_continue_reading_link() {
 	return ' <a href="' . esc_url( get_permalink() ) . '">' . __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) . '</a>';
@@ -387,15 +389,15 @@ function the_bootstrap_continue_reading_link() {
 /**
  * Replaces "[...]" (appended to automatically generated excerpts) with an ellipsis and the_bootstrap_continue_reading_link().
  *
- * To override this in a child theme, remove the filter and add your own
- * Function tied to the excerpt_more filter hook.
+ * to override this in a child theme, remove the filter and add your own
+ * function tied to the excerpt_more filter hook.
  *
  * @author  WordPress.org
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $more
+ * @param   string $more The "more" string.
  *
- * @return  string
+ * @return  string The modified "more" string.
  */
 function the_bootstrap_auto_excerpt_more( $more ) {
 	return '&hellip;' . the_bootstrap_continue_reading_link();
@@ -406,15 +408,15 @@ add_filter( 'excerpt_more', 'the_bootstrap_auto_excerpt_more' );
 /**
  * Adds a pretty "Continue Reading" link to custom post excerpts.
  *
- * To override this link in a child theme, remove the filter and add your own
- * Function tied to the get_the_excerpt filter hook.
+ * to override this link in a child theme, remove the filter and add your own
+ * function tied to the get_the_excerpt filter hook.
  *
  * @author  WordPress.org
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $output
+ * @param   string $output The excerpt output.
  *
- * @return  string
+ * @return  string The modified excerpt output.
  */
 function the_bootstrap_custom_excerpt_more( $output ) {
 	if ( has_excerpt() && ! is_attachment() ) {
@@ -431,9 +433,9 @@ add_filter( 'get_the_excerpt', 'the_bootstrap_custom_excerpt_more' );
  * @author  WordPress.org
  * @since   1.0.0 - 05.02.2012
  *
- * @param   array $args
+ * @param   array $args Menu arguments.
  *
- * @return  array
+ * @return  array Modified menu arguments.
  */
 function the_bootstrap_page_menu_args( $args ) {
 	$args['show_home'] = true;
@@ -443,15 +445,15 @@ add_filter( 'wp_page_menu_args', 'the_bootstrap_page_menu_args' );
 
 
 /**
- * Filter in a link to a content ID attribute for the next/previous image links on image attachment pages
+ * Filter in a link to a content ID attribute for the next/previous image links on image attachment pages.
  *
  * @author  Automattic
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $url
- * @param   int    $id
+ * @param   string $url The attachment URL.
+ * @param   int    $id  The attachment ID.
  *
- * @return  string
+ * @return  string The modified URL.
  */
 function the_bootstrap_enhanced_image_navigation( $url, $id ) {
 	if ( is_attachment() && wp_attachment_is_image( $id ) ) {
@@ -467,7 +469,7 @@ add_filter( 'attachment_link', 'the_bootstrap_enhanced_image_navigation', 10, 2 
 
 
 /**
- * Displays comment list, when there are any
+ * Displays comment list, when there are any.
  *
  * @author  Konstantin Obenland
  * @since   1.7.0 - 16.06.2012
@@ -477,7 +479,7 @@ add_filter( 'attachment_link', 'the_bootstrap_enhanced_image_navigation', 10, 2 
 function the_bootstrap_comments_list() {
 	if ( post_password_required() ) : ?>
 		<div id="comments">
-			<p class="nopassword"><?php _e( 'This post is password protected. Enter the password to view any comments.', 'the-bootstrap' ); ?></p>
+			<p class="nopassword"><?php esc_html_e( 'This post is password protected. Enter the password to view any comments.', 'the-bootstrap' ); ?></p>
 		</div><!-- #comments -->
 		<?php
 		return;
@@ -514,7 +516,7 @@ add_action( 'comment_form_comments_closed', 'the_bootstrap_comments_list', 1 );
 
 /**
  * Echoes comments-are-closed message when post type supports comments and we're
- * Not on a page
+ * not on a page.
  *
  * @author  Konstantin Obenland
  * @since   1.7.0 - 16.06.2012
@@ -524,7 +526,7 @@ add_action( 'comment_form_comments_closed', 'the_bootstrap_comments_list', 1 );
 function the_bootstrap_comments_closed() {
 	if ( ! is_page() && post_type_supports( get_post_type(), 'comments' ) ) :
 		?>
-		<p class="nocomments"><?php _e( 'Comments are closed.', 'the-bootstrap' ); ?></p>
+		<p class="nocomments"><?php esc_html_e( 'Comments are closed.', 'the-bootstrap' ); ?></p>
 		<?php
 	endif;
 }
@@ -532,14 +534,14 @@ add_action( 'comment_form_comments_closed', 'the_bootstrap_comments_closed' );
 
 
 /**
- * Filters comments_form() default arguments
+ * Filters comments_form() default arguments.
  *
  * @author  Konstantin Obenland
  * @since   1.7.0 - 16.06.2012
  *
- * @param   array $defaults
+ * @param   array $defaults Default arguments for the comment form.
  *
- * @return  array
+ * @return  array Modified comment form arguments.
  */
 function the_bootstrap_comment_form_defaults( $defaults ) {
 	return wp_parse_args(
@@ -564,16 +566,16 @@ if ( ! function_exists( 'the_bootstrap_comment' ) ) :
 	 * Template for comments and pingbacks.
 	 *
 	 * To override this walker in a child theme without modifying the comments template
-	 * Simply create your own the_bootstrap_comment(), and that function will be used instead.
+	 * simply create your own the_bootstrap_comment(), and that function will be used instead.
 	 *
 	 * Used as a callback by wp_list_comments() for displaying the comments.
 	 *
 	 * @author  Konstantin Obenland
 	 * @since   1.0.0 - 05.02.2012
 	 *
-	 * @param   object $comment    Comment data object.
-	 * @param   array  $args
-	 * @param   int    $depth      Depth of comment in reference to parents.
+	 * @param   object $comment The comment data object.
+	 * @param   array  $args    The comment list arguments.
+	 * @param   int    $depth   The depth of comment in reference to parents.
 	 *
 	 * @return  void
 	 */
@@ -584,7 +586,7 @@ if ( ! function_exists( 'the_bootstrap_comment' ) ) :
 
 		<li id="li-comment-<?php comment_ID(); ?>" <?php comment_class(); ?>>
 			<p class="row">
-				<strong class="ping-label col-lg-1"><?php _e( 'Pingback:', 'the-bootstrap' ); ?></strong>
+				<strong class="ping-label col-lg-1"><?php esc_html_e( 'Pingback:', 'the-bootstrap' ); ?></strong>
 				<span class="col-lg-7">
 				<?php
 				comment_author_link();
@@ -604,15 +606,17 @@ if ( ! function_exists( 'the_bootstrap_comment' ) ) :
 				<div class="comment-author-avatar col-lg-1
 				<?php
 				if ( $offset ) {
-					echo " offset-lg-{$offset}";}
+					echo esc_attr( " offset-lg-{$offset}" );}
 				?>
 				">
 					<?php echo get_avatar( $comment, 70 ); ?>
 				</div>
-				<footer class="comment-meta col-lg-<?php echo $span; ?>">
+				<footer class="comment-meta col-lg-<?php echo esc_attr( (string) $span ); ?>">
 					<p class="comment-author vcard">
 						<?php
-							/* translators: 1: comment author, 2: date and time */
+							/*
+							translators: 1: comment author, 2: date and time
+							*/
 							printf(
 								__( '%1$s <span class="says">said</span> on %2$s:', 'the-bootstrap' ),
 								sprintf( '<span class="fn">%s</span>', get_comment_author_link() ),
@@ -620,7 +624,9 @@ if ( ! function_exists( 'the_bootstrap_comment' ) ) :
 									'<a href="%1$s"><time pubdate datetime="%2$s">%3$s</time></a>',
 									esc_url( get_comment_link( $comment->comment_ID ) ),
 									get_comment_time( 'c' ),
-									/* translators: 1: date, 2: time */
+									/*
+									translators: 1: date, 2: time
+									*/
 									sprintf( __( '%1$s at %2$s', 'the-bootstrap' ), get_comment_date(), get_comment_time() )
 								)
 							);
@@ -629,12 +635,12 @@ if ( ! function_exists( 'the_bootstrap_comment' ) ) :
 					</p><!-- .comment-author .vcard -->
 
 					<?php if ( ! $comment->comment_approved ) : ?>
-					<div class="comment-awaiting-moderation alert alert-info"><em><?php _e( 'Your comment is awaiting moderation.', 'the-bootstrap' ); ?></em></div>
+					<div class="comment-awaiting-moderation alert alert-info"><em><?php esc_html_e( 'Your comment is awaiting moderation.', 'the-bootstrap' ); ?></em></div>
 					<?php endif; ?>
 
 				</footer><!-- .comment-meta -->
 
-				<div class="comment-content col-lg-<?php echo $span; ?>">
+				<div class="comment-content col-lg-<?php echo esc_attr( (string) $span ); ?>">
 					<?php
 					comment_text();
 					comment_reply_link(
@@ -658,11 +664,12 @@ endif; // Ends check for the_bootstrap_comment().
 
 
 /**
- * Adds markup to the comment form which is needed to make it work with Bootstrap
- * Needs
+ * Adds markup to the comment form which is needed to make it work with Bootstrap.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
+ *
+ * @return  void
  */
 function the_bootstrap_comment_form_top() {
 	echo '<div class="mb-3">';
@@ -671,11 +678,12 @@ add_action( 'comment_form_top', 'the_bootstrap_comment_form_top' );
 
 
 /**
- * Adds markup to the comment form which is needed to make it work with Bootstrap
- * Needs
+ * Adds markup to the comment form which is needed to make it work with Bootstrap.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
+ *
+ * @return  void
  */
 function the_bootstrap_comment_form() {
 	echo '</div></div>';
@@ -684,14 +692,14 @@ add_action( 'comment_form', 'the_bootstrap_comment_form' );
 
 
 /**
- * Custom author form field for the comments form
+ * Custom author form field for the comments form.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $html
+ * @param   string $html The original HTML for the author field.
  *
- * @return  string
+ * @return  string The modified HTML for the author field.
  */
 function the_bootstrap_comment_form_field_author( $html ) {
 	$commenter = wp_get_current_commenter();
@@ -708,14 +716,14 @@ add_filter( 'comment_form_field_author', 'the_bootstrap_comment_form_field_autho
 
 
 /**
- * Custom HTML5 email form field for the comments form
+ * Custom HTML5 email form field for the comments form.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $html
+ * @param   string $html The original HTML for the email field.
  *
- * @return  string
+ * @return  string The modified HTML for the email field.
  */
 function the_bootstrap_comment_form_field_email( $html ) {
 	$commenter = wp_get_current_commenter();
@@ -732,14 +740,14 @@ add_filter( 'comment_form_field_email', 'the_bootstrap_comment_form_field_email'
 
 
 /**
- * Custom HTML5 url form field for the comments form
+ * Custom HTML5 url form field for the comments form.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $html
+ * @param   string $html The original HTML for the URL field.
  *
- * @return  string
+ * @return  string The modified HTML for the URL field.
  */
 function the_bootstrap_comment_form_field_url( $html ) {
 	$commenter = wp_get_current_commenter();
@@ -753,20 +761,20 @@ add_filter( 'comment_form_field_url', 'the_bootstrap_comment_form_field_url' );
 
 
 /**
- * Adjusts an attechment link to hold the class of 'thumbnail' and make it look
- * pretty
+ * Adjusts an attachment link to hold the class of 'thumbnail' and make it look
+ * pretty.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $link
- * @param   int    $id         Post ID.
- * @param   string $size       Default is 'thumbnail'. Size of image, either array or string.
- * @param   bool   $permalink  Default is false. Whether to add permalink to image.
- * @param   bool   $icon       Default is false. Whether to include icon.
- * @param   string $text       Default is false. If string, then will be link text.
+ * @param   string $link      The attachment link HTML.
+ * @param   int    $id        Post ID.
+ * @param   string $size      Default is 'thumbnail'. Size of image, either array or string.
+ * @param   bool   $permalink Default is false. Whether to add permalink to image.
+ * @param   bool   $icon      Default is false. Whether to include icon.
+ * @param   string $text      Default is false. If string, then will be link text.
  *
- * @return  string
+ * @return  string The modified attachment link HTML.
  */
 function the_bootstrap_get_attachment_link( $link, $id, $size, $permalink, $icon, $text ) {
 	return ( ! $text ) ? str_replace( '<a ', '<a class="d-inline-block border rounded" ', $link ) : $link;
@@ -775,14 +783,14 @@ add_filter( 'wp_get_attachment_link', 'the_bootstrap_get_attachment_link', 10, 6
 
 
 /**
- * Adds the 'hero-unit' class for extra big font on sticky posts
+ * Adds the 'hero-unit' class for extra big font on sticky posts.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   array $classes
+ * @param   array $classes Existing post classes.
  *
- * @return  array
+ * @return  array Modified post classes.
  */
 function the_bootstrap_post_classes( $classes ) {
 	if ( is_sticky() && is_home() ) {
@@ -795,15 +803,15 @@ add_filter( 'post_class', 'the_bootstrap_post_classes' );
 
 
 /**
- * Callback function to display galleries (in HTML5)
+ * Callback function to display galleries (in HTML5).
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $content
- * @param   array  $attr
+ * @param   string $content The original gallery shortcode content.
+ * @param   array  $attr    The gallery shortcode attributes.
  *
- * @return  string
+ * @return  string The gallery HTML output.
  */
 function the_bootstrap_post_gallery( $content, $attr ) {
 	global $instance, $post;
@@ -943,16 +951,16 @@ function the_bootstrap_post_gallery( $content, $attr ) {
 
 
 /**
- * HTML 5 caption for pictures
+ * HTML 5 caption for pictures.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $empty
- * @param   array  $attr
- * @param   string $content
+ * @param   string $empty   Empty parameter (not used).
+ * @param   array  $attr    The caption shortcode attributes.
+ * @param   string $content The caption shortcode content.
  *
- * @return  string
+ * @return  string The caption HTML.
  */
 function the_bootstrap_img_caption_shortcode( $empty, $attr, $content ) {
 	extract(
@@ -984,14 +992,14 @@ add_filter( 'img_caption_shortcode', 'the_bootstrap_img_caption_shortcode', 10, 
 
 
 /**
- * Returns a password form which dispalys nicely with Bootstrap
+ * Returns a password form which displays nicely with Bootstrap.
  *
  * @author  Konstantin Obenland
  * @since   1.0.0 - 05.02.2012
  *
- * @param   string $form
+ * @param   string $form The original password form HTML.
  *
- * @return  string  The Bootstrap password form
+ * @return  string The Bootstrap-styled password form.
  */
 function the_bootstrap_the_password_form( $form ) {
 	return '<form class="post-password-form" action="' . esc_url( home_url( 'wp-pass.php' ) ) . '" method="post"><h4 class="mb-3">' . esc_html__( 'This post is password protected. To view it please enter your password below:', 'the-bootstrap' ) . '</h4><div class="mb-3"><label class="form-label" for="post-password-' . get_the_ID() . '">' . esc_html__( 'Password:', 'the-bootstrap' ) . '</label><input class="form-control" name="post_password" id="post-password-' . get_the_ID() . '" type="password" size="20" /></div><div class="mb-3"><button type="submit" class="post-password-submit submit btn btn-primary">' . esc_html__( 'Submit', 'the-bootstrap' ) . '</button></div></form>';
@@ -1000,14 +1008,14 @@ add_filter( 'the_password_form', 'the_bootstrap_the_password_form' );
 
 
 /**
- * Modifies the category dropdown args for widgets on 404 pages
+ * Modifies the category dropdown args for widgets on 404 pages.
  *
  * @author  Konstantin Obenland
  * @since   1.5.0 - 19.05.2012
  *
- * @param   array $args
+ * @param   array $args The original widget category dropdown arguments.
  *
- * @return  array
+ * @return  array The modified widget category dropdown arguments.
  */
 function the_bootstrap_widget_categories_dropdown_args( $args ) {
 	if ( is_404() ) {
@@ -1028,21 +1036,21 @@ add_filter( 'widget_categories_dropdown_args', 'the_bootstrap_widget_categories_
 
 
 /**
- * Adds the .thumbnail class when images are sent to editor
+ * Adds the .thumbnail class when images are sent to editor.
  *
  * @author  Konstantin Obenland
  * @since   2.0.0 - 29.08.2012
  *
- * @param   string $html
- * @param   int    $id
- * @param   string $caption
- * @param   string $title
- * @param   string $align
- * @param   string $url
- * @param   string $size
- * @param   string $alt
+ * @param   string $html    The original image HTML.
+ * @param   int    $id      The attachment ID.
+ * @param   string $caption The image caption.
+ * @param   string $title   The image title.
+ * @param   string $align   The image alignment.
+ * @param   string $url     The image URL.
+ * @param   string $size    The image size.
+ * @param   string $alt     The image alt text.
  *
- * @return  string  Image HTML
+ * @return  string The modified image HTML.
  */
 function the_bootstrap_image_send_to_editor( $html, $id, $caption, $title, $align, $url, $size, $alt ) {
 	if ( $url ) {
@@ -1088,9 +1096,11 @@ function _the_bootstrap_version() {
 }
 
 /**
- * Register custom taxonomies for projects
+ * Register custom taxonomies for projects.
  *
  * @since 1.0.0
+ *
+ * @return void
  */
 function the_bootstrap_register_project_taxonomies() {
 	// Topics taxonomy.
@@ -1237,9 +1247,11 @@ function the_bootstrap_register_project_taxonomies() {
 add_action( 'init', 'the_bootstrap_register_project_taxonomies' );
 
 /**
- * Register the Project custom post type
+ * Register the Project custom post type.
  *
  * @since 1.0.0
+ *
+ * @return void
  */
 function the_bootstrap_register_project_post_type() {
 	register_post_type(
@@ -1308,11 +1320,13 @@ function the_bootstrap_register_project_post_type() {
 add_action( 'init', 'the_bootstrap_register_project_post_type' );
 
 /**
- * Include custom post types in category and tag archives
+ * Include custom post types in category and tag archives.
  *
  * @since 1.0.0
- * @param array $request The query request
- * @return array Modified request
+ *
+ * @param array $request The original query request.
+ *
+ * @return array The modified query request.
  */
 function the_bootstrap_include_custom_post_types_in_archives( $request ) {
 	if ( isset( $request['category_name'] ) || isset( $request['tag'] ) ) {
@@ -1324,10 +1338,12 @@ add_filter( 'request', 'the_bootstrap_include_custom_post_types_in_archives' );
 
 
 /**
- * Flush rewrite rules when theme is activated
- * This replaces the performance-killing flush on every page load
+ * Flush rewrite rules when theme is activated.
+ * This replaces the performance-killing flush on every page load.
  *
  * @since 1.0.0
+ *
+ * @return void
  */
 function the_bootstrap_flush_rewrite_rules_on_activation() {
 	the_bootstrap_register_project_post_type();
@@ -1338,9 +1354,11 @@ add_action( 'after_switch_theme', 'the_bootstrap_flush_rewrite_rules_on_activati
 
 
 /**
- * Add custom favicon and app icons
+ * Add custom favicon and app icons.
  *
  * @since 1.0.0
+ *
+ * @return void
  */
 function the_bootstrap_add_favicon() {
 	$template_url = get_template_directory_uri();
@@ -1355,5 +1373,9 @@ function the_bootstrap_add_favicon() {
 add_action( 'wp_head', 'the_bootstrap_add_favicon', 1 );
 
 /*
-End of file functions.php */
-/* Location: ./wp-content/themes/the-bootstrap/functions.php */
+End of file functions.php
+*/
+
+/*
+Location: ./wp-content/themes/the-bootstrap/functions.php
+*/

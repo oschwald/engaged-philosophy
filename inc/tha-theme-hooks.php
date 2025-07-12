@@ -44,7 +44,7 @@ add_theme_support(
 		 * As a Theme developer, use the 'all' parameter, to declare support for all
 		 * hook types.
 		 * Please make sure you then actually reference all the hooks in this file,
-		 * Plugin developers depend on it!
+		 * plugin developers depend on it!
 		 */
 		'all',
 
@@ -53,7 +53,7 @@ add_theme_support(
 		 * Please make sure you then actually reference all the hooks in this type
 		 * family.
 		 *
-		 * When the 'all' parameter was set, specific hook types do not need to be
+		 * when the 'all' parameter was set, specific hook types do not need to be
 		 * added explicitly.
 		 */
 		'head',
@@ -102,10 +102,25 @@ add_filter( 'current_theme_supports-tha_hooks', 'tha_current_theme_supports', 10
  *
  * $tha_supports[] = 'head';
  */
+
+/**
+ * Fires at the top of the HTML head section.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_head_top() {
 	do_action( 'tha_head_top' );
 }
 
+/**
+ * Fires at the bottom of the HTML head section.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_head_bottom() {
 	do_action( 'tha_head_bottom' );
 }
@@ -116,18 +131,47 @@ function tha_head_bottom() {
  *
  * $tha_supports[] = 'header';
  */
+
+/**
+ * Fires before the semantic header element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_header_before() {
 	do_action( 'tha_header_before' );
 }
 
+/**
+ * Fires after the semantic header element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_header_after() {
 	do_action( 'tha_header_after' );
 }
 
+/**
+ * Fires at the top of the semantic header element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_header_top() {
 	do_action( 'tha_header_top' );
 }
 
+/**
+ * Fires at the bottom of the semantic header element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_header_bottom() {
 	do_action( 'tha_header_bottom' );
 }
@@ -137,18 +181,47 @@ function tha_header_bottom() {
  *
  * $tha_supports[] = 'content';
  */
+
+/**
+ * Fires before the semantic content element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_content_before() {
 	do_action( 'tha_content_before' );
 }
 
+/**
+ * Fires after the semantic content element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_content_after() {
 	do_action( 'tha_content_after' );
 }
 
+/**
+ * Fires at the top of the semantic content element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_content_top() {
 	do_action( 'tha_content_top' );
 }
 
+/**
+ * Fires at the bottom of the semantic content element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_content_bottom() {
 	do_action( 'tha_content_bottom' );
 }
@@ -158,18 +231,47 @@ function tha_content_bottom() {
  *
  * $tha_supports[] = 'entry';
  */
+
+/**
+ * Fires before the semantic entry element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_entry_before() {
 	do_action( 'tha_entry_before' );
 }
 
+/**
+ * Fires after the semantic entry element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_entry_after() {
 	do_action( 'tha_entry_after' );
 }
 
+/**
+ * Fires at the top of the semantic entry element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_entry_top() {
 	do_action( 'tha_entry_top' );
 }
 
+/**
+ * Fires at the bottom of the semantic entry element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_entry_bottom() {
 	do_action( 'tha_entry_bottom' );
 }
@@ -179,10 +281,25 @@ function tha_entry_bottom() {
  *
  * $tha_supports[] = 'comments';
  */
+
+/**
+ * Fires before the comments block.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_comments_before() {
 	do_action( 'tha_comments_before' );
 }
 
+/**
+ * Fires after the comments block.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_comments_after() {
 	do_action( 'tha_comments_after' );
 }
@@ -192,18 +309,47 @@ function tha_comments_after() {
  *
  * $tha_supports[] = 'sidebar';
  */
+
+/**
+ * Fires before the sidebar area.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_sidebars_before() {
 	do_action( 'tha_sidebars_before' );
 }
 
+/**
+ * Fires after the sidebar area.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_sidebars_after() {
 	do_action( 'tha_sidebars_after' );
 }
 
+/**
+ * Fires at the top of the sidebar.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_sidebar_top() {
 	do_action( 'tha_sidebar_top' );
 }
 
+/**
+ * Fires at the bottom of the sidebar.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_sidebar_bottom() {
 	do_action( 'tha_sidebar_bottom' );
 }
@@ -213,18 +359,47 @@ function tha_sidebar_bottom() {
  *
  * $tha_supports[] = 'footer';
  */
+
+/**
+ * Fires before the semantic footer element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_footer_before() {
 	do_action( 'tha_footer_before' );
 }
 
+/**
+ * Fires after the semantic footer element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_footer_after() {
 	do_action( 'tha_footer_after' );
 }
 
+/**
+ * Fires at the top of the semantic footer element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_footer_top() {
 	do_action( 'tha_footer_top' );
 }
 
+/**
+ * Fires at the bottom of the semantic footer element.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
 function tha_footer_bottom() {
 	do_action( 'tha_footer_bottom' );
 }

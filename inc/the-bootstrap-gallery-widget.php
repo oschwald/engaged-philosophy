@@ -39,12 +39,12 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 	/**
 	 * Displays the widget content
 	 *
-	 * @author  Konstantin Obeland
+	 * @author  Konstantin Obenland
 	 * @since   1.1.0 - 08.03.2012
 	 * @access  public
 	 *
-	 * @param   array $args
-	 * @param   array $instance
+	 * @param   array $args     The widget arguments.
+	 * @param   array $instance The widget instance settings.
 	 *
 	 * @return  void
 	 */
@@ -123,10 +123,10 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 	 * @since   1.1.0 - 08.03.2012
 	 * @access  public
 	 *
-	 * @param   array $new_instance
-	 * @param   array $old_instance
+	 * @param   array $new_instance The new widget settings.
+	 * @param   array $old_instance The previous widget settings.
 	 *
-	 * @return  array
+	 * @return  array The updated widget settings.
 	 */
 	public function update( $new_instance, $old_instance ) {
 
@@ -144,7 +144,7 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 	 * @since   1.1.0 - 08.03.2012
 	 * @access  public
 	 *
-	 * @param   array $instance
+	 * @param   array $instance The current widget settings.
 	 *
 	 * @return  void
 	 */
@@ -174,7 +174,7 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 		}
 		?>
 		<p>
-			<label for="<?php echo $this->get_field_id( 'post_id' ); ?>"><?php _e( 'Select Gallery:', 'the-bootstrap' ); ?></label>
+			<label for="<?php echo $this->get_field_id( 'post_id' ); ?>"><?php esc_html_e( 'Select Gallery:', 'the-bootstrap' ); ?></label>
 			<select name="<?php echo $this->get_field_name( 'post_id' ); ?>" id="<?php echo $this->get_field_id( 'post_id' ); ?>" class="widefat">
 				<?php
 				foreach ( $gallery_posts as $gallery_post ) {
@@ -187,8 +187,10 @@ class The_Bootstrap_Gallery_Widget extends WP_Widget {
 	}
 } // End of class The_Bootstrap_Gallery_Widget.
 
-
+/*
+End of file the-bootstrap-gallery-widget.php
+*/
 
 /*
-End of file the-bootstrap-gallery-widget.php */
-/* Location: ./wp-content/themes/the-bootstrap/the-bootstrap-gallery-widget.php */
+Location: ./wp-content/themes/the-bootstrap/the-bootstrap-gallery-widget.php
+*/

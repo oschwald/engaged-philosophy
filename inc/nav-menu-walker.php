@@ -10,14 +10,34 @@
 class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 
 	/**
+	 * Start the list before the elements are added.
+	 *
 	 * @see Walker_Nav_Menu::start_lvl()
+	 * @since 1.5.0
+	 *
+	 * @param string $output Used to append additional content (passed by reference).
+	 * @param int    $depth  Depth of menu item. Used for padding.
+	 * @param object $args   An object of wp_nav_menu() arguments.
+	 *
+	 * @return void
 	 */
 	function start_lvl( &$output, $depth = 0, $args = null ) {
 		$output .= "\n<ul class=\"dropdown-menu\">\n";
 	}
 
 	/**
+	 * Start the element output.
+	 *
 	 * @see Walker_Nav_Menu::start_el()
+	 * @since 1.5.0
+	 *
+	 * @param string $output            Used to append additional content (passed by reference).
+	 * @param object $data_object       The data object.
+	 * @param int    $depth             Depth of menu item. Used for padding.
+	 * @param object $args              An object of wp_nav_menu() arguments.
+	 * @param int    $current_object_id ID of the current menu item.
+	 *
+	 * @return void
 	 */
 	function start_el( &$output, $data_object, $depth = 0, $args = null, $current_object_id = 0 ) {
 		global $wp_query;
@@ -71,7 +91,19 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 	}
 
 	/**
+	 * Display array of elements hierarchically.
+	 *
 	 * @see Walker::display_element()
+	 * @since 1.5.0
+	 *
+	 * @param object $element           Menu item object.
+	 * @param array  $children_elements Child elements (passed by reference).
+	 * @param int    $max_depth         Maximum depth allowed.
+	 * @param int    $depth             Depth of current element.
+	 * @param array  $args              Arguments for display.
+	 * @param string $output            Used to append additional content (passed by reference).
+	 *
+	 * @return void
 	 */
 	function display_element( $element, &$children_elements, $max_depth, $depth, $args, &$output ) {
 
@@ -123,14 +155,14 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 
 
 /**
- * Adds the active CSS class
+ * Adds the active CSS class.
  *
  * @author  Konstantin Obenland
  * @since   1.5.0 - 15.05.2012
  *
- * @param   array $classes    Default class names
+ * @param   array $classes The default CSS class names for the menu item.
  *
- * @return  array
+ * @return  array The modified CSS class names.
  */
 function the_bootstrap_nav_menu_css_class( $classes ) {
 	if ( in_array( 'current-menu-item', $classes ) || in_array( 'current-menu-ancestor', $classes ) ) {
@@ -141,7 +173,10 @@ function the_bootstrap_nav_menu_css_class( $classes ) {
 }
 add_filter( 'nav_menu_css_class', 'the_bootstrap_nav_menu_css_class' );
 
+/*
+End of file nav-menu-walker.php
+*/
 
 /*
-End of file nav-menu-walker.php */
-/* Location: ./wp-content/themes/the-bootstrap/inc/nav-menu-walker.php */
+Location: ./wp-content/themes/the-bootstrap/inc/nav-menu-walker.php
+*/
