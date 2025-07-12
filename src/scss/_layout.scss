@@ -81,10 +81,12 @@ body > .container {
 	margin: 0 20px 0 0;
 }
 
-// Spacing utilities
+// Spacing utilities and text wrapping
 .entry-content,
 .page-header {
 	word-wrap: break-word;
+	overflow-wrap: break-word;
+	hyphens: auto;
 }
 
 #branding hgroup,

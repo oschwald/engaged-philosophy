@@ -172,11 +172,34 @@
 	}
 }
 
-// Medium devices (tablets, 768px to 1199px)
-@media (min-width: 768px) and (max-width: 1199px) {
+// Small tablets and landscape phones (768px to 991px) - stacked layout
+@media (min-width: 768px) and (max-width: 991px) {
 
 	#page {
-		margin-right: -15px;
+		margin-right: 0;
+	}
+
+	// Better mobile carousel layout
+	.carousel-item img {
+		height: 400px;
+	}
+
+	.lead-home {
+		height: auto !important;
+		min-height: unset !important;
+		padding: 1rem;
+		font-size: 105%;
+		max-width: 100%;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+	}
+}
+
+// Large tablets (992px to 1199px) - side-by-side layout with fixed height
+@media (min-width: 992px) and (max-width: 1199px) {
+
+	#page {
+		margin-right: 0;
 	}
 
 	// Better tablet carousel layout
@@ -186,7 +209,27 @@
 
 	.lead-home {
 		height: 400px;
-		font-size: 105%;
+		font-size: 100%;
+		max-width: 100%;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		padding: 1rem;
+		width: 100%;
+	}
+
+	// Bootstrap grid overflow fix for 1100px viewport
+	.container {
+		max-width: 100%;
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+
+	.col-lg-3 {
+		width: 25%;
+		flex: 0 0 25%;
+		max-width: 25%;
+		padding-left: 12px;
+		padding-right: 12px;
 	}
 
 	// Improved navigation spacing on tablets
@@ -211,6 +254,15 @@
 	.footer-custom > div {
 		flex-direction: row !important;
 		gap: 0.5rem !important;
+	}
+}
+
+
+// Additional fix for exact 1100px viewport
+@media (width: 1100px) {
+
+	.container {
+		max-width: 1050px;
 	}
 }
 
