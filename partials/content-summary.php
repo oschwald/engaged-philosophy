@@ -20,7 +20,7 @@ tha_entry_before(); ?>
     <div class="entry-content text-muted lh-base">
         <?php
             echo get_the_post_thumbnail($post->ID, 'thumbnail', array('class'=>'img-thumbnail float-end ms-3'));
-            the_excerpt( __( 'Continue reading <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ) );
+            the_excerpt();
             the_bootstrap_link_pages();
         ?>
     </div><!-- .entry-content -->

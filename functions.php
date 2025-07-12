@@ -113,7 +113,7 @@ function the_bootstrap_options()
  * @author	Automattic
  * @since	1.3.0 - 06.04.2012
  *
- * @return	void
+ * @return	array
  */
 function the_bootstrap_get_default_theme_options()
 {
@@ -135,7 +135,7 @@ function the_bootstrap_get_default_theme_options()
  * @author	WordPress.org
  * @since	1.3.0 - 06.04.2012
  *
- * @return	void
+ * @return	array
  */
 function the_bootstrap_layout_classes( $existing_classes )
 {
@@ -376,8 +376,6 @@ add_filter( 'wp_title', 'the_bootstrap_wp_title', 1, 2 );
  *
  * @author	WordPress.org
  * @since	1.0.0 - 05.02.2012
- *
- * @param	string	$more
  *
  * @return	string
  */
@@ -639,10 +637,6 @@ endif; // ends check for the_bootstrap_comment()
  *
  * @author	Konstantin Obenland
  * @since	1.0.0 - 05.02.2012
- *
- * @param	string	$html
- *
- * @return	string
  */
 function the_bootstrap_comment_form_top()
 {
@@ -657,10 +651,6 @@ add_action( 'comment_form_top', 'the_bootstrap_comment_form_top' );
  *
  * @author	Konstantin Obenland
  * @since	1.0.0 - 05.02.2012
- *
- * @param	string	$html
- *
- * @return	string
  */
 function the_bootstrap_comment_form()
 {
@@ -828,8 +818,9 @@ function the_bootstrap_post_gallery( $content, $attr )
 
     if ( $include ) {
         $include = preg_replace( '/[^0-9,]+/', '', $include );
+        $include_array = array_map('intval', explode(',', $include));
         $_attachments = get_posts( array(
-            'include'			=>	$include,
+            'include'			=>	$include_array,
             'post_status'		=>	'inherit',
             'post_type'			=>	'attachment',
             'post_mime_type'	=>	'image',
@@ -864,7 +855,7 @@ function the_bootstrap_post_gallery( $content, $attr )
     }
 
     if ( empty( $attachments ) )
-        return;
+        return '';
 
     if ( is_feed() ) {
         $output = "\n";
@@ -889,7 +880,7 @@ function the_bootstrap_post_gallery( $content, $attr )
 
     $i = 0;
     foreach ( $attachments as $id => $attachment ) {
-        $comments = get_comments( array(
+        $comments = (int) get_comments( array(
             'post_id'	=>	$id,
             'count'		=>	true,
             'type'		=>	'comment',

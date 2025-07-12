@@ -57,7 +57,7 @@ get_header(); ?>
         $tags = $matches[0];
 
         // Use a seed based on the current date to shuffle consistently per day
-        mt_srand(date('Ymd'));
+        mt_srand((int)date('Ymd'));
         shuffle($tags);
         echo implode(' ', $tags);
       }

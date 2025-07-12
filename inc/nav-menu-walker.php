@@ -73,7 +73,7 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 	/**
 	 * @see Walker::display_element()
 	 */
-	function display_element( $element, &$children_elements, $max_depth, $depth = 0, $args, &$output ) {
+	function display_element( $element, &$children_elements, $max_depth, $depth, $args, &$output ) {
 
 		if ( ! $element )
 			return;
@@ -107,7 +107,7 @@ class The_Bootstrap_Nav_Walker extends Walker_Nav_Menu {
 			unset( $children_elements[ $id ] );
 		}
 
-		if ( isset( $newlevel ) && $newlevel ) {
+		if ( isset( $newlevel ) ) {
 			//end the child delimiter
 			$cb_args = array_merge( array( &$output, $depth ), $args );
 			call_user_func_array( array( $this, 'end_lvl' ), $cb_args );

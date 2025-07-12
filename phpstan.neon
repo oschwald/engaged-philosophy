@@ -1,5 +1,8 @@
 parameters:
-	level: 1
+	level: 5
+	treatPhpDocTypesAsCertain: false
+	checkMissingCallableSignature: true
+	checkUninitializedProperties: true
 	paths:
 		- .
 	excludePaths:
@@ -26,15 +29,11 @@ parameters:
 	bootstrapFiles:
 		- vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
 
-	# Ignore common WordPress dynamic issues and missing typehints
+	# Ignore common WordPress dynamic issues
 	ignoreErrors:
 		- '#Function get_[a-zA-Z_]+ not found#'
 		- '#Function the_[a-zA-Z_]+ not found#'
 		- '#Variable \$[a-zA-Z_]+ might not be defined#'
-		-
-			identifier: missingType.iterableValue
-		-
-			identifier: missingType.generics
 
 	# WordPress globals
 	universalObjectCratesClasses:

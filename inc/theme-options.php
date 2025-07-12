@@ -39,7 +39,7 @@ add_action( 'admin_menu', 'the_bootstrap_theme_options_add_page' );
  * @return	void
  */
 function the_bootstrap_admin_enqueue_scripts( $hook_suffix ) {
-	wp_enqueue_style( 'the-bootstrap-theme-options', get_template_directory_uri() . '/css/theme-options.css', false, _the_bootstrap_version() );
+	wp_enqueue_style( 'the-bootstrap-theme-options', get_template_directory_uri() . '/css/theme-options.css', array(), _the_bootstrap_version() );
 }
 
 
@@ -64,7 +64,9 @@ function the_bootstrap_theme_options_init() {
 	register_setting(
 		'the_bootstrap_options',				// Options group, see settings_fields() call in the_bootstrap_theme_options_render_page()
 		'the_bootstrap_theme_options',			// Database option, see the_bootstrap_options()
-		'the_bootstrap_theme_options_validate'	// The sanitization callback, see the_bootstrap_theme_options_validate()
+		array(
+			'sanitize_callback' => 'the_bootstrap_theme_options_validate'	// The sanitization callback, see the_bootstrap_theme_options_validate()
+		)
 	);
 
 	// Register settings field group
@@ -158,7 +160,7 @@ add_action( 'admin_bar_menu', 'the_bootstrap_admin_bar_menu', 61 ); //Appearance
  * @author	WordPress.org
  * @since	1.3.0 - 06.04.2012
  *
- * @return	void
+ * @return	array
  */
 function the_bootstrap_layouts() {
 	$layout_options	=	array(
@@ -283,7 +285,7 @@ function the_bootstrap_theme_options_render_page() {
  * @author	Automattic
  * @since	1.3.0 - 06.04.2012
  *
- * @return	void
+ * @return	array
  */
 function the_bootstrap_theme_options_validate( $input ) {
 	$output	= $defaults = the_bootstrap_get_default_theme_options();
@@ -406,7 +408,7 @@ add_action( 'the_bootstrap_side_info_column', 'the_bootstrap_feed_box' );
  * @return	bool|array	Array with feed items on success
  */
 function _the_bootstrap_fetch_feed( $feed_url ) {
-	include_once( ABSPATH . WPINC . '/feed.php' );
+	include_once( ABSPATH . 'wp-includes/feed.php' );
 	$rss = fetch_feed( $feed_url );
 
 	// Bail if feed doesn't work

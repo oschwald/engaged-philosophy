@@ -109,7 +109,7 @@ function the_bootstrap_posted_on() {
 			esc_attr( get_the_time() ),
 			esc_attr( get_the_date( 'c' ) ),
 			esc_html( get_the_date() ),
-			esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ),
+			esc_url( get_author_posts_url( (int)get_the_author_meta( 'ID' ) ) ),
 			esc_attr( sprintf( __( 'View all posts by %s', 'the-bootstrap' ), get_the_author() ) ),
 			esc_html( get_the_author() )
 	);
@@ -161,7 +161,7 @@ function the_bootstrap_link_pages( $args = array() ) {
 		if ( 'number' == $next_or_number ) {
 			$output .= '<nav class="pagination"><ul class="pagination"><li class="page-item"><span class="page-link">' . __('Pages:', 'the-bootstrap') . '</span></li>';
 			for ( $i = 1; $i < ($numpages + 1); $i++ ) {
-				$j = str_replace( '%', $i, $pagelink );
+				$j = str_replace( '%', (string)$i, $pagelink );
 				if ( ($i != $page) || ((!$more) && ($page!=1)) ) {
 					$output .= '<li class="page-item">' . _wp_link_page($i) . '<span class="page-link">' . $j . '</span></a></li>';
 				}
@@ -175,11 +175,11 @@ function the_bootstrap_link_pages( $args = array() ) {
 			if ( $more ) {
 				$output .= '<nav class="pagination"><ul class="pagination"><li class="page-item"><span class="page-link">' . __('Pages:', 'the-bootstrap') . '</span></li>';
 				$i = $page - 1;
-				if ( $i && $more ) {
+				if ( $i ) {
 					$output .= '<li class="page-item">' . _wp_link_page( $i ) . '<span class="page-link">' . $previouspagelink. '</span></a></li>';
 				}
 				$i = $page + 1;
-				if ( $i <= $numpages && $more ) {
+				if ( $i <= $numpages ) {
 					$output .= '<li class="page-item">' . _wp_link_page( $i ) . '<span class="page-link">' . $nextpagelink. '</span></a></li>';
 				}
 				$output .= '</ul></nav>';
@@ -204,7 +204,7 @@ if ( ! function_exists( 'the_bootstrap_navbar_searchform' ) ) :
 *
 * @param	bool	$echo	Optional. Whether to echo the form
 *
-* @return	void
+* @return	string	Returns form HTML, echoes when $echo is true
 */
 function the_bootstrap_navbar_searchform( $echo = true ) {
 	$searchform = '	<form id="searchform" class="d-flex ms-auto" method="get" action="' . esc_url( home_url( '/' ) ) . '" role="search" aria-label="' . esc_attr__( 'Search the site', 'the-bootstrap' ) . '">
@@ -260,11 +260,11 @@ if ( ! function_exists( 'the_bootstrap_comments_link' ) ) :
  *
  * @since	2.0.0 - 01.09.2012
  *
- * @param	string	$zero		The string to display when no comments
- * @param	string	$one		The string to display when only one comment is available
- * @param	string	$more		The string to display when there are more than one comment
+ * @param	string|false	$zero		The string to display when no comments
+ * @param	string|false	$one		The string to display when only one comment is available
+ * @param	string|false	$more		The string to display when there are more than one comment
  * @param	string	$css_class	The CSS class to use for comments
- * @param	string	$none		The string to display when comments have been turned off
+ * @param	string|false	$none		The string to display when comments have been turned off
  *
  * @return	void
  */
@@ -296,7 +296,7 @@ function the_bootstrap_comments_link( $zero = false, $one = false, $more = false
 		( 0 == $number ) ? '#respond' : '#comments',
 		$class,
 		apply_filters( 'comments_popup_link_attributes', '' ),
-		esc_attr( sprintf( __( 'Comment on %s' ), the_title_attribute( array('echo' => 0 ) ) ) ),
+		esc_attr( sprintf( __( 'Comment on %s' ), the_title_attribute( array('echo' => false ) ) ) ),
 		apply_filters( 'comments_number', $comments_number, $number )
 	);
 

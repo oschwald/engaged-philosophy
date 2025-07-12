@@ -62,7 +62,7 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 				<?php endif; ?>
 
 				<dt><?php _e( 'Full size:', 'the-bootstrap' ); ?></dt>
-				<dd><?php echo wp_get_attachment_link( '', 'full', false, false, sprintf(__( '%s pixels', 'the-bootstrap' ), $image_meta['width'] . ' &times; ' . $image_meta['height'] ) ); ?></dd>
+				<dd><?php echo wp_get_attachment_link( get_the_ID(), 'full', false, false, sprintf(__( '%s pixels', 'the-bootstrap' ), $image_meta['width'] . ' &times; ' . $image_meta['height'] ) ); ?></dd>
 
 				<?php if ( $image_meta['image_meta']['aperture'] ) : ?>
 				<dt><?php _e( 'Aperture:', 'the-bootstrap' ); ?></dt>
@@ -87,9 +87,9 @@ class The_Bootstrap_Image_Meta_Widget extends WP_Widget {
 					if ( ( 1 / $image_meta['image_meta']['shutter_speed'] ) > 1 ) {
 					echo "1/";
 						if ( number_format_i18n( ( 1 / $image_meta['image_meta']['shutter_speed'] ), 1 ) ==  number_format_i18n( ( 1 / $image_meta['image_meta']['shutter_speed'] ), 0 ) ) {
-							printf( __( '%d sec.', 'the-bootstrap' ), number_format_i18n( ( 1 / $image_meta['image_meta']['shutter_speed'] ), 0, '.', '' ) );
+							printf( __( '%d sec.', 'the-bootstrap' ), number_format_i18n( ( 1 / $image_meta['image_meta']['shutter_speed'] ), 0 ) );
 						} else {
-							printf( __( '%d sec.', 'the-bootstrap' ), number_format_i18n( ( 1 / $image_meta['image_meta']['shutter_speed'] ), 1, '.', '' ) );
+							printf( __( '%d sec.', 'the-bootstrap' ), number_format_i18n( ( 1 / $image_meta['image_meta']['shutter_speed'] ), 1 ) );
 						}
 					} else {
 						printf( __( '%d sec.', 'the-bootstrap' ), number_format_i18n( $image_meta['image_meta']['shutter_speed'] ) );

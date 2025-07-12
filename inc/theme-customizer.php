@@ -16,7 +16,7 @@
  * @author	Konstantin Obenland
  * @since	1.4.0 - 05.05.2012
  *
- * @param	WP_Customize	$wp_customize
+ * @param	WP_Customize_Manager	$wp_customize
  *
  * @return	void
  */
@@ -46,7 +46,7 @@ function the_bootstrap_customize_register( $wp_customize ) {
 	$wp_customize->add_control( 'the_bootstrap_theme_layout', array(
 		'label'		=>	__( 'Default Layout', 'the-bootstrap' ),
 		'section'	=>	'the_bootstrap_theme_layout',
-		'settings'	=>	'the_bootstrap_theme_options[theme_layout]',
+		'setting'	=>	'the_bootstrap_theme_options[theme_layout]',
 		'type'		=>	'radio',
 		'choices'	=>	array(
 			'content-sidebar'	=>	__( 'Content on left', 'the-bootstrap' ),
@@ -58,7 +58,7 @@ function the_bootstrap_customize_register( $wp_customize ) {
 	$wp_customize->add_control( 'the_bootstrap_navbar_site_name', array(
 		'label'		=>	__( 'Add site name to navigation bar.', 'the-bootstrap' ),
 		'section'	=>	'the_bootstrap_navbar_options',
-		'settings'	=>	'the_bootstrap_theme_options[navbar_site_name]',
+		'setting'	=>	'the_bootstrap_theme_options[navbar_site_name]',
 		'type'		=>	'checkbox',
 	) );
 
@@ -66,7 +66,7 @@ function the_bootstrap_customize_register( $wp_customize ) {
 	$wp_customize->add_control( 'the_bootstrap_navbar_searchform', array(
 		'label'		=>	__( 'Add searchform to navigation bar.', 'the-bootstrap' ),
 		'section'	=>	'the_bootstrap_navbar_options',
-		'settings'	=>	'the_bootstrap_theme_options[navbar_searchform]',
+		'setting'	=>	'the_bootstrap_theme_options[navbar_searchform]',
 		'type'		=>	'checkbox',
 	) );
 
@@ -74,7 +74,7 @@ function the_bootstrap_customize_register( $wp_customize ) {
 	$wp_customize->add_control( 'the_bootstrap_navbar_inverse', array(
 		'label'		=>	__( 'Use inverse color on navigation bar.', 'the-bootstrap' ),
 		'section'	=>	'the_bootstrap_navbar_options',
-		'settings'	=>	'the_bootstrap_theme_options[navbar_inverse]',
+		'setting'	=>	'the_bootstrap_theme_options[navbar_inverse]',
 		'type'		=>	'checkbox',
 	) );
 
@@ -82,7 +82,7 @@ function the_bootstrap_customize_register( $wp_customize ) {
 	$wp_customize->add_control( 'the_bootstrap_navbar_position', array(
 		'label'		=>	__( 'Navigation Bar Position', 'the-bootstrap' ),
 		'section'	=>	'the_bootstrap_navbar_options',
-		'settings'	=>	'the_bootstrap_theme_options[navbar_position]',
+		'setting'	=>	'the_bootstrap_theme_options[navbar_position]',
 		'type'		=>	'radio',
 		'choices'	=>	array(
 			'static'				=>	__( 'Static.', 'the-bootstrap' ),

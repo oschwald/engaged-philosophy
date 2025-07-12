@@ -162,11 +162,12 @@ if ( ! function_exists( 'get_custom_header' ) ) :
  * @return	object
  */
 function get_custom_header() {
-	 return (object) array(
+	$header_image_data = get_theme_support( 'custom-header' );
+	return (object) array(
 		'url'           => get_header_image(),
 		'thumbnail_url' => get_header_image(),
-		'width'         => HEADER_IMAGE_WIDTH,
-		'height'        => HEADER_IMAGE_HEIGHT,
+		'width'         => $header_image_data[0]['width'],
+		'height'        => $header_image_data[0]['height'],
 	);
 }
 endif; // get_custom_header

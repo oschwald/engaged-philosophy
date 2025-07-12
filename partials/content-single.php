@@ -49,7 +49,7 @@ if ( get_the_author_meta( 'description' ) AND is_multi_author() ) : // If a user
 	<div id="author-description" class="col-lg-7">
 		<?php the_author_meta( 'description' ); ?>
 		<div id="author-link">
-			<a href="<?php echo esc_url( get_author_posts_url( get_the_author_meta( 'ID' ) ) ); ?>" rel="author">
+			<a href="<?php echo esc_url( get_author_posts_url( (int)get_the_author_meta( 'ID' ) ) ); ?>" rel="author">
 				<?php printf( __( 'View all posts by %s <span class="meta-nav">&rarr;</span>', 'the-bootstrap' ), get_the_author() ); ?>
 			</a>
 		</div><!-- #author-link	-->
