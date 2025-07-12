@@ -1,7 +1,8 @@
 // Custom Styles
 // --------------------------------------------------
 
-// Force all border-radius CSS custom properties to 0 (override Bootstrap defaults)
+// Force all border-radius CSS custom properties to 0
+// (override Bootstrap defaults)
 :root {
 	--bs-border-radius: 0 !important;
 	--bs-border-radius-sm: 0 !important;
@@ -47,18 +48,18 @@
 	left: 0;
 	right: 0;
 	padding: 2rem 1.5rem 1.5rem;
-	color: white;
+	color: #fff;
 	text-align: left;
 }
 
 .carousel-caption h4 {
-	color: white;
+	color: #fff;
 	font-size: 1.5rem;
 	margin-bottom: 0.75rem;
 }
 
 .carousel-caption p {
-	color: white;
+	color: #fff;
 	margin-bottom: 0;
 }
 
@@ -639,7 +640,7 @@ img.wp-smiley {
 }
 
 #site-generator a {
-	background: url("../../img/wordpress.png") no-repeat scroll left center transparent;
+	background: url(../../img/wordpress.png) no-repeat scroll left center transparent;
 	color: #787878;
 	display: inline-block;
 	line-height: 16px;

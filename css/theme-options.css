@@ -27,11 +27,11 @@
 }
 
 .obenland-wp div.inside li.rss {
-	background-image: url("../img/rss.png");
+	background-image: url(../img/rss.png);
 }
 
 .obenland-wp div.inside li.twitter {
-	background-image: url("../img/twitter.png");
+	background-image: url(../img/twitter.png);
 }
 
 #wpcontent select option {
