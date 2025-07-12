@@ -19,6 +19,14 @@
     width: auto !important;
   }
   
+  // Scale logo appropriately on mobile
+  #branding img,
+  #header-image img {
+    max-width: 90% !important;
+    height: auto !important;
+    max-height: 60px !important;
+  }
+  
   // Ensure logo container has enough space
   #branding .navbar-brand img,
   #branding a img {
@@ -56,21 +64,42 @@
     padding: 1rem;
   }
   
-  // Mobile footer improvements
+  // Mobile footer improvements - stack all elements vertically
   .footer-custom {
-    text-align: center;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 1rem !important;
     padding: 1rem !important;
+  }
+  
+  .footer-custom > div,
+  .footer-custom > nav {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+  
+  .footer-custom > div {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+  
+  // Center Facebook button and remove transforms
+  .fb-like {
+    padding: 0 !important;
+    transform: none !important;
+  }
+  
+  // Make email link more prominent on mobile
+  .footer-custom a[href^="mailto"] {
+    font-size: 1rem !important;
+    padding: 0.25rem 0 !important;
   }
   
   // Improve mobile text readability
   .tag-cloud-projects {
     padding: 1rem;
     font-size: 0.9rem;
-  }
-  
-  #page {
-    margin: 0;
-    padding: 10px;
   }
   
   .figure,
@@ -161,9 +190,27 @@
     padding: 0.5rem 0.8rem !important;
   }
   
-  // Better footer layout on tablets
+  // Better footer layout on tablets - only if not mobile
   .footer-custom {
     padding: 1.5rem !important;
+  }
+  
+  // Ensure footer stacking doesn't apply on tablet and larger
+  .footer-custom {
+    flex-direction: row !important;
+    text-align: left !important;
+    gap: 0 !important;
+  }
+  
+  .footer-custom > div,
+  .footer-custom > nav {
+    width: auto !important;
+    justify-content: flex-start !important;
+  }
+  
+  .footer-custom > div {
+    flex-direction: row !important;
+    gap: 0.5rem !important;
   }
 }
 
