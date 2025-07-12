@@ -13,24 +13,9 @@ function initResponsiveNav() {
 	}
 }
 
-// Handle carousel functionality (if needed)
-function initCarousel() {
-	const carouselElements = document.querySelectorAll( '.carousel' );
+// Carousel functionality is auto-initialized by Bootstrap 5
 
-	carouselElements.forEach( function ( carousel ) {
-		// Bootstrap 5 carousel is auto-initialized
-		// Add any custom carousel functionality here
-	} );
-}
-
-// Handle gallery functionality
-function initGallery() {
-	const galleryItems = document.querySelectorAll( '.gallery-item' );
-
-	galleryItems.forEach( function ( item ) {
-		// Add any gallery-specific functionality here
-	} );
-}
+// Gallery functionality is handled by WordPress core and Bootstrap CSS
 
 // Handle search functionality
 function initSearch() {
@@ -45,12 +30,11 @@ function initSearch() {
 // Load Facebook SDK externally
 function initFacebookSDK() {
 	( function ( d, s, id ) {
-		let js,
-			fjs = d.getElementsByTagName( s )[ 0 ];
+		const fjs = d.getElementsByTagName( s )[ 0 ];
 		if ( d.getElementById( id ) ) {
 			return;
 		}
-		js = d.createElement( s );
+		const js = d.createElement( s );
 		js.id = id;
 		js.src =
 			'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.0';
@@ -61,8 +45,6 @@ function initFacebookSDK() {
 // Initialize all theme functionality
 function initTheme() {
 	initResponsiveNav();
-	initCarousel();
-	initGallery();
 	initSearch();
 	initFacebookSDK();
 }

@@ -99,10 +99,10 @@ document.addEventListener( 'DOMContentLoaded', function () {
 				}
 				if ( container ) {
 					container.style.margin = '18px auto';
-					if ( 'static' != to && navbar ) {
+					if ( 'static' !== to && navbar ) {
 						navbar.classList.add( to );
 						const margin =
-							'fixed-top' == to ? 'margin-top' : 'margin-bottom';
+							'fixed-top' === to ? 'margin-top' : 'margin-bottom';
 						container.style[ margin ] = '58px';
 					}
 				}

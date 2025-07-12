@@ -13,5 +13,5 @@ import './custom-header.js';
 // Initialize theme functionality
 document.addEventListener( 'DOMContentLoaded', function () {
 	// Initialize any theme-specific JavaScript here
-	console.log( 'Engaged Philosophy theme loaded' );
+	// Theme loaded successfully
 } );

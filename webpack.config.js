@@ -1,7 +1,6 @@
 const defaultConfig = require( '@wordpress/scripts/config/webpack.config' );
 const { PurgeCSSPlugin } = require( 'purgecss-webpack-plugin' );
 const glob = require( 'glob-all' );
-const path = require( 'path' );
 
 module.exports = {
 	...defaultConfig,
