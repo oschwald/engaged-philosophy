@@ -15,7 +15,7 @@ $gray-dark: $gray-darker;
 $gray: #555;
 $gray-light: #afadac;
 $gray-lighter: #bfbbbc;
-$gray-lightest: #dddddd;
+$gray-lightest: #ddd;
 $white: #fff;
 
 // Accent colors
@@ -38,9 +38,9 @@ $link-color: $orange;
 $link-hover-color: $orange-dark;
 
 // Typography
-$font-family-sans-serif: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$font-family-serif: Georgia, "Times New Roman", Times, serif;
-$font-family-monospace: Monaco, Menlo, Consolas, "Courier New", monospace;
+$font-family-sans-serif: "Helvetica Neue", helvetica, arial, sans-serif;
+$font-family-serif: georgia, "Times New Roman", times, serif;
+$font-family-monospace: monaco, menlo, consolas, "Courier New", monospace;
 
 $font-size-base: 0.875rem; // 14px
 $line-height-base: 1.428571429; // 20px/14px
@@ -51,21 +51,21 @@ $headings-color: $orange;
 
 // Grid breakpoints (using Bootstrap 5 system)
 $grid-breakpoints: (
-  xs: 0,
-  sm: 576px,
-  md: 768px,
-  lg: 992px,
-  xl: 1200px,
-  xxl: 1400px
+	xs: 0,
+	sm: 576px,
+	md: 768px,
+	lg: 992px,
+	xl: 1200px,
+	xxl: 1400px
 );
 
 // Container max widths
 $container-max-widths: (
-  sm: 540px,
-  md: 720px,
-  lg: 960px,
-  xl: 1140px,
-  xxl: 1320px
+	sm: 540px,
+	md: 720px,
+	lg: 960px,
+	xl: 1140px,
+	xxl: 1320px
 );
 
 // Navbar

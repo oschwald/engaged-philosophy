@@ -1,6 +1,6 @@
 /*
 Theme Name: Engaged Philosophy 2.0
-Description: Based on the Bootstrap theme by Konstantin Obenland, modernized with Bootstrap 5. 
+Description: Based on the Bootstrap theme by Konstantin Obenland, modernized with Bootstrap 5.
              This file is deprecated - styles are now in build/style-style.css
 Author: Greg
 Version: 2.0.0
@@ -12,6 +12,6 @@ The actual compiled styles are located at: build/style-style.css
 
 /* Redirect notice for developers */
 body::before {
-  content: "⚠️ DEPRECATED: This style.css is deprecated. Use build/style-style.css";
-  display: none;
+	content: "⚠️ DEPRECATED: This style.css is deprecated. Use build/style-style.css";
+	display: none;
 }
