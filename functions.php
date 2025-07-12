@@ -1090,11 +1090,8 @@ function the_bootstrap_register_project_taxonomies() {
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
         'show_tagcloud' => true,
-        'show_in_rest' => true, // Enable block editor support
-        'rewrite' => array(
-            'slug' => 'topic',
-            'with_front' => false,
-        ),
+        'rewrite' => true,
+        'query_var' => true,
     ) );
 
     // Schools taxonomy
@@ -1118,11 +1115,8 @@ function the_bootstrap_register_project_taxonomies() {
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
         'show_tagcloud' => true,
-        'show_in_rest' => true,
-        'rewrite' => array(
-            'slug' => 'school',
-            'with_front' => false,
-        ),
+        'rewrite' => true,
+        'query_var' => true,
     ) );
 
     // Professors taxonomy
@@ -1144,11 +1138,8 @@ function the_bootstrap_register_project_taxonomies() {
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
         'show_tagcloud' => true,
-        'show_in_rest' => true,
-        'rewrite' => array(
-            'slug' => 'professor',
-            'with_front' => false,
-        ),
+        'rewrite' => true,
+        'query_var' => true,
     ) );
 
     // Courses taxonomy
@@ -1170,11 +1161,8 @@ function the_bootstrap_register_project_taxonomies() {
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
         'show_tagcloud' => true,
-        'show_in_rest' => true,
-        'rewrite' => array(
-            'slug' => 'course',
-            'with_front' => false,
-        ),
+        'rewrite' => true,
+        'query_var' => true,
     ) );
 
     // Semesters taxonomy
@@ -1196,11 +1184,8 @@ function the_bootstrap_register_project_taxonomies() {
         'show_admin_column' => true,
         'show_in_nav_menus' => true,
         'show_tagcloud' => true,
-        'show_in_rest' => true,
-        'rewrite' => array(
-            'slug' => 'semester',
-            'with_front' => false,
-        ),
+        'rewrite' => true,
+        'query_var' => true,
     ) );
 }
 add_action( 'init', 'the_bootstrap_register_project_taxonomies' );
@@ -1262,12 +1247,13 @@ function the_bootstrap_register_project_post_type() {
         ),
         'has_archive'         => true,
         'rewrite'             => array(
-            'slug'       => 'projects',
+            'slug'       => 'project',
             'with_front' => false,
         ),
         'query_var'           => true,
         'can_export'          => true,
         'delete_with_user'    => false,
+        'taxonomies'          => array( 'schools', 'topic' ),
     ) );
 }
 add_action( 'init', 'the_bootstrap_register_project_post_type' );
