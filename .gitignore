@@ -74,6 +74,14 @@ spider-test.js
 debug-check.js
 performance-check.js
 
+# Claude development and debugging tools
+debug-*.js
+test-*.js
+measure-*.js
+find-*.js
+inspect-*.js
+claude-*.js
+
 # Logs
 *.log
 logs/
@@ -93,3 +101,6 @@ coverage/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Package files
+engaged-philosophy-*.zip
