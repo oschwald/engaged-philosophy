@@ -1,2 +1,106 @@
+# Backup and temporary files
+*.bak
+*.swp
+*.tmp
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# PHP Composer
+vendor/
+
+# Build outputs
+build/
+dist/
 /compiled-style.css
 js/bootstrap.*
+
+# WordPress
+wp-config.php
+wp-content/uploads/
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Testing and development
+*.png
+*.jpg
+*.jpeg
+*.gif
+screenshot*.js
+comparison*.js
+*test*.sh
+*-test*.sh
+docker-compose.override.yml
+
+# Development scripts and tools
+build-modern.sh
+dev-watch.sh
+compare-screenshots.js
+comparison.html
+navbar-inspect.js
+spider-test.js
+debug-check.js
+performance-check.js
+
+# Claude development and debugging tools
+debug-*.js
+test-*.js
+measure-*.js
+find-*.js
+inspect-*.js
+claude-*.js
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Package files
+engaged-philosophy-*.zip

@@ -1,35 +1,17 @@
-/** style.css
- * 
- * Theme Name:	My Bootstrap
- * Description:	Based on the Bootstrap theme by Konstantin Obenland. Let's you override core Bootstrap style (and any other styles) by customizing files in less/my-theme/*.less
- * Author:		Dave Rolsky
- * Author URI:	http://blog.urth.org/
- * Version:		1.0.0
- * Tags:		black, blue, white, light, custom-background, custom-header, custom-menu, featured-images, flexible-header, flexible-width, full-width-template, left-sidebar, microformats, post-formats, right-sidebar, sticky-post, theme-options, threaded-comments, translation-ready, two-columns
- * Text Domain:	the-bootstrap
- * Domain Path:	/lang
- *
- * License:		GNU General Public License v3.0
- * License URI:	http://www.gnu.org/licenses/gpl-3.0.html
- *
- *
- *	Copyright (C) 2012 Dave Rolsky <autarch@urth.org>
- *
- *	This program is free software: you can redistribute it and/or modify
- *	it under the terms of the GNU General Public License as published by
- *	the Free Software Foundation, either version 3 of the License, or
- *	(at your option) any later version.
- *
- *	This program is distributed in the hope that it will be useful,
- *	but WITHOUT ANY WARRANTY; without even the implied warranty of
- *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *	GNU General Public License for more details.
- *
- *	You should have received a copy of the GNU General Public License
- *	along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 /*
- *  This file is not actually loaded by the site. It exists solely to provide
- *  information about the theme.
- */
+Theme Name: Engaged Philosophy 2.0
+Description: Based on the Bootstrap theme by Konstantin Obenland, modernized with Bootstrap 5.
+             This file is deprecated - styles are now in build/style-style.css
+Author: Greg
+Version: 2.0.0
+Text Domain: engaged-philosophy-2
+
+This file exists for WordPress theme detection compatibility.
+The actual compiled styles are located at: build/style-style.css
+*/
+
+/* Redirect notice for developers */
+body::before {
+	content: "⚠️ DEPRECATED: This style.css is deprecated. Use build/style-style.css";
+	display: none;
+}

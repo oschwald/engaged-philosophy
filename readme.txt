@@ -1,24 +1,24 @@
-=== The Bootstrap ===
-Contributors:		kobenland
-Tags:				black, blue, white, light, two-columns, left-sidebar, right-sidebar, flexible-width, custom-header, custom-background, threaded-comments, translation-ready, microformats, custom-menu, post-formats, sticky-posts
-Donate link:		https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=542W6XT4PLT4L
-Requires at least:	3.3.0
-Tested up to:		3.4.1
-Stable tag:			2.0.0
+=== Engaged Philosophy ===
+Contributors:		greg
+Tags:				education, philosophy, bootstrap, responsive, two-columns, left-sidebar, right-sidebar, custom-header, custom-background, threaded-comments, translation-ready, custom-menu, post-formats, sticky-posts
+Requires at least:	5.0
+Tested up to:		6.8
+Requires PHP:		7.4
+Stable tag:			1.0.0
 
-A WordPress Theme based on Bootstrap, from Twitter
+A WordPress Theme for Educational Philosophy Content, built with Bootstrap 5
 
 == Description ==
 
-The Theme is 100% responsive - you do not need a seperate mobile-Theme with this layout.
-It has a seperate Sidebar just for image pages, to make it a special place to show your pictures!
-The Bootstrap is fully compatible with WordPress SEO by Yoast!
+Engaged Philosophy is a modern WordPress theme designed for philosophy educators and students. It provides tools for implementing activist or service projects in philosophy classes with assignment guidelines, sample projects, and testimonials.
+
+The theme is 100% responsive and built with Bootstrap 5, ensuring optimal display on all devices. Features include a project showcase carousel, custom post types for projects, and specialized layouts for educational content.
 
 Please note:
 
 Due to design restrictions in Bootstrap, the navigation menu can "only" be three levels deep, while parent menu items only serves as a headline for the child menu items and can not be accessed over the navigation menu.
 The Footer Menu is best suitable for short menues with just a few links. It replaces the credits section, once a menu has been assigned to the location.
-To take advantage of all the possibilites Bootstrap has to offer, Bootstrap requires jQuery 1.7, which does not come with WordPress versions prior to 3.3.0. Consider adding a plugin that provides the lates version of jQuery, if you want to use this Theme with WordPress 3.2.1 or lower.
+This theme uses Bootstrap 5 with vanilla JavaScript, eliminating the need for jQuery. All interactive features are implemented using modern JavaScript and Bootstrap 5 components.
 
 = License =
 Unless otherwise specified, all the theme files, scripts and images are licensed under GNU General Public Licemse.
@@ -172,7 +172,7 @@ THIS IS A MAJOR RELEASE, BREAKING BACKWARD COMPATIBILITY IN SOME PLACES
 
 = 1.2.2 =
 * Added image carousel for the first ten images of a gallery post-format
-* Added default support for Bootstrap jQuery plugins Tooltip, Popover, Alert and Carousel
+* Added default support for Bootstrap 5 components including Tooltip, Popover, Alert and Carousel
 * Added tow more menu locations, nav pills style (props Benfarhat)
 * Define $content_width earlier, so embeds work how they are supposed to
 * Removed a misplaced character in Title title-attributes

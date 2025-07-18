@@ -1,0 +1,95 @@
+// Variables
+// --------------------------------------------------
+
+// Import Bootstrap variables first
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+// Custom theme variables
+// --------------------------------------------------
+
+// Grays
+$black: #000;
+$gray-darker: #646467;
+$gray-dark: $gray-darker;
+$gray: #555;
+$gray-light: #afadac;
+$gray-lighter: #bfbbbc;
+$gray-lightest: #ddd;
+$white: #fff;
+
+// Accent colors
+$blue: #049cdb;
+$blue-dark: #0064cd;
+$green: #46a546;
+$red: #9d261d;
+$yellow: #ffc40d;
+$orange: #fd7e14; // Production site orange
+$orange-dark: #e55100; // Darker shade for hover states
+$pink: #c3325f;
+$purple: #7a43b6;
+
+// Theme colors
+$body-bg: $white;
+$body-color: $gray-dark;
+
+// Links
+$link-color: $orange;
+$link-hover-color: $orange-dark;
+
+// Typography
+$font-family-sans-serif: "Helvetica Neue", helvetica, arial, sans-serif;
+$font-family-serif: georgia, "Times New Roman", times, serif;
+$font-family-monospace: monaco, menlo, consolas, "Courier New", monospace;
+
+$font-size-base: 0.875rem; // 14px
+$line-height-base: 1.428571429; // 20px/14px
+
+$headings-font-family: inherit;
+$headings-font-weight: inherit;
+$headings-color: $orange;
+
+// Grid breakpoints (using Bootstrap 5 system)
+$grid-breakpoints: (
+	xs: 0,
+	sm: 576px,
+	md: 768px,
+	lg: 992px,
+	xl: 1200px,
+	xxl: 1400px
+);
+
+// Container max widths
+$container-max-widths: (
+	sm: 540px,
+	md: 720px,
+	lg: 960px,
+	xl: 1140px,
+	xxl: 1320px
+);
+
+// Navbar
+$navbar-nav-link-padding-x: 0.5rem;
+$navbar-toggler-padding-y: 0.25rem;
+$navbar-toggler-padding-x: 0.75rem;
+$navbar-toggler-font-size: 1.25rem;
+$navbar-toggler-border-radius: 0;
+
+// Override Bootstrap variables as needed
+$primary: $orange;
+$secondary: $gray-light;
+$success: $green;
+$info: $blue;
+$warning: $yellow;
+$danger: $red;
+$light: $gray-lightest;
+$dark: $gray-dark;
+
+// Disable rounded corners globally
+$border-radius: 0;
+$border-radius-sm: 0;
+$border-radius-lg: 0;
+$border-radius-xl: 0;
+$border-radius-xxl: 0;
+$border-radius-2xl: 0;
+$border-radius-pill: 0;

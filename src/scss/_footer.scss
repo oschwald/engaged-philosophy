@@ -1,0 +1,50 @@
+// Footer Styles
+// --------------------------------------------------
+
+// Main footer
+.footer-custom {
+	background-color: #e0e0e0;
+	border: none;
+	margin: 0 -12px -12px -12px;
+	padding: 1rem 1.5rem !important;
+}
+
+.footer-custom a {
+	color: $orange;
+	text-decoration: none;
+}
+
+.footer-custom a:hover {
+	color: $orange-dark;
+	text-decoration: underline;
+}
+
+// Footer elements
+.fb-like {
+	padding-right: 10px;
+	transform: translateY(5px);
+}
+
+// Site generator footer
+#colophon .credits {
+	margin: 0;
+}
+
+#site-generator {
+	float: right;
+	font-family: Georgia, "Bitstream Charter", serif;
+	font-style: italic;
+}
+
+#site-generator a {
+	background: url(../../img/wordpress.png) no-repeat scroll left center transparent;
+	color: #787878;
+	display: inline-block;
+	line-height: 16px;
+	padding-left: 20px;
+	text-decoration: none;
+}
+
+#site-generator.footer-nav-menu a {
+	margin-top: 10px;
+}

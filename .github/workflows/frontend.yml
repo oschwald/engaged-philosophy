@@ -1,0 +1,108 @@
+name: Frontend (JS/CSS)
+
+on:
+  push:
+    branches: [ master, main ]
+    paths: 
+      - 'src/**'
+      - 'package*.json'
+      - 'webpack.config.js'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - 'src/**'
+      - 'package*.json'
+      - 'webpack.config.js'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  frontend-lint-and-build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run CSS linting
+      run: npm run lint:css
+
+    - name: Run JavaScript linting
+      run: npm run lint:js
+
+    - name: Run build
+      run: npm run build
+
+    - name: Verify build artifacts
+      run: |
+        test -f build/style.css || (echo "❌ Missing build/style.css" && exit 1)
+        test -f build/index.js || (echo "❌ Missing build/index.js" && exit 1)
+        echo "✅ All build artifacts present"
+
+    - name: Check for security vulnerabilities
+      run: npm audit --audit-level=moderate
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts-node-${{ matrix.node-version }}
+        path: build/
+        retention-days: 7
+
+  frontend-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Check package.json validity
+      run: npm run lint:package || echo "⚠️  package.json validation skipped (script not found)"
+
+    - name: Check for outdated packages
+      run: npm outdated || true
+
+    - name: Analyze bundle size (if applicable)
+      run: |
+        npm run build
+        if [ -f build/style.css ]; then
+          echo "📊 CSS bundle size:"
+          wc -c build/style.css
+        fi
+        if [ -f build/index.js ]; then
+          echo "📊 JS bundle size:"
+          wc -c build/index.js
+        fi
+
+    - name: Test SCSS compilation
+      run: |
+        echo "🔍 Testing SCSS compilation..."
+        npm run build
+        
+        # Check that all expected partials are included
+        echo "Checking for SCSS partial imports..."
+        grep -q "@import.*layout" src/scss/style.scss && echo "✅ Layout partial imported" || echo "⚠️  Layout partial missing"
+        grep -q "@import.*header" src/scss/style.scss && echo "✅ Header partial imported" || echo "⚠️  Header partial missing"
+        grep -q "@import.*navigation" src/scss/style.scss && echo "✅ Navigation partial imported" || echo "⚠️  Navigation partial missing"

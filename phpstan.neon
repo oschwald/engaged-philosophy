@@ -1,0 +1,44 @@
+parameters:
+	level: 5
+	treatPhpDocTypesAsCertain: false
+	checkMissingCallableSignature: true
+	checkUninitializedProperties: true
+	paths:
+		- .
+	excludePaths:
+		- vendor/
+		- node_modules/
+		- build/
+		- src/
+		- '*.js'
+		- '*.css'
+		- '*.scss'
+		- '*.json'
+		- '*.md'
+		- '*.txt'
+		- '*.log'
+		- '*.zip'
+		- debug-*.js
+		- test-*.js
+		- measure-*.js
+		- inspect-*.js
+		- find-*.js
+		- t.pl
+
+	# WordPress specific configuration
+	bootstrapFiles:
+		- vendor/php-stubs/wordpress-stubs/wordpress-stubs.php
+
+	# Ignore common WordPress dynamic issues
+	ignoreErrors:
+		- '#Function get_[a-zA-Z_]+ not found#'
+		- '#Function the_[a-zA-Z_]+ not found#'
+		- '#Variable \$[a-zA-Z_]+ might not be defined#'
+
+	# WordPress globals
+	universalObjectCratesClasses:
+		- stdClass
+		- WP_Post
+		- WP_User
+		- WP_Query
+		- WP_Term

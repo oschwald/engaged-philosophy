@@ -1,0 +1,81 @@
+// Image Styles
+// --------------------------------------------------
+
+// WordPress alignment classes
+.aligncenter {
+	display: block;
+	margin: 0 auto 20px;
+}
+
+.alignright {
+	float: right;
+	margin: 0 0 20px 20px;
+}
+
+.alignleft {
+	float: left;
+	margin: 0 20px 20px 0;
+}
+
+// WordPress captions
+.wp-caption {
+	max-width: 100%;
+}
+
+.wp-caption .wp-caption-text,
+.gallery-caption,
+.entry-caption {
+	padding: 0 9px 9px;
+	text-align: center;
+}
+
+.wp-caption .wp-caption-text {
+	padding-top: 9px;
+}
+
+.wp-caption.alignnone {
+	margin: 5px 20px 20px 0;
+}
+
+.wp-caption.alignleft {
+	margin: 5px 20px 20px 0;
+}
+
+.wp-caption.alignright {
+	margin: 5px 0 20px 20px;
+}
+
+// Entry attachment
+.entry-attachment .figure.attachment-table {
+	display: table;
+	margin: 0 auto;
+}
+
+.figure > img {
+	width: auto;
+}
+
+// WordPress specific images
+img.wp-smiley {
+	border: none;
+	margin-bottom: 0;
+	margin-top: 0;
+	padding: 0;
+}
+
+// Gallery columns
+.gallery-columns-3 > li {
+	width: calc(33.333% - 0.5rem);
+}
+
+.gallery-columns-5 > li {
+	width: calc(20% - 0.5rem);
+}
+
+.gallery-columns-6 > li {
+	width: calc(16.666% - 0.5rem);
+}
+
+.gallery-columns-7 > li {
+	width: calc(14.285% - 0.5rem);
+}

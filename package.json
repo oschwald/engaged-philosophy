@@ -1,0 +1,40 @@
+{
+	"name": "engaged-philosophy",
+	"version": "0.2.0",
+	"description": "A WordPress theme based on Bootstrap for philosophy content",
+	"main": "index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"build:production": "NODE_ENV=production wp-scripts build",
+		"start": "wp-scripts start",
+		"dev": "wp-scripts start",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"format": "wp-scripts format",
+		"packages-update": "wp-scripts packages-update",
+		"analyze:css": "npm run build:production && echo 'CSS analysis complete. Check build/style-style.css for optimized output'",
+		"package": "npm run build:production && zip -r engaged-philosophy-2.0.zip . -x '*.git*' 'node_modules/*' 'vendor/*' '*.log' '.DS_Store' 'package-lock.json' 'package.json' 'composer.json' 'composer.lock' 'webpack.config.js' 'phpcs.xml' 'phpstan.neon' '.eslintrc.js' 'src/*' 'less/*' '*.sh' '*.bak' '*.tmp' '*.swp' '*~' 'debug-*.js' 'test-*.js' 'measure-*.js' 'find-*.js' 'inspect-*.js' 'claude-*.js' 'screenshot*.js' 'comparison*.js' '*test*.sh' '*-test*.sh' 'docker-compose.yml' 'docker-compose.override.yml' 'CLAUDE.md' 't.pl' '*.png' '*.jpg' '*.jpeg' '*.gif' '.vscode/*' '.idea/*' '*.sublime-*' '.env*' 'coverage/*' 'logs/*' '*.pid*' 'engaged-philosophy-*.zip'"
+	},
+	"dependencies": {
+		"bootstrap": "^5.3.0",
+		"puppeteer": "^24.12.1"
+	},
+	"devDependencies": {
+		"@wordpress/scripts": "^27.0.0",
+		"glob-all": "^3.3.1",
+		"html-validate": "^9.7.1",
+		"playwright": "^1.53.2",
+		"purgecss-webpack-plugin": "^7.0.2"
+	},
+	"browserslist": [
+		"extends @wordpress/browserslist-config"
+	],
+	"keywords": [
+		"wordpress",
+		"theme",
+		"bootstrap",
+		"philosophy"
+	],
+	"author": "Greg",
+	"license": "GPL-3.0"
+}

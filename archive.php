@@ -1,54 +1,58 @@
 <?php
-/** archive.php
+/** Archive template
  *
  * The template for displaying Archive pages.
  *
  * Used to display archive-type pages if nothing more specific matches a query.
- * For example, puts together date-based pages if no date.php file exists.
+ * for example, puts together date-based pages if no date.php file exists.
  *
  * Learn more: http://codex.wordpress.org/Template_Hierarchy
  *
- * @author		Konstantin Obenland
- * @package		The Bootstrap
- * @since		1.0.0 - 07.02.2012
+ * @author      Konstantin Obenland
+ * @package     The Bootstrap
+ * @since       1.0.0 - 07.02.2012
  */
 
 get_header(); ?>
 
-<section id="primary" class="span8">
+<section id="primary" class="col-lg-8 px-4">
 
 	<?php tha_content_before(); ?>
 	<div id="content" role="main">
-		<?php tha_content_top();
-		
-		if ( have_posts() ) : ?>
+		<?php
+		tha_content_top();
+
+		if ( have_posts() ) :
+			?>
 
 			<header class="page-header">
 				<h1 class="page-title">
 					<?php
 					if ( is_day() ) :
-						printf( __( 'Daily Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date() . '</span>' );
+						printf( __( 'Daily Archives: %s', 'the-bootstrap' ), '<span>' . esc_html( get_the_date() ) . '</span>' );
 					elseif ( is_month() ) :
-						printf( __( 'Monthly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'F Y' ) . '</span>' );
+						printf( __( 'Monthly Archives: %s', 'the-bootstrap' ), '<span>' . esc_html( get_the_date( 'F Y' ) ) . '</span>' );
 					elseif ( is_year() ) :
-						printf( __( 'Yearly Archives: %s', 'the-bootstrap' ), '<span>' . get_the_date( 'Y' ) . '</span>' );
+						printf( __( 'Yearly Archives: %s', 'the-bootstrap' ), '<span>' . esc_html( get_the_date( 'Y' ) ) . '</span>' );
 					else :
-						_e( 'Blog Archives', 'the-bootstrap' );
-					endif; ?>
+						single_cat_title();
+					endif;
+					?>
 				</h1>
 			</header><!-- .page-header -->
 
 			<?php
 			while ( have_posts() ) {
 				the_post();
-				get_template_part( '/partials/content', get_post_format() );
+				get_template_part( '/partials/content', get_post_format() ? get_post_format() : 'summary' );
 			}
 			the_bootstrap_content_nav();
 		else :
 			get_template_part( '/partials/content', 'not-found' );
 		endif;
-		
-		tha_content_bottom(); ?>
+
+		tha_content_bottom();
+		?>
 	</div><!-- #content -->
 	<?php tha_content_after(); ?>
 </section><!-- #primary -->
@@ -57,6 +61,10 @@ get_header(); ?>
 get_sidebar();
 get_footer();
 
+/*
+End of file archive.php
+*/
 
-/* End of file archive.php */
-/* Location: ./wp-content/themes/the-bootstrap/archive.php */
+/*
+Location: ./wp-content/themes/the-bootstrap/archive.php
+*/

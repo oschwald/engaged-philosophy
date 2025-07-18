@@ -1,0 +1,297 @@
+// Responsive Breakpoints
+// --------------------------------------------------
+
+// Small devices (landscape phones, 767px and down)
+@media (max-width: 767px) {
+
+	body {
+		padding: 0;
+	}
+
+	.container {
+		width: auto;
+		padding: 0 10px;
+	}
+
+	// Fix logo text truncation on mobile
+	#branding img {
+		max-width: 100% !important;
+		height: auto !important;
+		width: auto !important;
+	}
+
+	// Scale logo appropriately on mobile - general first
+	#branding img,
+	#header-image img {
+		max-width: 90% !important;
+		height: auto !important;
+		max-height: 60px !important;
+	}
+
+	// More specific selectors come after - order by specificity
+	#branding a img {
+		max-width: 320px !important;
+		height: auto !important;
+	}
+
+	#branding .navbar-brand img {
+		max-width: 320px !important;
+		height: auto !important;
+	}
+
+	// Mobile navigation improvements
+	.navbar-toggler {
+		padding: 0.5rem;
+		border: 1px solid #ccc;
+	}
+
+	.navbar-collapse {
+		margin-top: 0.5rem;
+		background-color: #f8f9fa;
+		border: 1px solid #dee2e6;
+		padding: 1rem;
+	}
+
+	// Improve mobile carousel layout - single project per slide
+	.carousel-item .row {
+		flex-direction: column;
+	}
+
+	.carousel-item .col-md-6 {
+		width: 100% !important;
+		margin-bottom: 1rem;
+	}
+
+	// Better mobile spacing
+	.lead-home {
+		height: auto !important;
+		margin-bottom: 1rem;
+		padding: 1rem;
+	}
+
+	// Mobile footer improvements - stack all elements vertically
+	.footer-custom {
+		flex-direction: column !important;
+		align-items: center !important;
+		text-align: center !important;
+		gap: 1rem !important;
+		padding: 1rem !important;
+	}
+
+	.footer-custom > div,
+	.footer-custom > nav {
+		width: 100% !important;
+		justify-content: center !important;
+	}
+
+	.footer-custom > div {
+		flex-direction: column !important;
+		gap: 0.5rem !important;
+	}
+
+	// Center Facebook button and remove transforms
+	.fb-like {
+		padding: 0 !important;
+		transform: none !important;
+	}
+
+	// Make email link more prominent on mobile
+	.footer-custom a[href^="mailto"] {
+		font-size: 1rem !important;
+		padding: 0.25rem 0 !important;
+	}
+
+	// Improve mobile text readability
+	.tag-cloud-projects {
+		padding: 1rem;
+		font-size: 0.9rem;
+	}
+
+	.figure,
+	.gallery .figure {
+		display: table;
+	}
+
+	// Mobile carousel styling moved to _carousel.scss partial
+
+	.gallery > li {
+		flex: 0 0 auto;
+	}
+
+	.gallery-columns-2 > li {
+		width: calc(50% - 0.5rem);
+	}
+
+	.gallery-columns-3 > li {
+		width: calc(33.333% - 0.5rem);
+	}
+
+	.gallery-columns-4 > li {
+		width: calc(25% - 0.5rem);
+	}
+
+	.gallery-columns-5 > li {
+		width: calc(20% - 0.5rem);
+	}
+
+	.gallery-columns-6 > li {
+		width: calc(16.666% - 0.5rem);
+	}
+
+	.gallery-columns-7 > li {
+		width: calc(14.285% - 0.5rem);
+	}
+
+	.gallery-columns-8 > li {
+		width: calc(12.5% - 0.5rem);
+	}
+
+	.sidebar-content #primary,
+	.sidebar-content #attachment-comment {
+		float: none;
+		margin: inherit;
+	}
+
+	#s {
+		display: inline-block;
+	}
+
+	#site-generator,
+	#site-generator.footer-nav-menu a {
+		float: none;
+		margin-top: 5px;
+	}
+
+	textarea.form-control {
+		height: auto;
+	}
+
+	.fixed-top,
+	.fixed-bottom {
+		margin: 0;
+	}
+}
+
+// Small tablets and landscape phones (768px to 991px) - stacked layout
+@media (min-width: 768px) and (max-width: 991px) {
+
+	#page {
+		margin-right: 0;
+	}
+
+	// Better mobile carousel layout
+	.carousel-item img {
+		height: 400px;
+	}
+
+	.lead-home {
+		height: auto !important;
+		min-height: unset !important;
+		padding: 1rem;
+		font-size: 105%;
+		max-width: 100%;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+	}
+}
+
+// Large tablets (992px to 1199px) - side-by-side layout with fixed height
+@media (min-width: 992px) and (max-width: 1199px) {
+
+	#page {
+		margin-right: 0;
+	}
+
+	// Better tablet carousel layout
+	.carousel-item img {
+		height: 400px;
+	}
+
+	.lead-home {
+		height: 400px;
+		font-size: 100%;
+		max-width: 100%;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		padding: 1rem;
+		width: 100%;
+	}
+
+	// Bootstrap grid overflow fix for 1100px viewport
+	.container {
+		max-width: 100%;
+		padding-left: 15px;
+		padding-right: 15px;
+	}
+
+	.col-lg-3 {
+		width: 25%;
+		flex: 0 0 25%;
+		max-width: 25%;
+		padding-left: 12px;
+		padding-right: 12px;
+	}
+
+	// Improved navigation spacing on tablets
+	.navbar-nav .nav-link {
+		padding: 0.5rem 0.8rem !important;
+	}
+
+	// Better footer layout on tablets - only if not mobile
+	.footer-custom {
+		padding: 1.5rem !important;
+		flex-direction: row !important;
+		text-align: left !important;
+		gap: 0 !important;
+	}
+
+	.footer-custom > div,
+	.footer-custom > nav {
+		width: auto !important;
+		justify-content: flex-start !important;
+	}
+
+	.footer-custom > div {
+		flex-direction: row !important;
+		gap: 0.5rem !important;
+	}
+}
+
+
+// Additional fix for exact 1100px viewport
+@media (width: 1100px) {
+
+	.container {
+		max-width: 1050px;
+	}
+}
+
+// Large devices (desktops, 768px to 979px)
+@media (min-width: 768px) and (max-width: 979px) {
+
+	.dl-horizontal dt {
+		width: 85px;
+	}
+
+	.dl-horizontal dd {
+		margin-left: 95px;
+	}
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+
+	#page {
+		margin-right: -30px;
+		padding: 24px 0 10px;
+	}
+
+	.sidebar-content #primary,
+	.sidebar-content #attachment-comment {
+		margin-right: 30px;
+	}
+
+	.wp-caption {
+		display: table;
+	}
+}

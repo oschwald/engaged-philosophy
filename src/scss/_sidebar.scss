@@ -1,0 +1,170 @@
+// Sidebar Styles
+// --------------------------------------------------
+
+// Sidebar content container
+.lead-home {
+	font-size: 112%;
+	line-height: 1.5;
+	height: 460px;
+	padding: 1.5rem;
+	margin-bottom: 1.5rem;
+	background-color: #f8f9fa;
+	border: 1px solid #dee2e6;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	display: flex;
+	flex-direction: column;
+	max-width: 100%;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	box-sizing: border-box;
+}
+
+.lead-home p {
+	margin-bottom: 0.8rem;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+	hyphens: auto;
+}
+
+.lead-home p:last-child {
+	margin-bottom: 0;
+}
+
+.lead-home *:last-child {
+	margin-bottom: 0 !important;
+}
+
+.lead-home h5 {
+	color: $orange;
+	font-weight: 700;
+	font-size: 1.05rem;
+	margin-bottom: 0.75rem;
+}
+
+// Widget area
+.widget-area {
+	padding: 0 1rem 0 1.5rem;
+}
+
+.widget {
+	word-wrap: break-word;
+}
+
+.widget.card {
+	border: 1px solid #dee2e6;
+	background-color: #f8f9fa;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	margin-bottom: 1.5rem;
+}
+
+.widget .card-header {
+	background-color: #e9ecef;
+	border-bottom: 1px solid #dee2e6;
+	padding: 1.5rem 1.5rem;
+	margin-bottom: 0;
+}
+
+.widget .card-header h3.widget-title {
+	color: $orange;
+	font-size: 1rem;
+	font-weight: 600;
+	margin-bottom: 0;
+	text-transform: none;
+}
+
+.widget h2.widget-title {
+	color: $orange;
+	font-size: 1rem;
+	font-weight: 600;
+	margin-bottom: 0;
+	padding: 1.5rem 1.5rem;
+	background-color: #e9ecef;
+	border-bottom: 1px solid #dee2e6;
+}
+
+.widget-title {
+	color: $orange !important;
+	font-size: 1rem !important;
+	font-weight: 600 !important;
+	margin-bottom: 0 !important;
+	padding: 1.5rem 1.5rem !important;
+	background-color: #e9ecef !important;
+	border-bottom: 1px solid #dee2e6 !important;
+}
+
+.widget .card-body {
+	padding: 1.5rem;
+	background-color: #f8f9fa;
+}
+
+.widget .wp-caption {
+	display: inline-block;
+}
+
+// Widget lists
+.widget ul {
+	list-style: none;
+	padding-left: 0;
+	margin-bottom: 0;
+}
+
+.widget ul li {
+	padding: 0.75rem 1.5rem;
+	border-bottom: 1px solid #e9ecef;
+}
+
+.widget ul li a {
+	color: #333;
+	text-decoration: none;
+	font-size: 0.9rem;
+	line-height: 1.4;
+}
+
+.widget ul li a:hover {
+	color: $orange;
+	text-decoration: underline;
+}
+
+// Specific widget types - more specific selectors come after general ones
+.widget_archive ul li,
+.widget_categories ul li {
+	display: flex;
+	justify-content: space-between;
+}
+
+.widget_recent_comments ul li {
+	padding: 0.6rem 1rem;
+	font-size: 0.85rem;
+}
+
+// Last child selector comes after specific widget selectors
+.widget ul li:last-child {
+	border-bottom: none;
+}
+
+.widget_recent_comments .comment-author-link {
+	font-weight: 500;
+}
+
+// Search functionality
+.search-form {
+	margin: 0;
+}
+
+// Secondary sidebar specific
+#secondary > *:first-child {
+	border: 1px solid #dee2e6;
+	background-color: #f8f9fa;
+	padding: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+
+#secondary h2 {
+	background-color: #e9ecef;
+	color: #fd7e14;
+	padding: 1.5rem;
+	margin: 0;
+	border-bottom: 1px solid #dee2e6;
+	font-size: 1rem;
+	font-weight: 600;
+}

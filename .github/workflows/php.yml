@@ -1,0 +1,126 @@
+name: PHP Quality
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - '**.php'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpstan.neon'
+      - 'phpcs.xml'
+      - '.github/workflows/php.yml'
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - '**.php'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'phpstan.neon'
+      - 'phpcs.xml'
+      - '.github/workflows/php.yml'
+
+jobs:
+  php-analysis:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        php-version: [8.0, 8.1, 8.2, 8.3]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP ${{ matrix.php-version }}
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php-version }}
+        extensions: mbstring, xml, ctype, json, curl
+        coverage: none
+
+    - name: Validate composer.json
+      run: composer validate --strict
+
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress --no-interaction
+
+    - name: Run PHPStan static analysis (Level 5)
+      run: ./vendor/bin/phpstan analyse --memory-limit=2G --no-progress
+
+    - name: Run PHPCS WordPress coding standards
+      run: ./vendor/bin/phpcs --report=summary
+
+    - name: Check PHP syntax
+      run: find . -name "*.php" -not -path "./vendor/*" -not -path "./node_modules/*" -exec php -l {} \;
+
+
+  php-security:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, ctype, json, curl
+        coverage: none
+
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress --no-interaction
+
+    - name: Security audit for Composer packages
+      run: composer audit || echo "⚠️  Security audit completed with warnings"
+
+    - name: Check for common security issues
+      run: |
+        echo "🔒 Checking for common security issues..."
+        
+        # Check for potential SQL injection patterns
+        if grep -r "\$_GET\|$_POST\|$_REQUEST" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules | grep -v "sanitize\|escape"; then
+          echo "⚠️  Direct superglobal usage found - review for proper sanitization"
+        fi
+        
+        # Check for eval usage
+        if grep -r "eval(" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules; then
+          echo "❌ eval() usage found - security risk"
+          exit 1
+        else
+          echo "✅ No eval() usage found"
+        fi
+        
+        # Check for file inclusion vulnerabilities
+        if grep -r "include.*\$\|require.*\$" . --include="*.php" --exclude-dir=vendor --exclude-dir=node_modules; then
+          echo "⚠️  Dynamic file inclusion found - review for security"
+        fi
+
+  php-wordpress-standards:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, xml, ctype, json, curl
+        coverage: none
+
+    - name: Install Composer dependencies
+      run: composer install --prefer-dist --no-progress --no-interaction
+
+    - name: Run detailed PHPCS report
+      run: |
+        echo "📋 Running detailed WordPress coding standards check..."
+        ./vendor/bin/phpcs --report=summary --report=source
+
+    - name: Auto-fix coding standards (dry run)
+      run: |
+        echo "🔧 Checking what PHPCBF could auto-fix..."
+        ./vendor/bin/phpcbf --dry-run || echo "PHPCBF found issues that could be auto-fixed"
+
