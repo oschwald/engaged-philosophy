@@ -48,8 +48,8 @@ jobs:
 
     - name: Verify build artifacts
       run: |
-        test -f build/style.css || (echo "❌ Missing build/style.css" && exit 1)
-        test -f build/index.js || (echo "❌ Missing build/index.js" && exit 1)
+        test -f build/style-style.css || (echo "❌ Missing build/style-style.css" && exit 1)
+        test -f build/theme-scripts.js || (echo "❌ Missing build/theme-scripts.js" && exit 1)
         echo "✅ All build artifacts present"
 
     - name: Check for security vulnerabilities
@@ -87,13 +87,13 @@ jobs:
     - name: Analyze bundle size (if applicable)
       run: |
         npm run build
-        if [ -f build/style.css ]; then
+        if [ -f build/style-style.css ]; then
           echo "📊 CSS bundle size:"
-          wc -c build/style.css
+          wc -c build/style-style.css
         fi
-        if [ -f build/index.js ]; then
+        if [ -f build/theme-scripts.js ]; then
           echo "📊 JS bundle size:"
-          wc -c build/index.js
+          wc -c build/theme-scripts.js
         fi
 
     - name: Test SCSS compilation

@@ -39,8 +39,8 @@ jobs:
         npm run build
         
         # Verify all expected files are generated
-        test -f build/style.css || (echo "❌ Missing build/style.css" && exit 1)
-        test -f build/index.js || (echo "❌ Missing build/index.js" && exit 1)
+        test -f build/style-style.css || (echo "❌ Missing build/style-style.css" && exit 1)
+        test -f build/theme-scripts.js || (echo "❌ Missing build/theme-scripts.js" && exit 1)
         test -f style.css || (echo "❌ Missing theme style.css" && exit 1)
         
         echo "✅ Full integration build successful"
