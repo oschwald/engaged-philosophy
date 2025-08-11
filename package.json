@@ -21,7 +21,7 @@
 	"devDependencies": {
 		"@wordpress/scripts": "^30.21.0",
 		"glob-all": "^3.3.1",
-		"html-validate": "^9.7.1",
+		"html-validate": "^10.0.0",
 		"purgecss-webpack-plugin": "^7.0.2"
 	},
 	"browserslist": [
