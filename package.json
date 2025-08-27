@@ -16,7 +16,7 @@
 		"package": "npm run build:production && zip -r engaged-philosophy-2.0.zip . -x '*.git*' 'node_modules/*' 'vendor/*' '*.log' '.DS_Store' 'package-lock.json' 'package.json' 'composer.json' 'composer.lock' 'webpack.config.js' 'phpcs.xml' 'phpstan.neon' '.eslintrc.js' 'src/*' 'less/*' '*.sh' '*.bak' '*.tmp' '*.swp' '*~' 'debug-*.js' 'test-*.js' 'measure-*.js' 'find-*.js' 'inspect-*.js' 'claude-*.js' 'screenshot*.js' 'comparison*.js' '*test*.sh' '*-test*.sh' 'docker-compose.yml' 'docker-compose.override.yml' 'CLAUDE.md' 't.pl' '*.png' '*.jpg' '*.jpeg' '*.gif' '.vscode/*' '.idea/*' '*.sublime-*' '.env*' 'coverage/*' 'logs/*' '*.pid*' 'engaged-philosophy-*.zip'"
 	},
 	"dependencies": {
-		"bootstrap": "^5.3.0"
+		"bootstrap": "^5.3.8"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^30.21.0",
