@@ -22,7 +22,7 @@
 		"@wordpress/scripts": "^30.21.0",
 		"glob-all": "^3.3.1",
 		"html-validate": "^9.7.1",
-		"purgecss-webpack-plugin": "^7.0.2"
+		"purgecss-webpack-plugin": "^8.0.0"
 	},
 	"browserslist": [
 		"extends @wordpress/browserslist-config"
