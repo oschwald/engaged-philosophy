@@ -1,0 +1,125 @@
+---
+import ThemeSidebar from "./ThemeSidebar.astro";
+import { getExcerptText } from "../lib/site";
+import type { ContentEntry, ProjectData } from "../lib/types";
+
+interface Props {
+	taxonomy: string;
+	label: string;
+	projects: ContentEntry<ProjectData>[];
+	page: number;
+	perPage?: number;
+}
+
+const { taxonomy, label, projects, page, perPage = 10 } = Astro.props;
+
+const totalPages = Math.max(1, Math.ceil(projects.length / perPage));
+const currentPage = Math.min(Math.max(page, 1), totalPages);
+const start = (currentPage - 1) * perPage;
+const pageItems = projects.slice(start, start + perPage);
+const hasResults = pageItems.length > 0;
+const titlePrefix = taxonomy === "topic" ? "Project Topic: " : "";
+const basePath = `/${taxonomy}/${Astro.params.slug}/`;
+
+function pageHref(pageNumber: number) {
+	return pageNumber === 1 ? basePath : `${basePath}page/${pageNumber}/`;
+}
+---
+
+<section id="primary" class="col-lg-8 px-4">
+	<div id="content" role="main">
+		<header class="page-header">
+			<h1 class="page-title">
+				{titlePrefix}<span>{label}</span>
+			</h1>
+		</header>
+
+		{hasResults ? (
+			pageItems.map((project) => (
+				<article class={`mb-5 pb-4 border-bottom ${project.data.featured_image?.src ? "has-post-thumbnail " : ""}project type-project status-publish`}>
+					<header class="page-header mb-3">
+						<h2 class="entry-title h4 mb-0">{project.data.title}</h2>
+					</header>
+
+					<div class="entry-content text-muted lh-base">
+						{project.data.featured_image?.src && (
+							<img
+								class="img-thumbnail float-end ms-3"
+								src={project.data.featured_image.src}
+								alt={project.data.featured_image.alt || project.data.title}
+								width="150"
+								height="150"
+							/>
+						)}
+						<p>
+							{getExcerptText(project.data.excerpt_html, project.data.content_html)}
+							{" "}
+							<a href={`/${project.data.path}/`}>
+								Continue reading <span class="meta-nav">&rarr;</span>
+							</a>
+						</p>
+					</div>
+				</article>
+			))
+		) : (
+			<article class="post no-results not-found">
+				<header class="page-header">
+					<h1 class="entry-title">Nothing Found</h1>
+				</header>
+				<div class="entry-content">
+					<p>
+						Apologies, but no results were found for the requested archive. Perhaps
+						searching will help find a related post.
+					</p>
+					<form method="get" id="searchform" class="d-flex" action="/">
+						<label for={`archive-search-${taxonomy}-${label}`} class="visually-hidden">Search</label>
+						<div class="input-group">
+							<input
+								id={`archive-search-${taxonomy}-${label}`}
+								class="form-control"
+								type="search"
+								name="s"
+								placeholder="Search"
+							/>
+							<button class="btn btn-primary" type="submit" aria-label="Submit search">
+								<i class="bi bi-search"></i>
+							</button>
+						</div>
+					</form>
+				</div>
+			</article>
+		)}
+
+		{totalPages > 1 && (
+			<nav aria-label="Page navigation">
+				<ul class="pagination justify-content-center">
+					<li class:list={["page-item", currentPage === 1 && "disabled"]}>
+						{currentPage === 1 ? (
+							<span class="page-link">&laquo; Previous</span>
+						) : (
+							<a class="page-link" href={pageHref(currentPage - 1)}>&laquo; Previous</a>
+						)}
+					</li>
+					{Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+						<li class:list={["page-item", pageNumber === currentPage && "active"]}>
+							{pageNumber === currentPage ? (
+								<span class="page-link">{pageNumber}</span>
+							) : (
+								<a class="page-link" href={pageHref(pageNumber)}>{pageNumber}</a>
+							)}
+						</li>
+					))}
+					<li class:list={["page-item", currentPage === totalPages && "disabled"]}>
+						{currentPage === totalPages ? (
+							<span class="page-link">Next &raquo;</span>
+						) : (
+							<a class="page-link" href={pageHref(currentPage + 1)}>Next &raquo;</a>
+						)}
+					</li>
+				</ul>
+			</nav>
+		)}
+	</div>
+</section>
+
+<ThemeSidebar />

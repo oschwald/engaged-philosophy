@@ -1,0 +1,24 @@
+---
+import SearchResults from "../../components/SearchResults.astro";
+import Base from "../../layouts/Base.astro";
+import { searchSite } from "../../lib/search";
+
+const pageNumber = Number(Astro.params.page ?? "1");
+const query = Astro.url.searchParams.get("s")?.trim() ?? "";
+
+if (!query) {
+	return Astro.redirect("/404");
+}
+
+const search = searchSite(query, pageNumber);
+if (search.totalPages > 0 && pageNumber > search.totalPages) {
+	return Astro.redirect("/404");
+}
+---
+
+<Base
+	title={`Search Results for: ${query}${pageNumber > 1 ? ` – Page ${pageNumber}` : ""}`}
+	bodyClass={`search search-results${pageNumber > 1 ? ` paged paged-${pageNumber}` : ""} wp-theme-engaged-philosophy-20 content-sidebar`}
+>
+	<SearchResults query={query} page={pageNumber} />
+</Base>

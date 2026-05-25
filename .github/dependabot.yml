@@ -14,25 +14,12 @@ updates:
       - "dependencies"
       - "javascript"
 
-  # Enable version updates for Composer
-  - package-ecosystem: "composer"
-    directory: "/"
-    schedule:
-      interval: "daily"
-      time: "10:00"
-    commit-message:
-      prefix: "composer"
-      include: "scope"
-    labels:
-      - "dependencies"
-      - "php"
-
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
-      time: "11:00"
+      time: "10:00"
     commit-message:
       prefix: "ci"
       include: "scope"

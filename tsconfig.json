@@ -1,0 +1,25 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "compilerOptions": {
+    "types": [
+      "@cloudflare/workers-types"
+    ]
+  },
+  "include": [
+    "src/**/*.astro",
+    "src/**/*.ts",
+    "src/**/*.mts",
+    "src/**/*.tsx",
+    "astro.config.mjs"
+  ],
+  "exclude": [
+    "build",
+    "vendor",
+    "dist",
+    "css",
+    "js",
+    "inc",
+    "node_modules",
+    "webpack.config.js"
+  ]
+}

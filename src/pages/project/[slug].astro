@@ -1,0 +1,75 @@
+---
+import HtmlContent from "../../components/HtmlContent.astro";
+import Base from "../../layouts/Base.astro";
+import { getEntryTerms, getProjectBySlug } from "../../lib/seed";
+
+const { slug } = Astro.params;
+const project = getProjectBySlug(slug ?? "");
+
+if (!project) {
+	return Astro.redirect("/404");
+}
+
+const schools = getEntryTerms(project, "schools");
+const professors = getEntryTerms(project, "professors");
+const courses = getEntryTerms(project, "courses");
+const semesters = getEntryTerms(project, "semesters");
+const topics = getEntryTerms(project, "topic");
+---
+
+<Base title={project.data.title} bodyClass="single single-project">
+	<section id="primary" class="col-12 px-4">
+		<main id="content">
+			<article class="project type-project status-publish">
+				<header class="page-header">
+					<h1 class="entry-title">{project.data.title}</h1>
+				</header>
+
+				<div class="entry-content">
+					<div class="row">
+						<div class="col-lg-9">
+							<HtmlContent html={project.data.content_html} />
+						</div>
+
+						<div class="col-lg-3">
+							<div class="well bg-light p-3 border rounded">
+								<dl class="mb-0">
+									{schools.length > 0 && (
+										<>
+											<dt>College</dt>
+											<dd>{schools.map((term) => <a href={`/schools/${term.slug}/`}>{term.label}</a>).reduce((prev, curr) => [prev, ", ", curr])}</dd>
+										</>
+									)}
+									{professors.length > 0 && (
+										<>
+											<dt>Professor</dt>
+											<dd>{professors.map((term) => <a href={`/professors/${term.slug}/`}>{term.label}</a>).reduce((prev, curr) => [prev, ", ", curr])}</dd>
+										</>
+									)}
+									{courses.length > 0 && (
+										<>
+											<dt>Course</dt>
+											<dd>{courses.map((term) => <a href={`/courses/${term.slug}/`}>{term.label}</a>).reduce((prev, curr) => [prev, ", ", curr])}</dd>
+										</>
+									)}
+									{semesters.length > 0 && (
+										<>
+											<dt>Semester</dt>
+											<dd>{semesters.map((term) => <a href={`/semesters/${term.slug}/`}>{term.label}</a>).reduce((prev, curr) => [prev, ", ", curr])}</dd>
+										</>
+									)}
+									{topics.length > 0 && (
+										<>
+											<dt>Topics</dt>
+											<dd>{topics.map((term) => <a href={`/topic/${term.slug}/`}>{term.label}</a>).reduce((prev, curr) => [prev, ", ", curr])}</dd>
+										</>
+									)}
+								</dl>
+							</div>
+						</div>
+					</div>
+				</div>
+			</article>
+		</main>
+		</section>
+</Base>

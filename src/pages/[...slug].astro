@@ -1,0 +1,50 @@
+---
+import HtmlContent from "../components/HtmlContent.astro";
+import Base from "../layouts/Base.astro";
+import { getPageByPath } from "../lib/seed";
+import { joinPath } from "../lib/site";
+import type { ContentEntry, PageData } from "../lib/types";
+
+const slugParts = Astro.params.slug?.split("/").filter(Boolean) ?? [];
+const path = joinPath(slugParts);
+
+const page = getPageByPath(path) as ContentEntry<PageData> | null;
+
+if (!page) {
+	return Astro.redirect("/404");
+}
+
+const useFullWidthTemplate = page.data.template === "templates/_full_width.php" && page.data.path !== "faq";
+---
+
+<Base title={page.data.title}>
+	{useFullWidthTemplate ? (
+		<section id="primary" class="col-12 px-4">
+			<main id="content">
+				<article>
+					<header class="page-header">
+						<h1 class="entry-title">{page.data.title}</h1>
+					</header>
+					<div class="entry-content">
+						<HtmlContent html={page.data.content_html} />
+					</div>
+				</article>
+			</main>
+		</section>
+	) : (
+		<div class="container-fluid">
+			<section id="primary" class="p-4">
+				<div id="content" role="main">
+					<article>
+						<header class="page-header">
+							<h1 class="entry-title">{page.data.title}</h1>
+						</header>
+						<div class="entry-content">
+							<HtmlContent html={page.data.content_html} />
+						</div>
+					</article>
+				</div>
+			</section>
+		</div>
+	)}
+</Base>

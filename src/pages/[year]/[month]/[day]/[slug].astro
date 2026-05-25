@@ -1,0 +1,43 @@
+---
+import HtmlContent from "../../../../components/HtmlContent.astro";
+import ThemeSidebar from "../../../../components/ThemeSidebar.astro";
+import Base from "../../../../layouts/Base.astro";
+import { getPostByPath, getTermsBySlugs } from "../../../../lib/seed";
+import { joinPath } from "../../../../lib/site";
+
+const { year = "", month = "", day = "", slug = "" } = Astro.params;
+const path = joinPath([year, month, day, slug]);
+const post = getPostByPath(path);
+
+if (!post) {
+	return Astro.redirect("/404");
+}
+
+const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
+---
+
+<Base title={post.data.title} bodyClass="single single-post content-sidebar">
+	<section id="primary" class="col-lg-8 px-4">
+		<div id="content" role="main">
+			<article class="post">
+				<header class="page-header">
+					<h1 class="entry-title">{post.data.title}</h1>
+					<div class="entry-meta">
+						{post.data.published_on ? new Date(post.data.published_on).toLocaleDateString() : ""}
+					</div>
+				</header>
+				<div class="entry-content">
+					<HtmlContent html={post.data.content_html} />
+				</div>
+				{categories.length > 0 && (
+					<footer class="entry-footer">
+						<span class="cat-links block">
+							Posted in {categories.map((term) => <a href="#">{term.label}</a>).reduce((prev, curr) => [prev, ", ", curr])}.
+						</span>
+					</footer>
+				)}
+			</article>
+		</div>
+	</section>
+	<ThemeSidebar />
+</Base>

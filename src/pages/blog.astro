@@ -1,0 +1,25 @@
+---
+import Base from "../layouts/Base.astro";
+import HtmlContent from "../components/HtmlContent.astro";
+import { getPageByPath } from "../lib/seed";
+import type { ContentEntry, PageData } from "../lib/types";
+
+const page = getPageByPath("blog") as ContentEntry<PageData> | null;
+--- 
+
+<Base title={page?.data.title || "Blog"} bodyClass="page page-template page-template-default">
+	<div class="container-fluid">
+		<section id="primary" class="p-4">
+			<div id="content" role="main">
+				<article>
+					<header class="page-header">
+						<h1 class="entry-title">{page?.data.title || "Blog"}</h1>
+					</header>
+					<div class="entry-content">
+						<HtmlContent html={page?.data.content_html} />
+					</div>
+				</article>
+			</div>
+		</section>
+	</div>
+</Base>

@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 // Bootstrap functions and variable imports (required for overrides)
-@import "~bootstrap/scss/functions";
+@import "bootstrap/scss/functions";
 
 // Custom variable overrides - must come before Bootstrap variables
 $orange: #fd7e14; // Production site orange
@@ -42,7 +42,7 @@ $link-hover-color: $orange-dark;
 $headings-color: $orange;
 
 // Import Bootstrap with our overrides
-@import "~bootstrap/scss/bootstrap";
+@import "bootstrap/scss/bootstrap";
 
 // Import our custom variables after Bootstrap for internal use
 @import "variables";

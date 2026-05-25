@@ -1,0 +1,88 @@
+---
+import { getMediaById } from "../lib/seed";
+
+interface Props {
+	html?: string | null;
+	class?: string;
+}
+
+const { html, class: className = "" } = Astro.props;
+const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
+const blockTagPattern =
+	/<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|thead|tbody|tr|td|th|ul|li)\b/gi;
+
+function renderGallery(shortcode: string) {
+	const idsMatch = shortcode.match(/ids="([^"]+)"/);
+	if (!idsMatch) return "";
+
+	const ids = idsMatch[1]
+		.split(",")
+		.map((value) => value.trim())
+		.filter(Boolean);
+	const items = ids
+		.map((id) => getMediaById(id))
+		.filter(
+			(item): item is NonNullable<ReturnType<typeof getMediaById>> =>
+				item !== null && Boolean(item.url),
+		);
+
+	if (items.length === 0) return "";
+
+	return `<div class="legacy-gallery row g-3 mb-4">${items
+		.map(
+			(item) => {
+				const mediaUrl = item.url?.startsWith("/")
+					? `${WORDPRESS_SITE_URL}${item.url}`
+					: item.url;
+				return `<figure class="gallery-item col-sm-6 col-lg-4">
+				<a href="${mediaUrl}" target="_blank" rel="noreferrer">
+					<img class="img-fluid" src="${mediaUrl}" alt="${item.alt || item.title || ""}" loading="lazy" />
+				</a>
+			</figure>`;
+			},
+		)
+		.join("")}</div>`;
+}
+
+function applyAutoParagraphs(value: string) {
+	const normalized = value.replace(/\r\n?/g, "\n").trim();
+	if (!normalized || /<p[\s>]/i.test(normalized)) return normalized;
+
+	const separated = normalized.replace(blockTagPattern, (match) => `\n${match}\n`);
+	const chunks = separated
+		.split(/\n{2,}/)
+		.map((chunk) => chunk.trim())
+		.filter(Boolean);
+
+	return chunks
+		.map((chunk) =>
+			/^<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|thead|tbody|tr|td|th|ul|li)\b/i.test(
+				chunk,
+			)
+				? chunk
+				: `<p>${chunk.replace(/\n/g, "<br />\n")}</p>`,
+		)
+		.join("\n\n");
+}
+
+const normalizedHtml = (html ?? "")
+	.replaceAll(/<!--[\s\S]*?-->/g, "")
+	.replaceAll(/\[embed\]([^\[]+)\[\/embed\]/g, '<p><a href="$1">$1</a></p>')
+	.replaceAll(
+		/\[gallery[^\]]*\]/g,
+		(shortcode) => renderGallery(shortcode) || "",
+	)
+	.replaceAll(/(src|href)=["']\/wp-content\/uploads\//g, `$1="${WORDPRESS_SITE_URL}/wp-content/uploads/`)
+	.replaceAll(
+		/(srcset)=["']\/wp-content\/uploads\//g,
+		`$1="${WORDPRESS_SITE_URL}/wp-content/uploads/`,
+	)
+	.replaceAll(/https?:\/\/www\.engagedphilosophy\.com\/wp-content\/uploads\//g, `${WORDPRESS_SITE_URL}/wp-content/uploads/`)
+	.replaceAll(/https?:\/\/engagedphilosophy\.com\/wp-content\/uploads\//g, `${WORDPRESS_SITE_URL}/wp-content/uploads/`)
+	.replaceAll(/https?:\/\/www\.engagedphilosophy\.com\/(?!wp-content\/uploads\/)/g, "/")
+	.replaceAll(/https?:\/\/engagedphilosophy\.com\/(?!wp-content\/uploads\/)/g, "/");
+
+const renderedHtml = applyAutoParagraphs(normalizedHtml);
+---
+
+<div class:list={["legacy-content", className]} set:html={renderedHtml} />

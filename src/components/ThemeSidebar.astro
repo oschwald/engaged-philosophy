@@ -1,0 +1,20 @@
+---
+import { getPublishedPosts } from "../lib/seed";
+import { formatPathDate, sortByPublishedOn } from "../lib/site";
+
+const recentPosts = sortByPublishedOn(getPublishedPosts()).slice(0, 25);
+---
+
+<section id="secondary" class="widget-area col-lg-4 p-3" role="complementary">
+	<aside id="recent-posts-2" class="widget card mb-4 widget_recent_entries">
+		<h2 class="widget-title card-header h5 mb-0">Recent Interviews</h2>
+		<ul>
+			{recentPosts.map((post) => (
+				<li>
+					<a href={`/${post.data.path}/`}>{post.data.title}</a>
+					<span class="post-date">{formatPathDate(post.data.path)}</span>
+				</li>
+			))}
+		</ul>
+	</aside>
+</section>

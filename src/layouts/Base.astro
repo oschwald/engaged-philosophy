@@ -1,0 +1,193 @@
+---
+import { getPrimaryMenu, getSeedSettings } from "../lib/seed";
+import "../scss/style.scss";
+
+interface Props {
+	title?: string;
+	description?: string;
+	bodyClass?: string;
+}
+
+const { title, description, bodyClass = "" } = Astro.props;
+const settings = getSeedSettings();
+const siteTitle = settings?.title || "Engaged Philosophy";
+const siteDescription = settings?.tagline || "Civic Engagement in Philosophy Classes";
+const pageTitle = title && title !== "Home" ? `${title} – ${siteTitle}` : `${siteTitle} – ${siteDescription}`;
+const menuItems = getPrimaryMenu();
+const currentPath = Astro.url.pathname;
+---
+
+<!doctype html>
+<html class="no-js" lang="en-US">
+	<head>
+		<link rel="profile" href="https://gmpg.org/xfn/11" />
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>{pageTitle}</title>
+		<meta name="description" content={description || siteDescription} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="alternate icon" type="image/svg+xml" href="/favicon-simple.svg" />
+		<link rel="manifest" href="/site.webmanifest" />
+		<meta name="theme-color" content="#fd7e14" />
+		<meta name="msapplication-TileColor" content="#fd7e14" />
+		<link
+			rel="stylesheet"
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+		/>
+	</head>
+	<body class={bodyClass}>
+		<div id="fb-root"></div>
+		<div class="container">
+			<header id="branding" class="text-center py-3">
+				<a id="header-image" href="/" title={siteTitle} rel="home">
+					<img
+						src="https://www.engagedphilosophy.com/wp-content/uploads/2013/12/Engaged-Philosophy-Logo-web1.png"
+						alt={`${siteTitle} Logo`}
+					/>
+				</a>
+			</header>
+
+			<nav id="access" aria-label="Main navigation">
+				<h3 class="visually-hidden">Main menu</h3>
+				<div class="skip-link">
+					<a class="visually-hidden" href="#content" title="Skip to primary content">
+						Skip to primary content
+					</a>
+				</div>
+				<div class="skip-link">
+					<a class="visually-hidden" href="#secondary" title="Skip to secondary content">
+						Skip to secondary content
+					</a>
+				</div>
+				<div class="navbar navbar-expand-lg navbar-dark bg-dark">
+					<button
+						class="navbar-toggler"
+						type="button"
+						data-bs-toggle="collapse"
+						data-bs-target="#navbarNav"
+						aria-controls="navbarNav"
+						aria-expanded="false"
+						aria-label="Toggle navigation"
+					>
+						<span class="navbar-toggler-icon"></span>
+					</button>
+
+					<div class="collapse navbar-collapse" id="navbarNav">
+						<div class="menu-main-menu-container">
+							<ul id="menu-main-menu" class="navbar-nav ms-auto">
+								{menuItems.map((item) => {
+									const hasChildren = (item.children?.length ?? 0) > 0;
+									const isActive = item.url === currentPath || item.url === `${currentPath}/`;
+									const isBranchActive = hasChildren && item.children?.some((child) => child.url === currentPath || child.url === `${currentPath}/`);
+									return (
+										<li
+											class:list={[
+												"menu-item",
+												"nav-item",
+												hasChildren && "dropdown",
+												(isActive || isBranchActive) && "active",
+											]}
+										>
+											<a
+												class:list={["nav-link", hasChildren && "dropdown-toggle"]}
+												href={hasChildren ? "#" : item.url}
+												target={item.target}
+												{...(hasChildren
+													? {
+														"data-bs-toggle": "dropdown",
+														"aria-expanded": "false",
+														"aria-haspopup": "true",
+													}
+													: {})}
+											>
+												{item.label}
+											</a>
+											{hasChildren && (
+												<ul class="dropdown-menu">
+													{(item.children ?? []).map((child) => (
+														<li class="menu-item nav-item">
+															<a class="dropdown-item" href={child.url} target={child.target}>
+																{child.label}
+															</a>
+														</li>
+													))}
+												</ul>
+											)}
+										</li>
+									);
+								})}
+							</ul>
+						</div>
+						<form id="searchform" class="d-flex ms-auto" method="get" action="/" role="search" aria-label="Search the site">
+							<label for="s" class="visually-hidden">Search</label>
+							<input type="search" class="form-control" name="s" id="s" placeholder="Search" aria-label="Search the site" />
+							<button type="submit" class="btn btn-outline-secondary ms-1" aria-label="Submit search">
+								<i class="bi bi-search"></i>
+							</button>
+						</form>
+					</div>
+				</div>
+			</nav>
+
+			<div id="page" class="hfeed row">
+				<slot />
+				<footer id="colophon" class="col-12">
+					<div id="page-footer" class="footer-custom d-flex align-items-center justify-content-between px-3 py-3">
+						<span class="credits alignleft">&copy; 2026 <a href="/">{siteTitle}</a>, all rights reserved.</span>
+						<div class="d-flex align-items-center gap-2">
+							<div class="fb-like" data-href="https://www.facebook.com/engagedphilosophy" data-width="200" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+							<a href="mailto:info@engagedphilosophy.com">info@engagedphilosophy.com</a>
+						</div>
+					</div>
+				</footer>
+			</div>
+		</div>
+		<script>
+			import "../js/index.js";
+		</script>
+	</body>
+</html>
+
+<style is:global>
+	.legacy-content,
+	.entry-content {
+		line-height: 1.7;
+	}
+
+	.legacy-content > *:last-child,
+	.entry-content > *:last-child {
+		margin-bottom: 0;
+	}
+
+	.legacy-content img,
+	.entry-content img {
+		max-width: 100%;
+		height: auto;
+	}
+
+	.legacy-content iframe,
+	.legacy-content embed,
+	.legacy-content video,
+	.entry-content iframe,
+	.entry-content embed,
+	.entry-content video {
+		max-width: 100%;
+	}
+
+	.legacy-content table,
+	.entry-content table {
+		width: 100%;
+		margin-bottom: 1rem;
+	}
+	
+	.legacy-content ul,
+	.legacy-content ol,
+	.entry-content ul,
+	.entry-content ol {
+		padding-left: 1.5rem;
+	}
+
+	.legacy-gallery .gallery-item {
+		margin: 0;
+	}
+</style>
