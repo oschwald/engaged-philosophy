@@ -31,6 +31,7 @@ export interface PostData {
 
 export interface ProjectData extends PostData {
 	highlight?: boolean;
+	menu_order?: number;
 }
 
 export interface ContentEntry<T> {

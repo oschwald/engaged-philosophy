@@ -27,17 +27,32 @@ function extractTag(source, tag) {
 }
 
 function decodeEntities(value) {
-	return value
-		.replaceAll("&#038;", "&")
-		.replaceAll("&amp;", "&")
-		.replaceAll("&nbsp;", " ")
-		.replaceAll("&#8211;", "–")
-		.replaceAll("&#8212;", "—")
-		.replaceAll("&#8216;", "‘")
-		.replaceAll("&#8217;", "’")
-		.replaceAll("&#8220;", "“")
-		.replaceAll("&#8221;", "”")
-		.replaceAll("&#8230;", "…");
+	const namedEntities = {
+		amp: "&",
+		apos: "'",
+		quot: '"',
+		nbsp: " ",
+		hellip: "…",
+		ndash: "–",
+		mdash: "—",
+		lsquo: "‘",
+		rsquo: "’",
+		ldquo: "“",
+		rdquo: "”",
+	};
+
+	return (value || "").replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (entity, token) => {
+		const lowerToken = token.toLowerCase();
+		if (lowerToken.startsWith("#x")) {
+			const codePoint = Number.parseInt(lowerToken.slice(2), 16);
+			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
+		}
+		if (lowerToken.startsWith("#")) {
+			const codePoint = Number.parseInt(lowerToken.slice(1), 10);
+			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
+		}
+		return namedEntities[lowerToken] ?? entity;
+	});
 }
 
 function stripHtml(value) {
@@ -106,6 +121,16 @@ function normalizeBool(value) {
 
 function normalizeHtml(value) {
 	return decodeEntities(value || "").replace(CONTROL_CHARS, "").trim();
+}
+
+function repairMalformedInternalLinks(value, postsBySlug) {
+	return (value || "").replace(
+		/((?:https?:\/\/(?:www\.)?engagedphilosophy\.com)?\/(?:(?:…|\.\.\.|%E2%80%A6)\/){2,}\d{2}\/([a-z0-9-]+)\/?)/gi,
+		(match, _path, slug) => {
+			const canonicalPath = postsBySlug.get(slug.toLowerCase());
+			return canonicalPath ? `/${canonicalPath}/` : match;
+		},
+	);
 }
 
 function buildMenuTree(itemsById, parentId = "0") {
@@ -229,11 +254,12 @@ for (const item of items) {
 	const postId = extractTag(item, "wp:post_id");
 	const status = extractTag(item, "wp:status");
 	const rawTitle = extractTag(item, "title") || "";
-	const title = rawTitle || `${postType} ${postId}`;
+	const title = decodeEntities(rawTitle) || `${postType} ${postId}`;
 	const link = decodeEntities(extractTag(item, "link"));
 	const creator = extractTag(item, "dc:creator");
 	const authorName = authors.get(creator) || creator || "";
 	const rawSlug = extractTag(item, "wp:post_name");
+	const menuOrder = Number(extractTag(item, "wp:menu_order") || "0");
 	const metas = Object.fromEntries([...item.matchAll(META_RE)].map((m) => [m[1], m[2]]));
 	const categories = [...item.matchAll(ITEM_CATEGORY_RE)].map((m) => ({
 		domain: m[1],
@@ -351,6 +377,7 @@ for (const item of items) {
 				...baseData,
 				excerpt_html: normalizeHtml(extractTag(item, "excerpt:encoded")),
 				highlight: normalizeBool(metas.highlight || ""),
+				menu_order: menuOrder,
 				published_on: toIsoDate(extractTag(item, "wp:post_date_gmt") || extractTag(item, "wp:post_date")),
 			},
 			taxonomies: taxonomyAssignments,
@@ -359,6 +386,26 @@ for (const item of items) {
 }
 
 const pageItemsById = {};
+const postPathsBySlug = new Map(posts.map((entry) => [entry.slug.toLowerCase(), entry.data.path]));
+
+for (const entry of pages) {
+	entry.data.content_html = repairMalformedInternalLinks(entry.data.content_html, postPathsBySlug);
+	entry.data.about_html = repairMalformedInternalLinks(entry.data.about_html, postPathsBySlug);
+	entry.data.box_left_html = repairMalformedInternalLinks(entry.data.box_left_html, postPathsBySlug);
+	entry.data.box_middle_html = repairMalformedInternalLinks(entry.data.box_middle_html, postPathsBySlug);
+	entry.data.box_right_html = repairMalformedInternalLinks(entry.data.box_right_html, postPathsBySlug);
+}
+
+for (const entry of posts) {
+	entry.data.content_html = repairMalformedInternalLinks(entry.data.content_html, postPathsBySlug);
+	entry.data.excerpt_html = repairMalformedInternalLinks(entry.data.excerpt_html, postPathsBySlug);
+}
+
+for (const entry of projects) {
+	entry.data.content_html = repairMalformedInternalLinks(entry.data.content_html, postPathsBySlug);
+	entry.data.excerpt_html = repairMalformedInternalLinks(entry.data.excerpt_html, postPathsBySlug);
+}
+
 for (const item of rawMenuItems) {
 	let label = item.title;
 	let url = item.url;
@@ -449,6 +496,7 @@ const seed = {
 				{ slug: "content_html", label: "Content HTML", type: "text" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
 				{ slug: "highlight", label: "Highlight", type: "boolean", defaultValue: false },
+				{ slug: "menu_order", label: "Menu Order", type: "integer", defaultValue: 0 },
 				{ slug: "published_on", label: "Published On", type: "datetime" },
 				{ slug: "author_name", label: "Author Name", type: "string" },
 				{ slug: "legacy_wp_id", label: "Legacy WordPress ID", type: "integer" },

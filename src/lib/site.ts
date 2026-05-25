@@ -20,6 +20,10 @@ export function sortByPublishedOn<T extends { data: { published_on?: string; tit
 	items: T[],
 ) {
 	return [...items].sort((a, b) => {
+		const orderA = "menu_order" in a.data && typeof a.data.menu_order === "number" ? a.data.menu_order : 0;
+		const orderB = "menu_order" in b.data && typeof b.data.menu_order === "number" ? b.data.menu_order : 0;
+		if (orderA !== orderB) return orderA - orderB;
+
 		const dateA = a.data.published_on ? Date.parse(a.data.published_on) : 0;
 		const dateB = b.data.published_on ? Date.parse(b.data.published_on) : 0;
 		if (dateA !== dateB) return dateB - dateA;
@@ -43,20 +47,41 @@ export function getEntryDatabaseId<T extends { id?: string }>(item: { id: string
 	return item.data.id || item.id;
 }
 
+export function decodeHtmlEntities(value?: string | null) {
+	const namedEntities: Record<string, string> = {
+		amp: "&",
+		apos: "'",
+		quot: '"',
+		nbsp: " ",
+		hellip: "…",
+		ndash: "–",
+		mdash: "—",
+		lsquo: "‘",
+		rsquo: "’",
+		ldquo: "“",
+		rdquo: "”",
+	};
+
+	return (value ?? "").replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (entity, token) => {
+		const lowerToken = token.toLowerCase();
+		if (lowerToken.startsWith("#x")) {
+			const codePoint = Number.parseInt(lowerToken.slice(2), 16);
+			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
+		}
+		if (lowerToken.startsWith("#")) {
+			const codePoint = Number.parseInt(lowerToken.slice(1), 10);
+			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
+		}
+		return namedEntities[lowerToken] ?? entity;
+	});
+}
+
 export function stripHtml(value?: string | null) {
-	return (value ?? "")
+	return decodeHtmlEntities(value)
 		.replace(/<script[\s\S]*?<\/script>/gi, " ")
 		.replace(/<style[\s\S]*?<\/style>/gi, " ")
 		.replace(/<!--[\s\S]*?-->/g, " ")
 		.replace(/<[^>]+>/g, " ")
-		.replace(/&nbsp;/g, " ")
-		.replace(/&#8211;/g, "–")
-		.replace(/&#8212;/g, "—")
-		.replace(/&#8217;/g, "’")
-		.replace(/&#8220;/g, "“")
-		.replace(/&#8221;/g, "”")
-		.replace(/&quot;/g, '"')
-		.replace(/&amp;/g, "&")
 		.replace(/\s+/g, " ")
 		.trim();
 }

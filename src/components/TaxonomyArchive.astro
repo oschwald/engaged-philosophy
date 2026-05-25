@@ -18,6 +18,7 @@ const currentPage = Math.min(Math.max(page, 1), totalPages);
 const start = (currentPage - 1) * perPage;
 const pageItems = projects.slice(start, start + perPage);
 const hasResults = pageItems.length > 0;
+const showSidebar = taxonomy !== "topic";
 const titlePrefix = taxonomy === "topic" ? "Project Topic: " : "";
 const basePath = `/${taxonomy}/${Astro.params.slug}/`;
 
@@ -122,4 +123,4 @@ function pageHref(pageNumber: number) {
 	</div>
 </section>
 
-<ThemeSidebar />
+{showSidebar && <ThemeSidebar />}

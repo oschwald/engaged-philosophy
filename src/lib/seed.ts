@@ -143,6 +143,10 @@ export function getPostByPath(path: string) {
 	return posts.find((entry) => entry.data.path === path && isPublicEntry(entry)) ?? null;
 }
 
+export function getPostBySlug(slug: string) {
+	return posts.find((entry) => entry.slug === slug && isPublicEntry(entry)) ?? null;
+}
+
 export function getProjectBySlug(slug: string) {
 	return projects.find((entry) => entry.slug === slug && isPublicEntry(entry)) ?? null;
 }
