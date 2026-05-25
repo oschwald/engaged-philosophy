@@ -1,0 +1,10 @@
+build/
+dist/
+.astro/
+.wrangler/
+node_modules/
+src/node_modules/
+seed/seed.json
+engagedphilosophy.WordPress*.xml
+debug-crawl-parity.js
+*.zip

@@ -11,6 +11,8 @@
     "generate:seed": "node scripts/generate-seed.mjs",
     "dev": "astro dev",
     "build": "astro build",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "lint": "eslint eslint.config.js scripts/generate-seed.mjs \"src/**/*.{js,ts,astro}\"",
     "preview": "astro preview",
     "deploy": "astro build && wrangler deploy",
@@ -35,6 +37,8 @@
     "astro-eslint-parser": "^1.4.0",
     "eslint": "^10.4.0",
     "eslint-plugin-astro": "^1.7.0",
+    "prettier": "^3.8.3",
+    "prettier-plugin-astro": "^0.14.1",
     "typescript": "^5.8.3",
     "wrangler": "^4.17.0"
   }
