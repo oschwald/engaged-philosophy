@@ -5,9 +5,12 @@ import { getPageByPath } from "../lib/seed";
 import type { ContentEntry, PageData } from "../lib/types";
 
 const page = getPageByPath("blog") as ContentEntry<PageData> | null;
---- 
+---
 
-<Base title={page?.data.title || "Blog"} bodyClass="page page-template page-template-default">
+<Base
+	title={page?.data.title || "Blog"}
+	bodyClass="page page-template page-template-default"
+>
 	<div class="container-fluid">
 		<section id="primary" class="p-4">
 			<div id="content" role="main">

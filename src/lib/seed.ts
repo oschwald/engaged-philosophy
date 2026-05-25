@@ -1,6 +1,12 @@
 import seedJson from "../../seed/seed.json";
 
-import type { ContentEntry, MediaField, PageData, PostData, ProjectData } from "./types";
+import type {
+	ContentEntry,
+	MediaField,
+	PageData,
+	PostData,
+	ProjectData,
+} from "./types";
 
 type TaxonomyMap = Record<string, string[]>;
 
@@ -63,16 +69,21 @@ const seed = seedJson as {
 	};
 };
 
-function normalizeMediaField(media?: RawMediaField | null): MediaField | undefined {
+function normalizeMediaField(
+	media?: RawMediaField | null,
+): MediaField | undefined {
 	if (!media) return undefined;
 	if (media.src) return { src: media.src, alt: media.alt };
-	if (media.$media?.url) return { src: media.$media.url, alt: media.$media.alt };
+	if (media.$media?.url)
+		return { src: media.$media.url, alt: media.$media.alt };
 	return undefined;
 }
 
 function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 	entry: RawEntry<T>,
-): SeedBackedEntry<Omit<T, "featured_image"> & { featured_image?: MediaField }> {
+): SeedBackedEntry<
+	Omit<T, "featured_image"> & { featured_image?: MediaField }
+> {
 	return {
 		id: entry.id,
 		slug: entry.slug,
@@ -87,8 +98,12 @@ function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 
 const pages = (seed.content?.pages ?? []).map((entry) => normalizeEntry(entry));
 const posts = (seed.content?.posts ?? []).map((entry) => normalizeEntry(entry));
-const projects = (seed.content?.projects ?? []).map((entry) => normalizeEntry(entry));
-const taxonomyMap = new Map((seed.taxonomies ?? []).map((taxonomy) => [taxonomy.name, taxonomy]));
+const projects = (seed.content?.projects ?? []).map((entry) =>
+	normalizeEntry(entry),
+);
+const taxonomyMap = new Map(
+	(seed.taxonomies ?? []).map((taxonomy) => [taxonomy.name, taxonomy]),
+);
 const excludedPaths = new Set([
 	"1477",
 	"project-guidelines-critical-thinking-2-3",
@@ -103,8 +118,14 @@ function isPublicEntry(entry: { status: string; data: { path?: string } }) {
 	return isPublished(entry) && !excludedPaths.has(entry.data.path ?? "");
 }
 
-function countAssignments(collection: SeedBackedEntry<ProjectData>[], taxonomy: string, slug: string) {
-	return collection.filter((entry) => entry.taxonomies[taxonomy]?.includes(slug)).length;
+function countAssignments(
+	collection: SeedBackedEntry<ProjectData>[],
+	taxonomy: string,
+	slug: string,
+) {
+	return collection.filter((entry) =>
+		entry.taxonomies[taxonomy]?.includes(slug),
+	).length;
 }
 
 export function getSeedSettings() {
@@ -132,31 +153,48 @@ export function getPublishedProjects() {
 }
 
 export function getPageBySlug(slug: string) {
-	return pages.find((entry) => entry.slug === slug && isPublicEntry(entry)) ?? null;
+	return (
+		pages.find((entry) => entry.slug === slug && isPublicEntry(entry)) ?? null
+	);
 }
 
 export function getPageByPath(path: string) {
-	return pages.find((entry) => entry.data.path === path && isPublicEntry(entry)) ?? null;
+	return (
+		pages.find((entry) => entry.data.path === path && isPublicEntry(entry)) ??
+		null
+	);
 }
 
 export function getPostByPath(path: string) {
-	return posts.find((entry) => entry.data.path === path && isPublicEntry(entry)) ?? null;
+	return (
+		posts.find((entry) => entry.data.path === path && isPublicEntry(entry)) ??
+		null
+	);
 }
 
 export function getPostBySlug(slug: string) {
-	return posts.find((entry) => entry.slug === slug && isPublicEntry(entry)) ?? null;
+	return (
+		posts.find((entry) => entry.slug === slug && isPublicEntry(entry)) ?? null
+	);
 }
 
 export function getProjectBySlug(slug: string) {
-	return projects.find((entry) => entry.slug === slug && isPublicEntry(entry)) ?? null;
+	return (
+		projects.find((entry) => entry.slug === slug && isPublicEntry(entry)) ??
+		null
+	);
 }
 
 export function getProjectsByTaxonomy(taxonomy: string, slug: string) {
-	return getPublishedProjects().filter((entry) => entry.taxonomies[taxonomy]?.includes(slug));
+	return getPublishedProjects().filter((entry) =>
+		entry.taxonomies[taxonomy]?.includes(slug),
+	);
 }
 
 export function getTaxonomyTerm(taxonomy: string, slug: string) {
-	const term = taxonomyMap.get(taxonomy)?.terms?.find((item) => item.slug === slug);
+	const term = taxonomyMap
+		.get(taxonomy)
+		?.terms?.find((item) => item.slug === slug);
 	if (!term) return null;
 	return {
 		...term,
@@ -171,7 +209,10 @@ export function getTaxonomyTerms(taxonomy: string) {
 	}));
 }
 
-export function getEntryTerms(entry: SeedBackedEntry<ProjectData>, taxonomy: string) {
+export function getEntryTerms(
+	entry: SeedBackedEntry<ProjectData>,
+	taxonomy: string,
+) {
 	const slugs = entry.taxonomies[taxonomy] ?? [];
 	const terms = taxonomyMap.get(taxonomy)?.terms ?? [];
 	return slugs

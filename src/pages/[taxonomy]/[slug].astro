@@ -1,7 +1,11 @@
 ---
 import Base from "../../layouts/Base.astro";
 import TaxonomyArchive from "../../components/TaxonomyArchive.astro";
-import { getPageByPath, getProjectsByTaxonomy, getTaxonomyTerm } from "../../lib/seed";
+import {
+	getPageByPath,
+	getProjectsByTaxonomy,
+	getTaxonomyTerm,
+} from "../../lib/seed";
 import { isProjectTaxonomy, sortByPublishedOn } from "../../lib/site";
 import type { ContentEntry, PageData, ProjectData } from "../../lib/types";
 import HtmlContent from "../../components/HtmlContent.astro";
@@ -16,37 +20,48 @@ if (!isProjectTaxonomy(taxonomy)) {
 	}
 }
 
-const term = isProjectTaxonomy(taxonomy) ? getTaxonomyTerm(taxonomy, slug) : null;
+const term = isProjectTaxonomy(taxonomy)
+	? getTaxonomyTerm(taxonomy, slug)
+	: null;
 
 if (isProjectTaxonomy(taxonomy) && !term) {
 	return Astro.redirect("/404");
 }
 
 const projects = isProjectTaxonomy(taxonomy)
-	? sortByPublishedOn(getProjectsByTaxonomy(taxonomy, slug) as ContentEntry<ProjectData>[])
+	? sortByPublishedOn(
+			getProjectsByTaxonomy(taxonomy, slug) as ContentEntry<ProjectData>[],
+		)
 	: [];
 ---
 
-{page ? (
-	<Base title={page.data.title}>
-		<section id="primary" class="col-12 px-4">
-			<main id="content">
-				<article>
-					<header class="page-header">
-						<h1 class="entry-title">{page.data.title}</h1>
-					</header>
-					<div class="entry-content">
-						<HtmlContent html={page.data.content_html} />
-					</div>
-				</article>
-			</main>
-		</section>
-	</Base>
-) : (
-	<Base
-		title={term?.label}
-		bodyClass={`archive tax-${taxonomy} term-${slug} wp-theme-engaged-philosophy-20 content-sidebar`}
-	>
-		<TaxonomyArchive taxonomy={taxonomy} label={term?.label ?? ""} projects={projects} page={1} />
-	</Base>
-)}
+{
+	page ? (
+		<Base title={page.data.title}>
+			<section id="primary" class="col-12 px-4">
+				<main id="content">
+					<article>
+						<header class="page-header">
+							<h1 class="entry-title">{page.data.title}</h1>
+						</header>
+						<div class="entry-content">
+							<HtmlContent html={page.data.content_html} />
+						</div>
+					</article>
+				</main>
+			</section>
+		</Base>
+	) : (
+		<Base
+			title={term?.label}
+			bodyClass={`archive tax-${taxonomy} term-${slug} wp-theme-engaged-philosophy-20 content-sidebar`}
+		>
+			<TaxonomyArchive
+				taxonomy={taxonomy}
+				label={term?.label ?? ""}
+				projects={projects}
+				page={1}
+			/>
+		</Base>
+	)
+}

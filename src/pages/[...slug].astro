@@ -14,27 +14,16 @@ if (!page) {
 	return Astro.redirect("/404");
 }
 
-const useFullWidthTemplate = page.data.template === "templates/_full_width.php" && page.data.path !== "faq";
+const useFullWidthTemplate =
+	page.data.template === "templates/_full_width.php" &&
+	page.data.path !== "faq";
 ---
 
 <Base title={page.data.title}>
-	{useFullWidthTemplate ? (
-		<section id="primary" class="col-12 px-4">
-			<main id="content">
-				<article>
-					<header class="page-header">
-						<h1 class="entry-title">{page.data.title}</h1>
-					</header>
-					<div class="entry-content">
-						<HtmlContent html={page.data.content_html} />
-					</div>
-				</article>
-			</main>
-		</section>
-	) : (
-		<div class="container-fluid">
-			<section id="primary" class="p-4">
-				<div id="content" role="main">
+	{
+		useFullWidthTemplate ? (
+			<section id="primary" class="col-12 px-4">
+				<main id="content">
 					<article>
 						<header class="page-header">
 							<h1 class="entry-title">{page.data.title}</h1>
@@ -43,8 +32,23 @@ const useFullWidthTemplate = page.data.template === "templates/_full_width.php" 
 							<HtmlContent html={page.data.content_html} />
 						</div>
 					</article>
-				</div>
+				</main>
 			</section>
-		</div>
-	)}
+		) : (
+			<div class="container-fluid">
+				<section id="primary" class="p-4">
+					<div id="content" role="main">
+						<article>
+							<header class="page-header">
+								<h1 class="entry-title">{page.data.title}</h1>
+							</header>
+							<div class="entry-content">
+								<HtmlContent html={page.data.content_html} />
+							</div>
+						</article>
+					</div>
+				</section>
+			</div>
+		)
+	}
 </Base>

@@ -11,8 +11,12 @@ interface Props {
 const { title, description, bodyClass = "" } = Astro.props;
 const settings = getSeedSettings();
 const siteTitle = settings?.title || "Engaged Philosophy";
-const siteDescription = settings?.tagline || "Civic Engagement in Philosophy Classes";
-const pageTitle = title && title !== "Home" ? `${title} – ${siteTitle}` : `${siteTitle} – ${siteDescription}`;
+const siteDescription =
+	settings?.tagline || "Civic Engagement in Philosophy Classes";
+const pageTitle =
+	title && title !== "Home"
+		? `${title} – ${siteTitle}`
+		: `${siteTitle} – ${siteDescription}`;
 const menuItems = getPrimaryMenu();
 const currentPath = Astro.url.pathname;
 ---
@@ -26,7 +30,11 @@ const currentPath = Astro.url.pathname;
 		<title>{pageTitle}</title>
 		<meta name="description" content={description || siteDescription} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="alternate icon" type="image/svg+xml" href="/favicon-simple.svg" />
+		<link
+			rel="alternate icon"
+			type="image/svg+xml"
+			href="/favicon-simple.svg"
+		/>
 		<link rel="manifest" href="/site.webmanifest" />
 		<meta name="theme-color" content="#fd7e14" />
 		<meta name="msapplication-TileColor" content="#fd7e14" />
@@ -47,12 +55,20 @@ const currentPath = Astro.url.pathname;
 			<nav id="access" aria-label="Main navigation">
 				<h3 class="visually-hidden">Main menu</h3>
 				<div class="skip-link">
-					<a class="visually-hidden" href="#content" title="Skip to primary content">
+					<a
+						class="visually-hidden"
+						href="#content"
+						title="Skip to primary content"
+					>
 						Skip to primary content
 					</a>
 				</div>
 				<div class="skip-link">
-					<a class="visually-hidden" href="#secondary" title="Skip to secondary content">
+					<a
+						class="visually-hidden"
+						href="#secondary"
+						title="Skip to secondary content"
+					>
 						Skip to secondary content
 					</a>
 				</div>
@@ -72,53 +88,88 @@ const currentPath = Astro.url.pathname;
 					<div class="collapse navbar-collapse" id="navbarNav">
 						<div class="menu-main-menu-container">
 							<ul id="menu-main-menu" class="navbar-nav ms-auto">
-								{menuItems.map((item) => {
-									const hasChildren = (item.children?.length ?? 0) > 0;
-									const isActive = item.url === currentPath || item.url === `${currentPath}/`;
-									const isBranchActive = hasChildren && item.children?.some((child) => child.url === currentPath || child.url === `${currentPath}/`);
-									return (
-										<li
-											class:list={[
-												"menu-item",
-												"nav-item",
-												hasChildren && "dropdown",
-												(isActive || isBranchActive) && "active",
-											]}
-										>
-											<a
-												class:list={["nav-link", hasChildren && "dropdown-toggle"]}
-												href={hasChildren ? "#" : item.url}
-												target={item.target}
-												{...(hasChildren
-													? {
-														"data-bs-toggle": "dropdown",
-														"aria-expanded": "false",
-														"aria-haspopup": "true",
-													}
-													: {})}
+								{
+									menuItems.map((item) => {
+										const hasChildren = (item.children?.length ?? 0) > 0;
+										const isActive =
+											item.url === currentPath ||
+											item.url === `${currentPath}/`;
+										const isBranchActive =
+											hasChildren &&
+											item.children?.some(
+												(child) =>
+													child.url === currentPath ||
+													child.url === `${currentPath}/`,
+											);
+										return (
+											<li
+												class:list={[
+													"menu-item",
+													"nav-item",
+													hasChildren && "dropdown",
+													(isActive || isBranchActive) && "active",
+												]}
 											>
-												{item.label}
-											</a>
-											{hasChildren && (
-												<ul class="dropdown-menu">
-													{(item.children ?? []).map((child) => (
-														<li class="menu-item nav-item">
-															<a class="dropdown-item" href={child.url} target={child.target}>
-																{child.label}
-															</a>
-														</li>
-													))}
-												</ul>
-											)}
-										</li>
-									);
-								})}
+												<a
+													class:list={[
+														"nav-link",
+														hasChildren && "dropdown-toggle",
+													]}
+													href={hasChildren ? "#" : item.url}
+													target={item.target}
+													{...(hasChildren
+														? {
+																"data-bs-toggle": "dropdown",
+																"aria-expanded": "false",
+																"aria-haspopup": "true",
+															}
+														: {})}
+												>
+													{item.label}
+												</a>
+												{hasChildren && (
+													<ul class="dropdown-menu">
+														{(item.children ?? []).map((child) => (
+															<li class="menu-item nav-item">
+																<a
+																	class="dropdown-item"
+																	href={child.url}
+																	target={child.target}
+																>
+																	{child.label}
+																</a>
+															</li>
+														))}
+													</ul>
+												)}
+											</li>
+										);
+									})
+								}
 							</ul>
 						</div>
-						<form id="searchform" class="d-flex ms-auto" method="get" action="/" role="search" aria-label="Search the site">
+						<form
+							id="searchform"
+							class="d-flex ms-auto"
+							method="get"
+							action="/"
+							role="search"
+							aria-label="Search the site"
+						>
 							<label for="s" class="visually-hidden">Search</label>
-							<input type="search" class="form-control" name="s" id="s" placeholder="Search" aria-label="Search the site" />
-							<button type="submit" class="btn btn-outline-secondary ms-1" aria-label="Submit search">
+							<input
+								type="search"
+								class="form-control"
+								name="s"
+								id="s"
+								placeholder="Search"
+								aria-label="Search the site"
+							/>
+							<button
+								type="submit"
+								class="btn btn-outline-secondary ms-1"
+								aria-label="Submit search"
+							>
 								<i class="bi bi-search"></i>
 							</button>
 						</form>
@@ -129,11 +180,27 @@ const currentPath = Astro.url.pathname;
 			<div id="page" class="hfeed row">
 				<slot />
 				<footer id="colophon" class="col-12">
-					<div id="page-footer" class="footer-custom d-flex align-items-center justify-content-between px-3 py-3">
-						<span class="credits alignleft">&copy; 2026 <a href="/">{siteTitle}</a>, all rights reserved.</span>
+					<div
+						id="page-footer"
+						class="footer-custom d-flex align-items-center justify-content-between px-3 py-3"
+					>
+						<span class="credits alignleft"
+							>&copy; 2026 <a href="/">{siteTitle}</a>, all rights reserved.</span
+						>
 						<div class="d-flex align-items-center gap-2">
-							<div class="fb-like" data-href="https://www.facebook.com/engagedphilosophy" data-width="200" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
-							<a href="mailto:info@engagedphilosophy.com">info@engagedphilosophy.com</a>
+							<div
+								class="fb-like"
+								data-href="https://www.facebook.com/engagedphilosophy"
+								data-width="200"
+								data-layout="button_count"
+								data-action="like"
+								data-show-faces="false"
+								data-share="false"
+							>
+							</div>
+							<a href="mailto:info@engagedphilosophy.com"
+								>info@engagedphilosophy.com</a
+							>
 						</div>
 					</div>
 				</footer>
@@ -176,7 +243,7 @@ const currentPath = Astro.url.pathname;
 		width: 100%;
 		margin-bottom: 1rem;
 	}
-	
+
 	.legacy-content ul,
 	.legacy-content ol,
 	.entry-content ul,

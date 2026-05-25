@@ -12,7 +12,9 @@ const { results, totalPages, currentPage } = searchSite(query, page);
 
 function pageHref(pageNumber: number) {
 	const params = new URLSearchParams({ s: query });
-	return pageNumber === 1 ? `/?${params.toString()}` : `/page/${pageNumber}/?${params.toString()}`;
+	return pageNumber === 1
+		? `/?${params.toString()}`
+		: `/page/${pageNumber}/?${params.toString()}`;
 }
 ---
 
@@ -20,105 +22,144 @@ function pageHref(pageNumber: number) {
 	<div class="row">
 		<section id="primary" class="col-lg-8 p-4">
 			<div id="content" role="main">
-				{results.length > 0 ? (
-					<>
-						<header class="page-header mb-4 pb-3 border-bottom">
-							<h1 class="page-title h2 mb-0">
-								Search Results for: <span>{query}</span>
-							</h1>
-						</header>
+				{
+					results.length > 0 ? (
+						<>
+							<header class="page-header mb-4 pb-3 border-bottom">
+								<h1 class="page-title h2 mb-0">
+									Search Results for: <span>{query}</span>
+								</h1>
+							</header>
 
-						{results.map((result) => (
-							<article class:list={["mb-5", "pb-4", "border-bottom", result.kind, `type-${result.kind}`]}>
-								<header class="page-header mb-3">
-									<h2 class="entry-title h4 mb-0">{result.title}</h2>
-								</header>
+							{results.map((result) => (
+								<article
+									class:list={[
+										"mb-5",
+										"pb-4",
+										"border-bottom",
+										result.kind,
+										`type-${result.kind}`,
+									]}
+								>
+									<header class="page-header mb-3">
+										<h2 class="entry-title h4 mb-0">{result.title}</h2>
+									</header>
 
-								<div class="entry-content text-muted lh-base">
-									{result.imageSrc && (
-										<img
-											src={result.imageSrc}
-											class="img-thumbnail float-end ms-3"
-											alt={result.title}
-											width="150"
-											height="150"
-										/>
-									)}
-									{result.excerpt && (
-										<p>
-											{result.excerpt}{" "}
-											<a href={`/${result.path}/`}>
-												Continue reading <span class="meta-nav">&rarr;</span>
-											</a>
-										</p>
-									)}
-								</div>
-							</article>
-						))}
-
-						{totalPages > 1 && (
-							<nav aria-label="Page navigation">
-								<ul class="pagination justify-content-center">
-									<li class:list={["page-item", currentPage === 1 && "disabled"]}>
-										{currentPage === 1 ? (
-											<span class="page-link">Previous &laquo;</span>
-										) : (
-											<a class="page-link" href={pageHref(currentPage - 1)}>
-												Previous &laquo;
-											</a>
+									<div class="entry-content text-muted lh-base">
+										{result.imageSrc && (
+											<img
+												src={result.imageSrc}
+												class="img-thumbnail float-end ms-3"
+												alt={result.title}
+												width="150"
+												height="150"
+											/>
 										)}
-									</li>
-									{Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
-										<li class:list={["page-item", pageNumber === currentPage && "active"]}>
-											{pageNumber === currentPage ? (
-												<span class="page-link">{pageNumber}</span>
+										{result.excerpt && (
+											<p>
+												{result.excerpt}{" "}
+												<a href={`/${result.path}/`}>
+													Continue reading <span class="meta-nav">&rarr;</span>
+												</a>
+											</p>
+										)}
+									</div>
+								</article>
+							))}
+
+							{totalPages > 1 && (
+								<nav aria-label="Page navigation">
+									<ul class="pagination justify-content-center">
+										<li
+											class:list={[
+												"page-item",
+												currentPage === 1 && "disabled",
+											]}
+										>
+											{currentPage === 1 ? (
+												<span class="page-link">Previous &laquo;</span>
 											) : (
-												<a class="page-link" href={pageHref(pageNumber)}>
-													{pageNumber}
+												<a class="page-link" href={pageHref(currentPage - 1)}>
+													Previous &laquo;
 												</a>
 											)}
 										</li>
-									))}
-									<li class:list={["page-item", currentPage === totalPages && "disabled"]}>
-										{currentPage === totalPages ? (
-											<span class="page-link">Next &raquo;</span>
-										) : (
-											<a class="page-link" href={pageHref(currentPage + 1)}>
-												Next &raquo;
-											</a>
-										)}
-									</li>
-								</ul>
-							</nav>
-						)}
-					</>
-				) : (
-					<article class="post no-results not-found">
-						<header class="page-header">
-							<h1 class="entry-title">Nothing Found</h1>
-						</header>
+										{Array.from(
+											{ length: totalPages },
+											(_, index) => index + 1,
+										).map((pageNumber) => (
+											<li
+												class:list={[
+													"page-item",
+													pageNumber === currentPage && "active",
+												]}
+											>
+												{pageNumber === currentPage ? (
+													<span class="page-link">{pageNumber}</span>
+												) : (
+													<a class="page-link" href={pageHref(pageNumber)}>
+														{pageNumber}
+													</a>
+												)}
+											</li>
+										))}
+										<li
+											class:list={[
+												"page-item",
+												currentPage === totalPages && "disabled",
+											]}
+										>
+											{currentPage === totalPages ? (
+												<span class="page-link">Next &raquo;</span>
+											) : (
+												<a class="page-link" href={pageHref(currentPage + 1)}>
+													Next &raquo;
+												</a>
+											)}
+										</li>
+									</ul>
+								</nav>
+							)}
+						</>
+					) : (
+						<article class="post no-results not-found">
+							<header class="page-header">
+								<h1 class="entry-title">Nothing Found</h1>
+							</header>
 
-						<div class="entry-content">
-							<p>Sorry, but nothing matched your search criteria. Please try again with some different keywords.</p>
-							<form method="get" id="searchform" class="d-flex" action="/">
-								<label for="search-results-query" class="visually-hidden">Search</label>
-								<div class="input-group">
-									<input
-										id="search-results-query"
-										class="form-control"
-										type="search"
-										name="s"
-										value={query}
-										placeholder="Search"
-									/>
-									<button class="btn btn-primary" name="submit" id="searchsubmit" type="submit" aria-label="Submit search">
-										<i class="bi bi-search"></i>
-									</button>
-								</div>
-							</form>
-						</div>
-					</article>
-				)}
+							<div class="entry-content">
+								<p>
+									Sorry, but nothing matched your search criteria. Please try
+									again with some different keywords.
+								</p>
+								<form method="get" id="searchform" class="d-flex" action="/">
+									<label for="search-results-query" class="visually-hidden">
+										Search
+									</label>
+									<div class="input-group">
+										<input
+											id="search-results-query"
+											class="form-control"
+											type="search"
+											name="s"
+											value={query}
+											placeholder="Search"
+										/>
+										<button
+											class="btn btn-primary"
+											name="submit"
+											id="searchsubmit"
+											type="submit"
+											aria-label="Submit search"
+										>
+											<i class="bi bi-search" />
+										</button>
+									</div>
+								</form>
+							</div>
+						</article>
+					)
+				}
 			</div>
 		</section>
 

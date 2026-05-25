@@ -8,21 +8,30 @@ const SEED_PATH = path.join(SEED_DIR, "seed.json");
 
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g;
 const ITEM_RE = /<item>([\s\S]*?)<\/item>/g;
-const TERM_RE = /<wp:term>\s*<wp:term_id>(.*?)<\/wp:term_id>\s*<wp:term_taxonomy>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/wp:term_taxonomy>\s*<wp:term_slug><!\[CDATA\[(.*?)\]\]><\/wp:term_slug>\s*<wp:term_parent><!\[CDATA\[(.*?)\]\]><\/wp:term_parent>\s*<wp:term_name><!\[CDATA\[(.*?)\]\]><\/wp:term_name>\s*<\/wp:term>/gs;
-const WP_CATEGORY_RE = /<wp:category>\s*<wp:term_id>(.*?)<\/wp:term_id>\s*<wp:category_nicename><!\[CDATA\[(.*?)\]\]><\/wp:category_nicename>\s*<wp:category_parent><!\[CDATA\[(.*?)\]\]><\/wp:category_parent>\s*<wp:cat_name><!\[CDATA\[(.*?)\]\]><\/wp:cat_name>\s*<\/wp:category>/gs;
-const AUTHOR_RE = /<wp:author>[\s\S]*?<wp:author_login><!\[CDATA\[(.*?)\]\]><\/wp:author_login>[\s\S]*?<wp:author_display_name><!\[CDATA\[(.*?)\]\]><\/wp:author_display_name>[\s\S]*?<\/wp:author>/gs;
-const META_RE = /<wp:postmeta>\s*<wp:meta_key><!\[CDATA\[(.*?)\]\]><\/wp:meta_key>\s*<wp:meta_value><!\[CDATA\[(.*?)\]\]><\/wp:meta_value>\s*<\/wp:postmeta>/gs;
-const ITEM_CATEGORY_RE = /<category domain="([^"]+)" nicename="([^"]+)"><!\[CDATA\[(.*?)\]\]><\/category>/gs;
+const TERM_RE =
+	/<wp:term>\s*<wp:term_id>(.*?)<\/wp:term_id>\s*<wp:term_taxonomy>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/wp:term_taxonomy>\s*<wp:term_slug><!\[CDATA\[(.*?)\]\]><\/wp:term_slug>\s*<wp:term_parent><!\[CDATA\[(.*?)\]\]><\/wp:term_parent>\s*<wp:term_name><!\[CDATA\[(.*?)\]\]><\/wp:term_name>\s*<\/wp:term>/gs;
+const WP_CATEGORY_RE =
+	/<wp:category>\s*<wp:term_id>(.*?)<\/wp:term_id>\s*<wp:category_nicename><!\[CDATA\[(.*?)\]\]><\/wp:category_nicename>\s*<wp:category_parent><!\[CDATA\[(.*?)\]\]><\/wp:category_parent>\s*<wp:cat_name><!\[CDATA\[(.*?)\]\]><\/wp:cat_name>\s*<\/wp:category>/gs;
+const AUTHOR_RE =
+	/<wp:author>[\s\S]*?<wp:author_login><!\[CDATA\[(.*?)\]\]><\/wp:author_login>[\s\S]*?<wp:author_display_name><!\[CDATA\[(.*?)\]\]><\/wp:author_display_name>[\s\S]*?<\/wp:author>/gs;
+const META_RE =
+	/<wp:postmeta>\s*<wp:meta_key><!\[CDATA\[(.*?)\]\]><\/wp:meta_key>\s*<wp:meta_value><!\[CDATA\[(.*?)\]\]><\/wp:meta_value>\s*<\/wp:postmeta>/gs;
+const ITEM_CATEGORY_RE =
+	/<category domain="([^"]+)" nicename="([^"]+)"><!\[CDATA\[(.*?)\]\]><\/category>/gs;
 
 function readFile(filePath) {
 	return fs.readFileSync(filePath, "utf8").replace(CONTROL_CHARS, "");
 }
 
 function extractTag(source, tag) {
-	const cdataMatch = source.match(new RegExp(`<${tag}><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`, "s"));
+	const cdataMatch = source.match(
+		new RegExp(`<${tag}><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`, "s"),
+	);
 	if (cdataMatch) return cdataMatch[1].trim();
 
-	const plainMatch = source.match(new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "s"));
+	const plainMatch = source.match(
+		new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "s"),
+	);
 	return plainMatch ? plainMatch[1].trim() : "";
 }
 
@@ -112,11 +121,17 @@ function toMediaRef(attachment) {
 function normalizeBool(value) {
 	if (!value) return false;
 	const normalized = value.toLowerCase();
-	return normalized.includes("highlight") || normalized === "1" || normalized === "true";
+	return (
+		normalized.includes("highlight") ||
+		normalized === "1" ||
+		normalized === "true"
+	);
 }
 
 function normalizeHtml(value) {
-	return decodeEntities(value || "").replace(CONTROL_CHARS, "").trim();
+	return decodeEntities(value || "")
+		.replace(CONTROL_CHARS, "")
+		.trim();
 }
 
 function repairMalformedInternalLinks(value, postsBySlug) {
@@ -150,9 +165,11 @@ const siteTitle =
 	rawXml.match(/<channel>\s*<title>([\s\S]*?)<\/title>/)?.[1]?.trim() ||
 	"Engaged Philosophy";
 const siteDescription =
-	rawXml.match(/<channel>[\s\S]*?<description>([\s\S]*?)<\/description>/)?.[1]?.trim() ||
-	"Civic Engagement in Philosophy Classes";
-const siteUrl = extractTag(rawXml, "wp:base_site_url") || "https://www.engagedphilosophy.com";
+	rawXml
+		.match(/<channel>[\s\S]*?<description>([\s\S]*?)<\/description>/)?.[1]
+		?.trim() || "Civic Engagement in Philosophy Classes";
+const siteUrl =
+	extractTag(rawXml, "wp:base_site_url") || "https://www.engagedphilosophy.com";
 
 const authors = new Map();
 for (const match of rawXml.matchAll(AUTHOR_RE)) {
@@ -173,12 +190,20 @@ taxonomies.set("category", {
 for (const match of rawXml.matchAll(TERM_RE)) {
 	const [, , taxonomyCdata, taxonomyPlain, slug, parent, label] = match;
 	const taxonomyName = (taxonomyCdata || taxonomyPlain || "").trim();
-	if (!["topic", "schools", "professors", "courses", "semesters"].includes(taxonomyName)) continue;
+	if (
+		!["topic", "schools", "professors", "courses", "semesters"].includes(
+			taxonomyName,
+		)
+	)
+		continue;
 
 	if (!taxonomies.has(taxonomyName)) {
 		taxonomies.set(taxonomyName, {
 			name: taxonomyName,
-			label: taxonomyName === "topic" ? "Topics" : taxonomyName[0].toUpperCase() + taxonomyName.slice(1),
+			label:
+				taxonomyName === "topic"
+					? "Topics"
+					: taxonomyName[0].toUpperCase() + taxonomyName.slice(1),
 			labelSingular:
 				taxonomyName === "topic"
 					? "Topic"
@@ -220,7 +245,9 @@ for (const item of items) {
 
 	const postId = extractTag(item, "wp:post_id");
 	const attachmentUrl = extractTag(item, "wp:attachment_url");
-	const meta = Object.fromEntries([...item.matchAll(META_RE)].map((m) => [m[1], m[2]]));
+	const meta = Object.fromEntries(
+		[...item.matchAll(META_RE)].map((m) => [m[1], m[2]]),
+	);
 	const filename = attachmentUrl ? attachmentUrl.split("/").pop() : "";
 
 	attachments.set(postId, {
@@ -245,7 +272,8 @@ const usedSlugs = {
 
 for (const item of items) {
 	const postType = extractTag(item, "wp:post_type");
-	if (!["page", "post", "project", "nav_menu_item"].includes(postType)) continue;
+	if (!["page", "post", "project", "nav_menu_item"].includes(postType))
+		continue;
 
 	const postId = extractTag(item, "wp:post_id");
 	const status = extractTag(item, "wp:status");
@@ -256,7 +284,9 @@ for (const item of items) {
 	const authorName = authors.get(creator) || creator || "";
 	const rawSlug = extractTag(item, "wp:post_name");
 	const menuOrder = Number(extractTag(item, "wp:menu_order") || "0");
-	const metas = Object.fromEntries([...item.matchAll(META_RE)].map((m) => [m[1], m[2]]));
+	const metas = Object.fromEntries(
+		[...item.matchAll(META_RE)].map((m) => [m[1], m[2]]),
+	);
 	const categories = [...item.matchAll(ITEM_CATEGORY_RE)].map((m) => ({
 		domain: m[1],
 		slug: m[2],
@@ -264,7 +294,9 @@ for (const item of items) {
 	}));
 
 	if (postType === "nav_menu_item") {
-		const menuTerms = categories.filter((category) => category.domain === "nav_menu");
+		const menuTerms = categories.filter(
+			(category) => category.domain === "nav_menu",
+		);
 		if (!menuTerms.some((term) => term.slug === "main-menu")) continue;
 		rawMenuItems.push({
 			id: postId,
@@ -284,7 +316,11 @@ for (const item of items) {
 	const statusValue = normalizeStatus(status);
 	const rawPath = pathFromUrl(link, siteUrl);
 	const generatedSlug = slugify(rawSlug || title, `${postType}-${postId}`);
-	const slug = ensureUnique(generatedSlug, usedSlugs[`${postType}s`] || usedSlugs.pages, `${postType}-${postId}`);
+	const slug = ensureUnique(
+		generatedSlug,
+		usedSlugs[`${postType}s`] || usedSlugs.pages,
+		`${postType}-${postId}`,
+	);
 
 	let contentPath = rawPath;
 	if (!contentPath) {
@@ -346,10 +382,15 @@ for (const item of items) {
 			data: {
 				...baseData,
 				excerpt_html: normalizeHtml(extractTag(item, "excerpt:encoded")),
-				published_on: toIsoDate(extractTag(item, "wp:post_date_gmt") || extractTag(item, "wp:post_date")),
+				published_on: toIsoDate(
+					extractTag(item, "wp:post_date_gmt") ||
+						extractTag(item, "wp:post_date"),
+				),
 			},
 			taxonomies: {
-				category: categories.filter((category) => category.domain === "category").map((category) => category.slug),
+				category: categories
+					.filter((category) => category.domain === "category")
+					.map((category) => category.slug),
 			},
 		};
 		posts.push(entry);
@@ -358,7 +399,13 @@ for (const item of items) {
 
 	if (postType === "project") {
 		const taxonomyAssignments = {};
-		for (const taxonomyName of ["topic", "schools", "professors", "courses", "semesters"]) {
+		for (const taxonomyName of [
+			"topic",
+			"schools",
+			"professors",
+			"courses",
+			"semesters",
+		]) {
 			const assigned = categories
 				.filter((category) => category.domain === taxonomyName)
 				.map((category) => category.slug);
@@ -374,7 +421,10 @@ for (const item of items) {
 				excerpt_html: normalizeHtml(extractTag(item, "excerpt:encoded")),
 				highlight: normalizeBool(metas.highlight || ""),
 				menu_order: menuOrder,
-				published_on: toIsoDate(extractTag(item, "wp:post_date_gmt") || extractTag(item, "wp:post_date")),
+				published_on: toIsoDate(
+					extractTag(item, "wp:post_date_gmt") ||
+						extractTag(item, "wp:post_date"),
+				),
 			},
 			taxonomies: taxonomyAssignments,
 		});
@@ -382,31 +432,64 @@ for (const item of items) {
 }
 
 const pageItemsById = {};
-const postPathsBySlug = new Map(posts.map((entry) => [entry.slug.toLowerCase(), entry.data.path]));
+const postPathsBySlug = new Map(
+	posts.map((entry) => [entry.slug.toLowerCase(), entry.data.path]),
+);
 
 for (const entry of pages) {
-	entry.data.content_html = repairMalformedInternalLinks(entry.data.content_html, postPathsBySlug);
-	entry.data.about_html = repairMalformedInternalLinks(entry.data.about_html, postPathsBySlug);
-	entry.data.box_left_html = repairMalformedInternalLinks(entry.data.box_left_html, postPathsBySlug);
-	entry.data.box_middle_html = repairMalformedInternalLinks(entry.data.box_middle_html, postPathsBySlug);
-	entry.data.box_right_html = repairMalformedInternalLinks(entry.data.box_right_html, postPathsBySlug);
+	entry.data.content_html = repairMalformedInternalLinks(
+		entry.data.content_html,
+		postPathsBySlug,
+	);
+	entry.data.about_html = repairMalformedInternalLinks(
+		entry.data.about_html,
+		postPathsBySlug,
+	);
+	entry.data.box_left_html = repairMalformedInternalLinks(
+		entry.data.box_left_html,
+		postPathsBySlug,
+	);
+	entry.data.box_middle_html = repairMalformedInternalLinks(
+		entry.data.box_middle_html,
+		postPathsBySlug,
+	);
+	entry.data.box_right_html = repairMalformedInternalLinks(
+		entry.data.box_right_html,
+		postPathsBySlug,
+	);
 }
 
 for (const entry of posts) {
-	entry.data.content_html = repairMalformedInternalLinks(entry.data.content_html, postPathsBySlug);
-	entry.data.excerpt_html = repairMalformedInternalLinks(entry.data.excerpt_html, postPathsBySlug);
+	entry.data.content_html = repairMalformedInternalLinks(
+		entry.data.content_html,
+		postPathsBySlug,
+	);
+	entry.data.excerpt_html = repairMalformedInternalLinks(
+		entry.data.excerpt_html,
+		postPathsBySlug,
+	);
 }
 
 for (const entry of projects) {
-	entry.data.content_html = repairMalformedInternalLinks(entry.data.content_html, postPathsBySlug);
-	entry.data.excerpt_html = repairMalformedInternalLinks(entry.data.excerpt_html, postPathsBySlug);
+	entry.data.content_html = repairMalformedInternalLinks(
+		entry.data.content_html,
+		postPathsBySlug,
+	);
+	entry.data.excerpt_html = repairMalformedInternalLinks(
+		entry.data.excerpt_html,
+		postPathsBySlug,
+	);
 }
 
 for (const item of rawMenuItems) {
 	let label = item.title;
 	let url = item.url;
 
-	if (item.type === "post_type" && item.object === "page" && pageMap.has(item.objectId)) {
+	if (
+		item.type === "post_type" &&
+		item.object === "page" &&
+		pageMap.has(item.objectId)
+	) {
 		const page = pageMap.get(item.objectId);
 		label = page.title;
 		url = page.url;
@@ -449,7 +532,13 @@ const seed = {
 			supports: ["drafts", "revisions", "search"],
 			fields: [
 				{ slug: "title", label: "Title", type: "string", required: true },
-				{ slug: "path", label: "Path", type: "string", required: true, unique: true },
+				{
+					slug: "path",
+					label: "Path",
+					type: "string",
+					required: true,
+					unique: true,
+				},
 				{ slug: "content_html", label: "Content HTML", type: "text" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
 				{ slug: "template", label: "Template", type: "string" },
@@ -471,7 +560,13 @@ const seed = {
 			supports: ["drafts", "revisions", "search"],
 			fields: [
 				{ slug: "title", label: "Title", type: "string", required: true },
-				{ slug: "path", label: "Path", type: "string", required: true, unique: true },
+				{
+					slug: "path",
+					label: "Path",
+					type: "string",
+					required: true,
+					unique: true,
+				},
 				{ slug: "excerpt_html", label: "Excerpt HTML", type: "text" },
 				{ slug: "content_html", label: "Content HTML", type: "text" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
@@ -487,12 +582,28 @@ const seed = {
 			supports: ["drafts", "revisions", "search"],
 			fields: [
 				{ slug: "title", label: "Title", type: "string", required: true },
-				{ slug: "path", label: "Path", type: "string", required: true, unique: true },
+				{
+					slug: "path",
+					label: "Path",
+					type: "string",
+					required: true,
+					unique: true,
+				},
 				{ slug: "excerpt_html", label: "Excerpt HTML", type: "text" },
 				{ slug: "content_html", label: "Content HTML", type: "text" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
-				{ slug: "highlight", label: "Highlight", type: "boolean", defaultValue: false },
-				{ slug: "menu_order", label: "Menu Order", type: "integer", defaultValue: 0 },
+				{
+					slug: "highlight",
+					label: "Highlight",
+					type: "boolean",
+					defaultValue: false,
+				},
+				{
+					slug: "menu_order",
+					label: "Menu Order",
+					type: "integer",
+					defaultValue: 0,
+				},
 				{ slug: "published_on", label: "Published On", type: "datetime" },
 				{ slug: "author_name", label: "Author Name", type: "string" },
 				{ slug: "legacy_wp_id", label: "Legacy WordPress ID", type: "integer" },

@@ -1,45 +1,45 @@
 {
-  "name": "engaged-philosophy",
-  "version": "1.0.0",
-  "private": true,
-  "type": "module",
-  "description": "Engaged Philosophy migrated to Astro + EmDash on Cloudflare Workers",
-  "emdash": {
-    "seed": "seed/seed.json"
-  },
-  "scripts": {
-    "generate:seed": "node scripts/generate-seed.mjs",
-    "dev": "astro dev",
-    "build": "astro build",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "lint": "eslint eslint.config.js scripts/generate-seed.mjs \"src/**/*.{js,ts,astro}\"",
-    "preview": "astro preview",
-    "deploy": "astro build && wrangler deploy",
-    "typecheck": "astro check"
-  },
-  "dependencies": {
-    "@astrojs/cloudflare": "^13.5.4",
-    "@astrojs/react": "^5.0.5",
-    "@emdash-cms/cloudflare": "^0.14.0",
-    "astro": "^6.3.7",
-    "bootstrap": "^5.3.3",
-    "emdash": "^0.14.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "sass": "^1.89.0"
-  },
-  "devDependencies": {
-    "@astrojs/check": "^0.9.4",
-    "@cloudflare/workers-types": "^4.20250525.0",
-    "@typescript-eslint/eslint-plugin": "^8.60.0",
-    "@typescript-eslint/parser": "^8.60.0",
-    "astro-eslint-parser": "^1.4.0",
-    "eslint": "^10.4.0",
-    "eslint-plugin-astro": "^1.7.0",
-    "prettier": "^3.8.3",
-    "prettier-plugin-astro": "^0.14.1",
-    "typescript": "^5.8.3",
-    "wrangler": "^4.17.0"
-  }
+	"name": "engaged-philosophy",
+	"version": "1.0.0",
+	"private": true,
+	"type": "module",
+	"description": "Engaged Philosophy migrated to Astro + EmDash on Cloudflare Workers",
+	"emdash": {
+		"seed": "seed/seed.json"
+	},
+	"scripts": {
+		"generate:seed": "node scripts/generate-seed.mjs",
+		"dev": "astro dev",
+		"build": "astro build",
+		"format": "prettier --write .",
+		"format:check": "prettier --check .",
+		"lint": "eslint eslint.config.js scripts/generate-seed.mjs \"src/**/*.{js,ts,astro}\"",
+		"preview": "astro preview",
+		"deploy": "astro build && wrangler deploy",
+		"typecheck": "astro check"
+	},
+	"dependencies": {
+		"@astrojs/cloudflare": "^13.5.4",
+		"@astrojs/react": "^5.0.5",
+		"@emdash-cms/cloudflare": "^0.14.0",
+		"astro": "^6.3.7",
+		"bootstrap": "^5.3.3",
+		"emdash": "^0.14.0",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1",
+		"sass": "^1.89.0"
+	},
+	"devDependencies": {
+		"@astrojs/check": "^0.9.4",
+		"@cloudflare/workers-types": "^4.20250525.0",
+		"@typescript-eslint/eslint-plugin": "^8.60.0",
+		"@typescript-eslint/parser": "^8.60.0",
+		"astro-eslint-parser": "^1.4.0",
+		"eslint": "^10.4.0",
+		"eslint-plugin-astro": "^1.7.0",
+		"prettier": "^3.8.3",
+		"prettier-plugin-astro": "^0.14.1",
+		"typescript": "^5.8.3",
+		"wrangler": "^4.17.0"
+	}
 }

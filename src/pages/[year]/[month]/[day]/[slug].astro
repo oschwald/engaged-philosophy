@@ -23,19 +23,29 @@ const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
 				<header class="page-header">
 					<h1 class="entry-title">{post.data.title}</h1>
 					<div class="entry-meta">
-						{post.data.published_on ? new Date(post.data.published_on).toLocaleDateString() : ""}
+						{
+							post.data.published_on
+								? new Date(post.data.published_on).toLocaleDateString()
+								: ""
+						}
 					</div>
 				</header>
 				<div class="entry-content">
 					<HtmlContent html={post.data.content_html} />
 				</div>
-				{categories.length > 0 && (
-					<footer class="entry-footer">
-						<span class="cat-links block">
-							Posted in {categories.map((term) => <a href="#">{term.label}</a>).reduce((prev, curr) => [prev, ", ", curr])}.
-						</span>
-					</footer>
-				)}
+				{
+					categories.length > 0 && (
+						<footer class="entry-footer">
+							<span class="cat-links block">
+								Posted in{" "}
+								{categories
+									.map((term) => <a href="#">{term.label}</a>)
+									.reduce((prev, curr) => [prev, ", ", curr])}
+								.
+							</span>
+						</footer>
+					)
+				}
 			</article>
 		</div>
 	</section>

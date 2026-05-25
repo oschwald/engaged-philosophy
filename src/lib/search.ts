@@ -1,4 +1,8 @@
-import { getPublishedPages, getPublishedPosts, getPublishedProjects } from "./seed";
+import {
+	getPublishedPages,
+	getPublishedPosts,
+	getPublishedProjects,
+} from "./seed";
 import { getExcerptText, stripHtml } from "./site";
 import type { ContentEntry, PageData, PostData, ProjectData } from "./types";
 
@@ -28,12 +32,18 @@ function scoreText(haystack: string, term: string, weight: number) {
 }
 
 function countTermMatches(haystack: string, terms: string[], weight: number) {
-	return terms.reduce((total, term) => total + (haystack.includes(term) ? weight : 0), 0);
+	return terms.reduce(
+		(total, term) => total + (haystack.includes(term) ? weight : 0),
+		0,
+	);
 }
 
 function rankEntry(
 	kind: SearchResult["kind"],
-	entry: ContentEntry<PageData> | ContentEntry<PostData> | ContentEntry<ProjectData>,
+	entry:
+		| ContentEntry<PageData>
+		| ContentEntry<PostData>
+		| ContentEntry<ProjectData>,
 	query: string,
 	terms: string[],
 ): RankedResult | null {
@@ -69,7 +79,7 @@ function rankEntry(
 			imageSrc: entry.data.featured_image?.src,
 		},
 		score,
-		date: "published_on" in entry.data ? entry.data.published_on ?? "" : "",
+		date: "published_on" in entry.data ? (entry.data.published_on ?? "") : "",
 	};
 }
 
@@ -88,12 +98,23 @@ export function searchSite(rawQuery: string, page = 1) {
 	}
 
 	const ranked = [
-		...getPublishedProjects().map((entry) => rankEntry("project", entry, query, terms)),
-		...getPublishedPages().map((entry) => rankEntry("page", entry, query, terms)),
-		...getPublishedPosts().map((entry) => rankEntry("post", entry, query, terms)),
+		...getPublishedProjects().map((entry) =>
+			rankEntry("project", entry, query, terms),
+		),
+		...getPublishedPages().map((entry) =>
+			rankEntry("page", entry, query, terms),
+		),
+		...getPublishedPosts().map((entry) =>
+			rankEntry("post", entry, query, terms),
+		),
 	]
 		.filter((entry): entry is RankedResult => Boolean(entry))
-		.sort((left, right) => right.score - left.score || right.date.localeCompare(left.date) || left.entry.title.localeCompare(right.entry.title));
+		.sort(
+			(left, right) =>
+				right.score - left.score ||
+				right.date.localeCompare(left.date) ||
+				left.entry.title.localeCompare(right.entry.title),
+		);
 
 	const currentPage = Math.max(1, page);
 	const totalResults = ranked.length;
@@ -102,7 +123,9 @@ export function searchSite(rawQuery: string, page = 1) {
 
 	return {
 		query: rawQuery.trim(),
-		results: ranked.slice(startIndex, startIndex + PAGE_SIZE).map((item) => item.entry),
+		results: ranked
+			.slice(startIndex, startIndex + PAGE_SIZE)
+			.map((item) => item.entry),
 		totalResults,
 		totalPages,
 		currentPage,

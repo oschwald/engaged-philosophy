@@ -16,12 +16,18 @@ export function joinPath(parts: string[]) {
 	return parts.filter(Boolean).join("/");
 }
 
-export function sortByPublishedOn<T extends { data: { published_on?: string; title?: string } }>(
-	items: T[],
-) {
+export function sortByPublishedOn<
+	T extends { data: { published_on?: string; title?: string } },
+>(items: T[]) {
 	return [...items].sort((a, b) => {
-		const orderA = "menu_order" in a.data && typeof a.data.menu_order === "number" ? a.data.menu_order : 0;
-		const orderB = "menu_order" in b.data && typeof b.data.menu_order === "number" ? b.data.menu_order : 0;
+		const orderA =
+			"menu_order" in a.data && typeof a.data.menu_order === "number"
+				? a.data.menu_order
+				: 0;
+		const orderB =
+			"menu_order" in b.data && typeof b.data.menu_order === "number"
+				? b.data.menu_order
+				: 0;
 		if (orderA !== orderB) return orderA - orderB;
 
 		const dateA = a.data.published_on ? Date.parse(a.data.published_on) : 0;
@@ -43,7 +49,10 @@ export function findEntryByPath<T extends { path?: string }>(
 	return items.find((item) => item.data.path === path) ?? null;
 }
 
-export function getEntryDatabaseId<T extends { id?: string }>(item: { id: string; data: T }) {
+export function getEntryDatabaseId<T extends { id?: string }>(item: {
+	id: string;
+	data: T;
+}) {
 	return item.data.id || item.id;
 }
 

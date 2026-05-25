@@ -13,11 +13,13 @@ const { title, href, excerpt, image } = Astro.props;
 ---
 
 <article class="card h-100 shadow-sm">
-	{image?.src && (
-		<a href={href} class="card-img-link">
-			<img class="card-img-top" src={image.src} alt={image.alt || title} />
-		</a>
-	)}
+	{
+		image?.src && (
+			<a href={href} class="card-img-link">
+				<img class="card-img-top" src={image.src} alt={image.alt || title} />
+			</a>
+		)
+	}
 	<div class="card-body d-flex flex-column">
 		<h3 class="card-title h5">
 			<a href={href} class="stretched-link text-decoration-none">{title}</a>

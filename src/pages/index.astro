@@ -14,76 +14,94 @@ const highlightedProjects = sortByPublishedOn(
 ).slice(0, 6);
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
 const search = query ? searchSite(query) : null;
---- 
+---
 
 <Base
 	title={query ? `Search Results for: ${query}` : home?.data.title}
-	bodyClass={query ? "search search-results wp-theme-engaged-philosophy-20 content-sidebar" : "home page-template page-template-templates page-template-home"}
+	bodyClass={query
+		? "search search-results wp-theme-engaged-philosophy-20 content-sidebar"
+		: "home page-template page-template-templates page-template-home"}
 >
-	{query ? (
-		<SearchResults query={query} page={search?.currentPage} />
-	) : (
-		<section id="primary" class="col-12">
-			<main id="content">
-				<div class="row">
-					<div id="projects_carousel" class="carousel slide col-lg-9 ps-3 pe-0" data-bs-ride="carousel">
-						<div class="carousel-inner">
-							{highlightedProjects.map((project, index) => (
-								<div class:list={["carousel-item", index === 0 && "active"]}>
-									{project.data.featured_image?.src && (
-										<img
-											src={project.data.featured_image.src}
-											alt={`${project.data.title} project image`}
-											width="700"
-											height="460"
-										/>
-									)}
-									<div class="carousel-caption">
-										<h4>{project.data.title}</h4>
-										<HtmlContent
-											html={`${project.data.excerpt_html ?? ""} <a href="/${project.data.path}/">Continue reading <span class="meta-nav">&rarr;</span></a>`}
-										/>
+	{
+		query ? (
+			<SearchResults query={query} page={search?.currentPage} />
+		) : (
+			<section id="primary" class="col-12">
+				<main id="content">
+					<div class="row">
+						<div
+							id="projects_carousel"
+							class="carousel slide col-lg-9 ps-3 pe-0"
+							data-bs-ride="carousel"
+						>
+							<div class="carousel-inner">
+								{highlightedProjects.map((project, index) => (
+									<div class:list={["carousel-item", index === 0 && "active"]}>
+										{project.data.featured_image?.src && (
+											<img
+												src={project.data.featured_image.src}
+												alt={`${project.data.title} project image`}
+												width="700"
+												height="460"
+											/>
+										)}
+										<div class="carousel-caption">
+											<h4>{project.data.title}</h4>
+											<HtmlContent
+												html={`${project.data.excerpt_html ?? ""} <a href="/${project.data.path}/">Continue reading <span class="meta-nav">&rarr;</span></a>`}
+											/>
+										</div>
 									</div>
-								</div>
-							))}
+								))}
+							</div>
+							<button
+								class="carousel-control-prev"
+								type="button"
+								data-bs-target="#projects_carousel"
+								data-bs-slide="prev"
+							>
+								<span class="carousel-control-prev-icon" aria-hidden="true" />
+								<span class="visually-hidden">Previous</span>
+							</button>
+							<button
+								class="carousel-control-next"
+								type="button"
+								data-bs-target="#projects_carousel"
+								data-bs-slide="next"
+							>
+								<span class="carousel-control-next-icon" aria-hidden="true" />
+								<span class="visually-hidden">Next</span>
+							</button>
 						</div>
-						<button class="carousel-control-prev" type="button" data-bs-target="#projects_carousel" data-bs-slide="prev">
-							<span class="carousel-control-prev-icon" aria-hidden="true"></span>
-							<span class="visually-hidden">Previous</span>
-						</button>
-						<button class="carousel-control-next" type="button" data-bs-target="#projects_carousel" data-bs-slide="next">
-							<span class="carousel-control-next-icon" aria-hidden="true"></span>
-							<span class="visually-hidden">Next</span>
-						</button>
+						<div class="col-lg-3">
+							<div class="lead-home">
+								<HtmlContent html={home?.data.content_html} />
+							</div>
+						</div>
 					</div>
-					<div class="col-lg-3">
-						<div class="lead-home">
-							<HtmlContent html={home?.data.content_html} />
-						</div>
+					<div class="row mt-4">
+						{[
+							{
+								title: home?.data.box_left_title,
+								html: home?.data.box_left_html,
+							},
+							{
+								title: home?.data.box_middle_title,
+								html: home?.data.box_middle_html,
+							},
+							{
+								title: home?.data.box_right_title,
+								html: home?.data.box_right_html,
+							},
+						].map((box) => (
+							<div class="col-lg-4 mb-4">
+								{box.title && <h2>{box.title}</h2>}
+								<HtmlContent html={box.html} />
+							</div>
+						))}
 					</div>
-				</div>
-				<div class="row mt-4">
-					{[
-						{
-							title: home?.data.box_left_title,
-							html: home?.data.box_left_html,
-						},
-						{
-							title: home?.data.box_middle_title,
-							html: home?.data.box_middle_html,
-						},
-						{
-							title: home?.data.box_right_title,
-							html: home?.data.box_right_html,
-						},
-					].map((box) => (
-						<div class="col-lg-4 mb-4">
-							{box.title && <h2>{box.title}</h2>}
-							<HtmlContent html={box.html} />
-						</div>
-					))}
-				</div>
-			</main>
-		</section>
-	)}
+				</main>
+			</section>
+		)
+	}
 </Base>

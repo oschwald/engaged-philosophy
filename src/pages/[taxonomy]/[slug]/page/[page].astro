@@ -21,7 +21,9 @@ if (!Number.isFinite(pageNumber) || pageNumber < 2) {
 	return Astro.redirect(`/${taxonomy}/${slug}/`);
 }
 
-const projects = sortByPublishedOn(getProjectsByTaxonomy(taxonomy, slug) as ContentEntry<ProjectData>[]);
+const projects = sortByPublishedOn(
+	getProjectsByTaxonomy(taxonomy, slug) as ContentEntry<ProjectData>[],
+);
 const totalPages = Math.max(1, Math.ceil(projects.length / 10));
 
 if (pageNumber > totalPages) {
@@ -33,5 +35,10 @@ if (pageNumber > totalPages) {
 	title={`${term.label} – Page ${pageNumber}`}
 	bodyClass={`archive paged tax-${taxonomy} term-${slug} paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
 >
-	<TaxonomyArchive taxonomy={taxonomy} label={term.label} projects={projects} page={pageNumber} />
+	<TaxonomyArchive
+		taxonomy={taxonomy}
+		label={term.label}
+		projects={projects}
+		page={pageNumber}
+	/>
 </Base>

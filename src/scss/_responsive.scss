@@ -3,7 +3,6 @@
 
 // Small devices (landscape phones, 767px and down)
 @media (max-width: 767px) {
-
 	body {
 		padding: 0;
 	}
@@ -168,7 +167,6 @@
 
 // Small tablets and landscape phones (768px to 991px) - stacked layout
 @media (min-width: 768px) and (max-width: 991px) {
-
 	#page {
 		margin-right: 0;
 	}
@@ -191,7 +189,6 @@
 
 // Large tablets (992px to 1199px) - side-by-side layout with fixed height
 @media (min-width: 992px) and (max-width: 1199px) {
-
 	#page {
 		margin-right: 0;
 	}
@@ -251,10 +248,8 @@
 	}
 }
 
-
 // Additional fix for exact 1100px viewport
 @media (width: 1100px) {
-
 	.container {
 		max-width: 1050px;
 	}
@@ -262,7 +257,6 @@
 
 // Large devices (desktops, 768px to 979px)
 @media (min-width: 768px) and (max-width: 979px) {
-
 	.dl-horizontal dt {
 		width: 85px;
 	}
@@ -274,7 +268,6 @@
 
 // Extra large devices (large desktops, 1200px and up)
 @media (min-width: 1200px) {
-
 	#page {
 		margin-right: -30px;
 		padding: 24px 0 10px;

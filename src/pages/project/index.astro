@@ -4,7 +4,9 @@ import { getTaxonomyTerms } from "../../lib/seed";
 
 const allTopics = getTaxonomyTerms("topic");
 const topicsWithCounts = allTopics.filter((term) => (term.count ?? 0) > 0);
-const dateSeed = Number(new Date().toISOString().slice(0, 10).replace(/-/g, ""));
+const dateSeed = Number(
+	new Date().toISOString().slice(0, 10).replace(/-/g, ""),
+);
 const shuffled = [...topicsWithCounts];
 
 if (shuffled.length > 0) {
@@ -25,7 +27,10 @@ const minCount = counts.length ? Math.min(...counts) : 0;
 const maxCount = counts.length ? Math.max(...counts) : 0;
 ---
 
-<Base title="Civic Engagement Projects" bodyClass="post-type-archive post-type-archive-project">
+<Base
+	title="Civic Engagement Projects"
+	bodyClass="post-type-archive post-type-archive-project"
+>
 	<div class="container-fluid">
 		<section id="primary" class="p-4">
 			<main id="content">
@@ -43,23 +48,26 @@ const maxCount = counts.length ? Math.max(...counts) : 0;
 				<div class="row">
 					<div class="col-12">
 						<div class="tag-cloud-projects">
-							{visibleTopics.map((topic) => {
-								const count = topic.count ?? 0;
-								const scale = maxCount > minCount
-									? (count - minCount) / (maxCount - minCount)
-									: 0;
-								const fontSize = 13 + scale * (32 - 13);
+							{
+								visibleTopics.map((topic) => {
+									const count = topic.count ?? 0;
+									const scale =
+										maxCount > minCount
+											? (count - minCount) / (maxCount - minCount)
+											: 0;
+									const fontSize = 13 + scale * (32 - 13);
 
-								return (
-									<a
-										href={`/topic/${topic.slug}/`}
-										style={`font-size: ${fontSize}px; margin-right: 8px;`}
-										class="tag-link"
-									>
-										{topic.label}
-									</a>
-								);
-							})}
+									return (
+										<a
+											href={`/topic/${topic.slug}/`}
+											style={`font-size: ${fontSize}px; margin-right: 8px;`}
+											class="tag-link"
+										>
+											{topic.label}
+										</a>
+									);
+								})
+							}
 						</div>
 					</div>
 				</div>
