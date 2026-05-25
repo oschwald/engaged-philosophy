@@ -8,6 +8,7 @@ interface Props {
 
 const { html, class: className = "" } = Astro.props;
 const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
+const MEDIA_URL_PREFIX = (import.meta.env.PUBLIC_MEDIA_URL || WORDPRESS_SITE_URL).replace(/\/+$/, "");
 const blockTagPattern =
 	/<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|thead|tbody|tr|td|th|ul|li)\b/gi;
 
@@ -32,7 +33,7 @@ function renderGallery(shortcode: string) {
 		.map(
 			(item) => {
 				const mediaUrl = item.url?.startsWith("/")
-					? `${WORDPRESS_SITE_URL}${item.url}`
+					? `${MEDIA_URL_PREFIX}${item.url}`
 					: item.url;
 				return `<figure class="gallery-item col-sm-6 col-lg-4">
 				<a href="${mediaUrl}" target="_blank" rel="noreferrer">
@@ -72,13 +73,13 @@ const normalizedHtml = (html ?? "")
 		/\[gallery[^\]]*\]/g,
 		(shortcode) => renderGallery(shortcode) || "",
 	)
-	.replaceAll(/(src|href)=["']\/wp-content\/uploads\//g, `$1="${WORDPRESS_SITE_URL}/wp-content/uploads/`)
+	.replaceAll(/(src|href)=["']\/wp-content\/uploads\//g, `$1="${MEDIA_URL_PREFIX}/wp-content/uploads/`)
 	.replaceAll(
 		/(srcset)=["']\/wp-content\/uploads\//g,
-		`$1="${WORDPRESS_SITE_URL}/wp-content/uploads/`,
+		`$1="${MEDIA_URL_PREFIX}/wp-content/uploads/`,
 	)
-	.replaceAll(/https?:\/\/www\.engagedphilosophy\.com\/wp-content\/uploads\//g, `${WORDPRESS_SITE_URL}/wp-content/uploads/`)
-	.replaceAll(/https?:\/\/engagedphilosophy\.com\/wp-content\/uploads\//g, `${WORDPRESS_SITE_URL}/wp-content/uploads/`)
+	.replaceAll(/https?:\/\/www\.engagedphilosophy\.com\/wp-content\/uploads\//g, `${MEDIA_URL_PREFIX}/wp-content/uploads/`)
+	.replaceAll(/https?:\/\/engagedphilosophy\.com\/wp-content\/uploads\//g, `${MEDIA_URL_PREFIX}/wp-content/uploads/`)
 	.replaceAll(/https?:\/\/www\.engagedphilosophy\.com\/(?!wp-content\/uploads\/)/g, "/")
 	.replaceAll(/https?:\/\/engagedphilosophy\.com\/(?!wp-content\/uploads\/)/g, "/");
 
