@@ -1,3 +1,7 @@
+import tsParser from "@typescript-eslint/parser";
+import tsPlugin from "@typescript-eslint/eslint-plugin";
+import astroPlugin from "eslint-plugin-astro";
+
 export default [
 	{
 		ignores: [
@@ -11,8 +15,9 @@ export default [
 			"public/**",
 		],
 	},
+	...astroPlugin.configs["flat/recommended"],
 	{
-		files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
+		files: ["**/*.{js,mjs,cjs}"],
 		languageOptions: {
 			ecmaVersion: "latest",
 			sourceType: "module",
@@ -26,6 +31,31 @@ export default [
 		},
 		rules: {
 			"no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
+		},
+	},
+	{
+		files: ["**/*.{ts,mts,cts}"],
+		languageOptions: {
+			parser: tsParser,
+			ecmaVersion: "latest",
+			sourceType: "module",
+			globals: {
+				console: "readonly",
+				process: "readonly",
+			},
+		},
+		plugins: {
+			"@typescript-eslint": tsPlugin,
+		},
+		rules: {
+			"no-unused-vars": "off",
+			"@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+		},
+	},
+	{
+		files: ["**/*.astro"],
+		rules: {
+			"astro/no-set-html-directive": "off",
 		},
 	},
 ];

@@ -11,13 +11,14 @@
     "generate:seed": "node scripts/generate-seed.mjs",
     "dev": "astro dev",
     "build": "astro build",
+    "lint": "eslint eslint.config.js scripts/generate-seed.mjs \"src/**/*.{js,ts,astro}\"",
     "preview": "astro preview",
     "deploy": "astro build && wrangler deploy",
     "typecheck": "astro check"
   },
   "dependencies": {
-    "@astrojs/react": "^5.0.5",
     "@astrojs/cloudflare": "^13.5.4",
+    "@astrojs/react": "^5.0.5",
     "@emdash-cms/cloudflare": "^0.14.0",
     "astro": "^6.3.7",
     "bootstrap": "^5.3.3",
@@ -29,6 +30,11 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
     "@cloudflare/workers-types": "^4.20250525.0",
+    "@typescript-eslint/eslint-plugin": "^8.60.0",
+    "@typescript-eslint/parser": "^8.60.0",
+    "astro-eslint-parser": "^1.4.0",
+    "eslint": "^10.4.0",
+    "eslint-plugin-astro": "^1.7.0",
     "typescript": "^5.8.3",
     "wrangler": "^4.17.0"
   }

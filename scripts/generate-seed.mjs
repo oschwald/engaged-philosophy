@@ -55,10 +55,6 @@ function decodeEntities(value) {
 	});
 }
 
-function stripHtml(value) {
-	return decodeEntities(value).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-}
-
 function slugify(value, fallback) {
 	const base = decodeEntities(value)
 		.normalize("NFKD")
