@@ -16,6 +16,13 @@ const INTERNAL_UPLOAD_HOSTS = new Set([
 ]);
 const DOWNLOAD_RETRIES = 3;
 
+function sanitizeObjectKey(key) {
+	return key
+		.split("/")
+		.map((segment) => segment.replace(/\.\.+/g, "."))
+		.join("/");
+}
+
 function printUsage() {
 	console.log(`Usage: npm run migrate:media -- [options]
 
@@ -112,7 +119,7 @@ function normalizeUploadUrl(rawValue, siteUrl) {
 		const absoluteUrl = new URL(trimmed, siteUrl).toString();
 		return {
 			absoluteUrl,
-			key: trimmed.replace(/^\/+/, ""),
+			key: sanitizeObjectKey(trimmed.replace(/^\/+/, "")),
 		};
 	}
 
@@ -126,7 +133,7 @@ function normalizeUploadUrl(rawValue, siteUrl) {
 	const key = parsed.pathname.replace(/^\/+/, "");
 	return {
 		absoluteUrl: parsed.toString(),
-		key,
+		key: sanitizeObjectKey(key),
 	};
 }
 

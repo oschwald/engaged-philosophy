@@ -12,6 +12,17 @@ export type ProjectTaxonomy = (typeof PROJECT_TAXONOMIES)[number];
 
 export const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
 
+function normalizeMediaHost(value: string) {
+	return value.replace(/\/+$/, "");
+}
+
+function sanitizeUploadPath(pathname: string) {
+	return pathname
+		.split("/")
+		.map((segment) => segment.replace(/\.\.+/g, "."))
+		.join("/");
+}
+
 export function isProjectTaxonomy(value: string): value is ProjectTaxonomy {
 	return PROJECT_TAXONOMIES.includes(value as ProjectTaxonomy);
 }
@@ -131,20 +142,31 @@ export function rewriteWordPressUploadUrl(
 ) {
 	const normalized = (value ?? "").trim();
 	if (!normalized) return "";
+	const normalizedPrefix = normalizeMediaHost(mediaUrlPrefix);
+	const shouldSanitize = normalizedPrefix !== WORDPRESS_SITE_URL;
 
 	if (normalized.startsWith("/wp-content/uploads/")) {
-		return `${mediaUrlPrefix.replace(/\/+$/, "")}${normalized}`;
+		const pathname = shouldSanitize
+			? sanitizeUploadPath(normalized)
+			: normalized;
+		return `${normalizedPrefix}${pathname}`;
+	}
+	try {
+		const url = new URL(normalized);
+		if (
+			/^(?:www\.)?engagedphilosophy\.com$/i.test(url.hostname) &&
+			url.pathname.startsWith("/wp-content/uploads/")
+		) {
+			const pathname = shouldSanitize
+				? sanitizeUploadPath(url.pathname)
+				: url.pathname;
+			return `${normalizedPrefix}${pathname}${url.search}${url.hash}`;
+		}
+	} catch {
+		return normalized;
 	}
 
-	return normalized
-		.replace(
-			/^https?:\/\/www\.engagedphilosophy\.com(?=\/wp-content\/uploads\/)/i,
-			mediaUrlPrefix.replace(/\/+$/, ""),
-		)
-		.replace(
-			/^https?:\/\/engagedphilosophy\.com(?=\/wp-content\/uploads\/)/i,
-			mediaUrlPrefix.replace(/\/+$/, ""),
-		);
+	return normalized;
 }
 
 export function formatPathDate(path?: string) {
