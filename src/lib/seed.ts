@@ -1,4 +1,5 @@
 import seedJson from "../../seed/seed.json";
+import { rewriteWordPressUploadUrl } from "./site";
 
 import type {
 	ContentEntry,
@@ -73,9 +74,16 @@ function normalizeMediaField(
 	media?: RawMediaField | null,
 ): MediaField | undefined {
 	if (!media) return undefined;
-	if (media.src) return { src: media.src, alt: media.alt };
+	if (media.src)
+		return {
+			src: rewriteWordPressUploadUrl(media.src),
+			alt: media.alt,
+		};
 	if (media.$media?.url)
-		return { src: media.$media.url, alt: media.$media.alt };
+		return {
+			src: rewriteWordPressUploadUrl(media.$media.url),
+			alt: media.$media.alt,
+		};
 	return undefined;
 }
 
@@ -137,7 +145,12 @@ export function getPrimaryMenu() {
 }
 
 export function getMediaById(id: string) {
-	return seed.media?.[id] ?? null;
+	const media = seed.media?.[id];
+	if (!media) return null;
+	return {
+		...media,
+		url: rewriteWordPressUploadUrl(media.url),
+	};
 }
 
 export function getPublishedPages() {

@@ -8,6 +8,11 @@ export const PROJECT_TAXONOMIES = [
 
 export type ProjectTaxonomy = (typeof PROJECT_TAXONOMIES)[number];
 
+export const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
+export const MEDIA_URL_PREFIX = (
+	import.meta.env.PUBLIC_MEDIA_URL || WORDPRESS_SITE_URL
+).replace(/\/+$/, "");
+
 export function isProjectTaxonomy(value: string): value is ProjectTaxonomy {
 	return PROJECT_TAXONOMIES.includes(value as ProjectTaxonomy);
 }
@@ -108,6 +113,25 @@ export function getExcerptText(
 
 	const words = content.split(/\s+/);
 	return words.slice(0, wordLimit).join(" ");
+}
+
+export function rewriteWordPressUploadUrl(value?: string | null) {
+	const normalized = (value ?? "").trim();
+	if (!normalized) return "";
+
+	if (normalized.startsWith("/wp-content/uploads/")) {
+		return `${MEDIA_URL_PREFIX}${normalized}`;
+	}
+
+	return normalized
+		.replace(
+			/^https?:\/\/www\.engagedphilosophy\.com(?=\/wp-content\/uploads\/)/i,
+			MEDIA_URL_PREFIX,
+		)
+		.replace(
+			/^https?:\/\/engagedphilosophy\.com(?=\/wp-content\/uploads\/)/i,
+			MEDIA_URL_PREFIX,
+		);
 }
 
 export function formatPathDate(path?: string) {

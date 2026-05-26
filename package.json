@@ -9,6 +9,7 @@
 	},
 	"scripts": {
 		"generate:seed": "node scripts/generate-seed.mjs",
+		"migrate:media": "node scripts/migrate-media-to-r2.mjs",
 		"dev": "astro dev",
 		"build": "astro build",
 		"format": "prettier --write .",

@@ -3,18 +3,20 @@
 	"name": "engaged-philosophy",
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-05-25",
-	"compatibility_flags": [
-		"nodejs_compat"
-	],
+	"compatibility_flags": ["nodejs_compat"],
+	"vars": {
+		"PUBLIC_MEDIA_URL": "https://media.engagedphilosophy.com",
+	},
 	"d1_databases": [
 		{
 			"binding": "DB",
 			"database_name": "engaged-philosophy",
+			"database_id": "4fdc5af5-10a0-4aca-9e5f-54db71066fbd",
 		},
 		{
 			"binding": "engaged_philosophy",
 			"database_name": "engaged-philosophy",
-			"database_id": "4fdc5af5-10a0-4aca-9e5f-54db71066fbd"
+			"database_id": "4fdc5af5-10a0-4aca-9e5f-54db71066fbd",
 		},
 	],
 	"r2_buckets": [
@@ -24,12 +26,7 @@
 		},
 		{
 			"bucket_name": "engaged-philosophy-media",
-			"binding": "engaged_philosophy_media"
-		},
-	],
-	"worker_loaders": [
-		{
-			"binding": "LOADER",
+			"binding": "engaged_philosophy_media",
 		},
 	],
 }

@@ -1,5 +1,6 @@
 ---
 import { getMediaById } from "../lib/seed";
+import { MEDIA_URL_PREFIX, WORDPRESS_SITE_URL } from "../lib/site";
 
 interface Props {
 	html?: string | null;
@@ -7,10 +8,6 @@ interface Props {
 }
 
 const { html, class: className = "" } = Astro.props;
-const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
-const MEDIA_URL_PREFIX = (
-	import.meta.env.PUBLIC_MEDIA_URL || WORDPRESS_SITE_URL
-).replace(/\/+$/, "");
 const blockTagPattern =
 	/<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|thead|tbody|tr|td|th|ul|li)\b/gi;
 
