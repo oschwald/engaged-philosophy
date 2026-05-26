@@ -2,6 +2,7 @@
 import HtmlContent from "../../components/HtmlContent.astro";
 import Base from "../../layouts/Base.astro";
 import { getEntryTerms, getProjectBySlug } from "../../lib/seed";
+import { getEmDashEditAttrs } from "../../lib/site";
 
 const { slug } = Astro.params;
 const project = getProjectBySlug(slug ?? "");
@@ -20,12 +21,33 @@ const topics = getEntryTerms(project, "topic");
 <Base title={project.data.title} bodyClass="single single-project">
 	<section id="primary" class="col-12 px-4">
 		<main id="content">
-			<article class="project type-project status-publish">
+			<article
+				class="project type-project status-publish"
+				{...getEmDashEditAttrs("projects", project.slug, project.status)}
+			>
 				<header class="page-header">
-					<h1 class="entry-title">{project.data.title}</h1>
+					<h1
+						class="entry-title"
+						{...getEmDashEditAttrs(
+							"projects",
+							project.slug,
+							project.status,
+							"title",
+						)}
+					>
+						{project.data.title}
+					</h1>
 				</header>
 
-				<div class="entry-content">
+				<div
+					class="entry-content"
+					{...getEmDashEditAttrs(
+						"projects",
+						project.slug,
+						project.status,
+						"content_html",
+					)}
+				>
 					<div class="row">
 						<div class="col-lg-9">
 							<HtmlContent html={project.data.content_html} />

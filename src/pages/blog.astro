@@ -2,9 +2,9 @@
 import Base from "../layouts/Base.astro";
 import HtmlContent from "../components/HtmlContent.astro";
 import { getPageByPath } from "../lib/seed";
-import type { ContentEntry, PageData } from "../lib/types";
+import { getEmDashEditAttrs } from "../lib/site";
 
-const page = getPageByPath("blog") as ContentEntry<PageData> | null;
+const page = getPageByPath("blog");
 ---
 
 <Base
@@ -14,11 +14,30 @@ const page = getPageByPath("blog") as ContentEntry<PageData> | null;
 	<div class="container-fluid">
 		<section id="primary" class="p-4">
 			<div id="content" role="main">
-				<article>
+				<article
+					{...page ? getEmDashEditAttrs("pages", page.slug, page.status) : {}}
+				>
 					<header class="page-header">
-						<h1 class="entry-title">{page?.data.title || "Blog"}</h1>
+						<h1
+							class="entry-title"
+							{...page
+								? getEmDashEditAttrs("pages", page.slug, page.status, "title")
+								: {}}
+						>
+							{page?.data.title || "Blog"}
+						</h1>
 					</header>
-					<div class="entry-content">
+					<div
+						class="entry-content"
+						{...page
+							? getEmDashEditAttrs(
+									"pages",
+									page.slug,
+									page.status,
+									"content_html",
+								)
+							: {}}
+					>
 						<HtmlContent html={page?.data.content_html} />
 					</div>
 				</article>

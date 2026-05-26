@@ -3,7 +3,7 @@ import HtmlContent from "../../../../components/HtmlContent.astro";
 import ThemeSidebar from "../../../../components/ThemeSidebar.astro";
 import Base from "../../../../layouts/Base.astro";
 import { getPostByPath, getTermsBySlugs } from "../../../../lib/seed";
-import { joinPath } from "../../../../lib/site";
+import { getEmDashEditAttrs, joinPath } from "../../../../lib/site";
 
 const { year = "", month = "", day = "", slug = "" } = Astro.params;
 const path = joinPath([year, month, day, slug]);
@@ -19,9 +19,17 @@ const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
 <Base title={post.data.title} bodyClass="single single-post content-sidebar">
 	<section id="primary" class="col-lg-8 px-4">
 		<div id="content" role="main">
-			<article class="post">
+			<article
+				class="post"
+				{...getEmDashEditAttrs("posts", post.slug, post.status)}
+			>
 				<header class="page-header">
-					<h1 class="entry-title">{post.data.title}</h1>
+					<h1
+						class="entry-title"
+						{...getEmDashEditAttrs("posts", post.slug, post.status, "title")}
+					>
+						{post.data.title}
+					</h1>
 					<div class="entry-meta">
 						{
 							post.data.published_on
@@ -30,7 +38,15 @@ const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
 						}
 					</div>
 				</header>
-				<div class="entry-content">
+				<div
+					class="entry-content"
+					{...getEmDashEditAttrs(
+						"posts",
+						post.slug,
+						post.status,
+						"content_html",
+					)}
+				>
 					<HtmlContent html={post.data.content_html} />
 				</div>
 				{

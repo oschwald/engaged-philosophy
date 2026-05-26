@@ -2,13 +2,12 @@
 import HtmlContent from "../components/HtmlContent.astro";
 import Base from "../layouts/Base.astro";
 import { getPageByPath } from "../lib/seed";
-import { joinPath } from "../lib/site";
-import type { ContentEntry, PageData } from "../lib/types";
+import { getEmDashEditAttrs, joinPath } from "../lib/site";
 
 const slugParts = Astro.params.slug?.split("/").filter(Boolean) ?? [];
 const path = joinPath(slugParts);
 
-const page = getPageByPath(path) as ContentEntry<PageData> | null;
+const page = getPageByPath(path);
 
 if (!page) {
 	return Astro.redirect("/404");
@@ -24,11 +23,29 @@ const useFullWidthTemplate =
 		useFullWidthTemplate ? (
 			<section id="primary" class="col-12 px-4">
 				<main id="content">
-					<article>
+					<article {...getEmDashEditAttrs("pages", page.slug, page.status)}>
 						<header class="page-header">
-							<h1 class="entry-title">{page.data.title}</h1>
+							<h1
+								class="entry-title"
+								{...getEmDashEditAttrs(
+									"pages",
+									page.slug,
+									page.status,
+									"title",
+								)}
+							>
+								{page.data.title}
+							</h1>
 						</header>
-						<div class="entry-content">
+						<div
+							class="entry-content"
+							{...getEmDashEditAttrs(
+								"pages",
+								page.slug,
+								page.status,
+								"content_html",
+							)}
+						>
 							<HtmlContent html={page.data.content_html} />
 						</div>
 					</article>
@@ -38,11 +55,29 @@ const useFullWidthTemplate =
 			<div class="container-fluid">
 				<section id="primary" class="p-4">
 					<div id="content" role="main">
-						<article>
+						<article {...getEmDashEditAttrs("pages", page.slug, page.status)}>
 							<header class="page-header">
-								<h1 class="entry-title">{page.data.title}</h1>
+								<h1
+									class="entry-title"
+									{...getEmDashEditAttrs(
+										"pages",
+										page.slug,
+										page.status,
+										"title",
+									)}
+								>
+									{page.data.title}
+								</h1>
 							</header>
-							<div class="entry-content">
+							<div
+								class="entry-content"
+								{...getEmDashEditAttrs(
+									"pages",
+									page.slug,
+									page.status,
+									"content_html",
+								)}
+							>
 								<HtmlContent html={page.data.content_html} />
 							</div>
 						</article>

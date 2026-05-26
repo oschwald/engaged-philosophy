@@ -5,13 +5,14 @@ import Base from "../layouts/Base.astro";
 import { getPageBySlug, getPublishedProjects } from "../lib/seed";
 import { searchSite } from "../lib/search";
 import {
+	getEmDashEditAttrs,
 	getMediaUrlPrefix,
 	rewriteWordPressUploadUrl,
 	sortByPublishedOn,
 } from "../lib/site";
-import type { ContentEntry, PageData, ProjectData } from "../lib/types";
+import type { ContentEntry, ProjectData } from "../lib/types";
 
-const home = getPageBySlug("home") as ContentEntry<PageData> | null;
+const home = getPageBySlug("home");
 const projects = getPublishedProjects() as ContentEntry<ProjectData>[];
 const highlightedProjects = sortByPublishedOn(
 	projects.filter((project) => project.data.highlight),
@@ -19,6 +20,31 @@ const highlightedProjects = sortByPublishedOn(
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
 const mediaUrlPrefix = getMediaUrlPrefix();
 const search = query ? searchSite(query, 1, mediaUrlPrefix) : null;
+const homeEntryAttrs = home
+	? getEmDashEditAttrs("pages", home.slug, home.status)
+	: {};
+const homeBoxes = home
+	? [
+			{
+				title: home.data.box_left_title,
+				html: home.data.box_left_html,
+				titleField: "box_left_title",
+				htmlField: "box_left_html",
+			},
+			{
+				title: home.data.box_middle_title,
+				html: home.data.box_middle_html,
+				titleField: "box_middle_title",
+				htmlField: "box_middle_html",
+			},
+			{
+				title: home.data.box_right_title,
+				html: home.data.box_right_html,
+				titleField: "box_right_title",
+				htmlField: "box_right_html",
+			},
+		]
+	: [];
 ---
 
 <Base
@@ -32,7 +58,7 @@ const search = query ? searchSite(query, 1, mediaUrlPrefix) : null;
 			<SearchResults query={query} page={search?.currentPage} />
 		) : (
 			<section id="primary" class="col-12">
-				<main id="content">
+				<main id="content" {...homeEntryAttrs}>
 					<div class="row">
 						<div
 							id="projects_carousel"
@@ -82,29 +108,48 @@ const search = query ? searchSite(query, 1, mediaUrlPrefix) : null;
 							</button>
 						</div>
 						<div class="col-lg-3">
-							<div class="lead-home">
+							<div
+								class="lead-home"
+								{...(home
+									? getEmDashEditAttrs(
+											"pages",
+											home.slug,
+											home.status,
+											"content_html",
+										)
+									: {})}
+							>
 								<HtmlContent html={home?.data.content_html} />
 							</div>
 						</div>
 					</div>
 					<div class="row mt-4">
-						{[
-							{
-								title: home?.data.box_left_title,
-								html: home?.data.box_left_html,
-							},
-							{
-								title: home?.data.box_middle_title,
-								html: home?.data.box_middle_html,
-							},
-							{
-								title: home?.data.box_right_title,
-								html: home?.data.box_right_html,
-							},
-						].map((box) => (
+						{homeBoxes.map((box) => (
 							<div class="col-lg-4 mb-4">
-								{box.title && <h2>{box.title}</h2>}
-								<HtmlContent html={box.html} />
+								{box.title && home && (
+									<h2
+										{...getEmDashEditAttrs(
+											"pages",
+											home.slug,
+											home.status,
+											box.titleField,
+										)}
+									>
+										{box.title}
+									</h2>
+								)}
+								<div
+									{...(home
+										? getEmDashEditAttrs(
+												"pages",
+												home.slug,
+												home.status,
+												box.htmlField,
+											)
+										: {})}
+								>
+									<HtmlContent html={box.html} />
+								</div>
 							</div>
 						))}
 					</div>

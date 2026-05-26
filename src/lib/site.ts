@@ -10,6 +10,14 @@ export const PROJECT_TAXONOMIES = [
 
 export type ProjectTaxonomy = (typeof PROJECT_TAXONOMIES)[number];
 
+interface EmDashEditRef {
+	collection: string;
+	id: string;
+	status: string;
+	hasDraft: boolean;
+	field?: string;
+}
+
 export const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
 
 function normalizeMediaHost(value: string) {
@@ -69,6 +77,25 @@ export function getEntryDatabaseId<T extends { id?: string }>(item: {
 	data: T;
 }) {
 	return item.data.id || item.id;
+}
+
+export function getEmDashEditAttrs(
+	collection: string,
+	identifier: string,
+	status: string,
+	field?: string,
+) {
+	const ref: EmDashEditRef = {
+		collection,
+		id: identifier,
+		status,
+		hasDraft: false,
+		...(field ? { field } : {}),
+	};
+
+	return {
+		"data-emdash-ref": JSON.stringify(ref),
+	};
 }
 
 export function decodeHtmlEntities(value?: string | null) {
