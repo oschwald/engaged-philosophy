@@ -1,0 +1,8 @@
+{
+	"suppressions": [
+		{
+			"detector": "bodyClass",
+			"reason": "Theme body-class drift is lower signal than structural or visual regressions."
+		}
+	]
+}

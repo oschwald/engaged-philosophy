@@ -35,6 +35,7 @@ debug-crawl-parity.js
 
 # Local tool state
 .claude/
+.parity-audit/
 
 # Editor settings
 .vscode/
