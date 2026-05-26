@@ -37,8 +37,13 @@ function runWrangler(args) {
 		{
 			cwd: ROOT,
 			encoding: "utf8",
+			maxBuffer: 16 * 1024 * 1024,
 		},
 	);
+
+	if (result.error) {
+		throw result.error;
+	}
 
 	if (result.status !== 0) {
 		throw new Error(
@@ -136,7 +141,7 @@ function buildRevisionUpdates(revisions, mediaById) {
 }
 
 const mediaById = seed.media ?? {};
-const statements = ["BEGIN TRANSACTION;"];
+const statements = [];
 
 for (const [collection, fields] of Object.entries(FIELD_MAP)) {
 	for (const field of fields) {
@@ -155,7 +160,6 @@ const revisions = executeQuery(
 	`SELECT id, collection, data FROM revisions WHERE collection IN ('pages', 'posts', 'projects');`,
 );
 statements.push(...buildRevisionUpdates(revisions, mediaById));
-statements.push("COMMIT;");
 
 const sqlPath = path.join(
 	os.tmpdir(),
