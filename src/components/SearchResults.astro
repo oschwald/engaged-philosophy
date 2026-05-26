@@ -1,6 +1,7 @@
 ---
 import ThemeSidebar from "./ThemeSidebar.astro";
 import { searchSite } from "../lib/search";
+import { getMediaUrlPrefix } from "../lib/site";
 
 interface Props {
 	query: string;
@@ -8,7 +9,12 @@ interface Props {
 }
 
 const { query, page = 1 } = Astro.props;
-const { results, totalPages, currentPage } = searchSite(query, page);
+const mediaUrlPrefix = getMediaUrlPrefix();
+const { results, totalPages, currentPage } = searchSite(
+	query,
+	page,
+	mediaUrlPrefix,
+);
 
 function pageHref(pageNumber: number) {
 	const params = new URLSearchParams({ s: query });

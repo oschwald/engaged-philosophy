@@ -2,6 +2,7 @@
 import SearchResults from "../../components/SearchResults.astro";
 import Base from "../../layouts/Base.astro";
 import { searchSite } from "../../lib/search";
+import { getMediaUrlPrefix } from "../../lib/site";
 
 const pageNumber = Number(Astro.params.page ?? "1");
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
@@ -10,7 +11,8 @@ if (!query) {
 	return Astro.redirect("/404");
 }
 
-const search = searchSite(query, pageNumber);
+const mediaUrlPrefix = getMediaUrlPrefix();
+const search = searchSite(query, pageNumber, mediaUrlPrefix);
 if (search.totalPages > 0 && pageNumber > search.totalPages) {
 	return Astro.redirect("/404");
 }

@@ -1,3 +1,5 @@
+import { env as cloudflareEnv } from "cloudflare:workers";
+
 export const PROJECT_TAXONOMIES = [
 	"topic",
 	"schools",
@@ -9,9 +11,6 @@ export const PROJECT_TAXONOMIES = [
 export type ProjectTaxonomy = (typeof PROJECT_TAXONOMIES)[number];
 
 export const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
-export const MEDIA_URL_PREFIX = (
-	import.meta.env.PUBLIC_MEDIA_URL || WORDPRESS_SITE_URL
-).replace(/\/+$/, "");
 
 export function isProjectTaxonomy(value: string): value is ProjectTaxonomy {
 	return PROJECT_TAXONOMIES.includes(value as ProjectTaxonomy);
@@ -115,22 +114,36 @@ export function getExcerptText(
 	return words.slice(0, wordLimit).join(" ");
 }
 
-export function rewriteWordPressUploadUrl(value?: string | null) {
+export function getMediaUrlPrefix(
+	runtimeEnv?: { PUBLIC_MEDIA_URL?: string } | null,
+) {
+	const workerEnv = cloudflareEnv as { PUBLIC_MEDIA_URL?: string };
+	return (
+		runtimeEnv?.PUBLIC_MEDIA_URL ||
+		workerEnv.PUBLIC_MEDIA_URL ||
+		WORDPRESS_SITE_URL
+	).replace(/\/+$/, "");
+}
+
+export function rewriteWordPressUploadUrl(
+	value?: string | null,
+	mediaUrlPrefix = WORDPRESS_SITE_URL,
+) {
 	const normalized = (value ?? "").trim();
 	if (!normalized) return "";
 
 	if (normalized.startsWith("/wp-content/uploads/")) {
-		return `${MEDIA_URL_PREFIX}${normalized}`;
+		return `${mediaUrlPrefix.replace(/\/+$/, "")}${normalized}`;
 	}
 
 	return normalized
 		.replace(
 			/^https?:\/\/www\.engagedphilosophy\.com(?=\/wp-content\/uploads\/)/i,
-			MEDIA_URL_PREFIX,
+			mediaUrlPrefix.replace(/\/+$/, ""),
 		)
 		.replace(
 			/^https?:\/\/engagedphilosophy\.com(?=\/wp-content\/uploads\/)/i,
-			MEDIA_URL_PREFIX,
+			mediaUrlPrefix.replace(/\/+$/, ""),
 		);
 }
 

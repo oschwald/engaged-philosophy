@@ -1,6 +1,10 @@
 ---
 import ThemeSidebar from "./ThemeSidebar.astro";
-import { getExcerptText } from "../lib/site";
+import {
+	getExcerptText,
+	getMediaUrlPrefix,
+	rewriteWordPressUploadUrl,
+} from "../lib/site";
 import type { ContentEntry, ProjectData } from "../lib/types";
 
 interface Props {
@@ -21,6 +25,7 @@ const hasResults = pageItems.length > 0;
 const showSidebar = taxonomy !== "topic";
 const titlePrefix = taxonomy === "topic" ? "Project Topic: " : "";
 const basePath = `/${taxonomy}/${Astro.params.slug}/`;
+const mediaUrlPrefix = getMediaUrlPrefix();
 
 function pageHref(pageNumber: number) {
 	return pageNumber === 1 ? basePath : `${basePath}page/${pageNumber}/`;
@@ -49,7 +54,10 @@ function pageHref(pageNumber: number) {
 							{project.data.featured_image?.src && (
 								<img
 									class="img-thumbnail float-end ms-3"
-									src={project.data.featured_image.src}
+									src={rewriteWordPressUploadUrl(
+										project.data.featured_image.src,
+										mediaUrlPrefix,
+									)}
 									alt={project.data.featured_image.alt || project.data.title}
 									width="150"
 									height="150"

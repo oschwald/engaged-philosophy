@@ -4,7 +4,11 @@ import SearchResults from "../components/SearchResults.astro";
 import Base from "../layouts/Base.astro";
 import { getPageBySlug, getPublishedProjects } from "../lib/seed";
 import { searchSite } from "../lib/search";
-import { sortByPublishedOn } from "../lib/site";
+import {
+	getMediaUrlPrefix,
+	rewriteWordPressUploadUrl,
+	sortByPublishedOn,
+} from "../lib/site";
 import type { ContentEntry, PageData, ProjectData } from "../lib/types";
 
 const home = getPageBySlug("home") as ContentEntry<PageData> | null;
@@ -13,7 +17,8 @@ const highlightedProjects = sortByPublishedOn(
 	projects.filter((project) => project.data.highlight),
 ).slice(0, 6);
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
-const search = query ? searchSite(query) : null;
+const mediaUrlPrefix = getMediaUrlPrefix();
+const search = query ? searchSite(query, 1, mediaUrlPrefix) : null;
 ---
 
 <Base
@@ -39,7 +44,10 @@ const search = query ? searchSite(query) : null;
 									<div class:list={["carousel-item", index === 0 && "active"]}>
 										{project.data.featured_image?.src && (
 											<img
-												src={project.data.featured_image.src}
+												src={rewriteWordPressUploadUrl(
+													project.data.featured_image.src,
+													mediaUrlPrefix,
+												)}
 												alt={`${project.data.title} project image`}
 												width="700"
 												height="460"

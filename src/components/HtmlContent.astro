@@ -1,6 +1,6 @@
 ---
 import { getMediaById } from "../lib/seed";
-import { MEDIA_URL_PREFIX, WORDPRESS_SITE_URL } from "../lib/site";
+import { getMediaUrlPrefix, rewriteWordPressUploadUrl } from "../lib/site";
 
 interface Props {
 	html?: string | null;
@@ -8,6 +8,7 @@ interface Props {
 }
 
 const { html, class: className = "" } = Astro.props;
+const mediaUrlPrefix = getMediaUrlPrefix();
 const blockTagPattern =
 	/<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|thead|tbody|tr|td|th|ul|li)\b/gi;
 
@@ -30,9 +31,7 @@ function renderGallery(shortcode: string) {
 
 	return `<div class="legacy-gallery row g-3 mb-4">${items
 		.map((item) => {
-			const mediaUrl = item.url?.startsWith("/")
-				? `${MEDIA_URL_PREFIX}${item.url}`
-				: item.url;
+			const mediaUrl = rewriteWordPressUploadUrl(item.url, mediaUrlPrefix);
 			return `<figure class="gallery-item col-sm-6 col-lg-4">
 				<a href="${mediaUrl}" target="_blank" rel="noreferrer">
 					<img class="img-fluid" src="${mediaUrl}" alt="${item.alt || item.title || ""}" loading="lazy" />
@@ -75,19 +74,19 @@ const normalizedHtml = (html ?? "")
 	)
 	.replaceAll(
 		/(src|href)=["']\/wp-content\/uploads\//g,
-		`$1="${MEDIA_URL_PREFIX}/wp-content/uploads/`,
+		`$1="${mediaUrlPrefix}/wp-content/uploads/`,
 	)
 	.replaceAll(
 		/(srcset)=["']\/wp-content\/uploads\//g,
-		`$1="${MEDIA_URL_PREFIX}/wp-content/uploads/`,
+		`$1="${mediaUrlPrefix}/wp-content/uploads/`,
 	)
 	.replaceAll(
 		/https?:\/\/www\.engagedphilosophy\.com\/wp-content\/uploads\//g,
-		`${MEDIA_URL_PREFIX}/wp-content/uploads/`,
+		`${mediaUrlPrefix}/wp-content/uploads/`,
 	)
 	.replaceAll(
 		/https?:\/\/engagedphilosophy\.com\/wp-content\/uploads\//g,
-		`${MEDIA_URL_PREFIX}/wp-content/uploads/`,
+		`${mediaUrlPrefix}/wp-content/uploads/`,
 	)
 	.replaceAll(
 		/https?:\/\/www\.engagedphilosophy\.com\/(?!wp-content\/uploads\/)/g,

@@ -3,7 +3,7 @@ import {
 	getPublishedPosts,
 	getPublishedProjects,
 } from "./seed";
-import { getExcerptText, stripHtml } from "./site";
+import { getExcerptText, rewriteWordPressUploadUrl, stripHtml } from "./site";
 import type { ContentEntry, PageData, PostData, ProjectData } from "./types";
 
 export interface SearchResult {
@@ -46,6 +46,7 @@ function rankEntry(
 		| ContentEntry<ProjectData>,
 	query: string,
 	terms: string[],
+	mediaUrlPrefix: string,
 ): RankedResult | null {
 	const title = stripHtml(entry.data.title).trim();
 	const path = entry.data.path?.trim() ?? "";
@@ -76,14 +77,21 @@ function rankEntry(
 			title,
 			path,
 			excerpt,
-			imageSrc: entry.data.featured_image?.src,
+			imageSrc: rewriteWordPressUploadUrl(
+				entry.data.featured_image?.src,
+				mediaUrlPrefix,
+			),
 		},
 		score,
 		date: "published_on" in entry.data ? (entry.data.published_on ?? "") : "",
 	};
 }
 
-export function searchSite(rawQuery: string, page = 1) {
+export function searchSite(
+	rawQuery: string,
+	page = 1,
+	mediaUrlPrefix?: string,
+) {
 	const query = rawQuery.trim().toLowerCase();
 	const terms = query.split(/\s+/).filter(Boolean);
 
@@ -99,13 +107,13 @@ export function searchSite(rawQuery: string, page = 1) {
 
 	const ranked = [
 		...getPublishedProjects().map((entry) =>
-			rankEntry("project", entry, query, terms),
+			rankEntry("project", entry, query, terms, mediaUrlPrefix ?? ""),
 		),
 		...getPublishedPages().map((entry) =>
-			rankEntry("page", entry, query, terms),
+			rankEntry("page", entry, query, terms, mediaUrlPrefix ?? ""),
 		),
 		...getPublishedPosts().map((entry) =>
-			rankEntry("post", entry, query, terms),
+			rankEntry("post", entry, query, terms, mediaUrlPrefix ?? ""),
 		),
 	]
 		.filter((entry): entry is RankedResult => Boolean(entry))
