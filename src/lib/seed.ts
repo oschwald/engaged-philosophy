@@ -178,6 +178,12 @@ export function getPostBySlug(slug: string) {
 	);
 }
 
+export function getPostsByCategory(slug: string) {
+	return getPublishedPosts().filter((entry) =>
+		entry.taxonomies.category?.includes(slug),
+	);
+}
+
 export function getProjectBySlug(slug: string) {
 	return (
 		projects.find((entry) => entry.slug === slug && isPublicEntry(entry)) ??

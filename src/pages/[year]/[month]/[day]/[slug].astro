@@ -16,7 +16,10 @@ if (!post) {
 const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
 ---
 
-<Base title={post.data.title} bodyClass="single single-post content-sidebar">
+<Base
+	title={post.data.title}
+	bodyClass={`wp-singular post-template-default single single-post${post.data.id ? ` postid-${post.data.id}` : ""} single-format-standard wp-theme-engaged-philosophy-20 content-sidebar`}
+>
 	<section id="primary" class="col-lg-8 px-4">
 		<div id="content" role="main">
 			<article
@@ -55,7 +58,9 @@ const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
 							<span class="cat-links block">
 								Posted in{" "}
 								{categories
-									.map((term) => <a href="#">{term.label}</a>)
+									.map((term) => (
+										<a href={`/category/${term.slug}/`}>{term.label}</a>
+									))
 									.reduce((prev, curr) => [prev, ", ", curr])}
 								.
 							</span>

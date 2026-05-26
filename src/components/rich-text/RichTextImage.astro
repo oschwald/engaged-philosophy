@@ -19,6 +19,8 @@ interface Props {
 		};
 		alt?: string;
 		caption?: string;
+		href?: string;
+		align?: "left" | "right" | "center";
 		width?: number;
 		height?: number;
 		displayWidth?: number;
@@ -33,12 +35,63 @@ const mediaUrlPrefix = getMediaUrlPrefix();
 const src = isLegacyUpload
 	? rewriteWordPressUploadUrl(assetUrl, mediaUrlPrefix)
 	: "";
+const href = isWordPressUploadUrl(node.href)
+	? rewriteWordPressUploadUrl(node.href, mediaUrlPrefix)
+	: node.href;
+const alignmentClass =
+	node.align === "left"
+		? "alignleft"
+		: node.align === "right"
+			? "alignright"
+			: node.align === "center"
+				? "aligncenter"
+				: "";
 ---
 
 {
 	isLegacyUpload ? (
-		<figure class="emdash-image">
+		node?.caption ? (
+			<figure class:list={["emdash-image", alignmentClass]}>
+				{href ? (
+					<a href={href}>
+						<img
+							src={src}
+							alt={node?.alt || ""}
+							width={node?.displayWidth || node?.width}
+							height={node?.displayHeight || node?.height}
+							loading="lazy"
+							decoding="async"
+							style="max-width: 100%; height: auto;"
+						/>
+					</a>
+				) : (
+					<img
+						src={src}
+						alt={node?.alt || ""}
+						width={node?.displayWidth || node?.width}
+						height={node?.displayHeight || node?.height}
+						loading="lazy"
+						decoding="async"
+						style="max-width: 100%; height: auto;"
+					/>
+				)}
+				<figcaption>{node.caption}</figcaption>
+			</figure>
+		) : href ? (
+			<a href={href} class={alignmentClass || undefined}>
+				<img
+					src={src}
+					alt={node?.alt || ""}
+					width={node?.displayWidth || node?.width}
+					height={node?.displayHeight || node?.height}
+					loading="lazy"
+					decoding="async"
+					style="max-width: 100%; height: auto;"
+				/>
+			</a>
+		) : (
 			<img
+				class={alignmentClass || undefined}
 				src={src}
 				alt={node?.alt || ""}
 				width={node?.displayWidth || node?.width}
@@ -47,8 +100,7 @@ const src = isLegacyUpload
 				decoding="async"
 				style="max-width: 100%; height: auto;"
 			/>
-			{node?.caption && <figcaption>{node.caption}</figcaption>}
-		</figure>
+		)
 	) : (
 		<EmDashPortableTextImage node={node} />
 	)

@@ -8,7 +8,8 @@ const { gfm } = turndownPluginGfm;
 
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g;
 const LEGACY_SITE_HOST_RE = /^(?:www\.)?engagedphilosophy\.com$/i;
-const TOKEN_RE = /(\[gallery[^\]]*\]|\[embed\][\s\S]*?\[\/embed\])/gi;
+const TOKEN_RE =
+	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[embed\][\s\S]*?\[\/embed\])/gi;
 
 const turndown = new TurndownService({
 	codeBlockStyle: "fenced",
@@ -27,12 +28,19 @@ turndown.addRule("divBlock", {
 	replacement: (content) => `\n\n${content}\n\n`,
 });
 
+const BLOCK_TAG_RE =
+	/<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|thead|tbody|tr|td|th|ul|li)\b/gi;
+const BLOCK_FRAGMENT_RE =
+	/(<p\b[\s\S]*?<\/p>|<ul\b[\s\S]*?<\/ul>|<ol\b[\s\S]*?<\/ol>|<h[1-6]\b[\s\S]*?<\/h[1-6]>|<blockquote\b[\s\S]*?<\/blockquote>|<hr\b[^>]*\/?>)/gi;
+
 function generateKey() {
 	return crypto.randomUUID().replace(/-/g, "").slice(0, 12);
 }
 
 function normalizeLegacyHref(value) {
-	const normalized = (value || "").trim();
+	const normalized = (value || "")
+		.trim()
+		.replace(/\s+(?:"[^"]*"|'[^']*')$/, "");
 	if (!normalized) return "";
 	if (normalized.startsWith("/wp-content/uploads/")) return normalized;
 	if (normalized.startsWith("/")) return normalized;
@@ -47,6 +55,96 @@ function normalizeLegacyHref(value) {
 	} catch {
 		return normalized;
 	}
+}
+
+function parseAttributes(source) {
+	const attributes = {};
+	const attributePattern =
+		/([^\s=/>]+)(?:=(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g;
+	let match;
+
+	while ((match = attributePattern.exec(source))) {
+		const [, name, doubleQuoted, singleQuoted, bare] = match;
+		attributes[name.toLowerCase()] = doubleQuoted ?? singleQuoted ?? bare ?? "";
+	}
+
+	return attributes;
+}
+
+function getTagAttributes(token, tagName) {
+	const match = token.match(new RegExp(`<${tagName}\\b([^>]*)>`, "i"));
+	return match ? parseAttributes(match[1]) : {};
+}
+
+function pickImageSource(attributes) {
+	return (
+		attributes["data-orig-file"] ||
+		attributes["data-large-file"] ||
+		attributes.src ||
+		""
+	);
+}
+
+function getImageAlignment(attributes) {
+	const className = attributes.class || "";
+	if (/\balignleft\b/i.test(className)) return "left";
+	if (/\balignright\b/i.test(className)) return "right";
+	if (/\baligncenter\b/i.test(className)) return "center";
+	return undefined;
+}
+
+function normalizeImageHref(anchorHref, permalink, imageSrc) {
+	if (permalink) {
+		return normalizeLegacyHref(permalink);
+	}
+
+	const normalizedAnchor = normalizeLegacyHref(anchorHref);
+	if (normalizedAnchor && normalizedAnchor !== anchorHref) {
+		return normalizedAnchor;
+	}
+
+	const normalizedSource = normalizeLegacyHref(imageSrc);
+	if (normalizedSource.startsWith("/") || normalizedSource.startsWith("http")) {
+		return normalizedSource;
+	}
+
+	return "";
+}
+
+function normalizeCaptionCandidate(value) {
+	return (value || "")
+		.trim()
+		.replace(/\.[a-z0-9]{2,5}$/i, "")
+		.replace(/-\d+x\d+$/i, "")
+		.replace(/\s+/g, " ");
+}
+
+function isMeaningfulCaption(value, imageUrl = "", alt = "") {
+	const candidate = normalizeCaptionCandidate(value);
+	if (!candidate) return false;
+
+	const imageName = normalizeCaptionCandidate(
+		imageUrl.split("/").pop()?.split("?")[0] || "",
+	);
+	const altName = normalizeCaptionCandidate(alt);
+
+	return ![imageName, altName].some(
+		(reference) =>
+			reference && reference.toLowerCase() === candidate.toLowerCase(),
+	);
+}
+
+function extractPortableTextPlainText(blocks) {
+	return blocks
+		.map((block) => {
+			if (block?._type !== "block" || !Array.isArray(block.children)) return "";
+			return block.children
+				.map((child) => (typeof child.text === "string" ? child.text : ""))
+				.join("");
+		})
+		.join(" ")
+		.replace(/\s+/g, " ")
+		.trim();
 }
 
 function normalizePortableTextBlocks(blocks) {
@@ -87,21 +185,224 @@ function normalizePortableTextBlocks(blocks) {
 			}));
 		}
 
+		if (
+			nextBlock._type === "block" &&
+			nextBlock.listItem === "bullet" &&
+			Array.isArray(nextBlock.children)
+		) {
+			const text = nextBlock.children
+				.map((child) => (typeof child.text === "string" ? child.text : ""))
+				.join("")
+				.trim();
+			if (/^\*\s*\*$/.test(text) || /^\*\s*\*\s*\*$/.test(text)) {
+				return {
+					_type: "horizontalRule",
+					_key: nextBlock._key || generateKey(),
+				};
+			}
+		}
+
+		if (
+			nextBlock._type === "block" &&
+			typeof nextBlock.listItem === "string" &&
+			Array.isArray(nextBlock.children)
+		) {
+			const plainText = nextBlock.children
+				.map((child) => (typeof child.text === "string" ? child.text : ""))
+				.join("")
+				.trim();
+			const headingMatch = plainText.match(/^(#{1,6})\s+(.+)$/);
+			if (headingMatch) {
+				const [, hashes, headingText] = headingMatch;
+				const firstTextChildIndex = nextBlock.children.findIndex(
+					(child) => child?._type === "span" && typeof child.text === "string",
+				);
+				const normalizedChildren = nextBlock.children.map((child, index) =>
+					index === firstTextChildIndex && child?._type === "span"
+						? {
+								...child,
+								text: child.text.replace(/^(#{1,6})\s+/, ""),
+							}
+						: child,
+				);
+				nextBlock.style = `h${hashes.length}`;
+				nextBlock.children = normalizedChildren;
+			}
+		}
+
+		if (
+			nextBlock._type === "block" &&
+			Array.isArray(nextBlock.children) &&
+			Array.isArray(nextBlock.markDefs)
+		) {
+			const normalizedChildren = [];
+			const nextMarkDefs = [...nextBlock.markDefs];
+
+			for (const child of nextBlock.children) {
+				if (child?._type !== "span" || typeof child.text !== "string") {
+					normalizedChildren.push(child);
+					continue;
+				}
+				const text = child.text;
+				const inheritedMarks = Array.isArray(child.marks) ? child.marks : [];
+				const hasInlineMarkdown =
+					/\[[^\]]+\]\((?:https?:\/\/|\/)/.test(text) ||
+					/\*\*[^*]+\*\*/.test(text) ||
+					/(^|[^\w])_[^_]+_(?!\w)/.test(text);
+
+				if (!hasInlineMarkdown) {
+					normalizedChildren.push({
+						...child,
+						text: text.replace(/(\d+)\\\./g, "$1."),
+						marks: [...new Set(inheritedMarks)],
+					});
+					continue;
+				}
+
+				const parsed = markdownToPortableText(text);
+				if (
+					parsed.length !== 1 ||
+					parsed[0]?._type !== "block" ||
+					!Array.isArray(parsed[0].children)
+				) {
+					normalizedChildren.push({
+						...child,
+						marks: [...new Set(inheritedMarks)],
+					});
+					continue;
+				}
+
+				const markKeyMap = new Map();
+				for (const markDef of parsed[0].markDefs ?? []) {
+					const nextKey = generateKey();
+					markKeyMap.set(markDef._key, nextKey);
+					nextMarkDefs.push({
+						...markDef,
+						_key: nextKey,
+						...(markDef?._type === "link" && typeof markDef.href === "string"
+							? { href: normalizeLegacyHref(markDef.href) }
+							: {}),
+					});
+				}
+
+				for (const parsedChild of parsed[0].children) {
+					let parsedText = parsedChild.text;
+					const parsedMarks = [...(parsedChild.marks ?? [])];
+
+					const parsedStrongMatch =
+						typeof parsedText === "string"
+							? parsedText.match(/^\*\*([\s\S]+)\*\*$/)
+							: null;
+					if (parsedStrongMatch) {
+						parsedText = parsedStrongMatch[1];
+						parsedMarks.push("strong");
+					}
+
+					const parsedEmMatch =
+						typeof parsedText === "string"
+							? parsedText.match(/^_([\s\S]+)_$/)
+							: null;
+					if (parsedEmMatch) {
+						parsedText = parsedEmMatch[1];
+						parsedMarks.push("em");
+					}
+
+					normalizedChildren.push({
+						...parsedChild,
+						_key: generateKey(),
+						text:
+							typeof parsedText === "string"
+								? parsedText.replace(/(\d+)\\\./g, "$1.")
+								: parsedText,
+						marks: [
+							...new Set([
+								...inheritedMarks,
+								...parsedMarks.map((mark) => markKeyMap.get(mark) ?? mark),
+							]),
+						],
+					});
+				}
+			}
+
+			nextBlock.children = normalizedChildren;
+			nextBlock.markDefs = nextMarkDefs;
+		}
+
 		return nextBlock;
 	});
 }
 
+function autoWrapParagraphLikeHtml(html) {
+	const normalized = (html || "").replace(/\r\n?/g, "\n").trim();
+	if (!normalized || /<p[\s>]/i.test(normalized)) return normalized;
+
+	const separated = normalized.replace(BLOCK_TAG_RE, (match) => `\n${match}\n`);
+	const chunks = separated
+		.split(/\n{2,}/)
+		.map((chunk) => chunk.trim())
+		.filter(Boolean);
+
+	return chunks
+		.map((chunk) =>
+			/^<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|thead|tbody|tr|td|th|ul|li)\b/i.test(
+				chunk,
+			)
+				? chunk
+				: `<p>${chunk.replace(/\n/g, " ")}</p>`,
+		)
+		.join("\n\n");
+}
+
+function markdownFragmentToPortableText(html) {
+	const markdown = turndown.turndown(html).trim();
+	if (!markdown) return [];
+	return normalizePortableTextBlocks(markdownToPortableText(markdown));
+}
+
+function htmlToPlainText(html) {
+	return extractPortableTextPlainText(
+		markdownFragmentToPortableText(html || ""),
+	);
+}
+
 function htmlFragmentToPortableText(html) {
-	const normalizedHtml = (html || "")
-		.replace(CONTROL_CHARS, "")
-		.replace(/<!--[\s\S]*?-->/g, "")
-		.trim();
+	const normalizedHtml = autoWrapParagraphLikeHtml(
+		(html || "")
+			.replace(CONTROL_CHARS, "")
+			.replace(/<!--[\s\S]*?-->/g, "")
+			.trim(),
+	);
 	if (!normalizedHtml) return [];
 
-	const markdown = turndown.turndown(normalizedHtml).trim();
-	if (!markdown) return [];
+	const fragments = [];
+	let lastIndex = 0;
+	let sawBlockFragment = false;
 
-	return normalizePortableTextBlocks(markdownToPortableText(markdown));
+	for (const match of normalizedHtml.matchAll(BLOCK_FRAGMENT_RE)) {
+		sawBlockFragment = true;
+		const [fragment] = match;
+		const index = match.index ?? 0;
+		if (index > lastIndex) {
+			fragments.push(
+				...markdownFragmentToPortableText(
+					normalizedHtml.slice(lastIndex, index),
+				),
+			);
+		}
+		fragments.push(...markdownFragmentToPortableText(fragment));
+		lastIndex = index + fragment.length;
+	}
+
+	if (sawBlockFragment) {
+		if (lastIndex < normalizedHtml.length) {
+			fragments.push(
+				...markdownFragmentToPortableText(normalizedHtml.slice(lastIndex)),
+			);
+		}
+		return fragments;
+	}
+
+	return markdownFragmentToPortableText(normalizedHtml);
 }
 
 function galleryShortcodeToPortableText(shortcode, mediaById) {
@@ -122,7 +423,13 @@ function galleryShortcodeToPortableText(shortcode, mediaById) {
 				url: normalizeLegacyHref(media.url),
 			},
 			alt: media.alt || media.title || "",
-			caption: media.title || "",
+			...(isMeaningfulCaption(
+				media.caption || media.title || "",
+				media.url,
+				media.alt,
+			)
+				? { caption: media.caption || media.title || "" }
+				: {}),
 		}));
 
 	if (images.length === 0) return [];
@@ -131,6 +438,7 @@ function galleryShortcodeToPortableText(shortcode, mediaById) {
 		{
 			_type: "gallery",
 			_key: generateKey(),
+			layout: "shortcode",
 			columns: 3,
 			images,
 		},
@@ -147,6 +455,122 @@ function embedShortcodeToPortableText(shortcode) {
 	return normalizePortableTextBlocks(
 		markdownToPortableText(`[${url}](${url})`),
 	);
+}
+
+function imageAttributesToPortableText(
+	imageAttributes,
+	anchorAttributes = {},
+	overrides = {},
+) {
+	const imageSrc = normalizeLegacyHref(pickImageSource(imageAttributes));
+	if (!imageSrc) return null;
+
+	const href = normalizeImageHref(
+		anchorAttributes.href || "",
+		imageAttributes["data-permalink"] || "",
+		imageSrc,
+	);
+	const align =
+		overrides.align || getImageAlignment(imageAttributes) || undefined;
+	const width = Number(imageAttributes.width || "0") || undefined;
+	const height = Number(imageAttributes.height || "0") || undefined;
+
+	return {
+		_type: "image",
+		_key: generateKey(),
+		asset: {
+			_ref: generateKey(),
+			url: imageSrc,
+		},
+		alt: imageAttributes.alt || imageAttributes["data-image-title"] || "",
+		...(href ? { href } : {}),
+		...(align ? { align } : {}),
+		...(overrides.caption ? { caption: overrides.caption } : {}),
+		...(width ? { width } : {}),
+		...(height ? { height } : {}),
+	};
+}
+
+function imageHtmlToPortableText(token, overrides = {}) {
+	const anchorMatch = token.match(/^<a\b([^>]*)>([\s\S]*?)<\/a>$/i);
+	const anchorAttributes = anchorMatch ? parseAttributes(anchorMatch[1]) : {};
+	const imageSource = anchorMatch ? anchorMatch[2] : token;
+	const images = [];
+
+	for (const imageMatch of imageSource.matchAll(/<img\b([^>]*)>/gi)) {
+		const imageAttributes = parseAttributes(imageMatch[1]);
+		const image = imageAttributesToPortableText(
+			imageAttributes,
+			anchorAttributes,
+			overrides,
+		);
+		if (image) images.push(image);
+	}
+
+	return images;
+}
+
+function galleryFigureToPortableText(token) {
+	const galleryAttributes = getTagAttributes(token, "figure");
+	const className = galleryAttributes.class || "";
+	const columns =
+		Number(className.match(/\bcolumns-(\d+)\b/i)?.[1] || "0") || undefined;
+	const align = /\baligncenter\b/i.test(className) ? "center" : undefined;
+	const images = [];
+
+	for (const itemMatch of token.matchAll(
+		/<li\b[^>]*class=(?:"[^"]*\bblocks-gallery-item\b[^"]*"|'[^']*\bblocks-gallery-item\b[^']*')[^>]*>([\s\S]*?)<\/li>/gi,
+	)) {
+		const itemHtml = itemMatch[1];
+		const caption = htmlToPlainText(
+			itemHtml.match(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i)?.[1] || "",
+		);
+		images.push(...imageHtmlToPortableText(itemHtml, { caption }));
+	}
+
+	if (images.length === 0) return [];
+
+	const caption = htmlToPlainText(
+		token.match(
+			/<figcaption\b[^>]*class=(?:"[^"]*\bblocks-gallery-caption\b[^"]*"|'[^']*\bblocks-gallery-caption\b[^']*')[^>]*>([\s\S]*?)<\/figcaption>/i,
+		)?.[1] || "",
+	);
+
+	return [
+		{
+			_type: "gallery",
+			_key: generateKey(),
+			layout: "figure",
+			images,
+			...(columns ? { columns } : {}),
+			...(align ? { align } : {}),
+			...(caption ? { caption } : {}),
+		},
+	];
+}
+
+function imageFigureToPortableText(token) {
+	const figureMatch =
+		token.match(/<figure\b([^>]*)>([\s\S]*?)<\/figure>/i) ||
+		token.match(/^<figure\b([^>]*)>([\s\S]*?)<\/figure>$/i);
+	if (!figureMatch) return [];
+
+	const figureAttributes = parseAttributes(figureMatch[1]);
+	const caption = htmlToPlainText(
+		figureMatch[2].match(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i)?.[1] ||
+			"",
+	);
+	const align = getImageAlignment(figureAttributes);
+	return imageHtmlToPortableText(figureMatch[2], { align, caption });
+}
+
+function horizontalRuleToPortableText() {
+	return [
+		{
+			_type: "horizontalRule",
+			_key: generateKey(),
+		},
+	];
 }
 
 export function htmlToPortableText(html, mediaById = {}) {
@@ -166,7 +590,15 @@ export function htmlToPortableText(html, mediaById = {}) {
 			);
 		}
 
-		if (/^\[gallery/i.test(token)) {
+		if (/\bwp-block-gallery\b/i.test(token)) {
+			blocks.push(...galleryFigureToPortableText(token));
+		} else if (/\bwp-block-image\b/i.test(token)) {
+			blocks.push(...imageFigureToPortableText(token));
+		} else if (/^<a\b/i.test(token) || /^<img\b/i.test(token)) {
+			blocks.push(...imageHtmlToPortableText(token));
+		} else if (/^<hr\b/i.test(token)) {
+			blocks.push(...horizontalRuleToPortableText());
+		} else if (/^\[gallery/i.test(token)) {
 			blocks.push(...galleryShortcodeToPortableText(token, mediaById));
 		} else if (/^\[embed\]/i.test(token)) {
 			blocks.push(...embedShortcodeToPortableText(token));

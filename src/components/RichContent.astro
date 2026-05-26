@@ -3,6 +3,7 @@ import { PortableText } from "emdash/ui";
 
 import HtmlContent from "./HtmlContent.astro";
 import RichTextGallery from "./rich-text/RichTextGallery.astro";
+import RichTextHorizontalRule from "./rich-text/RichTextHorizontalRule.astro";
 import RichTextImage from "./rich-text/RichTextImage.astro";
 import RichTextLink from "./rich-text/RichTextLink.astro";
 import { isPortableTextValue } from "../lib/site";
@@ -25,6 +26,7 @@ const { value, class: className = "" } = Astro.props;
 					type: {
 						image: RichTextImage,
 						gallery: RichTextGallery,
+						horizontalRule: RichTextHorizontalRule,
 					},
 					mark: {
 						link: RichTextLink,

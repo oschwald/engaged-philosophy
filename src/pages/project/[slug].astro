@@ -18,7 +18,10 @@ const semesters = getEntryTerms(project, "semesters");
 const topics = getEntryTerms(project, "topic");
 ---
 
-<Base title={project.data.title} bodyClass="single single-project">
+<Base
+	title={project.data.title}
+	bodyClass={`wp-singular project-template-default single single-project${project.data.id ? ` postid-${project.data.id}` : ""} wp-theme-engaged-philosophy-20 content-sidebar`}
+>
 	<section id="primary" class="col-12 px-4">
 		<main id="content">
 			<article

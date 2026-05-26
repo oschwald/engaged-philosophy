@@ -11,6 +11,9 @@ interface Props {
 	node: {
 		_type: "gallery";
 		_key: string;
+		align?: "left" | "right" | "center";
+		caption?: string;
+		layout?: "figure" | "shortcode";
 		images: Array<{
 			_type: "image";
 			_key: string;
@@ -33,27 +36,82 @@ const mediaUrlPrefix = getMediaUrlPrefix();
 const isLegacyGallery =
 	images.length > 0 &&
 	images.every((image) => isWordPressUploadUrl(image.asset.url));
+const alignmentClass =
+	node.align === "left"
+		? "alignleft"
+		: node.align === "right"
+			? "alignright"
+			: node.align === "center"
+				? "aligncenter"
+				: "";
 ---
 
 {
 	isLegacyGallery ? (
-		<div class="legacy-gallery row g-3 mb-4">
-			{images.map((image) => {
-				const src = rewriteWordPressUploadUrl(image.asset?.url, mediaUrlPrefix);
-				return (
-					<figure class="gallery-item col-sm-6 col-lg-4">
-						<a href={src} target="_blank" rel="noreferrer">
+		node.layout === "shortcode" ? (
+			<div
+				class:list={[
+					"legacy-gallery",
+					"legacy-gallery-shortcode",
+					alignmentClass,
+				]}
+			>
+				{images.map((image) => {
+					const src = rewriteWordPressUploadUrl(
+						image.asset?.url,
+						mediaUrlPrefix,
+					);
+					return (
+						<a class="gallery-item" href={src}>
 							<img
-								class="img-fluid"
 								src={src}
 								alt={image.alt || image.caption || ""}
 								loading="lazy"
+								decoding="async"
 							/>
 						</a>
-					</figure>
-				);
-			})}
-		</div>
+					);
+				})}
+			</div>
+		) : (
+			<figure class:list={["legacy-gallery", alignmentClass]}>
+				<ul
+					class:list={[
+						"blocks-gallery-grid",
+						node.columns ? `columns-${node.columns}` : undefined,
+					]}
+				>
+					{images.map((image) => {
+						const src = rewriteWordPressUploadUrl(
+							image.asset?.url,
+							mediaUrlPrefix,
+						);
+						return (
+							<li class="blocks-gallery-item">
+								<figure>
+									<a href={src}>
+										<img
+											src={src}
+											alt={image.alt || image.caption || ""}
+											loading="lazy"
+											decoding="async"
+										/>
+									</a>
+									{image.caption && (
+										<figcaption class="blocks-gallery-item__caption">
+											{image.caption}
+										</figcaption>
+									)}
+								</figure>
+							</li>
+						);
+					})}
+				</ul>
+				{node.caption && (
+					<figcaption class="blocks-gallery-caption">{node.caption}</figcaption>
+				)}
+			</figure>
+		)
 	) : (
 		<EmDashGallery node={node} />
 	)
