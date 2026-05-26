@@ -13,7 +13,9 @@
 		"build": "astro build",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
-		"lint": "eslint eslint.config.js scripts/generate-seed.mjs \"src/**/*.{js,ts,astro}\"",
+		"lint:eslint": "eslint eslint.config.js scripts/generate-seed.mjs \"src/**/*.{js,ts,astro}\"",
+		"lint": "npm run format:check && npm run lint:eslint",
+		"lint:fix": "prettier --write . && npm run lint:eslint -- --fix",
 		"preview": "astro preview",
 		"deploy": "astro build && wrangler deploy",
 		"typecheck": "astro check"
