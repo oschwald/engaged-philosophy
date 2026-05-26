@@ -3,17 +3,28 @@
 	"name": "engaged-philosophy",
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-05-25",
-	"compatibility_flags": ["nodejs_compat"],
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",
 			"database_name": "engaged-philosophy",
+		},
+		{
+			"binding": "engaged_philosophy",
+			"database_name": "engaged-philosophy",
+			"database_id": "4fdc5af5-10a0-4aca-9e5f-54db71066fbd"
 		},
 	],
 	"r2_buckets": [
 		{
 			"binding": "MEDIA",
 			"bucket_name": "engaged-philosophy-media",
+		},
+		{
+			"bucket_name": "engaged-philosophy-media",
+			"binding": "engaged_philosophy_media"
 		},
 	],
 	"worker_loaders": [
