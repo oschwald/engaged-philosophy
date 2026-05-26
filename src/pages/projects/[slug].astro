@@ -1,5 +1,5 @@
 ---
-import HtmlContent from "../../components/HtmlContent.astro";
+import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
 import { getEmDashEntry } from "emdash";
 import { getProjectBySlug } from "../../lib/seed";
@@ -22,10 +22,11 @@ if (project) {
 const liveEntry = liveProject!;
 const title =
 	typeof liveEntry.data.title === "string" ? liveEntry.data.title : "";
-const contentHtml =
+const content =
+	Array.isArray(liveEntry.data.content_html) ||
 	typeof liveEntry.data.content_html === "string"
 		? liveEntry.data.content_html
-		: "";
+		: undefined;
 ---
 
 <Base title={title} bodyClass="single single-project">
@@ -38,7 +39,7 @@ const contentHtml =
 				<div class="entry-content">
 					<div class="row">
 						<div class="col-lg-9">
-							<HtmlContent html={contentHtml} />
+							<RichContent value={content} />
 						</div>
 					</div>
 				</div>

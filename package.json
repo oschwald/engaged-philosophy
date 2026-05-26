@@ -10,6 +10,7 @@
 	"scripts": {
 		"generate:seed": "node scripts/generate-seed.mjs",
 		"migrate:media": "node scripts/migrate-media-to-r2.mjs",
+		"migrate:portable-text": "node scripts/migrate-portable-text.mjs",
 		"dev": "astro dev",
 		"build": "astro build",
 		"format": "prettier --write .",
@@ -30,7 +31,9 @@
 		"emdash": "^0.14.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"sass": "^1.89.0"
+		"sass": "^1.89.0",
+		"turndown": "^7.2.4",
+		"turndown-plugin-gfm": "^1.0.2"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.4",

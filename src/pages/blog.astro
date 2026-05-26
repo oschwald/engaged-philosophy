@@ -1,6 +1,6 @@
 ---
 import Base from "../layouts/Base.astro";
-import HtmlContent from "../components/HtmlContent.astro";
+import RichContent from "../components/RichContent.astro";
 import { getPageByPath } from "../lib/seed";
 import { getEmDashEditAttrs } from "../lib/site";
 
@@ -38,7 +38,7 @@ const page = getPageByPath("blog");
 								)
 							: {}}
 					>
-						<HtmlContent html={page?.data.content_html} />
+						<RichContent value={page?.data.content_html} />
 					</div>
 				</article>
 			</div>

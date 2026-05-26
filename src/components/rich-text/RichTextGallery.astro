@@ -1,0 +1,60 @@
+---
+import { Gallery as EmDashGallery } from "emdash/ui";
+
+import {
+	getMediaUrlPrefix,
+	isWordPressUploadUrl,
+	rewriteWordPressUploadUrl,
+} from "../../lib/site";
+
+interface Props {
+	node: {
+		_type: "gallery";
+		_key: string;
+		images: Array<{
+			_type: "image";
+			_key: string;
+			asset: {
+				_ref: string;
+				url?: string;
+			};
+			alt?: string;
+			caption?: string;
+			width?: number;
+			height?: number;
+		}>;
+		columns?: number;
+	};
+}
+
+const { node } = Astro.props;
+const images = node.images;
+const mediaUrlPrefix = getMediaUrlPrefix();
+const isLegacyGallery =
+	images.length > 0 &&
+	images.every((image) => isWordPressUploadUrl(image.asset.url));
+---
+
+{
+	isLegacyGallery ? (
+		<div class="legacy-gallery row g-3 mb-4">
+			{images.map((image) => {
+				const src = rewriteWordPressUploadUrl(image.asset?.url, mediaUrlPrefix);
+				return (
+					<figure class="gallery-item col-sm-6 col-lg-4">
+						<a href={src} target="_blank" rel="noreferrer">
+							<img
+								class="img-fluid"
+								src={src}
+								alt={image.alt || image.caption || ""}
+								loading="lazy"
+							/>
+						</a>
+					</figure>
+				);
+			})}
+		</div>
+	) : (
+		<EmDashGallery node={node} />
+	)
+}

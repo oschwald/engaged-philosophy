@@ -1,5 +1,5 @@
 ---
-import HtmlContent from "../../components/HtmlContent.astro";
+import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
 import { getEntryTerms, getProjectBySlug } from "../../lib/seed";
 import { getEmDashEditAttrs } from "../../lib/site";
@@ -50,7 +50,7 @@ const topics = getEntryTerms(project, "topic");
 				>
 					<div class="row">
 						<div class="col-lg-9">
-							<HtmlContent html={project.data.content_html} />
+							<RichContent value={project.data.content_html} />
 						</div>
 
 						<div class="col-lg-3">

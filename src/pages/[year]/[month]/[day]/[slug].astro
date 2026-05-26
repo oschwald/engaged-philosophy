@@ -1,5 +1,5 @@
 ---
-import HtmlContent from "../../../../components/HtmlContent.astro";
+import RichContent from "../../../../components/RichContent.astro";
 import ThemeSidebar from "../../../../components/ThemeSidebar.astro";
 import Base from "../../../../layouts/Base.astro";
 import { getPostByPath, getTermsBySlugs } from "../../../../lib/seed";
@@ -47,7 +47,7 @@ const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
 						"content_html",
 					)}
 				>
-					<HtmlContent html={post.data.content_html} />
+					<RichContent value={post.data.content_html} />
 				</div>
 				{
 					categories.length > 0 && (

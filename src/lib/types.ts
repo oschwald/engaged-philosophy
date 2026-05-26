@@ -1,30 +1,34 @@
+import type { PortableTextBlock } from "emdash/ui";
+
 export interface MediaField {
 	src?: string;
 	alt?: string;
 }
 
+export type RichTextValue = string | PortableTextBlock[];
+
 export interface PageData {
 	id?: string;
 	title?: string;
 	path?: string;
-	content_html?: string;
+	content_html?: RichTextValue;
 	featured_image?: MediaField;
 	template?: string;
-	about_html?: string;
+	about_html?: RichTextValue;
 	box_left_title?: string;
-	box_left_html?: string;
+	box_left_html?: RichTextValue;
 	box_middle_title?: string;
-	box_middle_html?: string;
+	box_middle_html?: RichTextValue;
 	box_right_title?: string;
-	box_right_html?: string;
+	box_right_html?: RichTextValue;
 }
 
 export interface PostData {
 	id?: string;
 	title?: string;
 	path?: string;
-	excerpt_html?: string;
-	content_html?: string;
+	excerpt_html?: RichTextValue;
+	content_html?: RichTextValue;
 	featured_image?: MediaField;
 	published_on?: string;
 }

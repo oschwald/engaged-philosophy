@@ -1,0 +1,55 @@
+---
+import { PTImage as EmDashPortableTextImage } from "emdash/ui";
+
+import {
+	getMediaUrlPrefix,
+	isWordPressUploadUrl,
+	rewriteWordPressUploadUrl,
+} from "../../lib/site";
+
+interface Props {
+	node: {
+		_type: "image";
+		_key: string;
+		asset: {
+			_ref: string;
+			url?: string;
+			provider?: string;
+			meta?: Record<string, unknown>;
+		};
+		alt?: string;
+		caption?: string;
+		width?: number;
+		height?: number;
+		displayWidth?: number;
+		displayHeight?: number;
+	};
+}
+
+const { node } = Astro.props;
+const assetUrl = node.asset.url ?? "";
+const isLegacyUpload = isWordPressUploadUrl(assetUrl);
+const mediaUrlPrefix = getMediaUrlPrefix();
+const src = isLegacyUpload
+	? rewriteWordPressUploadUrl(assetUrl, mediaUrlPrefix)
+	: "";
+---
+
+{
+	isLegacyUpload ? (
+		<figure class="emdash-image">
+			<img
+				src={src}
+				alt={node?.alt || ""}
+				width={node?.displayWidth || node?.width}
+				height={node?.displayHeight || node?.height}
+				loading="lazy"
+				decoding="async"
+				style="max-width: 100%; height: auto;"
+			/>
+			{node?.caption && <figcaption>{node.caption}</figcaption>}
+		</figure>
+	) : (
+		<EmDashPortableTextImage node={node} />
+	)
+}

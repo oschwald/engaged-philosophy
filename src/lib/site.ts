@@ -1,4 +1,5 @@
 import { env as cloudflareEnv } from "cloudflare:workers";
+import type { PortableTextBlock } from "emdash/ui";
 
 export const PROJECT_TAXONOMIES = [
 	"topic",
@@ -19,6 +20,7 @@ interface EmDashEditRef {
 }
 
 export const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
+const WORDPRESS_SITE_HOST_RE = /^(?:www\.)?engagedphilosophy\.com$/i;
 
 function normalizeMediaHost(value: string) {
 	return value.replace(/\/+$/, "");
@@ -127,7 +129,51 @@ export function decodeHtmlEntities(value?: string | null) {
 	});
 }
 
-export function stripHtml(value?: string | null) {
+function portableTextToPlainText(value: PortableTextBlock[]) {
+	return value
+		.map((block) => {
+			if (block._type === "block" && Array.isArray(block.children)) {
+				const children = block.children as Array<{ text?: unknown }>;
+				return children
+					.map((child: { text?: unknown }) =>
+						typeof child.text === "string" ? child.text : "",
+					)
+					.join("");
+			}
+			if (block._type === "image") {
+				return typeof block.alt === "string" ? block.alt : "";
+			}
+			if ("images" in block && Array.isArray(block.images)) {
+				const images = block.images as Array<{
+					alt?: unknown;
+					caption?: unknown;
+				}>;
+				return images
+					.map((image) =>
+						typeof image.alt === "string"
+							? image.alt
+							: typeof image.caption === "string"
+								? image.caption
+								: "",
+					)
+					.join(" ");
+			}
+			return "";
+		})
+		.join(" ");
+}
+
+export function isPortableTextValue(
+	value?: string | PortableTextBlock[] | null,
+): value is PortableTextBlock[] {
+	return Array.isArray(value);
+}
+
+export function stripHtml(value?: string | PortableTextBlock[] | null) {
+	if (isPortableTextValue(value)) {
+		return portableTextToPlainText(value).replace(/\s+/g, " ").trim();
+	}
+
 	return decodeHtmlEntities(value)
 		.replace(/<script[\s\S]*?<\/script>/gi, " ")
 		.replace(/<style[\s\S]*?<\/style>/gi, " ")
@@ -138,8 +184,8 @@ export function stripHtml(value?: string | null) {
 }
 
 export function getExcerptText(
-	excerptHtml?: string | null,
-	contentHtml?: string | null,
+	excerptHtml?: string | PortableTextBlock[] | null,
+	contentHtml?: string | PortableTextBlock[] | null,
 	wordLimit = 55,
 ) {
 	const preferred = stripHtml(excerptHtml);
@@ -150,6 +196,16 @@ export function getExcerptText(
 
 	const words = content.split(/\s+/);
 	return words.slice(0, wordLimit).join(" ");
+}
+
+export function isWordPressUploadUrl(value?: string | null) {
+	const normalized = (value ?? "").trim();
+	return (
+		normalized.startsWith("/wp-content/uploads/") ||
+		/^https?:\/\/(?:www\.)?engagedphilosophy\.com\/wp-content\/uploads\//i.test(
+			normalized,
+		)
+	);
 }
 
 export function getMediaUrlPrefix(
@@ -188,6 +244,23 @@ export function rewriteWordPressUploadUrl(
 				? sanitizeUploadPath(url.pathname)
 				: url.pathname;
 			return `${normalizedPrefix}${pathname}${url.search}${url.hash}`;
+		}
+	} catch {
+		return normalized;
+	}
+
+	return normalized;
+}
+
+export function rewriteWordPressSiteUrl(value?: string | null) {
+	const normalized = (value ?? "").trim();
+	if (!normalized) return "";
+	if (normalized.startsWith("/")) return normalized;
+
+	try {
+		const url = new URL(normalized);
+		if (WORDPRESS_SITE_HOST_RE.test(url.hostname)) {
+			return `${url.pathname}${url.search}${url.hash}` || "/";
 		}
 	} catch {
 		return normalized;

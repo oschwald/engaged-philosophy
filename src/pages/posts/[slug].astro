@@ -1,5 +1,5 @@
 ---
-import HtmlContent from "../../components/HtmlContent.astro";
+import RichContent from "../../components/RichContent.astro";
 import ThemeSidebar from "../../components/ThemeSidebar.astro";
 import Base from "../../layouts/Base.astro";
 import { getEmDashEntry } from "emdash";
@@ -23,10 +23,11 @@ if (post) {
 const liveEntry = livePost!;
 const title =
 	typeof liveEntry.data.title === "string" ? liveEntry.data.title : "";
-const contentHtml =
+const content =
+	Array.isArray(liveEntry.data.content_html) ||
 	typeof liveEntry.data.content_html === "string"
 		? liveEntry.data.content_html
-		: "";
+		: undefined;
 const publishedOn =
 	typeof liveEntry.data.published_on === "string"
 		? liveEntry.data.published_on
@@ -44,7 +45,7 @@ const publishedOn =
 					</div>
 				</header>
 				<div class="entry-content">
-					<HtmlContent html={contentHtml} />
+					<RichContent value={content} />
 				</div>
 			</article>
 		</div>

@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { htmlToPortableText } from "./lib/portable-text.mjs";
+
 const ROOT = process.cwd();
 const WXR_PATH = path.join(ROOT, "engagedphilosophy.WordPress.2026-05-25.xml");
 const SEED_DIR = path.join(ROOT, "seed");
@@ -497,6 +499,17 @@ const pageItemsById = {};
 const postPathsBySlug = new Map(
 	posts.map((entry) => [entry.slug.toLowerCase(), entry.data.path]),
 );
+const seedMedia = Object.fromEntries(
+	Array.from(attachments.entries()).map(([id, attachment]) => [
+		id,
+		{
+			url: attachment.url,
+			alt: attachment.alt || "",
+			filename: attachment.filename || "",
+			title: attachment.title || "",
+		},
+	]),
+);
 
 for (const entry of pages) {
 	entry.data.content_html = repairMalformedInternalLinks(
@@ -549,6 +562,23 @@ for (const entry of pages) {
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
+	entry.data.content_html = htmlToPortableText(
+		entry.data.content_html,
+		seedMedia,
+	);
+	entry.data.about_html = htmlToPortableText(entry.data.about_html, seedMedia);
+	entry.data.box_left_html = htmlToPortableText(
+		entry.data.box_left_html,
+		seedMedia,
+	);
+	entry.data.box_middle_html = htmlToPortableText(
+		entry.data.box_middle_html,
+		seedMedia,
+	);
+	entry.data.box_right_html = htmlToPortableText(
+		entry.data.box_right_html,
+		seedMedia,
+	);
 }
 
 for (const entry of posts) {
@@ -572,6 +602,14 @@ for (const entry of posts) {
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
+	entry.data.content_html = htmlToPortableText(
+		entry.data.content_html,
+		seedMedia,
+	);
+	entry.data.excerpt_html = htmlToPortableText(
+		entry.data.excerpt_html,
+		seedMedia,
+	);
 }
 
 for (const entry of projects) {
@@ -594,6 +632,14 @@ for (const entry of projects) {
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
+	);
+	entry.data.content_html = htmlToPortableText(
+		entry.data.content_html,
+		seedMedia,
+	);
+	entry.data.excerpt_html = htmlToPortableText(
+		entry.data.excerpt_html,
+		seedMedia,
 	);
 }
 
@@ -655,16 +701,16 @@ const seed = {
 					required: true,
 					unique: true,
 				},
-				{ slug: "content_html", label: "Content HTML", type: "text" },
+				{ slug: "content_html", label: "Content", type: "portableText" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
 				{ slug: "template", label: "Template", type: "string" },
-				{ slug: "about_html", label: "About HTML", type: "text" },
+				{ slug: "about_html", label: "About", type: "portableText" },
 				{ slug: "box_left_title", label: "Left Box Title", type: "string" },
-				{ slug: "box_left_html", label: "Left Box HTML", type: "text" },
+				{ slug: "box_left_html", label: "Left Box", type: "portableText" },
 				{ slug: "box_middle_title", label: "Middle Box Title", type: "string" },
-				{ slug: "box_middle_html", label: "Middle Box HTML", type: "text" },
+				{ slug: "box_middle_html", label: "Middle Box", type: "portableText" },
 				{ slug: "box_right_title", label: "Right Box Title", type: "string" },
-				{ slug: "box_right_html", label: "Right Box HTML", type: "text" },
+				{ slug: "box_right_html", label: "Right Box", type: "portableText" },
 				{ slug: "author_name", label: "Author Name", type: "string" },
 				{ slug: "legacy_wp_id", label: "Legacy WordPress ID", type: "integer" },
 			],
@@ -683,8 +729,8 @@ const seed = {
 					required: true,
 					unique: true,
 				},
-				{ slug: "excerpt_html", label: "Excerpt HTML", type: "text" },
-				{ slug: "content_html", label: "Content HTML", type: "text" },
+				{ slug: "excerpt_html", label: "Excerpt", type: "portableText" },
+				{ slug: "content_html", label: "Content", type: "portableText" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
 				{ slug: "published_on", label: "Published On", type: "datetime" },
 				{ slug: "author_name", label: "Author Name", type: "string" },
@@ -705,8 +751,8 @@ const seed = {
 					required: true,
 					unique: true,
 				},
-				{ slug: "excerpt_html", label: "Excerpt HTML", type: "text" },
-				{ slug: "content_html", label: "Content HTML", type: "text" },
+				{ slug: "excerpt_html", label: "Excerpt", type: "portableText" },
+				{ slug: "content_html", label: "Content", type: "portableText" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
 				{
 					slug: "highlight",
@@ -737,17 +783,7 @@ const seed = {
 			items: buildMenuTree(pageItemsById),
 		},
 	],
-	media: Object.fromEntries(
-		Array.from(attachments.entries()).map(([id, attachment]) => [
-			id,
-			{
-				url: attachment.url,
-				alt: attachment.alt || "",
-				filename: attachment.filename || "",
-				title: attachment.title || "",
-			},
-		]),
-	),
+	media: seedMedia,
 	content: {
 		pages: pages.sort((a, b) => a.data.path.localeCompare(b.data.path)),
 		posts: posts.sort((a, b) => a.data.path.localeCompare(b.data.path)),

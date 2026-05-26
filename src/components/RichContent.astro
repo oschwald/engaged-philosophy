@@ -1,0 +1,41 @@
+---
+import { PortableText } from "emdash/ui";
+
+import HtmlContent from "./HtmlContent.astro";
+import RichTextGallery from "./rich-text/RichTextGallery.astro";
+import RichTextImage from "./rich-text/RichTextImage.astro";
+import RichTextLink from "./rich-text/RichTextLink.astro";
+import { isPortableTextValue } from "../lib/site";
+import type { RichTextValue } from "../lib/types";
+
+interface Props {
+	value?: RichTextValue | null;
+	class?: string;
+}
+
+const { value, class: className = "" } = Astro.props;
+---
+
+{
+	isPortableTextValue(value) ? (
+		<div class:list={["legacy-content", className]}>
+			<PortableText
+				value={value}
+				components={{
+					type: {
+						image: RichTextImage,
+						gallery: RichTextGallery,
+					},
+					mark: {
+						link: RichTextLink,
+					},
+				}}
+			/>
+		</div>
+	) : (
+		<HtmlContent
+			html={typeof value === "string" ? value : ""}
+			class={className}
+		/>
+	)
+}

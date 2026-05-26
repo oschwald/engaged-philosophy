@@ -1,11 +1,12 @@
 ---
-import HtmlContent from "../components/HtmlContent.astro";
+import RichContent from "../components/RichContent.astro";
 import SearchResults from "../components/SearchResults.astro";
 import Base from "../layouts/Base.astro";
 import { getPageBySlug, getPublishedProjects } from "../lib/seed";
 import { searchSite } from "../lib/search";
 import {
 	getEmDashEditAttrs,
+	getExcerptText,
 	getMediaUrlPrefix,
 	rewriteWordPressUploadUrl,
 	sortByPublishedOn,
@@ -81,9 +82,15 @@ const homeBoxes = home
 										)}
 										<div class="carousel-caption">
 											<h4>{project.data.title}</h4>
-											<HtmlContent
-												html={`${project.data.excerpt_html ?? ""} <a href="/${project.data.path}/">Continue reading <span class="meta-nav">&rarr;</span></a>`}
-											/>
+											<p>
+												{getExcerptText(
+													project.data.excerpt_html,
+													project.data.content_html,
+												)}{" "}
+												<a href={`/${project.data.path}/`}>
+													Continue reading <span class="meta-nav">&rarr;</span>
+												</a>
+											</p>
 										</div>
 									</div>
 								))}
@@ -119,7 +126,7 @@ const homeBoxes = home
 										)
 									: {})}
 							>
-								<HtmlContent html={home?.data.content_html} />
+								<RichContent value={home?.data.content_html} />
 							</div>
 						</div>
 					</div>
@@ -148,7 +155,7 @@ const homeBoxes = home
 											)
 										: {})}
 								>
-									<HtmlContent html={box.html} />
+									<RichContent value={box.html} />
 								</div>
 							</div>
 						))}
