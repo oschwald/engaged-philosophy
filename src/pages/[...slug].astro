@@ -1,13 +1,14 @@
 ---
 import HtmlContent from "../components/HtmlContent.astro";
 import Base from "../layouts/Base.astro";
-import { getPageByPath } from "../lib/seed";
+import { getPageByPath, getPageBySlug } from "../lib/seed";
 import { getEmDashEditAttrs, joinPath } from "../lib/site";
 
 const slugParts = Astro.params.slug?.split("/").filter(Boolean) ?? [];
 const path = joinPath(slugParts);
 
-const page = getPageByPath(path);
+const page =
+	getPageByPath(path) ?? (slugParts.length === 1 ? getPageBySlug(path) : null);
 
 if (!page) {
 	return Astro.redirect("/404");
