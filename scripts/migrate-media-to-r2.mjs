@@ -9,7 +9,12 @@ const DEFAULT_SITE_URL = "https://www.engagedphilosophy.com";
 const DEFAULT_CONCURRENCY = 4;
 const DEFAULT_WRANGLER_CONFIG = path.join(ROOT, "wrangler.jsonc");
 const UPLOAD_URL_RE =
-	/https?:\/\/(?:www\.)?engagedphilosophy\.com\/wp-content\/uploads\/[^"'()\s<>]+|\/wp-content\/uploads\/[^"'()\s<>]+/gi;
+	/https?:\/\/[^"'()\s<>]+|(?:^|[\s"'(=])(\/wp-content\/uploads\/[^"'()\s<>]+)/gi;
+const INTERNAL_UPLOAD_HOSTS = new Set([
+	"engagedphilosophy.com",
+	"www.engagedphilosophy.com",
+]);
+const DOWNLOAD_RETRIES = 3;
 
 function printUsage() {
 	console.log(`Usage: npm run migrate:media -- [options]
@@ -103,13 +108,24 @@ function walkStrings(value, visit) {
 
 function normalizeUploadUrl(rawValue, siteUrl) {
 	const trimmed = rawValue.trim();
-	const absoluteUrl = trimmed.startsWith("/wp-content/uploads/")
-		? new URL(trimmed, siteUrl).toString()
-		: trimmed;
-	const parsed = new URL(absoluteUrl);
+	if (trimmed.startsWith("/wp-content/uploads/")) {
+		const absoluteUrl = new URL(trimmed, siteUrl).toString();
+		return {
+			absoluteUrl,
+			key: trimmed.replace(/^\/+/, ""),
+		};
+	}
+
+	const parsed = new URL(trimmed);
+	if (
+		!INTERNAL_UPLOAD_HOSTS.has(parsed.hostname.toLowerCase()) ||
+		!parsed.pathname.startsWith("/wp-content/uploads/")
+	) {
+		return null;
+	}
 	const key = parsed.pathname.replace(/^\/+/, "");
 	return {
-		absoluteUrl,
+		absoluteUrl: parsed.toString(),
 		key,
 	};
 }
@@ -134,7 +150,9 @@ async function collectUploadTargets(seedPath, siteUrl, matchText) {
 
 	walkStrings(seed, (value) => {
 		for (const match of value.matchAll(UPLOAD_URL_RE)) {
-			const normalized = normalizeUploadUrl(match[0], siteUrl);
+			const rawValue = match[1] || match[0];
+			const normalized = normalizeUploadUrl(rawValue, siteUrl);
+			if (!normalized) continue;
 			if (matchText && !normalized.absoluteUrl.includes(matchText)) continue;
 			targets.set(normalized.key, normalized.absoluteUrl);
 		}
@@ -175,15 +193,29 @@ function runCommand(command, args) {
 }
 
 async function downloadFile(url, filePath) {
-	const response = await fetch(url);
-	if (!response.ok) {
-		throw new Error(
-			`Download failed with ${response.status} ${response.statusText}`,
-		);
+	let lastError = null;
+
+	for (let attempt = 1; attempt <= DOWNLOAD_RETRIES; attempt += 1) {
+		try {
+			const response = await fetch(url);
+			if (!response.ok) {
+				throw new Error(
+					`Download failed with ${response.status} ${response.statusText}`,
+				);
+			}
+			const arrayBuffer = await response.arrayBuffer();
+			await writeFile(filePath, Buffer.from(arrayBuffer));
+			return response.headers.get("content-type") ?? "";
+		} catch (error) {
+			lastError = error;
+			if (attempt === DOWNLOAD_RETRIES) break;
+			await new Promise((resolve) => {
+				setTimeout(resolve, attempt * 1_000);
+			});
+		}
 	}
-	const arrayBuffer = await response.arrayBuffer();
-	await writeFile(filePath, Buffer.from(arrayBuffer));
-	return response.headers.get("content-type") ?? "";
+
+	throw lastError instanceof Error ? lastError : new Error(String(lastError));
 }
 
 async function uploadFile(bucket, key, filePath, contentType) {

@@ -7,6 +7,12 @@
 	"vars": {
 		"PUBLIC_MEDIA_URL": "https://media.engagedphilosophy.com",
 	},
+	"kv_namespaces": [
+		{
+			"binding": "SESSION",
+			"id": "933be9ebf8f14f78934b855dc054f7f8",
+		},
+	],
 	"d1_databases": [
 		{
 			"binding": "DB",

@@ -18,6 +18,8 @@ const META_RE =
 	/<wp:postmeta>\s*<wp:meta_key><!\[CDATA\[(.*?)\]\]><\/wp:meta_key>\s*<wp:meta_value><!\[CDATA\[(.*?)\]\]><\/wp:meta_value>\s*<\/wp:postmeta>/gs;
 const ITEM_CATEGORY_RE =
 	/<category domain="([^"]+)" nicename="([^"]+)"><!\[CDATA\[(.*?)\]\]><\/category>/gs;
+const INTERNAL_UPLOAD_URL_RE =
+	/(https?:\/\/(?:www\.)?engagedphilosophy\.com\/wp-content\/uploads\/[^"'()\s<>]+|\/wp-content\/uploads\/[^"'()\s<>]+)/gi;
 
 function readFile(filePath) {
 	return fs.readFileSync(filePath, "utf8").replace(CONTROL_CHARS, "");
@@ -134,6 +136,51 @@ function normalizeHtml(value) {
 		.trim();
 }
 
+function normalizeUploadFilename(value) {
+	return (value || "")
+		.replace(/-e\d+(?=\.[^.]+$)/i, "")
+		.replace(/-\d+x\d+(?=\.[^.]+$)/i, "");
+}
+
+function registerUnique(map, key, value) {
+	if (!key || !value) return;
+	const existing = map.get(key);
+	if (!existing) {
+		map.set(key, value);
+		return;
+	}
+	if (existing !== value) {
+		map.set(key, null);
+	}
+}
+
+function repairInternalUploadLinks(
+	value,
+	exactReplacements,
+	filenameReplacements,
+	siteUrl,
+) {
+	return (value || "").replace(INTERNAL_UPLOAD_URL_RE, (match) => {
+		const trimmed = match.trim();
+		const absoluteUrl = trimmed.startsWith("/wp-content/uploads/")
+			? new URL(trimmed, siteUrl).toString()
+			: trimmed;
+		const directReplacement =
+			exactReplacements.get(absoluteUrl) ?? exactReplacements.get(trimmed);
+		if (directReplacement) return directReplacement;
+
+		try {
+			const { pathname } = new URL(absoluteUrl);
+			const filename = pathname.split("/").pop() || "";
+			const normalizedFilename = normalizeUploadFilename(filename);
+			const filenameReplacement = filenameReplacements.get(normalizedFilename);
+			return filenameReplacement || match;
+		} catch {
+			return match;
+		}
+	});
+}
+
 function repairMalformedInternalLinks(value, postsBySlug) {
 	return (value || "").replace(
 		/((?:https?:\/\/(?:www\.)?engagedphilosophy\.com)?\/(?:(?:…|\.\.\.|%E2%80%A6)\/){2,}\d{2}\/([a-z0-9-]+)\/?)/gi,
@@ -238,6 +285,8 @@ for (const match of rawXml.matchAll(WP_CATEGORY_RE)) {
 
 const items = [...rawXml.matchAll(ITEM_RE)].map((match) => match[1]);
 const attachments = new Map();
+const attachmentReplacements = new Map();
+const attachmentReplacementsByFilename = new Map();
 
 for (const item of items) {
 	const postType = extractTag(item, "wp:post_type");
@@ -245,10 +294,23 @@ for (const item of items) {
 
 	const postId = extractTag(item, "wp:post_id");
 	const attachmentUrl = extractTag(item, "wp:attachment_url");
+	const guidUrl = decodeEntities(extractTag(item, "guid"));
 	const meta = Object.fromEntries(
 		[...item.matchAll(META_RE)].map((m) => [m[1], m[2]]),
 	);
 	const filename = attachmentUrl ? attachmentUrl.split("/").pop() : "";
+
+	if (attachmentUrl) {
+		registerUnique(attachmentReplacements, attachmentUrl, attachmentUrl);
+		if (guidUrl) {
+			registerUnique(attachmentReplacements, guidUrl, attachmentUrl);
+		}
+		registerUnique(
+			attachmentReplacementsByFilename,
+			normalizeUploadFilename(filename),
+			attachmentUrl,
+		);
+	}
 
 	attachments.set(postId, {
 		url: attachmentUrl,
@@ -441,21 +503,51 @@ for (const entry of pages) {
 		entry.data.content_html,
 		postPathsBySlug,
 	);
+	entry.data.content_html = repairInternalUploadLinks(
+		entry.data.content_html,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
 	entry.data.about_html = repairMalformedInternalLinks(
 		entry.data.about_html,
 		postPathsBySlug,
+	);
+	entry.data.about_html = repairInternalUploadLinks(
+		entry.data.about_html,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
 	);
 	entry.data.box_left_html = repairMalformedInternalLinks(
 		entry.data.box_left_html,
 		postPathsBySlug,
 	);
+	entry.data.box_left_html = repairInternalUploadLinks(
+		entry.data.box_left_html,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
 	entry.data.box_middle_html = repairMalformedInternalLinks(
 		entry.data.box_middle_html,
 		postPathsBySlug,
 	);
+	entry.data.box_middle_html = repairInternalUploadLinks(
+		entry.data.box_middle_html,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
 	entry.data.box_right_html = repairMalformedInternalLinks(
 		entry.data.box_right_html,
 		postPathsBySlug,
+	);
+	entry.data.box_right_html = repairInternalUploadLinks(
+		entry.data.box_right_html,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
 	);
 }
 
@@ -464,9 +556,21 @@ for (const entry of posts) {
 		entry.data.content_html,
 		postPathsBySlug,
 	);
+	entry.data.content_html = repairInternalUploadLinks(
+		entry.data.content_html,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
 	entry.data.excerpt_html = repairMalformedInternalLinks(
 		entry.data.excerpt_html,
 		postPathsBySlug,
+	);
+	entry.data.excerpt_html = repairInternalUploadLinks(
+		entry.data.excerpt_html,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
 	);
 }
 
@@ -475,9 +579,21 @@ for (const entry of projects) {
 		entry.data.content_html,
 		postPathsBySlug,
 	);
+	entry.data.content_html = repairInternalUploadLinks(
+		entry.data.content_html,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
 	entry.data.excerpt_html = repairMalformedInternalLinks(
 		entry.data.excerpt_html,
 		postPathsBySlug,
+	);
+	entry.data.excerpt_html = repairInternalUploadLinks(
+		entry.data.excerpt_html,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
 	);
 }
 
