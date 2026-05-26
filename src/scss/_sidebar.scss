@@ -132,18 +132,9 @@
 	justify-content: space-between;
 }
 
-.widget_recent_comments ul li {
-	padding: 0.6rem 1rem;
-	font-size: 0.85rem;
-}
-
 // Last child selector comes after specific widget selectors
 .widget ul li:last-child {
 	border-bottom: none;
-}
-
-.widget_recent_comments .comment-author-link {
-	font-weight: 500;
 }
 
 // Search functionality

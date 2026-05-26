@@ -113,40 +113,7 @@
 
 	// Mobile carousel styling moved to _carousel.scss partial
 
-	.gallery > li {
-		flex: 0 0 auto;
-	}
-
-	.gallery-columns-2 > li {
-		width: calc(50% - 0.5rem);
-	}
-
-	.gallery-columns-3 > li {
-		width: calc(33.333% - 0.5rem);
-	}
-
-	.gallery-columns-4 > li {
-		width: calc(25% - 0.5rem);
-	}
-
-	.gallery-columns-5 > li {
-		width: calc(20% - 0.5rem);
-	}
-
-	.gallery-columns-6 > li {
-		width: calc(16.666% - 0.5rem);
-	}
-
-	.gallery-columns-7 > li {
-		width: calc(14.285% - 0.5rem);
-	}
-
-	.gallery-columns-8 > li {
-		width: calc(12.5% - 0.5rem);
-	}
-
-	.sidebar-content #primary,
-	.sidebar-content #attachment-comment {
+	.sidebar-content #primary {
 		float: none;
 		margin: inherit;
 	}
@@ -273,12 +240,7 @@
 		padding: 24px 0 10px;
 	}
 
-	.sidebar-content #primary,
-	.sidebar-content #attachment-comment {
+	.sidebar-content #primary {
 		margin-right: 30px;
-	}
-
-	.wp-caption {
-		display: table;
 	}
 }
