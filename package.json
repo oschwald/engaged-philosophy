@@ -10,7 +10,9 @@
 	"scripts": {
 		"generate:seed": "node scripts/generate-seed.mjs",
 		"migrate:media": "node scripts/migrate-media-to-r2.mjs",
+		"migrate:importer-schema": "node scripts/migrate-importer-schema.mjs",
 		"migrate:portable-text": "node scripts/migrate-portable-text.mjs",
+		"sync:seed-d1": "node scripts/sync-seed-to-d1.mjs",
 		"parity:audit": "node scripts/parity-audit.mjs",
 		"dev": "astro dev",
 		"build": "astro build",

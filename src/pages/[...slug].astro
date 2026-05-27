@@ -2,7 +2,12 @@
 import RichContent from "../components/RichContent.astro";
 import Base from "../layouts/Base.astro";
 import { getPageByPath, getPageBySlug } from "../lib/seed";
-import { getEmDashEditAttrs, joinPath } from "../lib/site";
+import {
+	getEmDashEditAttrs,
+	getEntryContent,
+	getEntryContentField,
+	joinPath,
+} from "../lib/site";
 
 const slugParts = Astro.params.slug?.split("/").filter(Boolean) ?? [];
 const path = joinPath(slugParts);
@@ -59,10 +64,10 @@ const bodyClass = [
 								"pages",
 								page.slug,
 								page.status,
-								"content_html",
+								getEntryContentField(page.data),
 							)}
 						>
-							<RichContent value={page.data.content_html} />
+							<RichContent value={getEntryContent(page.data)} />
 						</div>
 					</article>
 				</main>
@@ -91,10 +96,10 @@ const bodyClass = [
 									"pages",
 									page.slug,
 									page.status,
-									"content_html",
+									getEntryContentField(page.data),
 								)}
 							>
-								<RichContent value={page.data.content_html} />
+								<RichContent value={getEntryContent(page.data)} />
 							</div>
 						</article>
 					</div>

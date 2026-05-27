@@ -1,6 +1,8 @@
 ---
 import ThemeSidebar from "./ThemeSidebar.astro";
 import {
+	getEntryContent,
+	getEntryExcerpt,
 	getExcerptText,
 	getMediaUrlPrefix,
 	rewriteWordPressUploadUrl,
@@ -65,8 +67,8 @@ function pageHref(pageNumber: number) {
 							)}
 							<p>
 								{getExcerptText(
-									project.data.excerpt_html,
-									project.data.content_html,
+									getEntryExcerpt(project.data),
+									getEntryContent(project.data),
 								)}{" "}
 								<a href={`/${project.data.path}/`}>
 									Continue reading <span class="meta-nav">&rarr;</span>

@@ -14,14 +14,14 @@ const ROOT = process.cwd();
 const DATABASE_NAME = "engaged-philosophy";
 const FIELD_MAP = {
 	pages: [
-		"content_html",
+		"content",
 		"about_html",
 		"box_left_html",
 		"box_middle_html",
 		"box_right_html",
 	],
-	posts: ["excerpt_html", "content_html"],
-	projects: ["excerpt_html", "content_html"],
+	posts: ["excerpt", "content"],
+	projects: ["excerpt", "content"],
 };
 
 const mode = process.argv.includes("--remote")

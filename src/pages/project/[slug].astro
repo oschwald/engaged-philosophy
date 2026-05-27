@@ -2,7 +2,11 @@
 import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
 import { getEntryTerms, getProjectBySlug } from "../../lib/seed";
-import { getEmDashEditAttrs } from "../../lib/site";
+import {
+	getEmDashEditAttrs,
+	getEntryContent,
+	getEntryContentField,
+} from "../../lib/site";
 
 const { slug } = Astro.params;
 const project = getProjectBySlug(slug ?? "");
@@ -48,12 +52,12 @@ const topics = getEntryTerms(project, "topic");
 						"projects",
 						project.slug,
 						project.status,
-						"content_html",
+						getEntryContentField(project.data),
 					)}
 				>
 					<div class="row">
 						<div class="col-lg-9">
-							<RichContent value={project.data.content_html} />
+							<RichContent value={getEntryContent(project.data)} />
 						</div>
 
 						<div class="col-lg-3">

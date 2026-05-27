@@ -3,6 +3,7 @@ import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
 import { getEmDashEntry } from "emdash";
 import { getProjectBySlug } from "../../lib/seed";
+import { getEntryContent } from "../../lib/site";
 
 const { slug = "" } = Astro.params;
 const project = getProjectBySlug(slug);
@@ -22,11 +23,7 @@ if (project) {
 const liveEntry = liveProject!;
 const title =
 	typeof liveEntry.data.title === "string" ? liveEntry.data.title : "";
-const content =
-	Array.isArray(liveEntry.data.content_html) ||
-	typeof liveEntry.data.content_html === "string"
-		? liveEntry.data.content_html
-		: undefined;
+const content = getEntryContent(liveEntry.data);
 ---
 
 <Base title={title} bodyClass="single single-project">

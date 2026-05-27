@@ -6,6 +6,9 @@ import { getPageBySlug, getPublishedProjects } from "../lib/seed";
 import { searchSite } from "../lib/search";
 import {
 	getEmDashEditAttrs,
+	getEntryContent,
+	getEntryContentField,
+	getEntryExcerpt,
 	getExcerptText,
 	getMediaUrlPrefix,
 	rewriteWordPressUploadUrl,
@@ -84,8 +87,8 @@ const homeBoxes = home
 											<h4>{project.data.title}</h4>
 											<p>
 												{getExcerptText(
-													project.data.excerpt_html,
-													project.data.content_html,
+													getEntryExcerpt(project.data),
+													getEntryContent(project.data),
 												)}{" "}
 												<a href={`/${project.data.path}/`}>
 													Continue reading <span class="meta-nav">&rarr;</span>
@@ -122,11 +125,13 @@ const homeBoxes = home
 											"pages",
 											home.slug,
 											home.status,
-											"content_html",
+											getEntryContentField(home.data),
 										)
 									: {})}
 							>
-								<RichContent value={home?.data.content_html} />
+								<RichContent
+									value={home ? getEntryContent(home.data) : undefined}
+								/>
 							</div>
 						</div>
 					</div>

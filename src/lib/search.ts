@@ -3,7 +3,13 @@ import {
 	getPublishedPosts,
 	getPublishedProjects,
 } from "./seed";
-import { getExcerptText, rewriteWordPressUploadUrl, stripHtml } from "./site";
+import {
+	getEntryContent,
+	getEntryExcerpt,
+	getExcerptText,
+	rewriteWordPressUploadUrl,
+	stripHtml,
+} from "./site";
 import type { ContentEntry, PageData, PostData, ProjectData } from "./types";
 
 export interface SearchResult {
@@ -52,12 +58,10 @@ function rankEntry(
 	const path = entry.data.path?.trim() ?? "";
 	if (!title || !path) return null;
 
-	const excerpt = getExcerptText(
-		"excerpt_html" in entry.data ? entry.data.excerpt_html : undefined,
-		entry.data.content_html,
-	);
+	const content = getEntryContent(entry.data);
+	const excerpt = getExcerptText(getEntryExcerpt(entry.data), content);
 	const titleText = title.toLowerCase();
-	const bodyText = stripHtml(entry.data.content_html).toLowerCase();
+	const bodyText = stripHtml(content).toLowerCase();
 	const pathText = path.toLowerCase();
 
 	const score =

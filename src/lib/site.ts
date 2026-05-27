@@ -19,6 +19,15 @@ interface EmDashEditRef {
 	field?: string;
 }
 
+type RichTextFieldValue = string | PortableTextBlock[] | null | undefined;
+
+interface RichTextEntryData {
+	content?: RichTextFieldValue;
+	content_html?: RichTextFieldValue;
+	excerpt?: RichTextFieldValue;
+	excerpt_html?: RichTextFieldValue;
+}
+
 export const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
 const WORDPRESS_SITE_HOST_RE = /^(?:www\.)?engagedphilosophy\.com$/i;
 
@@ -98,6 +107,22 @@ export function getEmDashEditAttrs(
 	return {
 		"data-emdash-ref": JSON.stringify(ref),
 	};
+}
+
+function getRichTextValue(value: RichTextFieldValue) {
+	return typeof value === "string" || Array.isArray(value) ? value : undefined;
+}
+
+export function getEntryContent(data?: RichTextEntryData | null) {
+	return getRichTextValue(data?.content ?? data?.content_html);
+}
+
+export function getEntryExcerpt(data?: RichTextEntryData | null) {
+	return getRichTextValue(data?.excerpt ?? data?.excerpt_html);
+}
+
+export function getEntryContentField(data?: RichTextEntryData | null) {
+	return data && Object.hasOwn(data, "content") ? "content" : "content_html";
 }
 
 export function decodeHtmlEntities(value?: string | null) {
@@ -190,17 +215,17 @@ export function stripHtml(value?: string | PortableTextBlock[] | null) {
 }
 
 export function getExcerptText(
-	excerptHtml?: string | PortableTextBlock[] | null,
-	contentHtml?: string | PortableTextBlock[] | null,
+	excerpt?: string | PortableTextBlock[] | null,
+	content?: string | PortableTextBlock[] | null,
 	wordLimit = 55,
 ) {
-	const preferred = stripHtml(excerptHtml);
+	const preferred = stripHtml(excerpt);
 	if (preferred) return preferred;
 
-	const content = stripHtml(contentHtml);
-	if (!content) return "";
+	const contentText = stripHtml(content);
+	if (!contentText) return "";
 
-	const words = content.split(/\s+/);
+	const words = contentText.split(/\s+/);
 	return words.slice(0, wordLimit).join(" ");
 }
 

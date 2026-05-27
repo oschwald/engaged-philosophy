@@ -3,7 +3,12 @@ import RichContent from "../../../../components/RichContent.astro";
 import ThemeSidebar from "../../../../components/ThemeSidebar.astro";
 import Base from "../../../../layouts/Base.astro";
 import { getPostByPath, getTermsBySlugs } from "../../../../lib/seed";
-import { getEmDashEditAttrs, joinPath } from "../../../../lib/site";
+import {
+	getEmDashEditAttrs,
+	getEntryContent,
+	getEntryContentField,
+	joinPath,
+} from "../../../../lib/site";
 
 const { year = "", month = "", day = "", slug = "" } = Astro.params;
 const path = joinPath([year, month, day, slug]);
@@ -47,10 +52,10 @@ const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
 						"posts",
 						post.slug,
 						post.status,
-						"content_html",
+						getEntryContentField(post.data),
 					)}
 				>
-					<RichContent value={post.data.content_html} />
+					<RichContent value={getEntryContent(post.data)} />
 				</div>
 				{
 					categories.length > 0 && (

@@ -407,7 +407,7 @@ for (const item of items) {
 	const baseData = {
 		title,
 		path: contentPath,
-		content_html: normalizeHtml(extractTag(item, "content:encoded")),
+		content: normalizeHtml(extractTag(item, "content:encoded")),
 		author_name: authorName,
 		legacy_wp_id: Number(postId),
 		...(thumbnail ? { featured_image: thumbnail } : {}),
@@ -445,7 +445,7 @@ for (const item of items) {
 			status: statusValue,
 			data: {
 				...baseData,
-				excerpt_html: normalizeHtml(extractTag(item, "excerpt:encoded")),
+				excerpt: normalizeHtml(extractTag(item, "excerpt:encoded")),
 				published_on: toIsoDate(
 					extractTag(item, "wp:post_date_gmt") ||
 						extractTag(item, "wp:post_date"),
@@ -482,7 +482,7 @@ for (const item of items) {
 			status: statusValue,
 			data: {
 				...baseData,
-				excerpt_html: normalizeHtml(extractTag(item, "excerpt:encoded")),
+				excerpt: normalizeHtml(extractTag(item, "excerpt:encoded")),
 				highlight: normalizeBool(metas.highlight || ""),
 				menu_order: menuOrder,
 				published_on: toIsoDate(
@@ -512,12 +512,12 @@ const seedMedia = Object.fromEntries(
 );
 
 for (const entry of pages) {
-	entry.data.content_html = repairMalformedInternalLinks(
-		entry.data.content_html,
+	entry.data.content = repairMalformedInternalLinks(
+		entry.data.content,
 		postPathsBySlug,
 	);
-	entry.data.content_html = repairInternalUploadLinks(
-		entry.data.content_html,
+	entry.data.content = repairInternalUploadLinks(
+		entry.data.content,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
@@ -562,10 +562,7 @@ for (const entry of pages) {
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.content_html = htmlToPortableText(
-		entry.data.content_html,
-		seedMedia,
-	);
+	entry.data.content = htmlToPortableText(entry.data.content, seedMedia);
 	entry.data.about_html = htmlToPortableText(entry.data.about_html, seedMedia);
 	entry.data.box_left_html = htmlToPortableText(
 		entry.data.box_left_html,
@@ -582,65 +579,53 @@ for (const entry of pages) {
 }
 
 for (const entry of posts) {
-	entry.data.content_html = repairMalformedInternalLinks(
-		entry.data.content_html,
+	entry.data.content = repairMalformedInternalLinks(
+		entry.data.content,
 		postPathsBySlug,
 	);
-	entry.data.content_html = repairInternalUploadLinks(
-		entry.data.content_html,
+	entry.data.content = repairInternalUploadLinks(
+		entry.data.content,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.excerpt_html = repairMalformedInternalLinks(
-		entry.data.excerpt_html,
+	entry.data.excerpt = repairMalformedInternalLinks(
+		entry.data.excerpt,
 		postPathsBySlug,
 	);
-	entry.data.excerpt_html = repairInternalUploadLinks(
-		entry.data.excerpt_html,
+	entry.data.excerpt = repairInternalUploadLinks(
+		entry.data.excerpt,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.content_html = htmlToPortableText(
-		entry.data.content_html,
-		seedMedia,
-	);
-	entry.data.excerpt_html = htmlToPortableText(
-		entry.data.excerpt_html,
-		seedMedia,
-	);
+	entry.data.content = htmlToPortableText(entry.data.content, seedMedia);
+	entry.data.excerpt = htmlToPortableText(entry.data.excerpt, seedMedia);
 }
 
 for (const entry of projects) {
-	entry.data.content_html = repairMalformedInternalLinks(
-		entry.data.content_html,
+	entry.data.content = repairMalformedInternalLinks(
+		entry.data.content,
 		postPathsBySlug,
 	);
-	entry.data.content_html = repairInternalUploadLinks(
-		entry.data.content_html,
+	entry.data.content = repairInternalUploadLinks(
+		entry.data.content,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.excerpt_html = repairMalformedInternalLinks(
-		entry.data.excerpt_html,
+	entry.data.excerpt = repairMalformedInternalLinks(
+		entry.data.excerpt,
 		postPathsBySlug,
 	);
-	entry.data.excerpt_html = repairInternalUploadLinks(
-		entry.data.excerpt_html,
+	entry.data.excerpt = repairInternalUploadLinks(
+		entry.data.excerpt,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.content_html = htmlToPortableText(
-		entry.data.content_html,
-		seedMedia,
-	);
-	entry.data.excerpt_html = htmlToPortableText(
-		entry.data.excerpt_html,
-		seedMedia,
-	);
+	entry.data.content = htmlToPortableText(entry.data.content, seedMedia);
+	entry.data.excerpt = htmlToPortableText(entry.data.excerpt, seedMedia);
 }
 
 for (const item of rawMenuItems) {
@@ -701,7 +686,7 @@ const seed = {
 					required: true,
 					unique: true,
 				},
-				{ slug: "content_html", label: "Content", type: "portableText" },
+				{ slug: "content", label: "Content", type: "portableText" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
 				{ slug: "template", label: "Template", type: "string" },
 				{ slug: "about_html", label: "About", type: "portableText" },
@@ -729,8 +714,8 @@ const seed = {
 					required: true,
 					unique: true,
 				},
-				{ slug: "excerpt_html", label: "Excerpt", type: "portableText" },
-				{ slug: "content_html", label: "Content", type: "portableText" },
+				{ slug: "excerpt", label: "Excerpt", type: "portableText" },
+				{ slug: "content", label: "Content", type: "portableText" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
 				{ slug: "published_on", label: "Published On", type: "datetime" },
 				{ slug: "author_name", label: "Author Name", type: "string" },
@@ -751,8 +736,8 @@ const seed = {
 					required: true,
 					unique: true,
 				},
-				{ slug: "excerpt_html", label: "Excerpt", type: "portableText" },
-				{ slug: "content_html", label: "Content", type: "portableText" },
+				{ slug: "excerpt", label: "Excerpt", type: "portableText" },
+				{ slug: "content", label: "Content", type: "portableText" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
 				{
 					slug: "highlight",

@@ -2,7 +2,11 @@
 import Base from "../layouts/Base.astro";
 import RichContent from "../components/RichContent.astro";
 import { getPageByPath } from "../lib/seed";
-import { getEmDashEditAttrs } from "../lib/site";
+import {
+	getEmDashEditAttrs,
+	getEntryContent,
+	getEntryContentField,
+} from "../lib/site";
 
 const page = getPageByPath("blog");
 ---
@@ -34,11 +38,13 @@ const page = getPageByPath("blog");
 									"pages",
 									page.slug,
 									page.status,
-									"content_html",
+									getEntryContentField(page.data),
 								)
 							: {}}
 					>
-						<RichContent value={page?.data.content_html} />
+						<RichContent
+							value={page ? getEntryContent(page.data) : undefined}
+						/>
 					</div>
 				</article>
 			</div>

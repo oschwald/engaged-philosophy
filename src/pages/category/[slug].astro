@@ -4,6 +4,8 @@ import Base from "../../layouts/Base.astro";
 import { getPostsByCategory, getTaxonomyTerm } from "../../lib/seed";
 import {
 	formatPathDate,
+	getEntryContent,
+	getEntryExcerpt,
 	getExcerptText,
 	sortByPublishedOn,
 } from "../../lib/site";
@@ -47,8 +49,8 @@ const posts = sortByPublishedOn(getPostsByCategory(slug));
 									<div class="entry-content text-muted lh-base">
 										<p>
 											{getExcerptText(
-												post.data.excerpt_html,
-												post.data.content_html,
+												getEntryExcerpt(post.data),
+												getEntryContent(post.data),
 											)}{" "}
 											<a href={`/${post.data.path}/`}>
 												Continue reading <span class="meta-nav">&rarr;</span>

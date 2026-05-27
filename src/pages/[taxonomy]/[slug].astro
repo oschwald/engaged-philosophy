@@ -8,6 +8,8 @@ import {
 } from "../../lib/seed";
 import {
 	getEmDashEditAttrs,
+	getEntryContent,
+	getEntryContentField,
 	isProjectTaxonomy,
 	sortByPublishedOn,
 } from "../../lib/site";
@@ -64,10 +66,10 @@ const projects = isProjectTaxonomy(taxonomy)
 								"pages",
 								page.slug,
 								page.status,
-								"content_html",
+								getEntryContentField(page.data),
 							)}
 						>
-							<RichContent value={page.data.content_html} />
+							<RichContent value={getEntryContent(page.data)} />
 						</div>
 					</article>
 				</main>
