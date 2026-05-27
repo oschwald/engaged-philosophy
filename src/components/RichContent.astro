@@ -1,11 +1,8 @@
 ---
+import { getEditMeta } from "emdash";
 import { PortableText } from "emdash/ui";
 
 import HtmlContent from "./HtmlContent.astro";
-import RichTextGallery from "./rich-text/RichTextGallery.astro";
-import RichTextHorizontalRule from "./rich-text/RichTextHorizontalRule.astro";
-import RichTextImage from "./rich-text/RichTextImage.astro";
-import RichTextLink from "./rich-text/RichTextLink.astro";
 import RichTextNumberedHeading from "./rich-text/RichTextNumberedHeading.astro";
 import { isPortableTextValue } from "../lib/site";
 import type { RichTextValue } from "../lib/types";
@@ -16,6 +13,7 @@ interface Props {
 }
 
 const { value, class: className = "" } = Astro.props;
+const editMeta = getEditMeta(value);
 
 function normalizeLegacyPortableText(blocks: Exclude<RichTextValue, string>) {
 	let numberedHeadingIndex = 0;
@@ -45,9 +43,10 @@ function normalizeLegacyPortableText(blocks: Exclude<RichTextValue, string>) {
 	});
 }
 
-const normalizedValue = isPortableTextValue(value)
-	? normalizeLegacyPortableText(value)
-	: value;
+const normalizedValue =
+	isPortableTextValue(value) && !editMeta
+		? normalizeLegacyPortableText(value)
+		: value;
 ---
 
 {
@@ -57,13 +56,7 @@ const normalizedValue = isPortableTextValue(value)
 				value={normalizedValue}
 				components={{
 					type: {
-						image: RichTextImage,
-						gallery: RichTextGallery,
-						horizontalRule: RichTextHorizontalRule,
 						numberedHeading: RichTextNumberedHeading,
-					},
-					mark: {
-						link: RichTextLink,
 					},
 				}}
 			/>

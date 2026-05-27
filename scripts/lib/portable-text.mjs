@@ -8,6 +8,9 @@ const { gfm } = turndownPluginGfm;
 
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g;
 const LEGACY_SITE_HOST_RE = /^(?:www\.)?engagedphilosophy\.com$/i;
+const PUBLIC_MEDIA_URL = (
+	process.env.PUBLIC_MEDIA_URL || "https://media.engagedphilosophy.com"
+).replace(/\/+$/, "");
 const TOKEN_RE =
 	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[embed\][\s\S]*?\[\/embed\])/gi;
 
@@ -59,6 +62,15 @@ function normalizeLegacyHref(value) {
 	} catch {
 		return normalized;
 	}
+}
+
+function rewriteUploadUrl(value) {
+	const normalized = normalizeLegacyHref(value);
+	if (!normalized.startsWith("/wp-content/uploads/")) {
+		return normalized;
+	}
+
+	return `${PUBLIC_MEDIA_URL}${normalized}`;
 }
 
 function parseAttributes(source) {
@@ -165,6 +177,54 @@ function extractPortableTextPlainText(blocks) {
 		.trim();
 }
 
+function createTextBlock(text) {
+	return {
+		_type: "block",
+		_key: generateKey(),
+		style: "normal",
+		markDefs: [],
+		children: [
+			{
+				_type: "span",
+				_key: generateKey(),
+				text,
+				marks: [],
+			},
+		],
+	};
+}
+
+function normalizeImageBlock(block) {
+	if (!block?.asset || typeof block.asset.url !== "string") {
+		return null;
+	}
+	if (shouldIgnoreImageUrl(block.asset.url)) {
+		return null;
+	}
+
+	return {
+		_type: "image",
+		_key: block._key || generateKey(),
+		asset: {
+			...block.asset,
+			_ref: block.asset._ref || generateKey(),
+			url: rewriteUploadUrl(block.asset.url),
+		},
+		...(typeof block.alt === "string" ? { alt: block.alt } : {}),
+		...(typeof block.caption === "string" && block.caption.trim()
+			? { caption: block.caption.trim() }
+			: {}),
+		...(typeof block.width === "number" ? { width: block.width } : {}),
+		...(typeof block.height === "number" ? { height: block.height } : {}),
+		...(typeof block.displayWidth === "number"
+			? { displayWidth: block.displayWidth }
+			: {}),
+		...(typeof block.displayHeight === "number"
+			? { displayHeight: block.displayHeight }
+			: {}),
+	};
+}
+
 function normalizePortableTextBlocks(blocks) {
 	const normalizedBlocks = [];
 
@@ -174,43 +234,39 @@ function normalizePortableTextBlocks(blocks) {
 		if (Array.isArray(nextBlock.markDefs)) {
 			nextBlock.markDefs = nextBlock.markDefs.map((markDef) =>
 				markDef?._type === "link" && typeof markDef.href === "string"
-					? { ...markDef, href: normalizeLegacyHref(markDef.href) }
+					? { ...markDef, href: rewriteUploadUrl(markDef.href) }
 					: markDef,
 			);
 		}
 
-		if (
-			nextBlock._type === "image" &&
-			nextBlock.asset &&
-			typeof nextBlock.asset.url === "string"
-		) {
-			if (shouldIgnoreImageUrl(nextBlock.asset.url)) {
-				continue;
+		if (nextBlock._type === "image") {
+			const normalizedImage = normalizeImageBlock(nextBlock);
+			if (normalizedImage) {
+				normalizedBlocks.push(normalizedImage);
 			}
-			nextBlock.asset = {
-				...nextBlock.asset,
-				_ref: nextBlock.asset._ref || generateKey(),
-				url: normalizeLegacyHref(nextBlock.asset.url),
-			};
+			continue;
 		}
 
 		if (nextBlock._type === "gallery" && Array.isArray(nextBlock.images)) {
-			nextBlock.images = nextBlock.images
-				.filter((image) => !shouldIgnoreImageUrl(image.asset?.url))
-				.map((image) => ({
-					...image,
-					asset: {
-						...image.asset,
-						_ref: image.asset?._ref || generateKey(),
-						url:
-							typeof image.asset?.url === "string"
-								? normalizeLegacyHref(image.asset.url)
-								: image.asset?.url,
-					},
-				}));
-			if (nextBlock.images.length === 0) {
-				continue;
+			const images = nextBlock.images
+				.map((image) => normalizeImageBlock(image))
+				.filter(Boolean);
+			if (images.length > 0) {
+				normalizedBlocks.push(...images);
 			}
+			if (typeof nextBlock.caption === "string" && nextBlock.caption.trim()) {
+				normalizedBlocks.push(createTextBlock(nextBlock.caption.trim()));
+			}
+			continue;
+		}
+
+		if (nextBlock._type === "horizontalRule") {
+			normalizedBlocks.push({
+				_type: "break",
+				_key: nextBlock._key || generateKey(),
+				style: "lineBreak",
+			});
+			continue;
 		}
 
 		if (
@@ -224,8 +280,9 @@ function normalizePortableTextBlocks(blocks) {
 				.trim();
 			if (/^\*\s*\*$/.test(text) || /^\*\s*\*\s*\*$/.test(text)) {
 				normalizedBlocks.push({
-					_type: "horizontalRule",
+					_type: "break",
 					_key: nextBlock._key || generateKey(),
+					style: "lineBreak",
 				});
 				continue;
 			}
@@ -309,7 +366,7 @@ function normalizePortableTextBlocks(blocks) {
 						...markDef,
 						_key: nextKey,
 						...(markDef?._type === "link" && typeof markDef.href === "string"
-							? { href: normalizeLegacyHref(markDef.href) }
+							? { href: rewriteUploadUrl(markDef.href) }
 							: {}),
 					});
 				}
@@ -451,7 +508,7 @@ function galleryShortcodeToPortableText(shortcode, mediaById) {
 			_key: generateKey(),
 			asset: {
 				_ref: id,
-				url: normalizeLegacyHref(media.url),
+				url: rewriteUploadUrl(media.url),
 			},
 			alt: media.alt || media.title || "",
 			...(isMeaningfulCaption(
@@ -523,10 +580,10 @@ function imageAttributesToPortableText(
 		_key: generateKey(),
 		asset: {
 			_ref: generateKey(),
-			url: imageSrc,
+			url: rewriteUploadUrl(imageSrc),
 		},
 		alt: imageAttributes.alt || imageAttributes["data-image-title"] || "",
-		...(href ? { href } : {}),
+		...(href ? { href: rewriteUploadUrl(href) } : {}),
 		...(align ? { align } : {}),
 		...(overrides.caption ? { caption: overrides.caption } : {}),
 		...(width ? { width } : {}),
@@ -611,8 +668,9 @@ function imageFigureToPortableText(token) {
 function horizontalRuleToPortableText() {
 	return [
 		{
-			_type: "horizontalRule",
+			_type: "break",
 			_key: generateKey(),
+			style: "lineBreak",
 		},
 	];
 }
