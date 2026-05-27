@@ -3,7 +3,7 @@ import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
 import { getEntryTerms, getProjectBySlug } from "../../lib/seed";
 import {
-	getEmDashEditAttrs,
+	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
 } from "../../lib/site";
@@ -30,17 +30,12 @@ const topics = getEntryTerms(project, "topic");
 		<main id="content">
 			<article
 				class="project type-project status-publish"
-				{...getEmDashEditAttrs("projects", project.slug, project.status)}
+				{...getEmDashEditEntryAttrs("projects", project)}
 			>
 				<header class="page-header">
 					<h1
 						class="entry-title"
-						{...getEmDashEditAttrs(
-							"projects",
-							project.slug,
-							project.status,
-							"title",
-						)}
+						{...getEmDashEditEntryAttrs("projects", project, "title")}
 					>
 						{project.data.title}
 					</h1>
@@ -48,10 +43,9 @@ const topics = getEntryTerms(project, "topic");
 
 				<div
 					class="entry-content"
-					{...getEmDashEditAttrs(
+					{...getEmDashEditEntryAttrs(
 						"projects",
-						project.slug,
-						project.status,
+						project,
 						getEntryContentField(project.data),
 					)}
 				>

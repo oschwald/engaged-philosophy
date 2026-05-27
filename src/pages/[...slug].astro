@@ -3,7 +3,7 @@ import RichContent from "../components/RichContent.astro";
 import Base from "../layouts/Base.astro";
 import { getPageByPath, getPageBySlug } from "../lib/seed";
 import {
-	getEmDashEditAttrs,
+	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
 	joinPath,
@@ -44,26 +44,20 @@ const bodyClass = [
 		useFullWidthTemplate ? (
 			<section id="primary" class="col-12 px-4">
 				<main id="content">
-					<article {...getEmDashEditAttrs("pages", page.slug, page.status)}>
+					<article {...getEmDashEditEntryAttrs("pages", page)}>
 						<header class="page-header">
 							<h1
 								class="entry-title"
-								{...getEmDashEditAttrs(
-									"pages",
-									page.slug,
-									page.status,
-									"title",
-								)}
+								{...getEmDashEditEntryAttrs("pages", page, "title")}
 							>
 								{page.data.title}
 							</h1>
 						</header>
 						<div
 							class="entry-content"
-							{...getEmDashEditAttrs(
+							{...getEmDashEditEntryAttrs(
 								"pages",
-								page.slug,
-								page.status,
+								page,
 								getEntryContentField(page.data),
 							)}
 						>
@@ -76,26 +70,20 @@ const bodyClass = [
 			<div class="container-fluid">
 				<section id="primary" class="p-4">
 					<div id="content" role="main">
-						<article {...getEmDashEditAttrs("pages", page.slug, page.status)}>
+						<article {...getEmDashEditEntryAttrs("pages", page)}>
 							<header class="page-header">
 								<h1
 									class="entry-title"
-									{...getEmDashEditAttrs(
-										"pages",
-										page.slug,
-										page.status,
-										"title",
-									)}
+									{...getEmDashEditEntryAttrs("pages", page, "title")}
 								>
 									{page.data.title}
 								</h1>
 							</header>
 							<div
 								class="entry-content"
-								{...getEmDashEditAttrs(
+								{...getEmDashEditEntryAttrs(
 									"pages",
-									page.slug,
-									page.status,
+									page,
 									getEntryContentField(page.data),
 								)}
 							>

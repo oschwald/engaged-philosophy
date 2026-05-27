@@ -7,7 +7,7 @@ import {
 	getTaxonomyTerm,
 } from "../../lib/seed";
 import {
-	getEmDashEditAttrs,
+	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
 	isProjectTaxonomy,
@@ -46,26 +46,20 @@ const projects = isProjectTaxonomy(taxonomy)
 		<Base title={page.data.title}>
 			<section id="primary" class="col-12 px-4">
 				<main id="content">
-					<article {...getEmDashEditAttrs("pages", page.slug, page.status)}>
+					<article {...getEmDashEditEntryAttrs("pages", page)}>
 						<header class="page-header">
 							<h1
 								class="entry-title"
-								{...getEmDashEditAttrs(
-									"pages",
-									page.slug,
-									page.status,
-									"title",
-								)}
+								{...getEmDashEditEntryAttrs("pages", page, "title")}
 							>
 								{page.data.title}
 							</h1>
 						</header>
 						<div
 							class="entry-content"
-							{...getEmDashEditAttrs(
+							{...getEmDashEditEntryAttrs(
 								"pages",
-								page.slug,
-								page.status,
+								page,
 								getEntryContentField(page.data),
 							)}
 						>

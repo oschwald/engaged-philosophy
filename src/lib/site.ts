@@ -109,6 +109,19 @@ export function getEmDashEditAttrs(
 	};
 }
 
+export function getEmDashEditEntryAttrs<T extends { id?: string }>(
+	collection: string,
+	entry: { id: string; data: T; status: string },
+	field?: string,
+) {
+	return getEmDashEditAttrs(
+		collection,
+		getEntryDatabaseId(entry),
+		entry.status,
+		field,
+	);
+}
+
 function getRichTextValue(value: RichTextFieldValue) {
 	return typeof value === "string" || Array.isArray(value) ? value : undefined;
 }

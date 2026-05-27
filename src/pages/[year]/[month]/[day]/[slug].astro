@@ -4,7 +4,7 @@ import ThemeSidebar from "../../../../components/ThemeSidebar.astro";
 import Base from "../../../../layouts/Base.astro";
 import { getPostByPath, getTermsBySlugs } from "../../../../lib/seed";
 import {
-	getEmDashEditAttrs,
+	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
 	joinPath,
@@ -27,14 +27,11 @@ const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
 >
 	<section id="primary" class="col-lg-8 px-4">
 		<div id="content" role="main">
-			<article
-				class="post"
-				{...getEmDashEditAttrs("posts", post.slug, post.status)}
-			>
+			<article class="post" {...getEmDashEditEntryAttrs("posts", post)}>
 				<header class="page-header">
 					<h1
 						class="entry-title"
-						{...getEmDashEditAttrs("posts", post.slug, post.status, "title")}
+						{...getEmDashEditEntryAttrs("posts", post, "title")}
 					>
 						{post.data.title}
 					</h1>
@@ -48,10 +45,9 @@ const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
 				</header>
 				<div
 					class="entry-content"
-					{...getEmDashEditAttrs(
+					{...getEmDashEditEntryAttrs(
 						"posts",
-						post.slug,
-						post.status,
+						post,
 						getEntryContentField(post.data),
 					)}
 				>

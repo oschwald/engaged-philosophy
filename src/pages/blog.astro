@@ -3,7 +3,7 @@ import Base from "../layouts/Base.astro";
 import RichContent from "../components/RichContent.astro";
 import { getPageByPath } from "../lib/seed";
 import {
-	getEmDashEditAttrs,
+	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
 } from "../lib/site";
@@ -18,15 +18,11 @@ const page = getPageByPath("blog");
 	<div class="container-fluid">
 		<section id="primary" class="p-4">
 			<div id="content" role="main">
-				<article
-					{...page ? getEmDashEditAttrs("pages", page.slug, page.status) : {}}
-				>
+				<article {...page ? getEmDashEditEntryAttrs("pages", page) : {}}>
 					<header class="page-header">
 						<h1
 							class="entry-title"
-							{...page
-								? getEmDashEditAttrs("pages", page.slug, page.status, "title")
-								: {}}
+							{...page ? getEmDashEditEntryAttrs("pages", page, "title") : {}}
 						>
 							{page?.data.title || "Blog"}
 						</h1>
@@ -34,10 +30,9 @@ const page = getPageByPath("blog");
 					<div
 						class="entry-content"
 						{...page
-							? getEmDashEditAttrs(
+							? getEmDashEditEntryAttrs(
 									"pages",
-									page.slug,
-									page.status,
+									page,
 									getEntryContentField(page.data),
 								)
 							: {}}

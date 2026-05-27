@@ -5,7 +5,7 @@ import Base from "../layouts/Base.astro";
 import { getPageBySlug, getPublishedProjects } from "../lib/seed";
 import { searchSite } from "../lib/search";
 import {
-	getEmDashEditAttrs,
+	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
 	getEntryExcerpt,
@@ -24,9 +24,7 @@ const highlightedProjects = sortByPublishedOn(
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
 const mediaUrlPrefix = getMediaUrlPrefix();
 const search = query ? searchSite(query, 1, mediaUrlPrefix) : null;
-const homeEntryAttrs = home
-	? getEmDashEditAttrs("pages", home.slug, home.status)
-	: {};
+const homeEntryAttrs = home ? getEmDashEditEntryAttrs("pages", home) : {};
 const homeBoxes = home
 	? [
 			{
@@ -121,10 +119,9 @@ const homeBoxes = home
 							<div
 								class="lead-home"
 								{...(home
-									? getEmDashEditAttrs(
+									? getEmDashEditEntryAttrs(
 											"pages",
-											home.slug,
-											home.status,
+											home,
 											getEntryContentField(home.data),
 										)
 									: {})}
@@ -140,24 +137,14 @@ const homeBoxes = home
 							<div class="col-lg-4 mb-4">
 								{box.title && home && (
 									<h2
-										{...getEmDashEditAttrs(
-											"pages",
-											home.slug,
-											home.status,
-											box.titleField,
-										)}
+										{...getEmDashEditEntryAttrs("pages", home, box.titleField)}
 									>
 										{box.title}
 									</h2>
 								)}
 								<div
 									{...(home
-										? getEmDashEditAttrs(
-												"pages",
-												home.slug,
-												home.status,
-												box.htmlField,
-											)
+										? getEmDashEditEntryAttrs("pages", home, box.htmlField)
 										: {})}
 								>
 									<RichContent value={box.html} />
