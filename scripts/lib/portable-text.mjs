@@ -9,7 +9,7 @@ const { gfm } = turndownPluginGfm;
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g;
 const LEGACY_SITE_HOST_RE = /^(?:www\.)?engagedphilosophy\.com$/i;
 const TOKEN_RE =
-	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[embed\][\s\S]*?\[\/embed\])/gi;
+	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[embed\][\s\S]*?\[\/embed\])/gi;
 
 const turndown = new TurndownService({
 	codeBlockStyle: "fenced",
@@ -42,6 +42,10 @@ function normalizeLegacyHref(value) {
 		.trim()
 		.replace(/\s+(?:"[^"]*"|'[^']*')$/, "");
 	if (!normalized) return "";
+	const embeddedUploadMatch = normalized.match(
+		/\/wp-content\/uploads\/[^"'()\s<>]+(?:\?[^"'()\s<>]*)?/i,
+	);
+	if (embeddedUploadMatch) return embeddedUploadMatch[0];
 	if (normalized.startsWith("/wp-content/uploads/")) return normalized;
 	if (normalized.startsWith("/")) return normalized;
 
@@ -134,6 +138,20 @@ function isMeaningfulCaption(value, imageUrl = "", alt = "") {
 	);
 }
 
+function shouldIgnoreImageUrl(value) {
+	if (!value) return true;
+
+	try {
+		const url = new URL(value, "https://www.engagedphilosophy.com");
+		return (
+			url.hostname === "mail.google.com" &&
+			/(?:^|\/)cleardot\.gif$/i.test(url.pathname)
+		);
+	} catch {
+		return false;
+	}
+}
+
 function extractPortableTextPlainText(blocks) {
 	return blocks
 		.map((block) => {
@@ -148,7 +166,9 @@ function extractPortableTextPlainText(blocks) {
 }
 
 function normalizePortableTextBlocks(blocks) {
-	return blocks.map((block) => {
+	const normalizedBlocks = [];
+
+	for (const block of blocks) {
 		const nextBlock = structuredClone(block);
 
 		if (Array.isArray(nextBlock.markDefs)) {
@@ -164,6 +184,9 @@ function normalizePortableTextBlocks(blocks) {
 			nextBlock.asset &&
 			typeof nextBlock.asset.url === "string"
 		) {
+			if (shouldIgnoreImageUrl(nextBlock.asset.url)) {
+				continue;
+			}
 			nextBlock.asset = {
 				...nextBlock.asset,
 				_ref: nextBlock.asset._ref || generateKey(),
@@ -172,17 +195,22 @@ function normalizePortableTextBlocks(blocks) {
 		}
 
 		if (nextBlock._type === "gallery" && Array.isArray(nextBlock.images)) {
-			nextBlock.images = nextBlock.images.map((image) => ({
-				...image,
-				asset: {
-					...image.asset,
-					_ref: image.asset?._ref || generateKey(),
-					url:
-						typeof image.asset?.url === "string"
-							? normalizeLegacyHref(image.asset.url)
-							: image.asset?.url,
-				},
-			}));
+			nextBlock.images = nextBlock.images
+				.filter((image) => !shouldIgnoreImageUrl(image.asset?.url))
+				.map((image) => ({
+					...image,
+					asset: {
+						...image.asset,
+						_ref: image.asset?._ref || generateKey(),
+						url:
+							typeof image.asset?.url === "string"
+								? normalizeLegacyHref(image.asset.url)
+								: image.asset?.url,
+					},
+				}));
+			if (nextBlock.images.length === 0) {
+				continue;
+			}
 		}
 
 		if (
@@ -195,10 +223,11 @@ function normalizePortableTextBlocks(blocks) {
 				.join("")
 				.trim();
 			if (/^\*\s*\*$/.test(text) || /^\*\s*\*\s*\*$/.test(text)) {
-				return {
+				normalizedBlocks.push({
 					_type: "horizontalRule",
 					_key: nextBlock._key || generateKey(),
-				};
+				});
+				continue;
 			}
 		}
 
@@ -328,8 +357,10 @@ function normalizePortableTextBlocks(blocks) {
 			nextBlock.markDefs = nextMarkDefs;
 		}
 
-		return nextBlock;
-	});
+		normalizedBlocks.push(nextBlock);
+	}
+
+	return normalizedBlocks;
 }
 
 function autoWrapParagraphLikeHtml(html) {
@@ -472,8 +503,20 @@ function imageAttributesToPortableText(
 	);
 	const align =
 		overrides.align || getImageAlignment(imageAttributes) || undefined;
-	const width = Number(imageAttributes.width || "0") || undefined;
-	const height = Number(imageAttributes.height || "0") || undefined;
+	const width =
+		Number(
+			imageAttributes.width ||
+				imageAttributes["data-width"] ||
+				imageAttributes["data-original-width"] ||
+				"0",
+		) || undefined;
+	const height =
+		Number(
+			imageAttributes.height ||
+				imageAttributes["data-height"] ||
+				imageAttributes["data-original-height"] ||
+				"0",
+		) || undefined;
 
 	return {
 		_type: "image",
@@ -511,7 +554,8 @@ function imageHtmlToPortableText(token, overrides = {}) {
 }
 
 function galleryFigureToPortableText(token) {
-	const galleryAttributes = getTagAttributes(token, "figure");
+	const tagName = token.trim().startsWith("<ul") ? "ul" : "figure";
+	const galleryAttributes = getTagAttributes(token, tagName);
 	const className = galleryAttributes.class || "";
 	const columns =
 		Number(className.match(/\bcolumns-(\d+)\b/i)?.[1] || "0") || undefined;
@@ -592,6 +636,8 @@ export function htmlToPortableText(html, mediaById = {}) {
 
 		if (/\bwp-block-gallery\b/i.test(token)) {
 			blocks.push(...galleryFigureToPortableText(token));
+		} else if (/\bwp-block-jetpack-tiled-gallery\b/i.test(token)) {
+			blocks.push(...imageHtmlToPortableText(token, { align: "center" }));
 		} else if (/\bwp-block-image\b/i.test(token)) {
 			blocks.push(...imageFigureToPortableText(token));
 		} else if (/^<a\b/i.test(token) || /^<img\b/i.test(token)) {
@@ -611,7 +657,7 @@ export function htmlToPortableText(html, mediaById = {}) {
 		blocks.push(...htmlFragmentToPortableText(source.slice(lastIndex)));
 	}
 
-	return blocks;
+	return normalizePortableTextBlocks(blocks);
 }
 
 export function isPortableTextJson(value) {

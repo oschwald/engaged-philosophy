@@ -1,0 +1,150 @@
+---
+import ThemeSidebar from "./ThemeSidebar.astro";
+import { getPostsByCategory } from "../lib/seed";
+import {
+	formatPathDate,
+	getEntryContent,
+	getEntryExcerpt,
+	getExcerptText,
+	sortByPublishedOn,
+} from "../lib/site";
+
+interface Props {
+	slug: string;
+	label: string;
+	page: number;
+	perPage?: number;
+}
+
+const { slug, label, page, perPage = 10 } = Astro.props;
+const posts = sortByPublishedOn(getPostsByCategory(slug));
+const totalPages = Math.max(1, Math.ceil(posts.length / perPage));
+const currentPage = Math.min(Math.max(page, 1), totalPages);
+const start = (currentPage - 1) * perPage;
+const pageItems = posts.slice(start, start + perPage);
+
+function pageHref(pageNumber: number) {
+	return pageNumber === 1
+		? `/category/${slug}/`
+		: `/category/${slug}/page/${pageNumber}/`;
+}
+
+function getPaginationItems(
+	total: number,
+	current: number,
+): Array<number | "ellipsis"> {
+	if (total <= 1) return [];
+
+	const items = [1];
+	for (
+		let pageNumber = Math.max(2, current - 2);
+		pageNumber <= Math.min(total - 1, current + 2);
+		pageNumber += 1
+	) {
+		items.push(pageNumber);
+	}
+	if (total > 1) items.push(total);
+
+	const unique = [...new Set(items)].sort((left, right) => left - right);
+	return unique.flatMap((pageNumber, index) => {
+		const previous = unique[index - 1];
+		if (index > 0 && previous !== undefined && pageNumber - previous > 1) {
+			return ["ellipsis", pageNumber];
+		}
+		return [pageNumber];
+	});
+}
+
+const paginationItems = getPaginationItems(totalPages, currentPage);
+---
+
+<section id="primary" class="col-lg-8 p-4">
+	<div id="content" role="main">
+		<header class="page-header mb-4 pb-3 border-bottom">
+			<h1 class="page-title h2 mb-0">
+				Category Archives: <span>{label}</span>
+			</h1>
+		</header>
+
+		{
+			pageItems.length > 0 ? (
+				pageItems.map((post) => (
+					<article class="mb-5 pb-4 border-bottom post">
+						<header class="page-header mb-3">
+							<h2 class="entry-title h4 mb-0">
+								<a href={`/${post.data.path}/`}>{post.data.title}</a>
+							</h2>
+							<div class="entry-meta">{formatPathDate(post.data.path)}</div>
+						</header>
+						<div class="entry-content text-muted lh-base">
+							<p>
+								{getExcerptText(
+									getEntryExcerpt(post.data),
+									getEntryContent(post.data),
+								)}{" "}
+								<a href={`/${post.data.path}/`}>
+									Continue reading <span class="meta-nav">&rarr;</span>
+								</a>
+							</p>
+						</div>
+					</article>
+				))
+			) : (
+				<article class="post no-results not-found">
+					<header class="page-header">
+						<h1 class="entry-title">Nothing Found</h1>
+					</header>
+					<div class="entry-content">
+						<p>No posts were found for this category.</p>
+					</div>
+				</article>
+			)
+		}
+
+		{
+			totalPages > 1 && (
+				<nav aria-label="Page navigation">
+					<ul class="pagination justify-content-center">
+						{paginationItems.map((item) =>
+							item === "ellipsis" ? (
+								<li class="page-item disabled">
+									<span class="page-link">&hellip;</span>
+								</li>
+							) : (
+								<li
+									class:list={["page-item", item === currentPage && "active"]}
+								>
+									{item === currentPage ? (
+										<span aria-current="page" class="page-link">
+											{item}
+										</span>
+									) : (
+										<a class="page-link" href={pageHref(item)}>
+											{item}
+										</a>
+									)}
+								</li>
+							),
+						)}
+						<li
+							class:list={[
+								"page-item",
+								currentPage === totalPages && "disabled",
+							]}
+						>
+							{currentPage === totalPages ? (
+								<span class="page-link">Next &raquo;</span>
+							) : (
+								<a class="next page-link" href={pageHref(currentPage + 1)}>
+									Next &raquo;
+								</a>
+							)}
+						</li>
+					</ul>
+				</nav>
+			)
+		}
+	</div>
+</section>
+
+<ThemeSidebar />

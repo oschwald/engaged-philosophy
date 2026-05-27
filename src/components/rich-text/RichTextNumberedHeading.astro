@@ -1,0 +1,41 @@
+---
+import { PortableText } from "emdash/ui";
+
+import RichTextLink from "./RichTextLink.astro";
+
+interface Props {
+	node: {
+		_type: "numberedHeading";
+		_key: string;
+		level?: number;
+		index: number;
+		block: {
+			_type: "block";
+			_key: string;
+			style?: string;
+			markDefs?: Array<Record<string, unknown>>;
+			children?: Array<Record<string, unknown>>;
+		};
+	};
+}
+
+const { node } = Astro.props;
+const level = Math.min(Math.max(node.level || 4, 1), 6);
+const block = {
+	...node.block,
+	style: `h${level}`,
+};
+---
+
+<ol start={node.index} class="legacy-numbered-heading">
+	<li>
+		<PortableText
+			value={[block]}
+			components={{
+				mark: {
+					link: RichTextLink,
+				},
+			}}
+		/>
+	</li>
+</ol>

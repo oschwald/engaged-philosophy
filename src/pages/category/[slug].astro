@@ -1,14 +1,7 @@
 ---
-import ThemeSidebar from "../../components/ThemeSidebar.astro";
+import CategoryArchive from "../../components/CategoryArchive.astro";
 import Base from "../../layouts/Base.astro";
-import { getPostsByCategory, getTaxonomyTerm } from "../../lib/seed";
-import {
-	formatPathDate,
-	getEntryContent,
-	getEntryExcerpt,
-	getExcerptText,
-	sortByPublishedOn,
-} from "../../lib/site";
+import { getTaxonomyTerm } from "../../lib/seed";
 
 const { slug = "" } = Astro.params;
 const term = getTaxonomyTerm("category", slug);
@@ -16,8 +9,6 @@ const term = getTaxonomyTerm("category", slug);
 if (!term) {
 	return Astro.redirect("/404");
 }
-
-const posts = sortByPublishedOn(getPostsByCategory(slug));
 ---
 
 <Base
@@ -26,54 +17,7 @@ const posts = sortByPublishedOn(getPostsByCategory(slug));
 >
 	<div class="container-fluid">
 		<div class="row">
-			<section id="primary" class="col-lg-8 p-4">
-				<div id="content" role="main">
-					<header class="page-header mb-4 pb-3 border-bottom">
-						<h1 class="page-title h2 mb-0">
-							Category: <span>{term.label}</span>
-						</h1>
-					</header>
-
-					{
-						posts.length > 0 ? (
-							posts.map((post) => (
-								<article class="mb-5 pb-4 border-bottom post">
-									<header class="page-header mb-3">
-										<h2 class="entry-title h4 mb-0">
-											<a href={`/${post.data.path}/`}>{post.data.title}</a>
-										</h2>
-										<div class="entry-meta">
-											{formatPathDate(post.data.path)}
-										</div>
-									</header>
-									<div class="entry-content text-muted lh-base">
-										<p>
-											{getExcerptText(
-												getEntryExcerpt(post.data),
-												getEntryContent(post.data),
-											)}{" "}
-											<a href={`/${post.data.path}/`}>
-												Continue reading <span class="meta-nav">&rarr;</span>
-											</a>
-										</p>
-									</div>
-								</article>
-							))
-						) : (
-							<article class="post no-results not-found">
-								<header class="page-header">
-									<h1 class="entry-title">Nothing Found</h1>
-								</header>
-								<div class="entry-content">
-									<p>No posts were found for this category.</p>
-								</div>
-							</article>
-						)
-					}
-				</div>
-			</section>
-
-			<ThemeSidebar />
+			<CategoryArchive slug={slug} label={term.label} page={1} />
 		</div>
 	</div>
 </Base>

@@ -286,6 +286,29 @@ for (const match of rawXml.matchAll(WP_CATEGORY_RE)) {
 }
 
 const items = [...rawXml.matchAll(ITEM_RE)].map((match) => match[1]);
+items.sort((left, right) => {
+	const leftType = extractTag(left, "wp:post_type");
+	const rightType = extractTag(right, "wp:post_type");
+	if (leftType === "nav_menu_item" || rightType === "nav_menu_item") return 0;
+
+	const leftStatus = extractTag(left, "wp:status");
+	const rightStatus = extractTag(right, "wp:status");
+	const leftSlug = extractTag(left, "wp:post_name");
+	const rightSlug = extractTag(right, "wp:post_name");
+	const leftLink = decodeEntities(extractTag(left, "link"));
+	const rightLink = decodeEntities(extractTag(right, "link"));
+	const leftPath = pathFromUrl(leftLink, siteUrl);
+	const rightPath = pathFromUrl(rightLink, siteUrl);
+	const leftContentLength = extractTag(left, "content:encoded").length;
+	const rightContentLength = extractTag(right, "content:encoded").length;
+
+	return (
+		Number(rightStatus === "publish") - Number(leftStatus === "publish") ||
+		Number(Boolean(rightSlug)) - Number(Boolean(leftSlug)) ||
+		Number(Boolean(rightPath)) - Number(Boolean(leftPath)) ||
+		rightContentLength - leftContentLength
+	);
+});
 const attachments = new Map();
 const attachmentReplacements = new Map();
 const attachmentReplacementsByFilename = new Map();

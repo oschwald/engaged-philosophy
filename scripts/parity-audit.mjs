@@ -23,6 +23,7 @@ const DEFAULTS = {
 	outputDir: path.join(ROOT, ".parity-audit"),
 	configPath: path.join(ROOT, "scripts", "parity-audit.config.json"),
 	browserPath: process.env.PARITY_AUDIT_BROWSER_PATH || "",
+	route: "",
 };
 
 const VIEWPORTS = [
@@ -79,6 +80,15 @@ function parseArgs(argv) {
 			i += 1;
 		} else if (arg === "--browser-path" && next) {
 			options.browserPath = path.resolve(ROOT, next);
+			i += 1;
+		} else if ((arg === "--route" || arg === "--path") && next) {
+			options.route = normalizePath(next);
+			i += 1;
+		} else if (arg === "--base" && next) {
+			options.live = next;
+			i += 1;
+		} else if (arg === "--candidate" && next) {
+			options.preview = next;
 			i += 1;
 		}
 	}
@@ -229,11 +239,12 @@ async function fetchPage(base, pathname) {
 	};
 }
 
-async function crawl(base, starts, limit, concurrency) {
+async function crawl(base, starts, limit, concurrency, options = {}) {
 	const queue = [...starts];
 	const seen = new Set();
 	const pages = new Map();
 	let active = 0;
+	const followLinks = options.followLinks ?? true;
 
 	return await new Promise((resolve) => {
 		const pump = () => {
@@ -245,7 +256,7 @@ async function crawl(base, starts, limit, concurrency) {
 				fetchPage(base, pathname)
 					.then((page) => {
 						pages.set(pathname, page);
-						if (page.status === 200) {
+						if (followLinks && page.status === 200) {
 							for (const link of page.links) {
 								if (!seen.has(link)) queue.push(link);
 							}
@@ -297,6 +308,8 @@ function summarizeBlocks($, root) {
 		strong: 0,
 		em: 0,
 		links: 0,
+		numberedHeadings: 0,
+		sizedImages: 0,
 		alignleft: 0,
 		alignright: 0,
 		aligncenter: 0,
@@ -324,6 +337,7 @@ function summarizeBlocks($, root) {
 		if (/aligncenter/.test(classes)) counts.aligncenter += 1;
 
 		if (tag === "img") {
+			if (node.attr("width") || node.attr("height")) counts.sizedImages += 1;
 			images.push({
 				src: node.attr("src") || "",
 				width: node.attr("width") || "",
@@ -356,6 +370,13 @@ function summarizeBlocks($, root) {
 			text: normalizeText($(element).text()).slice(0, 120),
 		});
 	});
+	root.find("ol").each((_, element) => {
+		const firstChild = $(element).children().first();
+		const heading = firstChild.find("h1,h2,h3,h4,h5,h6").first();
+		if (firstChild.is("li") && heading.length > 0) {
+			counts.numberedHeadings += 1;
+		}
+	});
 
 	return { blocks, counts, images, links };
 }
@@ -364,11 +385,16 @@ function summarizeHtml(html) {
 	const $ = load(html);
 	const title = normalizeText($("title").first().text());
 	const bodyClass = normalizeText($("body").attr("class") || "");
-	const contentRoot =
-		$(".entry-content").first().length > 0
-			? $(".entry-content").first()
-			: $("#content").first().length > 0
-				? $("#content").first()
+	const entryContents = $(".entry-content");
+	const contentContainer = $("#content").first();
+	const shouldUseContentContainer =
+		contentContainer.length > 0 && entryContents.length !== 1;
+	const contentRoot = shouldUseContentContainer
+		? contentContainer
+		: entryContents.first().length > 0
+			? entryContents.first()
+			: contentContainer.length > 0
+				? contentContainer
 				: $("body");
 	const contentHtml = contentRoot.html() || "";
 	const contentText = normalizeText(contentRoot.text());
@@ -382,6 +408,7 @@ function summarizeHtml(html) {
 		/\d+\\\./.test(contentHtml);
 	const uploadLeak = /(?:src|href)="\/wp-content\/uploads\//.test(contentHtml);
 	const galleryLeak = /\[gallery\b/i.test(contentHtml);
+	const portableTextUnknown = /data-portabletext-unknown/.test(contentHtml);
 	return {
 		title,
 		bodyClass,
@@ -396,6 +423,7 @@ function summarizeHtml(html) {
 			markdownLeak,
 			uploadLeak,
 			galleryLeak,
+			portableTextUnknown,
 		},
 	};
 }
@@ -457,11 +485,22 @@ function compareSummaries(pathname, live, preview, options, config) {
 			detail: { live: live.counts.p, preview: preview.counts.p },
 		});
 	}
-	for (const countId of ["ul", "ol", "li", "hr", "figure", "img"]) {
+	for (const countId of [
+		"headings",
+		"numberedHeadings",
+		"ul",
+		"ol",
+		"li",
+		"hr",
+		"figure",
+		"img",
+		"sizedImages",
+	]) {
 		if (live.counts[countId] !== preview.counts[countId]) {
 			detectors.push({
 				id: `${countId}Count`,
-				severity: countId === "hr" ? "medium" : "high",
+				severity:
+					countId === "hr" || countId === "sizedImages" ? "medium" : "high",
 				detail: {
 					live: live.counts[countId],
 					preview: preview.counts[countId],
@@ -481,7 +520,12 @@ function compareSummaries(pathname, live, preview, options, config) {
 			});
 		}
 	}
-	for (const detectorId of ["markdownLeak", "uploadLeak", "galleryLeak"]) {
+	for (const detectorId of [
+		"markdownLeak",
+		"uploadLeak",
+		"galleryLeak",
+		"portableTextUnknown",
+	]) {
 		if (preview.detectors[detectorId]) {
 			detectors.push({
 				id: detectorId,
@@ -615,6 +659,17 @@ async function captureVisualDiffs(baseLive, basePreview, diffs, options) {
 		.filter((diff) => diff.kind === "contentDiff" || diff.kind === "statusDiff")
 		.sort((a, b) => b.severityScore - a.severityScore)
 		.slice(0, options.visualLimit);
+	if (options.route) {
+		const focusedDiff = diffs.find((diff) => diff.path === options.route);
+		if (
+			focusedDiff &&
+			(focusedDiff.kind === "contentDiff" ||
+				focusedDiff.kind === "statusDiff") &&
+			!selected.some((diff) => diff.path === focusedDiff.path)
+		) {
+			selected.unshift(focusedDiff);
+		}
+	}
 	if (selected.length === 0) return [];
 
 	const browserPath = resolveBrowserPath(options.browserPath);
@@ -791,18 +846,23 @@ async function main() {
 	const config = readConfig(options.configPath);
 	ensureDir(options.outputDir);
 
-	const starts = getSeedRoutes();
+	const starts = options.route ? [options.route] : getSeedRoutes();
+	const crawlOptions = {
+		followLinks: !options.route,
+	};
 	const livePages = await crawl(
 		options.live,
 		starts,
 		options.limit,
 		options.concurrency,
+		crawlOptions,
 	);
 	const previewPages = await crawl(
 		options.preview,
 		starts,
 		options.limit,
 		options.concurrency,
+		crawlOptions,
 	);
 	const allPaths = uniqueSorted([...livePages.keys(), ...previewPages.keys()]);
 	const diffs = allPaths

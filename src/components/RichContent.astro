@@ -6,6 +6,7 @@ import RichTextGallery from "./rich-text/RichTextGallery.astro";
 import RichTextHorizontalRule from "./rich-text/RichTextHorizontalRule.astro";
 import RichTextImage from "./rich-text/RichTextImage.astro";
 import RichTextLink from "./rich-text/RichTextLink.astro";
+import RichTextNumberedHeading from "./rich-text/RichTextNumberedHeading.astro";
 import { isPortableTextValue } from "../lib/site";
 import type { RichTextValue } from "../lib/types";
 
@@ -15,18 +16,51 @@ interface Props {
 }
 
 const { value, class: className = "" } = Astro.props;
+
+function normalizeLegacyPortableText(blocks: Exclude<RichTextValue, string>) {
+	let numberedHeadingIndex = 0;
+
+	return blocks.map((block) => {
+		if (
+			block?._type === "block" &&
+			typeof block.style === "string" &&
+			/^h[1-6]$/.test(block.style) &&
+			block.listItem === "number"
+		) {
+			numberedHeadingIndex += 1;
+			return {
+				_type: "numberedHeading",
+				_key: block._key,
+				level: Number(block.style.slice(1)),
+				index: numberedHeadingIndex,
+				block: {
+					...block,
+					listItem: undefined,
+					level: undefined,
+				},
+			};
+		}
+
+		return block;
+	});
+}
+
+const normalizedValue = isPortableTextValue(value)
+	? normalizeLegacyPortableText(value)
+	: value;
 ---
 
 {
-	isPortableTextValue(value) ? (
+	isPortableTextValue(normalizedValue) ? (
 		<div class:list={["legacy-content", className]}>
 			<PortableText
-				value={value}
+				value={normalizedValue}
 				components={{
 					type: {
 						image: RichTextImage,
 						gallery: RichTextGallery,
 						horizontalRule: RichTextHorizontalRule,
+						numberedHeading: RichTextNumberedHeading,
 					},
 					mark: {
 						link: RichTextLink,
@@ -36,7 +70,7 @@ const { value, class: className = "" } = Astro.props;
 		</div>
 	) : (
 		<HtmlContent
-			html={typeof value === "string" ? value : ""}
+			html={typeof normalizedValue === "string" ? normalizedValue : ""}
 			class={className}
 		/>
 	)

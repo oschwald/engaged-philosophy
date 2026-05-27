@@ -15,6 +15,7 @@ const blockTagPattern =
 function renderGallery(shortcode: string) {
 	const idsMatch = shortcode.match(/ids="([^"]+)"/);
 	if (!idsMatch) return "";
+	const columns = Number(shortcode.match(/columns="(\d+)"/)?.[1] || "3");
 
 	const ids = idsMatch[1]
 		.split(",")
@@ -29,12 +30,21 @@ function renderGallery(shortcode: string) {
 
 	if (items.length === 0) return "";
 
-	return `<div class="legacy-gallery row g-3 mb-4">${items
-		.map((item) => {
+	const usesLeadLayout = columns === 3 && items.length === 4;
+
+	return `<div class="legacy-gallery legacy-gallery-shortcode ${
+		usesLeadLayout ? "legacy-gallery-shortcode--lead " : ""
+	}legacy-gallery-columns-${columns}">${items
+		.map((item, index) => {
 			const mediaUrl = rewriteWordPressUploadUrl(item.url, mediaUrlPrefix);
-			return `<figure class="gallery-item col-sm-6 col-lg-4">
-				<a href="${mediaUrl}" target="_blank" rel="noreferrer">
-					<img class="img-fluid" src="${mediaUrl}" alt="${item.alt || item.title || ""}" loading="lazy" />
+			const size = usesLeadLayout
+				? index === 0
+					? { width: 936, height: 936 }
+					: { width: 309, height: 309 }
+				: null;
+			return `<figure class="gallery-item">
+				<a class="${usesLeadLayout && index === 0 ? "gallery-item--lead" : ""}" href="${mediaUrl}" target="_blank" rel="noreferrer">
+					<img class="img-fluid" src="${mediaUrl}" alt="${item.alt || item.title || ""}" ${size ? `width="${size.width}" height="${size.height}"` : ""} loading="lazy" />
 				</a>
 			</figure>`;
 		})
