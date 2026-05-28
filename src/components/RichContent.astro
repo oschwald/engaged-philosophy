@@ -2,6 +2,7 @@
 import { getEditMeta } from "emdash";
 import { PortableText } from "emdash/ui";
 
+import EmDashInlineEditor from "./EmDashInlineEditor";
 import HtmlContent from "./HtmlContent.astro";
 import RichTextNumberedHeading from "./rich-text/RichTextNumberedHeading.astro";
 import { isPortableTextValue } from "../lib/site";
@@ -52,14 +53,24 @@ const normalizedValue =
 {
 	isPortableTextValue(normalizedValue) ? (
 		<div class:list={["legacy-content", className]}>
-			<PortableText
-				value={normalizedValue}
-				components={{
-					type: {
-						numberedHeading: RichTextNumberedHeading,
-					},
-				}}
-			/>
+			{editMeta ? (
+				<EmDashInlineEditor
+					client:only="react"
+					value={normalizedValue}
+					collection={editMeta.collection}
+					entryId={editMeta.id}
+					field={editMeta.field}
+				/>
+			) : (
+				<PortableText
+					value={normalizedValue}
+					components={{
+						type: {
+							numberedHeading: RichTextNumberedHeading,
+						},
+					}}
+				/>
+			)}
 		</div>
 	) : (
 		<HtmlContent

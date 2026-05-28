@@ -1,14 +1,19 @@
 ---
 import Base from "../layouts/Base.astro";
 import RichContent from "../components/RichContent.astro";
-import { getPageByPath } from "../lib/seed";
+import { getPageByPath, getPageBySlug } from "../lib/seed";
 import {
+	getEditModeEntryBySlug,
 	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
 } from "../lib/site";
 
-const page = getPageByPath("blog");
+const page = await getEditModeEntryBySlug(
+	"pages",
+	"blog",
+	getPageBySlug("blog") ?? getPageByPath("blog"),
+);
 ---
 
 <Base

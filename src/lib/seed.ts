@@ -9,6 +9,7 @@ import type {
 } from "./types";
 
 type TaxonomyMap = Record<string, string[]>;
+type EmDashTermsMap = Record<string, Array<{ slug: string; label: string }>>;
 
 interface RawMediaField {
 	src?: string;
@@ -106,7 +107,7 @@ const taxonomyMap = new Map(
 );
 const excludedPaths = new Set([
 	"1477",
-	"project-guidelines-critical-thinking-2-3",
+	"project-guidelines-critical-thinking-3",
 	"project/photos-for-our-furry-friends-2",
 ]);
 
@@ -216,14 +217,41 @@ export function getTaxonomyTerms(taxonomy: string) {
 }
 
 export function getEntryTerms(
-	entry: SeedBackedEntry<ProjectData>,
+	entry: {
+		taxonomies?: TaxonomyMap;
+		data?: Record<string, unknown> & {
+			terms?: EmDashTermsMap;
+		};
+	},
 	taxonomy: string,
 ) {
-	const slugs = entry.taxonomies[taxonomy] ?? [];
+	const hydratedTerms = entry.data?.terms?.[taxonomy];
+	if (hydratedTerms) {
+		return hydratedTerms;
+	}
+
+	const slugs = entry.taxonomies?.[taxonomy] ?? [];
 	const terms = taxonomyMap.get(taxonomy)?.terms ?? [];
 	return slugs
 		.map((slug) => terms.find((term) => term.slug === slug))
 		.filter((term): term is SeedTaxonomyTerm => Boolean(term));
+}
+
+export function getEntryTermSlugs(
+	entry: {
+		taxonomies?: TaxonomyMap;
+		data?: Record<string, unknown> & {
+			terms?: EmDashTermsMap;
+		};
+	},
+	taxonomy: string,
+) {
+	const hydratedTerms = entry.data?.terms?.[taxonomy];
+	if (hydratedTerms) {
+		return hydratedTerms.map((term) => term.slug);
+	}
+
+	return entry.taxonomies?.[taxonomy] ?? [];
 }
 
 export function getTermsBySlugs(taxonomy: string, slugs: string[]) {

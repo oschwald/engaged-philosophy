@@ -1,3 +1,4 @@
+import { getEmDashCollection, getEmDashEntry, getRequestContext } from "emdash";
 import { env as cloudflareEnv } from "cloudflare:workers";
 import type { PortableTextBlock } from "emdash/ui";
 
@@ -17,6 +18,14 @@ interface EmDashEditRef {
 	status: string;
 	hasDraft: boolean;
 	field?: string;
+}
+
+interface EmDashFieldAnnotation {
+	"data-emdash-ref": string;
+}
+
+interface EmDashEditProxy {
+	readonly [field: string]: Partial<EmDashFieldAnnotation>;
 }
 
 type RichTextFieldValue = string | PortableTextBlock[] | null | undefined;
@@ -90,6 +99,51 @@ export function getEntryDatabaseId<T extends { id?: string }>(item: {
 	return item.data.id || item.id;
 }
 
+function hasEmDashEditProxy<T extends { id?: string }>(
+	entry: object,
+): entry is {
+	id: string;
+	data: T;
+	edit: EmDashEditProxy & Partial<EmDashFieldAnnotation>;
+} {
+	return (
+		"edit" in entry && typeof entry.edit === "object" && entry.edit !== null
+	);
+}
+
+export function isEmDashEditMode() {
+	return getRequestContext()?.editMode ?? false;
+}
+
+export async function getEditModeEntryBySlug<T>(
+	collection: string,
+	slug: string,
+	fallback: T,
+) {
+	if (!isEmDashEditMode()) {
+		return fallback;
+	}
+
+	const { entry } = await getEmDashEntry(collection, slug);
+	return (entry as T | null) ?? fallback;
+}
+
+export async function getEditModeEntryByPath<T>(
+	collection: string,
+	path: string,
+	fallback: T,
+) {
+	if (!isEmDashEditMode()) {
+		return fallback;
+	}
+
+	const { entries } = await getEmDashCollection(collection, {
+		limit: 1,
+		where: { path },
+	});
+	return ((entries.at(0) as T | undefined) ?? fallback) as T;
+}
+
 export function getEmDashEditAttrs(
 	collection: string,
 	identifier: string,
@@ -111,13 +165,17 @@ export function getEmDashEditAttrs(
 
 export function getEmDashEditEntryAttrs<T extends { id?: string }>(
 	collection: string,
-	entry: { id: string; data: T; status: string },
+	entry: { id: string; data: T; status?: string },
 	field?: string,
 ) {
+	if (hasEmDashEditProxy<T>(entry)) {
+		return field ? (entry.edit[field] ?? {}) : entry.edit;
+	}
+
 	return getEmDashEditAttrs(
 		collection,
 		getEntryDatabaseId(entry),
-		entry.status,
+		entry.status ?? "published",
 		field,
 	);
 }

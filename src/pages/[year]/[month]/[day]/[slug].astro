@@ -2,8 +2,13 @@
 import RichContent from "../../../../components/RichContent.astro";
 import ThemeSidebar from "../../../../components/ThemeSidebar.astro";
 import Base from "../../../../layouts/Base.astro";
-import { getPostByPath, getTermsBySlugs } from "../../../../lib/seed";
 import {
+	getEntryTermSlugs,
+	getPostByPath,
+	getTermsBySlugs,
+} from "../../../../lib/seed";
+import {
+	getEditModeEntryBySlug,
 	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
@@ -12,13 +17,16 @@ import {
 
 const { year = "", month = "", day = "", slug = "" } = Astro.params;
 const path = joinPath([year, month, day, slug]);
-const post = getPostByPath(path);
+const post = await getEditModeEntryBySlug("posts", slug, getPostByPath(path));
 
 if (!post) {
 	return Astro.redirect("/404");
 }
 
-const categories = getTermsBySlugs("category", post.taxonomies?.category ?? []);
+const categories = getTermsBySlugs(
+	"category",
+	getEntryTermSlugs(post, "category"),
+);
 ---
 
 <Base
