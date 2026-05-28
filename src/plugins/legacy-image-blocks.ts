@@ -14,10 +14,10 @@ export function createPlugin() {
 					category: "Media",
 					fields: [
 						{
-							type: "text_input",
+							type: "media_picker",
 							action_id: "url",
-							label: "Image URL",
-							placeholder: "https://media.engagedphilosophy.com/...",
+							label: "Image",
+							placeholder: "Choose an image",
 						},
 						{
 							type: "text_input",
