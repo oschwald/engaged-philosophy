@@ -402,10 +402,10 @@ function summarizeHtml(html) {
 	const blockSequence = blocks.map((block) => block.tag);
 	const sampleBlocks = blocks.slice(0, 30);
 	const markdownLeak =
-		/\*\*[^*]+\*\*/.test(contentHtml) ||
-		/\[[^\]]+\]\((?:https?:\/\/|\/)/.test(contentHtml) ||
-		/(?:^|[^a-z0-9])_[a-z][^_<]*_/.test(contentHtml) ||
-		/\d+\\\./.test(contentHtml);
+		/\*\*[^*]+\*\*/.test(contentText) ||
+		/\[[^\]]+\]\((?:https?:\/\/|\/)/.test(contentText) ||
+		/(?:^|[^a-z0-9])_[a-z][^_<]*_/.test(contentText) ||
+		/\d+\\\./.test(contentText);
 	const uploadLeak = /(?:src|href)="\/wp-content\/uploads\//.test(contentHtml);
 	const galleryLeak = /\[gallery\b/i.test(contentHtml);
 	const portableTextUnknown = /data-portabletext-unknown/.test(contentHtml);

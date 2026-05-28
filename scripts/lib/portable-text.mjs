@@ -35,9 +35,38 @@ const BLOCK_TAG_RE =
 	/<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|thead|tbody|tr|td|th|ul|li)\b/gi;
 const BLOCK_FRAGMENT_RE =
 	/(<p\b[\s\S]*?<\/p>|<ul\b[\s\S]*?<\/ul>|<ol\b[\s\S]*?<\/ol>|<h[1-6]\b[\s\S]*?<\/h[1-6]>|<blockquote\b[\s\S]*?<\/blockquote>|<hr\b[^>]*\/?>)/gi;
+const EM_LINK_START_TOKEN = "EMLINKSTART";
+const EM_LINK_END_TOKEN = "EMLINKEND";
 
 function generateKey() {
 	return crypto.randomUUID().replace(/-/g, "").slice(0, 12);
+}
+
+function normalizeMarkdownEscapes(text) {
+	return text
+		.replace(/(\d+)\\\./g, "$1.")
+		.replace(/\\([\\`*_{}\[\]()#+\-.!])/g, "$1");
+}
+
+function normalizeMarkdownLinks(markdown) {
+	return markdown.replace(
+		/\[([\s\S]*?)\]\(((?:https?:\/\/|\/)[^)\s]+)\)/g,
+		(_, label, url) => `[${label.replace(/\s+/g, " ").trim()}](${url})`,
+	);
+}
+
+function wrapEmphasizedMarkdownLinks(markdown) {
+	return markdown.replace(
+		/_((?:\[[^\]]+\]\((?:https?:\/\/|\/)[^)\s]+\)))_/g,
+		`${EM_LINK_START_TOKEN}$1${EM_LINK_END_TOKEN}`,
+	);
+}
+
+function stripAdminLinksHtml(html) {
+	return html.replace(
+		/<p\b[^>]*>\s*<a\b[^>]*href=(["'])https?:\/\/(?:www\.)?engagedphilosophy\.com\/wp-admin\/[^"']*\1[^>]*>[\s\S]*?<\/a>\s*<\/p>/gi,
+		"",
+	);
 }
 
 function normalizeLegacyHref(value) {
@@ -194,6 +223,74 @@ function createTextBlock(text) {
 	};
 }
 
+function unwrapWrappedMarks(block) {
+	if (block?._type !== "block" || !Array.isArray(block.children)) return block;
+
+	const textChildren = block.children.filter(
+		(child) => child?._type === "span" && typeof child.text === "string",
+	);
+	if (!textChildren.length) return block;
+
+	const plainText = textChildren.map((child) => child.text).join("");
+	if (/^\*\*[\s\S]+\*\*$/.test(plainText)) {
+		const first = textChildren.find((child) => child.text.length > 0);
+		const last = [...textChildren].reverse().find((child) => child.text.length > 0);
+		if (first) {
+			first.text = first.text.replace(/^\*\*/, "");
+		}
+		if (last) {
+			last.text = last.text.replace(/\*\*$/, "");
+		}
+		for (const child of textChildren) {
+			child.marks = [...new Set([...(child.marks ?? []), "strong"])];
+		}
+	}
+
+	for (const child of textChildren) {
+		child.text = normalizeMarkdownEscapes(child.text);
+	}
+
+	block.children = block.children.filter(
+		(child) =>
+			child?._type !== "span" ||
+			child.text !== "" ||
+			(Array.isArray(child.marks) && child.marks.length > 0),
+	);
+
+	return block;
+}
+
+function applyEmphasizedLinkTokens(block) {
+	if (block?._type !== "block" || !Array.isArray(block.children)) return block;
+
+	let inEmphasizedLink = false;
+	for (const child of block.children) {
+		if (child?._type !== "span" || typeof child.text !== "string") continue;
+
+		const hasStart = child.text.includes(EM_LINK_START_TOKEN);
+		const hasEnd = child.text.includes(EM_LINK_END_TOKEN);
+		const cleanedText = child.text
+			.replaceAll(EM_LINK_START_TOKEN, "")
+			.replaceAll(EM_LINK_END_TOKEN, "");
+
+		if (hasStart) inEmphasizedLink = true;
+		child.text = cleanedText;
+		if (inEmphasizedLink && cleanedText) {
+			child.marks = [...new Set([...(child.marks ?? []), "em"])];
+		}
+		if (hasEnd) inEmphasizedLink = false;
+	}
+
+	block.children = block.children.filter(
+		(child) =>
+			child?._type !== "span" ||
+			child.text !== "" ||
+			(Array.isArray(child.marks) && child.marks.length > 0),
+	);
+
+	return block;
+}
+
 function normalizeImageBlock(block) {
 	if (!block?.asset || typeof block.asset.url !== "string") {
 		return null;
@@ -339,7 +436,7 @@ function normalizePortableTextBlocks(blocks) {
 				if (!hasInlineMarkdown) {
 					normalizedChildren.push({
 						...child,
-						text: text.replace(/(\d+)\\\./g, "$1."),
+						text: normalizeMarkdownEscapes(text),
 						marks: [...new Set(inheritedMarks)],
 					});
 					continue;
@@ -398,7 +495,7 @@ function normalizePortableTextBlocks(blocks) {
 						_key: generateKey(),
 						text:
 							typeof parsedText === "string"
-								? parsedText.replace(/(\d+)\\\./g, "$1.")
+								? normalizeMarkdownEscapes(parsedText)
 								: parsedText,
 						marks: [
 							...new Set([
@@ -412,6 +509,8 @@ function normalizePortableTextBlocks(blocks) {
 
 			nextBlock.children = normalizedChildren;
 			nextBlock.markDefs = nextMarkDefs;
+			applyEmphasizedLinkTokens(nextBlock);
+			unwrapWrappedMarks(nextBlock);
 		}
 
 		normalizedBlocks.push(nextBlock);
@@ -442,7 +541,9 @@ function autoWrapParagraphLikeHtml(html) {
 }
 
 function markdownFragmentToPortableText(html) {
-	const markdown = turndown.turndown(html).trim();
+	const markdown = wrapEmphasizedMarkdownLinks(
+		normalizeMarkdownLinks(turndown.turndown(stripAdminLinksHtml(html)).trim()),
+	);
 	if (!markdown) return [];
 	return normalizePortableTextBlocks(markdownToPortableText(markdown));
 }
