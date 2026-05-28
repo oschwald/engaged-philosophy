@@ -102,6 +102,12 @@ const alignmentClass =
 			/>
 		)
 	) : (
-		<EmDashPortableTextImage node={node} />
+		alignmentClass ? (
+			<div class={alignmentClass}>
+				<EmDashPortableTextImage node={node} />
+			</div>
+		) : (
+			<EmDashPortableTextImage node={node} />
+		)
 	)
 }

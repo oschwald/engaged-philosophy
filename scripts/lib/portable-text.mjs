@@ -12,7 +12,7 @@ const PUBLIC_MEDIA_URL = (
 	process.env.PUBLIC_MEDIA_URL || "https://media.engagedphilosophy.com"
 ).replace(/\/+$/, "");
 const TOKEN_RE =
-	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[embed\][\s\S]*?\[\/embed\])/gi;
+	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[embed\][\s\S]*?\[\/embed\]|\[caption[^\]]*\][\s\S]*?\[\/caption\])/gi;
 
 const turndown = new TurndownService({
 	codeBlockStyle: "fenced",
@@ -311,6 +311,8 @@ function normalizeImageBlock(block) {
 		...(typeof block.caption === "string" && block.caption.trim()
 			? { caption: block.caption.trim() }
 			: {}),
+		...(typeof block.href === "string" ? { href: rewriteUploadUrl(block.href) } : {}),
+		...(typeof block.align === "string" ? { align: block.align } : {}),
 		...(typeof block.width === "number" ? { width: block.width } : {}),
 		...(typeof block.height === "number" ? { height: block.height } : {}),
 		...(typeof block.displayWidth === "number"
@@ -646,6 +648,37 @@ function embedShortcodeToPortableText(shortcode) {
 	);
 }
 
+function getCaptionAlignment(alignAttr) {
+	if (!alignAttr) return undefined;
+	if (/\balignleft\b|left/i.test(alignAttr)) return "left";
+	if (/\balignright\b|right/i.test(alignAttr)) return "right";
+	if (/\baligncenter\b|center/i.test(alignAttr)) return "center";
+	return undefined;
+}
+
+function captionShortcodeToPortableText(token) {
+	const match = token.match(/^\[caption\s+([^\]]+)\]([\s\S]*?)\[\/caption\]$/i);
+	if (!match) return [];
+
+	const captionAttributes = parseAttributes(match[1]);
+	const innerContent = match[2];
+
+	const contentMatch = innerContent.match(
+		/^(\s*(?:<a\b[^>]*>\s*)?<img\b[^>]*>(?:\s*<\/a>)?)([\s\S]*)$/i,
+	);
+	if (!contentMatch) return [];
+
+	const imageHtml = contentMatch[1];
+	const captionText = htmlToPlainText(contentMatch[2]);
+
+	const align = getCaptionAlignment(captionAttributes.align);
+
+	return imageHtmlToPortableText(imageHtml, {
+		align,
+		...(captionText ? { caption: captionText } : {}),
+	});
+}
+
 function imageAttributesToPortableText(
 	imageAttributes,
 	anchorAttributes = {},
@@ -807,6 +840,8 @@ export function htmlToPortableText(html, mediaById = {}) {
 			blocks.push(...galleryShortcodeToPortableText(token, mediaById));
 		} else if (/^\[embed\]/i.test(token)) {
 			blocks.push(...embedShortcodeToPortableText(token));
+		} else if (/^\[caption/i.test(token)) {
+			blocks.push(...captionShortcodeToPortableText(token));
 		}
 
 		lastIndex = index + token.length;

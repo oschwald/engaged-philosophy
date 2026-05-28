@@ -5,6 +5,10 @@ import { PortableText } from "emdash/ui";
 import EmDashInlineEditor from "./EmDashInlineEditor";
 import HtmlContent from "./HtmlContent.astro";
 import RichTextNumberedHeading from "./rich-text/RichTextNumberedHeading.astro";
+import RichTextImage from "./rich-text/RichTextImage.astro";
+import RichTextGallery from "./rich-text/RichTextGallery.astro";
+import RichTextHorizontalRule from "./rich-text/RichTextHorizontalRule.astro";
+import RichTextLink from "./rich-text/RichTextLink.astro";
 import { isPortableTextValue } from "../lib/site";
 import type { RichTextValue } from "../lib/types";
 
@@ -48,6 +52,7 @@ const normalizedValue =
 	isPortableTextValue(value) && !editMeta
 		? normalizeLegacyPortableText(value)
 		: value;
+
 ---
 
 {
@@ -67,6 +72,12 @@ const normalizedValue =
 					components={{
 						type: {
 							numberedHeading: RichTextNumberedHeading,
+							image: RichTextImage,
+							gallery: RichTextGallery,
+							break: RichTextHorizontalRule,
+						},
+						mark: {
+							link: RichTextLink,
 						},
 					}}
 				/>

@@ -304,7 +304,7 @@ export function isWordPressUploadUrl(value?: string | null) {
 	const normalized = (value ?? "").trim();
 	return (
 		normalized.startsWith("/wp-content/uploads/") ||
-		/^https?:\/\/(?:www\.)?engagedphilosophy\.com\/wp-content\/uploads\//i.test(
+		/^https?:\/\/(?:www\.|media\.)?engagedphilosophy\.com\/wp-content\/uploads\//i.test(
 			normalized,
 		)
 	);
