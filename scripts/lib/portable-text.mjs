@@ -234,7 +234,9 @@ function unwrapWrappedMarks(block) {
 	const plainText = textChildren.map((child) => child.text).join("");
 	if (/^\*\*[\s\S]+\*\*$/.test(plainText)) {
 		const first = textChildren.find((child) => child.text.length > 0);
-		const last = [...textChildren].reverse().find((child) => child.text.length > 0);
+		const last = [...textChildren]
+			.reverse()
+			.find((child) => child.text.length > 0);
 		if (first) {
 			first.text = first.text.replace(/^\*\*/, "");
 		}
@@ -291,12 +293,96 @@ function applyEmphasizedLinkTokens(block) {
 	return block;
 }
 
+function normalizeLegacyAlignment(align) {
+	return align === "left" || align === "right" || align === "center"
+		? align
+		: undefined;
+}
+
+function createLegacyImageBlock({
+	key,
+	url,
+	alt,
+	caption,
+	href,
+	align,
+	width,
+	height,
+	displayWidth,
+	displayHeight,
+}) {
+	return {
+		_type: "legacyImage",
+		_key: key || generateKey(),
+		url: rewriteUploadUrl(url),
+		...(typeof alt === "string" && alt ? { alt } : {}),
+		...(typeof caption === "string" && caption.trim()
+			? { caption: caption.trim() }
+			: {}),
+		...(typeof href === "string" && href
+			? { href: rewriteUploadUrl(href) }
+			: {}),
+		...(normalizeLegacyAlignment(align)
+			? { align: normalizeLegacyAlignment(align) }
+			: {}),
+		...(typeof width === "number" ? { width } : {}),
+		...(typeof height === "number" ? { height } : {}),
+		...(typeof displayWidth === "number" ? { displayWidth } : {}),
+		...(typeof displayHeight === "number" ? { displayHeight } : {}),
+	};
+}
+
+function normalizeLegacyImageBlock(block) {
+	const sourceUrl =
+		typeof block?.url === "string"
+			? block.url
+			: typeof block?.asset?.url === "string"
+				? block.asset.url
+				: "";
+	if (!sourceUrl || shouldIgnoreImageUrl(sourceUrl)) {
+		return null;
+	}
+
+	return createLegacyImageBlock({
+		key: block._key,
+		url: sourceUrl,
+		alt: typeof block.alt === "string" ? block.alt : "",
+		caption: typeof block.caption === "string" ? block.caption : "",
+		href: typeof block.href === "string" ? block.href : "",
+		align: typeof block.align === "string" ? block.align : undefined,
+		width: typeof block.width === "number" ? block.width : undefined,
+		height: typeof block.height === "number" ? block.height : undefined,
+		displayWidth:
+			typeof block.displayWidth === "number" ? block.displayWidth : undefined,
+		displayHeight:
+			typeof block.displayHeight === "number" ? block.displayHeight : undefined,
+	});
+}
+
 function normalizeImageBlock(block) {
 	if (!block?.asset || typeof block.asset.url !== "string") {
 		return null;
 	}
 	if (shouldIgnoreImageUrl(block.asset.url)) {
 		return null;
+	}
+	if (typeof block.href === "string" || typeof block.align === "string") {
+		return createLegacyImageBlock({
+			key: block._key,
+			url: block.asset.url,
+			alt: typeof block.alt === "string" ? block.alt : "",
+			caption: typeof block.caption === "string" ? block.caption : "",
+			href: typeof block.href === "string" ? block.href : "",
+			align: typeof block.align === "string" ? block.align : undefined,
+			width: typeof block.width === "number" ? block.width : undefined,
+			height: typeof block.height === "number" ? block.height : undefined,
+			displayWidth:
+				typeof block.displayWidth === "number" ? block.displayWidth : undefined,
+			displayHeight:
+				typeof block.displayHeight === "number"
+					? block.displayHeight
+					: undefined,
+		});
 	}
 
 	return {
@@ -311,7 +397,9 @@ function normalizeImageBlock(block) {
 		...(typeof block.caption === "string" && block.caption.trim()
 			? { caption: block.caption.trim() }
 			: {}),
-		...(typeof block.href === "string" ? { href: rewriteUploadUrl(block.href) } : {}),
+		...(typeof block.href === "string"
+			? { href: rewriteUploadUrl(block.href) }
+			: {}),
 		...(typeof block.align === "string" ? { align: block.align } : {}),
 		...(typeof block.width === "number" ? { width: block.width } : {}),
 		...(typeof block.height === "number" ? { height: block.height } : {}),
@@ -340,6 +428,14 @@ function normalizePortableTextBlocks(blocks) {
 
 		if (nextBlock._type === "image") {
 			const normalizedImage = normalizeImageBlock(nextBlock);
+			if (normalizedImage) {
+				normalizedBlocks.push(normalizedImage);
+			}
+			continue;
+		}
+
+		if (nextBlock._type === "legacyImage") {
+			const normalizedImage = normalizeLegacyImageBlock(nextBlock);
 			if (normalizedImage) {
 				normalizedBlocks.push(normalizedImage);
 			}
@@ -710,18 +806,28 @@ function imageAttributesToPortableText(
 		) || undefined;
 
 	return {
-		_type: "image",
-		_key: generateKey(),
-		asset: {
-			_ref: generateKey(),
-			url: rewriteUploadUrl(imageSrc),
-		},
-		alt: imageAttributes.alt || imageAttributes["data-image-title"] || "",
-		...(href ? { href: rewriteUploadUrl(href) } : {}),
-		...(align ? { align } : {}),
-		...(overrides.caption ? { caption: overrides.caption } : {}),
-		...(width ? { width } : {}),
-		...(height ? { height } : {}),
+		...(href || align
+			? createLegacyImageBlock({
+					url: imageSrc,
+					alt: imageAttributes.alt || imageAttributes["data-image-title"] || "",
+					href,
+					align,
+					caption: overrides.caption,
+					width,
+					height,
+				})
+			: {
+					_type: "image",
+					_key: generateKey(),
+					asset: {
+						_ref: generateKey(),
+						url: rewriteUploadUrl(imageSrc),
+					},
+					alt: imageAttributes.alt || imageAttributes["data-image-title"] || "",
+					...(overrides.caption ? { caption: overrides.caption } : {}),
+					...(width ? { width } : {}),
+					...(height ? { height } : {}),
+				}),
 	};
 }
 

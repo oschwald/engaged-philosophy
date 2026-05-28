@@ -9,14 +9,15 @@ import {
 
 interface Props {
 	node: {
-		_type: "image";
+		_type: "image" | "legacyImage";
 		_key: string;
-		asset: {
-			_ref: string;
+		asset?: {
+			_ref?: string;
 			url?: string;
 			provider?: string;
 			meta?: Record<string, unknown>;
 		};
+		url?: string;
 		alt?: string;
 		caption?: string;
 		href?: string;
@@ -28,13 +29,31 @@ interface Props {
 	};
 }
 
+type StandardImageNode = {
+	_type: "image";
+	_key: string;
+	asset: {
+		_ref: string;
+		url?: string;
+		provider?: string;
+		meta?: Record<string, unknown>;
+	};
+	alt?: string;
+	caption?: string;
+	width?: number;
+	height?: number;
+	displayWidth?: number;
+	displayHeight?: number;
+};
+
 const { node } = Astro.props;
-const assetUrl = node.asset.url ?? "";
+const assetUrl = node.asset?.url ?? node.url ?? "";
+const isLegacyNode = node._type === "legacyImage";
 const isLegacyUpload = isWordPressUploadUrl(assetUrl);
 const mediaUrlPrefix = getMediaUrlPrefix();
 const src = isLegacyUpload
 	? rewriteWordPressUploadUrl(assetUrl, mediaUrlPrefix)
-	: "";
+	: assetUrl;
 const href = isWordPressUploadUrl(node.href)
 	? rewriteWordPressUploadUrl(node.href, mediaUrlPrefix)
 	: node.href;
@@ -46,10 +65,33 @@ const alignmentClass =
 			: node.align === "center"
 				? "aligncenter"
 				: "";
+const standardImageNode: StandardImageNode | null =
+	node._type === "image" && node.asset?._ref
+		? {
+				_type: "image",
+				_key: node._key,
+				asset: {
+					_ref: node.asset._ref,
+					...(node.asset.url ? { url: node.asset.url } : {}),
+					...(node.asset.provider ? { provider: node.asset.provider } : {}),
+					...(node.asset.meta ? { meta: node.asset.meta } : {}),
+				},
+				...(node.alt ? { alt: node.alt } : {}),
+				...(node.caption ? { caption: node.caption } : {}),
+				...(typeof node.width === "number" ? { width: node.width } : {}),
+				...(typeof node.height === "number" ? { height: node.height } : {}),
+				...(typeof node.displayWidth === "number"
+					? { displayWidth: node.displayWidth }
+					: {}),
+				...(typeof node.displayHeight === "number"
+					? { displayHeight: node.displayHeight }
+					: {}),
+			}
+		: null;
 ---
 
 {
-	isLegacyUpload ? (
+	isLegacyNode || isLegacyUpload ? (
 		node?.caption ? (
 			<figure class:list={["emdash-image", alignmentClass]}>
 				{href ? (
@@ -102,12 +144,6 @@ const alignmentClass =
 			/>
 		)
 	) : (
-		alignmentClass ? (
-			<div class={alignmentClass}>
-				<EmDashPortableTextImage node={node} />
-			</div>
-		) : (
-			<EmDashPortableTextImage node={node} />
-		)
+		standardImageNode && <EmDashPortableTextImage node={standardImageNode} />
 	)
 }

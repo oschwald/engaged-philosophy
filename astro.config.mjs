@@ -5,6 +5,10 @@ import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
 
+const legacyImagePluginEntrypoint = fileURLToPath(
+	new URL("./src/plugins/legacy-image-blocks.ts", import.meta.url),
+);
+
 export default defineConfig({
 	output: "server",
 	adapter: cloudflare(),
@@ -25,6 +29,13 @@ export default defineConfig({
 		emdash({
 			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),
+			plugins: [
+				{
+					id: "legacy-image-blocks",
+					version: "0.1.0",
+					entrypoint: legacyImagePluginEntrypoint,
+				},
+			],
 		}),
 	],
 	devToolbar: { enabled: false },
