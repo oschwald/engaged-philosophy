@@ -310,6 +310,37 @@ export function isWordPressUploadUrl(value?: string | null) {
 	);
 }
 
+export function getAssetSrc(
+	asset?: { _ref?: string; url?: string } | null,
+	fallbackUrl?: string | null,
+	getPublicMediaUrl?: ((key: string) => string) | null,
+) {
+	const url = asset?.url ?? fallbackUrl ?? "";
+	if (isWordPressUploadUrl(url)) {
+		return rewriteWordPressUploadUrl(url, getMediaUrlPrefix());
+	}
+
+	if (
+		asset?._ref &&
+		getPublicMediaUrl &&
+		!asset._ref.includes("/") &&
+		!asset._ref.startsWith("http")
+	) {
+		try {
+			const key =
+				asset.url && asset.url.startsWith("/_emdash/api/media/file/")
+					? asset.url.replace(/^\/_emdash\/api\/media\/file\//, "")
+					: asset._ref;
+			const resolved = getPublicMediaUrl(key);
+			if (resolved) return resolved;
+		} catch (e) {
+			console.error("Failed to resolve public media URL:", e);
+		}
+	}
+
+	return url;
+}
+
 export function getMediaUrlPrefix(
 	runtimeEnv?: { PUBLIC_MEDIA_URL?: string } | null,
 ) {

@@ -1,11 +1,7 @@
 ---
 import { Gallery as EmDashGallery } from "emdash/ui";
 
-import {
-	getMediaUrlPrefix,
-	isWordPressUploadUrl,
-	rewriteWordPressUploadUrl,
-} from "../../lib/site";
+import { getAssetSrc } from "../../lib/site";
 
 interface Props {
 	node: {
@@ -32,10 +28,8 @@ interface Props {
 
 const { node } = Astro.props;
 const images = node.images;
-const mediaUrlPrefix = getMediaUrlPrefix();
-const isLegacyGallery =
-	images.length > 0 &&
-	images.every((image) => isWordPressUploadUrl(image.asset.url));
+const getPublicMediaUrl = Astro.locals.emdash?.getPublicMediaUrl;
+const isLegacyGallery = node.layout === "shortcode" || node.layout === "figure";
 const usesLeadLayout =
 	node.layout === "shortcode" && node.columns === 3 && images.length === 4;
 const alignmentClass =
@@ -61,10 +55,7 @@ const alignmentClass =
 				]}
 			>
 				{images.map((image, index) => {
-					const src = rewriteWordPressUploadUrl(
-						image.asset?.url,
-						mediaUrlPrefix,
-					);
+					const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
 					const size = usesLeadLayout
 						? index === 0
 							? { width: 936, height: 936 }
@@ -99,10 +90,7 @@ const alignmentClass =
 					]}
 				>
 					{images.map((image) => {
-						const src = rewriteWordPressUploadUrl(
-							image.asset?.url,
-							mediaUrlPrefix,
-						);
+						const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
 						return (
 							<li class="blocks-gallery-item">
 								<figure>
@@ -138,10 +126,7 @@ const alignmentClass =
 				]}
 			>
 				{images.map((image) => {
-					const src = rewriteWordPressUploadUrl(
-						image.asset?.url,
-						mediaUrlPrefix,
-					);
+					const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
 					return (
 						<li class="blocks-gallery-item">
 							<figure>

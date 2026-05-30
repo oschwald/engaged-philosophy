@@ -7,8 +7,6 @@ import HtmlContent from "./HtmlContent.astro";
 import RichTextNumberedHeading from "./rich-text/RichTextNumberedHeading.astro";
 import RichTextImage from "./rich-text/RichTextImage.astro";
 import RichTextGallery from "./rich-text/RichTextGallery.astro";
-import RichTextHorizontalRule from "./rich-text/RichTextHorizontalRule.astro";
-import RichTextLink from "./rich-text/RichTextLink.astro";
 import { isPortableTextValue } from "../lib/site";
 import type { RichTextValue } from "../lib/types";
 
@@ -74,10 +72,6 @@ const normalizedValue =
 							image: RichTextImage,
 							legacyImage: RichTextImage,
 							gallery: RichTextGallery,
-							break: RichTextHorizontalRule,
-						},
-						mark: {
-							link: RichTextLink,
 						},
 					}}
 				/>

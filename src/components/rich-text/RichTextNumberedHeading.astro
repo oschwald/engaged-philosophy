@@ -1,8 +1,6 @@
 ---
 import { PortableText } from "emdash/ui";
 
-import RichTextLink from "./RichTextLink.astro";
-
 interface Props {
 	node: {
 		_type: "numberedHeading";
@@ -29,13 +27,6 @@ const block = {
 
 <ol start={node.index} class="legacy-numbered-heading">
 	<li>
-		<PortableText
-			value={[block]}
-			components={{
-				mark: {
-					link: RichTextLink,
-				},
-			}}
-		/>
+		<PortableText value={[block]} />
 	</li>
 </ol>

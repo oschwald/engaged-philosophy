@@ -10,3 +10,4 @@ debug-crawl-parity.js
 *.zip
 emdash.md
 review.md
+.snapshot/
