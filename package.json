@@ -20,7 +20,7 @@
 		"lint:eslint": "eslint eslint.config.js \"scripts/**/*.mjs\" \"src/**/*.{js,ts,astro}\"",
 		"lint": "npm run format:check && npm run lint:eslint",
 		"lint:fix": "prettier --write . && npm run lint:eslint -- --fix",
-		"test": "npm run test:portable-text",
+		"test": "npm run test:portable-text && npm run test:functional",
 		"test:functional": "node scripts/test-rendered-smoke.mjs",
 		"test:smoke": "node scripts/test-rendered-smoke.mjs",
 		"test:portable-text": "node scripts/test-portable-text.mjs",
