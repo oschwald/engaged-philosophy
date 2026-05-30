@@ -32,7 +32,7 @@ const VIEWPORTS = [
 ];
 
 const CONTENT_BLOCK_SELECTOR =
-	"p, h1, h2, h3, h4, h5, h6, ul, ol, li, hr, figure, img, blockquote";
+	"p, h1, h2, h3, h4, h5, h6, ul, ol, li, hr, figure, img, video, iframe, blockquote";
 const IGNORE_PATTERNS = [
 	/^\/wp-/,
 	/^\/wp-content\//,
@@ -305,6 +305,8 @@ function summarizeBlocks($, root) {
 		hr: 0,
 		figure: 0,
 		img: 0,
+		video: 0,
+		iframe: 0,
 		strong: 0,
 		em: 0,
 		links: 0,
@@ -331,6 +333,8 @@ function summarizeBlocks($, root) {
 		if (tag === "hr") counts.hr += 1;
 		if (tag === "figure") counts.figure += 1;
 		if (tag === "img") counts.img += 1;
+		if (tag === "video") counts.video += 1;
+		if (tag === "iframe") counts.iframe += 1;
 
 		if (/alignleft/.test(classes)) counts.alignleft += 1;
 		if (/alignright/.test(classes)) counts.alignright += 1;
@@ -346,7 +350,10 @@ function summarizeBlocks($, root) {
 			});
 		}
 
-		if (["p", "li", "hr", "figure"].includes(tag) || /^h[1-6]$/.test(tag)) {
+		if (
+			["p", "li", "hr", "figure", "video", "iframe"].includes(tag) ||
+			/^h[1-6]$/.test(tag)
+		) {
 			blocks.push({
 				tag,
 				text,
@@ -408,6 +415,7 @@ function summarizeHtml(html) {
 		/\d+\\\./.test(contentText);
 	const uploadLeak = /(?:src|href)="\/wp-content\/uploads\//.test(contentHtml);
 	const galleryLeak = /\[gallery\b/i.test(contentHtml);
+	const shortcodeLeak = /\[(?:playlist|video|audio|embed)\b/i.test(contentHtml);
 	const portableTextUnknown = /data-portabletext-unknown/.test(contentHtml);
 	return {
 		title,
@@ -423,6 +431,7 @@ function summarizeHtml(html) {
 			markdownLeak,
 			uploadLeak,
 			galleryLeak,
+			shortcodeLeak,
 			portableTextUnknown,
 		},
 	};
@@ -494,6 +503,8 @@ function compareSummaries(pathname, live, preview, options, config) {
 		"hr",
 		"figure",
 		"img",
+		"video",
+		"iframe",
 		"sizedImages",
 	]) {
 		if (live.counts[countId] !== preview.counts[countId]) {
@@ -524,6 +535,7 @@ function compareSummaries(pathname, live, preview, options, config) {
 		"markdownLeak",
 		"uploadLeak",
 		"galleryLeak",
+		"shortcodeLeak",
 		"portableTextUnknown",
 	]) {
 		if (preview.detectors[detectorId]) {

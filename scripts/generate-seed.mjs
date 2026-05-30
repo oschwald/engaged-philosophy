@@ -126,6 +126,33 @@ function toMediaRef(attachment) {
 	};
 }
 
+function extractSerializedInt(source, key) {
+	const match = source.match(
+		new RegExp(`s:${key.length}:"${key}";i:([0-9]+);`),
+	);
+	return match ? Number.parseInt(match[1], 10) : undefined;
+}
+
+function extractSerializedString(source, key) {
+	const match = source.match(
+		new RegExp(`s:${key.length}:"${key}";s:[0-9]+:"([^"]*)";`),
+	);
+	return match ? match[1] : "";
+}
+
+function parseAttachmentMetadata(value) {
+	const source = value || "";
+	const width = extractSerializedInt(source, "width");
+	const height = extractSerializedInt(source, "height");
+	const mimeType = extractSerializedString(source, "mime_type");
+
+	return {
+		...(Number.isInteger(width) ? { width } : {}),
+		...(Number.isInteger(height) ? { height } : {}),
+		...(mimeType ? { mimeType } : {}),
+	};
+}
+
 function normalizeBool(value) {
 	if (!value) return false;
 	const normalized = value.toLowerCase();
@@ -328,6 +355,7 @@ for (const item of items) {
 		[...item.matchAll(META_RE)].map((m) => [m[1], m[2]]),
 	);
 	const filename = attachmentUrl ? attachmentUrl.split("/").pop() : "";
+	const metadata = parseAttachmentMetadata(meta._wp_attachment_metadata);
 
 	if (attachmentUrl) {
 		registerUnique(attachmentReplacements, attachmentUrl, attachmentUrl);
@@ -346,6 +374,7 @@ for (const item of items) {
 		alt: meta._wp_attachment_image_alt || "",
 		filename,
 		title: extractTag(item, "title"),
+		...metadata,
 	});
 }
 
@@ -580,6 +609,24 @@ const seedMedia = Object.fromEntries(
 		},
 	]),
 );
+const portableTextMedia = Object.fromEntries(
+	Array.from(attachments.entries()).map(([id, attachment]) => [
+		id,
+		{
+			url: attachment.url,
+			alt: attachment.alt || "",
+			filename: attachment.filename || "",
+			title: attachment.title || "",
+			...(attachment.mimeType ? { mimeType: attachment.mimeType } : {}),
+			...(typeof attachment.width === "number"
+				? { width: attachment.width }
+				: {}),
+			...(typeof attachment.height === "number"
+				? { height: attachment.height }
+				: {}),
+		},
+	]),
+);
 
 for (const entry of pages) {
 	entry.data.content = repairMalformedInternalLinks(
@@ -632,19 +679,25 @@ for (const entry of pages) {
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.content = htmlToPortableText(entry.data.content, seedMedia);
-	entry.data.about_html = htmlToPortableText(entry.data.about_html, seedMedia);
+	entry.data.content = htmlToPortableText(
+		entry.data.content,
+		portableTextMedia,
+	);
+	entry.data.about_html = htmlToPortableText(
+		entry.data.about_html,
+		portableTextMedia,
+	);
 	entry.data.box_left_html = htmlToPortableText(
 		entry.data.box_left_html,
-		seedMedia,
+		portableTextMedia,
 	);
 	entry.data.box_middle_html = htmlToPortableText(
 		entry.data.box_middle_html,
-		seedMedia,
+		portableTextMedia,
 	);
 	entry.data.box_right_html = htmlToPortableText(
 		entry.data.box_right_html,
-		seedMedia,
+		portableTextMedia,
 	);
 }
 
@@ -669,8 +722,14 @@ for (const entry of posts) {
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.content = htmlToPortableText(entry.data.content, seedMedia);
-	entry.data.excerpt = htmlToPortableText(entry.data.excerpt, seedMedia);
+	entry.data.content = htmlToPortableText(
+		entry.data.content,
+		portableTextMedia,
+	);
+	entry.data.excerpt = htmlToPortableText(
+		entry.data.excerpt,
+		portableTextMedia,
+	);
 }
 
 for (const entry of projects) {
@@ -694,8 +753,14 @@ for (const entry of projects) {
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.content = htmlToPortableText(entry.data.content, seedMedia);
-	entry.data.excerpt = htmlToPortableText(entry.data.excerpt, seedMedia);
+	entry.data.content = htmlToPortableText(
+		entry.data.content,
+		portableTextMedia,
+	);
+	entry.data.excerpt = htmlToPortableText(
+		entry.data.excerpt,
+		portableTextMedia,
+	);
 }
 
 for (const item of rawMenuItems) {

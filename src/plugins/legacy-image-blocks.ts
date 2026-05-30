@@ -59,6 +59,40 @@ export function createPlugin() {
 						},
 					],
 				},
+				{
+					type: "legacyVideo",
+					label: "Legacy video",
+					description: "Video block for WordPress playlist shortcode imports.",
+					category: "Media",
+					fields: [
+						{
+							type: "media_picker",
+							action_id: "url",
+							label: "Video",
+							placeholder: "Choose a video",
+						},
+						{
+							type: "text_input",
+							action_id: "title",
+							label: "Title",
+						},
+						{
+							type: "text_input",
+							action_id: "mimeType",
+							label: "MIME type",
+						},
+						{
+							type: "number_input",
+							action_id: "width",
+							label: "Width",
+						},
+						{
+							type: "number_input",
+							action_id: "height",
+							label: "Height",
+						},
+					],
+				},
 			],
 		},
 	});

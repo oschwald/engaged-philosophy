@@ -12,7 +12,7 @@ const PUBLIC_MEDIA_URL = (
 	process.env.PUBLIC_MEDIA_URL || "https://media.engagedphilosophy.com"
 ).replace(/\/+$/, "");
 const TOKEN_RE =
-	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[embed\][\s\S]*?\[\/embed\]|\[caption[^\]]*\][\s\S]*?\[\/caption\])/gi;
+	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[playlist[^\]]*\]|\[embed\][\s\S]*?\[\/embed\]|\[caption[^\]]*\][\s\S]*?\[\/caption\])/gi;
 
 const turndown = new TurndownService({
 	codeBlockStyle: "fenced",
@@ -114,6 +114,23 @@ function parseAttributes(source) {
 	}
 
 	return attributes;
+}
+
+function guessMimeType(url) {
+	const pathname = (() => {
+		try {
+			return new URL(url, "https://www.engagedphilosophy.com").pathname;
+		} catch {
+			return url;
+		}
+	})().toLowerCase();
+
+	if (pathname.endsWith(".mp4") || pathname.endsWith(".m4v"))
+		return "video/mp4";
+	if (pathname.endsWith(".mov")) return "video/quicktime";
+	if (pathname.endsWith(".webm")) return "video/webm";
+	if (pathname.endsWith(".ogv")) return "video/ogg";
+	return "";
 }
 
 function getTagAttributes(token, tagName) {
@@ -741,6 +758,40 @@ function galleryShortcodeToPortableText(shortcode, mediaById) {
 	];
 }
 
+function playlistShortcodeToPortableText(shortcode, mediaById) {
+	const attributes = parseAttributes(shortcode);
+	const ids = attributes.ids || "";
+	const type = (attributes.type || "").toLowerCase();
+	if (!ids) return [];
+
+	return ids
+		.split(",")
+		.map((value) => value.trim())
+		.filter(Boolean)
+		.map((id) => ({ id, media: mediaById[id] }))
+		.filter((item) => item.media?.url)
+		.map(({ media }) => {
+			const mimeType = media.mimeType || guessMimeType(media.url);
+			const isVideo =
+				type === "video" ||
+				mimeType.startsWith("video/") ||
+				/\.(?:mp4|m4v|mov|webm|ogv)(?:[?#].*)?$/i.test(media.url);
+
+			if (!isVideo) return null;
+
+			return {
+				_type: "legacyVideo",
+				_key: generateKey(),
+				url: rewriteUploadUrl(media.url),
+				...(media.title ? { title: media.title } : {}),
+				...(mimeType ? { mimeType } : {}),
+				...(typeof media.width === "number" ? { width: media.width } : {}),
+				...(typeof media.height === "number" ? { height: media.height } : {}),
+			};
+		})
+		.filter(Boolean);
+}
+
 function embedShortcodeToPortableText(shortcode) {
 	const url = shortcode
 		.replace(/^\[embed\]/i, "")
@@ -956,6 +1007,8 @@ export function htmlToPortableText(html, mediaById = {}) {
 			blocks.push(...horizontalRuleToPortableText());
 		} else if (/^\[gallery/i.test(token)) {
 			blocks.push(...galleryShortcodeToPortableText(token, mediaById));
+		} else if (/^\[playlist/i.test(token)) {
+			blocks.push(...playlistShortcodeToPortableText(token, mediaById));
 		} else if (/^\[embed\]/i.test(token)) {
 			blocks.push(...embedShortcodeToPortableText(token));
 		} else if (/^\[caption/i.test(token)) {

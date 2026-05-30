@@ -88,3 +88,31 @@ const [invalidColumnsGallery] = htmlToPortableText(
 	shortcodeMedia,
 );
 assert.equal(invalidColumnsGallery.columns, 3);
+
+const [shortcodeVideo] = htmlToPortableText(
+	`[playlist type="video" ids="3120"]`,
+	{
+		3120: {
+			url: "https://www.engagedphilosophy.com/wp-content/uploads/2022/02/video.mp4",
+			title: "Imported video",
+			mimeType: "video/mp4",
+			width: 720,
+			height: 720,
+		},
+	},
+);
+assert.equal(shortcodeVideo._type, "legacyVideo");
+assert.equal(
+	shortcodeVideo.url,
+	"https://media.engagedphilosophy.com/wp-content/uploads/2022/02/video.mp4",
+);
+assert.equal(shortcodeVideo.title, "Imported video");
+assert.equal(shortcodeVideo.mimeType, "video/mp4");
+assert.equal(shortcodeVideo.width, 720);
+assert.equal(shortcodeVideo.height, 720);
+
+const missingShortcodeVideo = htmlToPortableText(
+	`[playlist type="video" ids="missing"]`,
+	{},
+);
+assert.deepEqual(missingShortcodeVideo, []);
