@@ -2,44 +2,22 @@
 import { PTImage as EmDashPortableTextImage } from "emdash/ui";
 
 import { getAssetSrc, isWordPressUploadUrl } from "../../lib/site";
+import type {
+	RichTextAssetRef,
+	RichTextImageNode,
+	RichTextRenderableImageNode,
+} from "../../lib/rich-text-types";
 
 interface Props {
-	node: {
-		_type: "image" | "legacyImage";
-		_key: string;
-		asset?: {
-			_ref?: string;
-			url?: string;
-			provider?: string;
-			meta?: Record<string, unknown>;
-		};
-		url?: string;
-		alt?: string;
-		caption?: string;
-		href?: string;
-		align?: "left" | "right" | "center";
-		width?: number;
-		height?: number;
-		displayWidth?: number;
-		displayHeight?: number;
-	};
+	node: RichTextRenderableImageNode;
 }
 
-type StandardImageNode = {
+type StandardImageNode = RichTextImageNode & {
 	_type: "image";
 	_key: string;
-	asset: {
+	asset: RichTextAssetRef & {
 		_ref: string;
-		url?: string;
-		provider?: string;
-		meta?: Record<string, unknown>;
 	};
-	alt?: string;
-	caption?: string;
-	width?: number;
-	height?: number;
-	displayWidth?: number;
-	displayHeight?: number;
 };
 
 const { node } = Astro.props;

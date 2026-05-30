@@ -1,11 +1,11 @@
-import type { PortableTextBlock } from "emdash/ui";
+import type { RichTextValue } from "./rich-text-types";
+
+export type { RichTextValue } from "./rich-text-types";
 
 export interface MediaField {
 	src?: string;
 	alt?: string;
 }
-
-export type RichTextValue = string | PortableTextBlock[];
 
 export interface PageData {
 	id?: string;

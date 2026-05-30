@@ -11,7 +11,11 @@ import RichTextGallery from "./rich-text/RichTextGallery.astro";
 import RichTextPageList from "./rich-text/RichTextPageList.astro";
 import RichTextVideo from "./rich-text/RichTextVideo.astro";
 import { isPortableTextValue } from "../lib/site";
-import type { RichTextValue } from "../lib/types";
+import type {
+	RichTextBlock,
+	RichTextNumberedHeadingNode,
+	RichTextValue,
+} from "../lib/rich-text-types";
 
 interface Props {
 	value?: RichTextValue | null;
@@ -21,28 +25,38 @@ interface Props {
 const { value, class: className = "" } = Astro.props;
 const editMeta = getEditMeta(value);
 
+type NumberedPortableBlock = RichTextBlock & {
+	_type?: string;
+	_key?: string;
+	style?: string;
+	listItem?: string;
+	level?: unknown;
+};
+
 function normalizeLegacyPortableText(blocks: Exclude<RichTextValue, string>) {
 	let numberedHeadingIndex = 0;
 
 	return blocks.map((block) => {
+		const portableBlock = block as NumberedPortableBlock;
 		if (
-			block?._type === "block" &&
-			typeof block.style === "string" &&
-			/^h[1-6]$/.test(block.style) &&
-			block.listItem === "number"
+			portableBlock?._type === "block" &&
+			typeof portableBlock.style === "string" &&
+			/^h[1-6]$/.test(portableBlock.style) &&
+			portableBlock.listItem === "number"
 		) {
 			numberedHeadingIndex += 1;
-			return {
+			const numberedHeading: RichTextNumberedHeadingNode = {
 				_type: "numberedHeading",
-				_key: block._key,
-				level: Number(block.style.slice(1)),
+				_key: portableBlock._key ?? `numbered-heading-${numberedHeadingIndex}`,
+				level: Number(portableBlock.style.slice(1)),
 				index: numberedHeadingIndex,
 				block: {
-					...block,
+					...portableBlock,
 					listItem: undefined,
 					level: undefined,
 				},
 			};
+			return numberedHeading;
 		}
 
 		return block;

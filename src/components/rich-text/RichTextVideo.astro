@@ -1,16 +1,9 @@
 ---
 import { getAssetSrc } from "../../lib/site";
+import type { RichTextVideoNode } from "../../lib/rich-text-types";
 
 interface Props {
-	node: {
-		_type: "legacyVideo";
-		_key: string;
-		url?: string;
-		title?: string;
-		mimeType?: string;
-		width?: number;
-		height?: number;
-	};
+	node: RichTextVideoNode;
 }
 
 const { node } = Astro.props;

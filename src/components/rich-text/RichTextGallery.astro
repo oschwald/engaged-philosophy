@@ -2,28 +2,10 @@
 import { Gallery as EmDashGallery } from "emdash/ui";
 
 import { getAssetSrc } from "../../lib/site";
+import type { RichTextGalleryNode } from "../../lib/rich-text-types";
 
 interface Props {
-	node: {
-		_type: "gallery";
-		_key: string;
-		align?: "left" | "right" | "center";
-		caption?: string;
-		layout?: "figure" | "shortcode";
-		images: Array<{
-			_type: "image";
-			_key: string;
-			asset: {
-				_ref: string;
-				url?: string;
-			};
-			alt?: string;
-			caption?: string;
-			width?: number;
-			height?: number;
-		}>;
-		columns?: number;
-	};
+	node: RichTextGalleryNode;
 }
 
 const { node } = Astro.props;

@@ -1,13 +1,8 @@
 ---
+import type { RichTextEmbedNode } from "../../lib/rich-text-types";
+
 interface Props {
-	node: {
-		_type: "legacyEmbed";
-		_key: string;
-		provider?: string;
-		url?: string;
-		embedUrl?: string;
-		title?: string;
-	};
+	node: RichTextEmbedNode;
 }
 
 const { node } = Astro.props;

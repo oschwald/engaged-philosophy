@@ -1,20 +1,9 @@
 ---
 import { PortableText } from "emdash/ui";
+import type { RichTextNumberedHeadingNode } from "../../lib/rich-text-types";
 
 interface Props {
-	node: {
-		_type: "numberedHeading";
-		_key: string;
-		level?: number;
-		index: number;
-		block: {
-			_type: "block";
-			_key: string;
-			style?: string;
-			markDefs?: Array<Record<string, unknown>>;
-			children?: Array<Record<string, unknown>>;
-		};
-	};
+	node: RichTextNumberedHeadingNode;
 }
 
 const { node } = Astro.props;
