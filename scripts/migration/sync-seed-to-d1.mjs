@@ -10,14 +10,26 @@ const DATABASE_NAME = "engaged-philosophy";
 const CHUNK_SIZE = 750_000;
 const INSERT_BATCH_SIZE = 1;
 const DEFAULT_LOCALE = "en";
-const seedPath = parseSeedPathArg(process.argv.slice(2));
-const seed = readSeedFile(seedPath);
-const mode = process.argv.includes("--remote")
+const args = process.argv.slice(2);
+const seedPath = parseSeedPathArg(args);
+const mode = args.includes("--remote")
 	? "--remote"
-	: process.argv.includes("--local")
+	: args.includes("--local")
 		? "--local"
 		: "--local";
-const dryRun = process.argv.includes("--dry-run");
+const dryRun = args.includes("--dry-run");
+const remoteConfirmed =
+	args.includes("--confirm") &&
+	args[args.indexOf("--confirm") + 1] === "remote";
+
+if (mode === "--remote" && !dryRun && !remoteConfirmed) {
+	console.error(
+		"Refusing to overwrite remote D1 without --confirm remote. Use --dry-run to inspect remote counts without confirmation.",
+	);
+	process.exit(1);
+}
+
+const seed = readSeedFile(seedPath);
 
 const COLLECTION_CONFIG = {
 	pages: {
