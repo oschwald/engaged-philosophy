@@ -517,7 +517,7 @@ function normalizePortableTextBlocks(blocks) {
 				.trim();
 			const headingMatch = plainText.match(/^(#{1,6})\s+(.+)$/);
 			if (headingMatch) {
-				const [, hashes, headingText] = headingMatch;
+				const [, hashes] = headingMatch;
 				const firstTextChildIndex = nextBlock.children.findIndex(
 					(child) => child?._type === "span" && typeof child.text === "string",
 				);
