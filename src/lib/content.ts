@@ -8,6 +8,7 @@ import {
 	type ContentEntry as EmDashContentEntry,
 } from "emdash";
 
+import { isPublicContentPath } from "./content-visibility";
 import type {
 	ContentEntry,
 	MediaField,
@@ -34,11 +35,6 @@ type RawMediaField = MediaField & {
 };
 
 const COLLECTION_LIMIT = 1000;
-const excludedPaths = new Set([
-	"1477",
-	"project-guidelines-critical-thinking-3",
-	"project/photos-for-our-furry-friends-2",
-]);
 
 function normalizeMediaField(
 	media?: RawMediaField | null,
@@ -63,7 +59,7 @@ function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 }
 
 function isPublicEntry(entry: { data: { path?: string } }) {
-	return !excludedPaths.has(entry.data.path ?? "");
+	return isPublicContentPath(entry.data.path);
 }
 
 function normalizeContentPath(path: string) {
