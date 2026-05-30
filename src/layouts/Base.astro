@@ -1,5 +1,6 @@
 ---
 import { getPrimaryMenu, getSeedSettings } from "../lib/seed";
+import { getMediaUrlPrefix } from "../lib/site";
 import "../scss/style.scss";
 
 interface Props {
@@ -19,6 +20,7 @@ const pageTitle =
 		: `${siteTitle} – ${siteDescription}`;
 const menuItems = getPrimaryMenu();
 const currentPath = Astro.url.pathname;
+const mediaUrlPrefix = getMediaUrlPrefix();
 ---
 
 <!doctype html>
@@ -48,7 +50,10 @@ const currentPath = Astro.url.pathname;
 		<div class="container">
 			<header id="branding" class="text-center py-3">
 				<a id="header-image" href="/" title={siteTitle} rel="home">
-					<img src="/img/logo.png" alt={`${siteTitle} Logo`} />
+					<img
+						src={`${mediaUrlPrefix}/img/logo.png`}
+						alt={`${siteTitle} Logo`}
+					/>
 				</a>
 			</header>
 
