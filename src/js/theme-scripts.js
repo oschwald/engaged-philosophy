@@ -1,18 +1,6 @@
 // Theme-specific JavaScript functionality
 // Migrated from original Bootstrap 2 theme
 
-// Handle responsive navigation
-function initResponsiveNav() {
-	const navToggle = document.querySelector(".navbar-toggler");
-	const navCollapse = document.querySelector(".navbar-collapse");
-
-	if (navToggle && navCollapse) {
-		navToggle.addEventListener("click", function () {
-			navCollapse.classList.toggle("show");
-		});
-	}
-}
-
 // Carousel functionality is auto-initialized by Bootstrap 5
 
 // Gallery functionality is handled by WordPress core and Bootstrap CSS
@@ -43,7 +31,6 @@ function initFacebookSDK() {
 
 // Initialize all theme functionality
 function initTheme() {
-	initResponsiveNav();
 	initSearch();
 	initFacebookSDK();
 }
