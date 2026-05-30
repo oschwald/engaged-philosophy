@@ -444,10 +444,16 @@ function normalizePortableTextBlocks(blocks) {
 
 		if (nextBlock._type === "gallery" && Array.isArray(nextBlock.images)) {
 			const images = nextBlock.images
-				.map((image) => normalizeImageBlock(image))
+				.map((image) => {
+					if (image?._type === "legacyImage") {
+						return normalizeLegacyImageBlock(image);
+					}
+					return normalizeImageBlock(image);
+				})
 				.filter(Boolean);
 			if (images.length > 0) {
-				normalizedBlocks.push(...images);
+				nextBlock.images = images;
+				normalizedBlocks.push(nextBlock);
 			}
 			if (typeof nextBlock.caption === "string" && nextBlock.caption.trim()) {
 				normalizedBlocks.push(createTextBlock(nextBlock.caption.trim()));
