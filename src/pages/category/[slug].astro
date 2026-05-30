@@ -1,10 +1,10 @@
 ---
 import CategoryArchive from "../../components/CategoryArchive.astro";
 import Base from "../../layouts/Base.astro";
-import { getTaxonomyTerm } from "../../lib/seed";
+import { getTaxonomyTerm } from "../../lib/content";
 
 const { slug = "" } = Astro.params;
-const term = getTaxonomyTerm("category", slug);
+const term = await getTaxonomyTerm("category", slug);
 
 if (!term) {
 	return Astro.redirect("/404");

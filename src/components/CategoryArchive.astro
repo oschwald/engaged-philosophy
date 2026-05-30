@@ -1,6 +1,6 @@
 ---
 import ThemeSidebar from "./ThemeSidebar.astro";
-import { getPostsByCategory } from "../lib/seed";
+import { getPostsByCategory } from "../lib/content";
 import {
 	formatPathDate,
 	getEntryContent,
@@ -17,7 +17,7 @@ interface Props {
 }
 
 const { slug, label, page, perPage = 10 } = Astro.props;
-const posts = sortByPublishedOn(getPostsByCategory(slug));
+const posts = sortByPublishedOn(await getPostsByCategory(slug));
 const totalPages = Math.max(1, Math.ceil(posts.length / perPage));
 const currentPage = Math.min(Math.max(page, 1), totalPages);
 const start = (currentPage - 1) * perPage;

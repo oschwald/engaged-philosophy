@@ -1,5 +1,5 @@
 ---
-import { getPrimaryMenu, getSeedSettings } from "../lib/seed";
+import { getPrimaryMenu, getRuntimeSiteSettings } from "../lib/content";
 import { getMediaUrlPrefix } from "../lib/site";
 import "../scss/style.scss";
 
@@ -10,7 +10,7 @@ interface Props {
 }
 
 const { title, description, bodyClass = "" } = Astro.props;
-const settings = getSeedSettings();
+const settings = await getRuntimeSiteSettings();
 const siteTitle = settings?.title || "Engaged Philosophy";
 const siteDescription =
 	settings?.tagline || "Civic Engagement in Philosophy Classes";
@@ -18,7 +18,7 @@ const pageTitle =
 	title && title !== "Home"
 		? `${title} – ${siteTitle}`
 		: `${siteTitle} – ${siteDescription}`;
-const menuItems = getPrimaryMenu();
+const menuItems = await getPrimaryMenu();
 const currentPath = Astro.url.pathname;
 const mediaUrlPrefix = getMediaUrlPrefix();
 ---

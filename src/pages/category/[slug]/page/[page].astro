@@ -1,10 +1,10 @@
 ---
 import CategoryArchive from "../../../../components/CategoryArchive.astro";
 import Base from "../../../../layouts/Base.astro";
-import { getPostsByCategory, getTaxonomyTerm } from "../../../../lib/seed";
+import { getPostsByCategory, getTaxonomyTerm } from "../../../../lib/content";
 
 const { slug = "", page = "1" } = Astro.params;
-const term = getTaxonomyTerm("category", slug);
+const term = await getTaxonomyTerm("category", slug);
 
 if (!term) {
 	return Astro.redirect("/404");
@@ -15,7 +15,7 @@ if (!Number.isFinite(pageNumber) || pageNumber < 2) {
 	return Astro.redirect(`/category/${slug}/`);
 }
 
-const posts = getPostsByCategory(slug);
+const posts = await getPostsByCategory(slug);
 const totalPages = Math.max(1, Math.ceil(posts.length / 10));
 
 if (pageNumber > totalPages) {

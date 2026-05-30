@@ -1,8 +1,8 @@
 ---
-import { getPublishedPosts } from "../lib/seed";
+import { getPublishedPosts } from "../lib/content";
 import { formatPathDate, sortByPublishedOn } from "../lib/site";
 
-const recentPosts = sortByPublishedOn(getPublishedPosts()).slice(0, 25);
+const recentPosts = sortByPublishedOn(await getPublishedPosts()).slice(0, 25);
 ---
 
 <section id="secondary" class="widget-area col-lg-4 p-3" role="complementary">

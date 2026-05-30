@@ -1,7 +1,7 @@
 ---
 import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
-import { getEntryTerms, getProjectBySlug } from "../../lib/seed";
+import { getEntryTerms, getProjectBySlug } from "../../lib/content";
 import {
 	getEditModeEntryBySlug,
 	getEmDashEditEntryAttrs,
@@ -13,7 +13,7 @@ const { slug } = Astro.params;
 const project = await getEditModeEntryBySlug(
 	"projects",
 	slug ?? "",
-	getProjectBySlug(slug ?? ""),
+	await getProjectBySlug(slug ?? ""),
 );
 
 if (!project) {

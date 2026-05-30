@@ -1,6 +1,5 @@
 ---
-import { getMediaById } from "../lib/seed";
-import { getMediaUrlPrefix, rewriteWordPressUploadUrl } from "../lib/site";
+import { getMediaUrlPrefix } from "../lib/site";
 
 interface Props {
 	html?: string | null;
@@ -11,45 +10,6 @@ const { html, class: className = "" } = Astro.props;
 const mediaUrlPrefix = getMediaUrlPrefix();
 const blockTagPattern =
 	/<\/?(?:address|article|aside|blockquote|details|div|dl|fieldset|figcaption|figure|footer|form|h[1-6]|header|hr|main|nav|ol|p|pre|section|table|thead|tbody|tr|td|th|ul|li)\b/gi;
-
-function renderGallery(shortcode: string) {
-	const idsMatch = shortcode.match(/ids="([^"]+)"/);
-	if (!idsMatch) return "";
-	const columns = Number(shortcode.match(/columns="(\d+)"/)?.[1] || "3");
-
-	const ids = idsMatch[1]
-		.split(",")
-		.map((value) => value.trim())
-		.filter(Boolean);
-	const items = ids
-		.map((id) => getMediaById(id))
-		.filter(
-			(item): item is NonNullable<ReturnType<typeof getMediaById>> =>
-				item !== null && Boolean(item.url),
-		);
-
-	if (items.length === 0) return "";
-
-	const usesLeadLayout = columns === 3 && items.length === 4;
-
-	return `<div class="legacy-gallery legacy-gallery-shortcode ${
-		usesLeadLayout ? "legacy-gallery-shortcode--lead " : ""
-	}legacy-gallery-columns-${columns}">${items
-		.map((item, index) => {
-			const mediaUrl = rewriteWordPressUploadUrl(item.url, mediaUrlPrefix);
-			const size = usesLeadLayout
-				? index === 0
-					? { width: 936, height: 936 }
-					: { width: 309, height: 309 }
-				: null;
-			return `<figure class="gallery-item">
-				<a class="${usesLeadLayout && index === 0 ? "gallery-item--lead" : ""}" href="${mediaUrl}" target="_blank" rel="noreferrer">
-					<img class="img-fluid" src="${mediaUrl}" alt="${item.alt || item.title || ""}" ${size ? `width="${size.width}" height="${size.height}"` : ""} loading="lazy" />
-				</a>
-			</figure>`;
-		})
-		.join("")}</div>`;
-}
 
 function applyAutoParagraphs(value: string) {
 	const normalized = value.replace(/\r\n?/g, "\n").trim();
@@ -78,10 +38,7 @@ function applyAutoParagraphs(value: string) {
 const normalizedHtml = (html ?? "")
 	.replaceAll(/<!--[\s\S]*?-->/g, "")
 	.replaceAll(/\[embed\]([^\[]+)\[\/embed\]/g, '<p><a href="$1">$1</a></p>')
-	.replaceAll(
-		/\[gallery[^\]]*\]/g,
-		(shortcode) => renderGallery(shortcode) || "",
-	)
+	.replaceAll(/\[gallery[^\]]*\]/g, "")
 	.replaceAll(
 		/(src|href)=["']\/wp-content\/uploads\//g,
 		`$1="${mediaUrlPrefix}/wp-content/uploads/`,

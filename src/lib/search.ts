@@ -2,7 +2,7 @@ import {
 	getPublishedPages,
 	getPublishedPosts,
 	getPublishedProjects,
-} from "./seed";
+} from "./content";
 import {
 	getEntryContent,
 	getEntryExcerpt,
@@ -91,7 +91,7 @@ function rankEntry(
 	};
 }
 
-export function searchSite(
+export async function searchSite(
 	rawQuery: string,
 	page = 1,
 	mediaUrlPrefix?: string,
@@ -109,14 +109,19 @@ export function searchSite(
 		};
 	}
 
+	const [projects, pages, posts] = await Promise.all([
+		getPublishedProjects(),
+		getPublishedPages(),
+		getPublishedPosts(),
+	]);
 	const ranked = [
-		...getPublishedProjects().map((entry) =>
+		...projects.map((entry) =>
 			rankEntry("project", entry, query, terms, mediaUrlPrefix ?? ""),
 		),
-		...getPublishedPages().map((entry) =>
+		...pages.map((entry) =>
 			rankEntry("page", entry, query, terms, mediaUrlPrefix ?? ""),
 		),
-		...getPublishedPosts().map((entry) =>
+		...posts.map((entry) =>
 			rankEntry("post", entry, query, terms, mediaUrlPrefix ?? ""),
 		),
 	]

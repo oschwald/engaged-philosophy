@@ -10,7 +10,7 @@ interface Props {
 
 const { query, page = 1 } = Astro.props;
 const mediaUrlPrefix = getMediaUrlPrefix();
-const { results, totalPages, currentPage } = searchSite(
+const { results, totalPages, currentPage } = await searchSite(
 	query,
 	page,
 	mediaUrlPrefix,

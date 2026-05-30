@@ -1,8 +1,8 @@
 ---
 import Base from "../../layouts/Base.astro";
-import { getTaxonomyTerms } from "../../lib/seed";
+import { getTaxonomyTerms } from "../../lib/content";
 
-const allTopics = getTaxonomyTerms("topic");
+const allTopics = await getTaxonomyTerms("topic");
 const topicsWithCounts = allTopics.filter((term) => (term.count ?? 0) > 0);
 const dateSeed = Number(
 	new Date().toISOString().slice(0, 10).replace(/-/g, ""),

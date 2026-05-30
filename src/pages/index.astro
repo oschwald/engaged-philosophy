@@ -2,7 +2,7 @@
 import RichContent from "../components/RichContent.astro";
 import SearchResults from "../components/SearchResults.astro";
 import Base from "../layouts/Base.astro";
-import { getPageBySlug, getPublishedProjects } from "../lib/seed";
+import { getPageBySlug, getPublishedProjects } from "../lib/content";
 import { searchSite } from "../lib/search";
 import {
 	getEditModeEntryBySlug,
@@ -20,15 +20,15 @@ import type { ContentEntry, ProjectData } from "../lib/types";
 const home = await getEditModeEntryBySlug(
 	"pages",
 	"home",
-	getPageBySlug("home"),
+	await getPageBySlug("home"),
 );
-const projects = getPublishedProjects() as ContentEntry<ProjectData>[];
+const projects = (await getPublishedProjects()) as ContentEntry<ProjectData>[];
 const highlightedProjects = sortByPublishedOn(
 	projects.filter((project) => project.data.highlight),
 ).slice(0, 6);
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
 const mediaUrlPrefix = getMediaUrlPrefix();
-const search = query ? searchSite(query, 1, mediaUrlPrefix) : null;
+const search = query ? await searchSite(query, 1, mediaUrlPrefix) : null;
 const homeEntryAttrs = home ? getEmDashEditEntryAttrs("pages", home) : {};
 const homeBoxes = home
 	? [

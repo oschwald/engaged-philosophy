@@ -5,7 +5,7 @@ import {
 	getPageByPath,
 	getProjectsByTaxonomy,
 	getTaxonomyTerm,
-} from "../../lib/seed";
+} from "../../lib/content";
 import {
 	getEditModeEntryByPath,
 	getEmDashEditEntryAttrs,
@@ -22,7 +22,7 @@ const pagePath = `${taxonomy}/${slug}`;
 const page = await getEditModeEntryByPath(
 	"pages",
 	pagePath,
-	getPageByPath(pagePath),
+	await getPageByPath(pagePath),
 );
 
 if (!isProjectTaxonomy(taxonomy)) {
@@ -32,7 +32,7 @@ if (!isProjectTaxonomy(taxonomy)) {
 }
 
 const term = isProjectTaxonomy(taxonomy)
-	? getTaxonomyTerm(taxonomy, slug)
+	? await getTaxonomyTerm(taxonomy, slug)
 	: null;
 
 if (isProjectTaxonomy(taxonomy) && !term) {
@@ -41,7 +41,10 @@ if (isProjectTaxonomy(taxonomy) && !term) {
 
 const projects = isProjectTaxonomy(taxonomy)
 	? sortByPublishedOn(
-			getProjectsByTaxonomy(taxonomy, slug) as ContentEntry<ProjectData>[],
+			(await getProjectsByTaxonomy(
+				taxonomy,
+				slug,
+			)) as ContentEntry<ProjectData>[],
 		)
 	: [];
 ---

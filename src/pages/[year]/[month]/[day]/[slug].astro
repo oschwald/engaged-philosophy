@@ -6,7 +6,7 @@ import {
 	getEntryTermSlugs,
 	getPostByPath,
 	getTermsBySlugs,
-} from "../../../../lib/seed";
+} from "../../../../lib/content";
 import {
 	getEditModeEntryBySlug,
 	getEmDashEditEntryAttrs,
@@ -17,13 +17,17 @@ import {
 
 const { year = "", month = "", day = "", slug = "" } = Astro.params;
 const path = joinPath([year, month, day, slug]);
-const post = await getEditModeEntryBySlug("posts", slug, getPostByPath(path));
+const post = await getEditModeEntryBySlug(
+	"posts",
+	slug,
+	await getPostByPath(path),
+);
 
 if (!post) {
 	return Astro.redirect("/404");
 }
 
-const categories = getTermsBySlugs(
+const categories = await getTermsBySlugs(
 	"category",
 	getEntryTermSlugs(post, "category"),
 );

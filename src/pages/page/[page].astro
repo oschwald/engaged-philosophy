@@ -12,7 +12,7 @@ if (!query) {
 }
 
 const mediaUrlPrefix = getMediaUrlPrefix();
-const search = searchSite(query, pageNumber, mediaUrlPrefix);
+const search = await searchSite(query, pageNumber, mediaUrlPrefix);
 if (search.totalPages > 0 && pageNumber > search.totalPages) {
 	return Astro.redirect("/404");
 }

@@ -138,10 +138,14 @@ export async function getEditModeEntryByPath<T>(
 	}
 
 	const { entries } = await getEmDashCollection(collection, {
-		limit: 1,
-		where: { path },
+		limit: 1000,
 	});
-	return ((entries.at(0) as T | undefined) ?? fallback) as T;
+	return (
+		(entries.find((entry) => {
+			const data = entry.data as { path?: unknown };
+			return data.path === path;
+		}) as T | undefined) ?? fallback
+	);
 }
 
 export function getEmDashEditAttrs(
