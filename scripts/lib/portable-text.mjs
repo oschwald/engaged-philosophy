@@ -12,7 +12,7 @@ const PUBLIC_MEDIA_URL = (
 	process.env.PUBLIC_MEDIA_URL || "https://media.engagedphilosophy.com"
 ).replace(/\/+$/, "");
 const TOKEN_RE =
-	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[playlist[^\]]*\]|\[embed\][\s\S]*?\[\/embed\]|\[caption[^\]]*\][\s\S]*?\[\/caption\])/gi;
+	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[playlist[^\]]*\]|\[youtube[^\]]*\]|\[list-pages[^\]]*\]|\[embed\][\s\S]*?\[\/embed\]|\[caption[^\]]*\][\s\S]*?\[\/caption\])/gi;
 
 const turndown = new TurndownService({
 	codeBlockStyle: "fenced",
@@ -131,6 +131,91 @@ function guessMimeType(url) {
 	if (pathname.endsWith(".webm")) return "video/webm";
 	if (pathname.endsWith(".ogv")) return "video/ogg";
 	return "";
+}
+
+function timestampToSeconds(value) {
+	if (!value) return 0;
+	if (/^\d+$/.test(value)) return Number.parseInt(value, 10);
+
+	const match = value.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/i);
+	if (!match) return 0;
+
+	const [, hours = "0", minutes = "0", seconds = "0"] = match;
+	return (
+		Number.parseInt(hours || "0", 10) * 3600 +
+		Number.parseInt(minutes || "0", 10) * 60 +
+		Number.parseInt(seconds || "0", 10)
+	);
+}
+
+function getLegacyEmbed(value) {
+	let url;
+	try {
+		url = new URL(value);
+	} catch {
+		return null;
+	}
+
+	const hostname = url.hostname.replace(/^www\./i, "").toLowerCase();
+
+	if (
+		hostname === "youtu.be" ||
+		hostname === "youtube.com" ||
+		hostname.endsWith(".youtube.com")
+	) {
+		const pathParts = url.pathname.split("/").filter(Boolean);
+		const id =
+			hostname === "youtu.be"
+				? pathParts[0]
+				: url.searchParams.get("v") ||
+					(pathParts[0] === "embed" || pathParts[0] === "shorts"
+						? pathParts[1]
+						: "");
+		if (!id) return null;
+
+		const start = timestampToSeconds(
+			url.searchParams.get("start") || url.searchParams.get("t") || "",
+		);
+		const embedUrl = new URL(`https://www.youtube.com/embed/${id}`);
+		if (start > 0) embedUrl.searchParams.set("start", String(start));
+
+		return {
+			provider: "youtube",
+			url: url.href,
+			embedUrl: embedUrl.href,
+			title: "YouTube video",
+		};
+	}
+
+	if (hostname === "vimeo.com" || hostname.endsWith(".vimeo.com")) {
+		const id = url.pathname
+			.split("/")
+			.filter(Boolean)
+			.findLast((part) => /^\d+$/.test(part));
+		if (!id) return null;
+
+		return {
+			provider: "vimeo",
+			url: url.href,
+			embedUrl: `https://player.vimeo.com/video/${id}`,
+			title: "Vimeo video",
+		};
+	}
+
+	if (hostname === "animoto.com" || hostname.endsWith(".animoto.com")) {
+		const pathParts = url.pathname.split("/").filter(Boolean);
+		const id = pathParts[0] === "play" ? pathParts[1] : "";
+		if (!id) return null;
+
+		return {
+			provider: "animoto",
+			url: url.href,
+			embedUrl: `https://animoto.com/play/${id}`,
+			title: "Animoto video",
+		};
+	}
+
+	return null;
 }
 
 function getTagAttributes(token, tagName) {
@@ -792,16 +877,66 @@ function playlistShortcodeToPortableText(shortcode, mediaById) {
 		.filter(Boolean);
 }
 
+function shortcodeUrlToPortableText(url) {
+	if (!url) return [];
+	const cleanUrl = url.replace(/^https?:\/\/(https?:\/\/)/i, "$1");
+	const mimeType = guessMimeType(cleanUrl);
+
+	if (mimeType.startsWith("video/")) {
+		return [
+			{
+				_type: "legacyVideo",
+				_key: generateKey(),
+				url: cleanUrl,
+				mimeType,
+			},
+		];
+	}
+
+	const embed = getLegacyEmbed(cleanUrl);
+	if (embed) {
+		return [
+			{
+				_type: "legacyEmbed",
+				_key: generateKey(),
+				...embed,
+			},
+		];
+	}
+
+	return normalizePortableTextBlocks(
+		markdownToPortableText(`[${cleanUrl}](${cleanUrl})`),
+	);
+}
+
 function embedShortcodeToPortableText(shortcode) {
 	const url = shortcode
 		.replace(/^\[embed\]/i, "")
 		.replace(/\[\/embed\]$/i, "")
 		.trim();
 
-	if (!url) return [];
-	return normalizePortableTextBlocks(
-		markdownToPortableText(`[${url}](${url})`),
-	);
+	return shortcodeUrlToPortableText(url);
+}
+
+function youtubeShortcodeToPortableText(shortcode) {
+	const id = shortcode
+		.replace(/^\[youtube/i, "")
+		.replace(/\]$/i, "")
+		.trim()
+		.split(/\s+/)[0];
+
+	if (!/^[\w-]{6,}$/.test(id)) return [];
+
+	return shortcodeUrlToPortableText(`https://www.youtube.com/watch?v=${id}`);
+}
+
+function listPagesShortcodeToPortableText() {
+	return [
+		{
+			_type: "legacyPageList",
+			_key: generateKey(),
+		},
+	];
 }
 
 function getCaptionAlignment(alignAttr) {
@@ -1009,6 +1144,10 @@ export function htmlToPortableText(html, mediaById = {}) {
 			blocks.push(...galleryShortcodeToPortableText(token, mediaById));
 		} else if (/^\[playlist/i.test(token)) {
 			blocks.push(...playlistShortcodeToPortableText(token, mediaById));
+		} else if (/^\[youtube/i.test(token)) {
+			blocks.push(...youtubeShortcodeToPortableText(token));
+		} else if (/^\[list-pages/i.test(token)) {
+			blocks.push(...listPagesShortcodeToPortableText());
 		} else if (/^\[embed\]/i.test(token)) {
 			blocks.push(...embedShortcodeToPortableText(token));
 		} else if (/^\[caption/i.test(token)) {

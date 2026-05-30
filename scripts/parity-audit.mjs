@@ -415,7 +415,8 @@ function summarizeHtml(html) {
 		/\d+\\\./.test(contentText);
 	const uploadLeak = /(?:src|href)="\/wp-content\/uploads\//.test(contentHtml);
 	const galleryLeak = /\[gallery\b/i.test(contentHtml);
-	const shortcodeLeak = /\[(?:playlist|video|audio|embed)\b/i.test(contentHtml);
+	const shortcodeLeak =
+		/\[(?:playlist|video|audio|embed|youtube|list-pages)\b/i.test(contentHtml);
 	const portableTextUnknown = /data-portabletext-unknown/.test(contentHtml);
 	return {
 		title,

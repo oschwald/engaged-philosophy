@@ -116,3 +116,61 @@ const missingShortcodeVideo = htmlToPortableText(
 	{},
 );
 assert.deepEqual(missingShortcodeVideo, []);
+
+const [youtubeShortcodeEmbed] = htmlToPortableText(`[youtube 67-3Jr2QWcg]`);
+assert.equal(youtubeShortcodeEmbed._type, "legacyEmbed");
+assert.equal(youtubeShortcodeEmbed.provider, "youtube");
+assert.equal(
+	youtubeShortcodeEmbed.url,
+	"https://www.youtube.com/watch?v=67-3Jr2QWcg",
+);
+assert.equal(
+	youtubeShortcodeEmbed.embedUrl,
+	"https://www.youtube.com/embed/67-3Jr2QWcg",
+);
+
+const [youtubeEmbed] = htmlToPortableText(
+	`[embed]https://www.youtube.com/watch?v=LFi0DJxA9lg&t=1s[/embed]`,
+);
+assert.equal(youtubeEmbed._type, "legacyEmbed");
+assert.equal(youtubeEmbed.provider, "youtube");
+assert.equal(
+	youtubeEmbed.embedUrl,
+	"https://www.youtube.com/embed/LFi0DJxA9lg?start=1",
+);
+
+const [malformedYoutubeEmbed] = htmlToPortableText(
+	`[embed]http://https://youtu.be/OTRLMgHMn4s[/embed]`,
+);
+assert.equal(malformedYoutubeEmbed._type, "legacyEmbed");
+assert.equal(
+	malformedYoutubeEmbed.embedUrl,
+	"https://www.youtube.com/embed/OTRLMgHMn4s",
+);
+
+const [vimeoEmbed] = htmlToPortableText(
+	`[embed]https://vimeo.com/246180371[/embed]`,
+);
+assert.equal(vimeoEmbed._type, "legacyEmbed");
+assert.equal(vimeoEmbed.provider, "vimeo");
+assert.equal(vimeoEmbed.embedUrl, "https://player.vimeo.com/video/246180371");
+
+const [animotoEmbed] = htmlToPortableText(
+	`[embed]https://animoto.com/play/sYH1W3uAKarloLeVbwgDAQ[/embed]`,
+);
+assert.equal(animotoEmbed._type, "legacyEmbed");
+assert.equal(animotoEmbed.provider, "animoto");
+assert.equal(
+	animotoEmbed.embedUrl,
+	"https://animoto.com/play/sYH1W3uAKarloLeVbwgDAQ",
+);
+
+const [directVideoEmbed] = htmlToPortableText(
+	`[embed]https://cdn.example.test/video.mp4[/embed]`,
+);
+assert.equal(directVideoEmbed._type, "legacyVideo");
+assert.equal(directVideoEmbed.url, "https://cdn.example.test/video.mp4");
+assert.equal(directVideoEmbed.mimeType, "video/mp4");
+
+const [pageList] = htmlToPortableText(`[list-pages]`);
+assert.equal(pageList._type, "legacyPageList");
