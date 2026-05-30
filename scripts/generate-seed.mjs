@@ -103,7 +103,11 @@ function pathFromUrl(url, siteUrl) {
 function ensureUnique(value, seen, fallbackPrefix, explicitSet) {
 	let candidate = value;
 	let i = 2;
-	while (!candidate || seen.has(candidate) || (explicitSet && candidate !== value && explicitSet.has(candidate))) {
+	while (
+		!candidate ||
+		seen.has(candidate) ||
+		(explicitSet && candidate !== value && explicitSet.has(candidate))
+	) {
 		candidate = value ? `${value}-${i}` : `${fallbackPrefix}-${i}`;
 		i += 1;
 	}
@@ -366,8 +370,7 @@ const explicitPaths = new Set();
 
 for (const item of items) {
 	const postType = extractTag(item, "wp:post_type");
-	if (!["page", "post", "project"].includes(postType))
-		continue;
+	if (!["page", "post", "project"].includes(postType)) continue;
 
 	const status = extractTag(item, "wp:status");
 	if (!["publish", "draft"].includes(status)) continue;
@@ -381,11 +384,16 @@ for (const item of items) {
 	const rawSlug = extractTag(item, "wp:post_name");
 	if (rawSlug) {
 		const postId = extractTag(item, "wp:post_id");
-		const title = decodeEntities(extractTag(item, "title") || "");
 		const generatedSlug = slugify(rawSlug, `${postType}-${postId}`);
 		if (generatedSlug) {
 			const typeKey = `${postType}s`;
-			explicitSlugs[typeKey === "projects" ? "projects" : typeKey === "posts" ? "posts" : "pages"].add(generatedSlug);
+			explicitSlugs[
+				typeKey === "projects"
+					? "projects"
+					: typeKey === "posts"
+						? "posts"
+						: "pages"
+			].add(generatedSlug);
 		}
 	}
 }
@@ -457,7 +465,12 @@ for (const item of items) {
 
 	contentPath = contentPath.replace(/^\/+|\/+$/g, "");
 	if (postType !== "page" || contentPath !== "") {
-		contentPath = ensureUnique(contentPath, usedPaths, `${postType}-${postId}`, explicitPaths);
+		contentPath = ensureUnique(
+			contentPath,
+			usedPaths,
+			`${postType}-${postId}`,
+			explicitPaths,
+		);
 	}
 
 	const thumbnail = toMediaRef(attachments.get(metas._thumbnail_id));
