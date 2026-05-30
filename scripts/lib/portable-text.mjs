@@ -810,9 +810,10 @@ function imageAttributesToPortableText(
 				imageAttributes["data-original-height"] ||
 				"0",
 		) || undefined;
+	const forceImage = overrides.forceImage === true;
 
 	return {
-		...(href || align
+		...((href || align) && !forceImage
 			? createLegacyImageBlock({
 					url: imageSrc,
 					alt: imageAttributes.alt || imageAttributes["data-image-title"] || "",
@@ -872,7 +873,9 @@ function galleryFigureToPortableText(token) {
 		const caption = htmlToPlainText(
 			itemHtml.match(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i)?.[1] || "",
 		);
-		images.push(...imageHtmlToPortableText(itemHtml, { caption }));
+		images.push(
+			...imageHtmlToPortableText(itemHtml, { caption, forceImage: true }),
+		);
 	}
 
 	if (images.length === 0) return [];
