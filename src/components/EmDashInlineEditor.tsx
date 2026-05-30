@@ -1,6 +1,6 @@
 import type { PortableTextBlock } from "emdash/ui";
 
-import { InlinePortableTextEditor } from "../../node_modules/emdash/src/components/InlinePortableTextEditor";
+import { InlinePortableTextEditor } from "../lib/emdash-inline-editor";
 
 interface Props {
 	value: PortableTextBlock[];
