@@ -1,4 +1,4 @@
-import { getEmDashCollection, getEmDashEntry, getRequestContext } from "emdash";
+import { getRequestContext } from "emdash";
 import { env as cloudflareEnv } from "cloudflare:workers";
 import type { PortableTextBlock } from "emdash/ui";
 
@@ -113,39 +113,6 @@ function hasEmDashEditProxy<T extends { id?: string }>(
 
 export function isEmDashEditMode() {
 	return getRequestContext()?.editMode ?? false;
-}
-
-export async function getEditModeEntryBySlug<T>(
-	collection: string,
-	slug: string,
-	fallback: T,
-) {
-	if (!isEmDashEditMode()) {
-		return fallback;
-	}
-
-	const { entry } = await getEmDashEntry(collection, slug);
-	return (entry as T | null) ?? fallback;
-}
-
-export async function getEditModeEntryByPath<T>(
-	collection: string,
-	path: string,
-	fallback: T,
-) {
-	if (!isEmDashEditMode()) {
-		return fallback;
-	}
-
-	const { entries } = await getEmDashCollection(collection, {
-		limit: 1000,
-	});
-	return (
-		(entries.find((entry) => {
-			const data = entry.data as { path?: unknown };
-			return data.path === path;
-		}) as T | undefined) ?? fallback
-	);
 }
 
 export function getEmDashEditAttrs(

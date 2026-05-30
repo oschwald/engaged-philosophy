@@ -3,17 +3,12 @@ import Base from "../layouts/Base.astro";
 import RichContent from "../components/RichContent.astro";
 import { getPageByPath, getPageBySlug } from "../lib/content";
 import {
-	getEditModeEntryBySlug,
 	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
 } from "../lib/site";
 
-const page = await getEditModeEntryBySlug(
-	"pages",
-	"blog",
-	(await getPageBySlug("blog")) ?? (await getPageByPath("blog")),
-);
+const page = (await getPageBySlug("blog")) ?? (await getPageByPath("blog"));
 ---
 
 <Base

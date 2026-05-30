@@ -3,18 +3,13 @@ import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
 import { getEntryTerms, getProjectBySlug } from "../../lib/content";
 import {
-	getEditModeEntryBySlug,
 	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
 } from "../../lib/site";
 
 const { slug } = Astro.params;
-const project = await getEditModeEntryBySlug(
-	"projects",
-	slug ?? "",
-	await getProjectBySlug(slug ?? ""),
-);
+const project = await getProjectBySlug(slug ?? "");
 
 if (!project) {
 	return Astro.redirect("/404");

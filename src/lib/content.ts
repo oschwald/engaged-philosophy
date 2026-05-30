@@ -66,6 +66,14 @@ function isPublicEntry(entry: { data: { path?: string } }) {
 	return !excludedPaths.has(entry.data.path ?? "");
 }
 
+function normalizeContentPath(path: string) {
+	return path.replace(/^\/+|\/+$/g, "");
+}
+
+function slugFromPath(path: string) {
+	return normalizeContentPath(path).split("/").filter(Boolean).at(-1) ?? "";
+}
+
 function flattenTerms<T extends { children?: T[] }>(terms: T[]): T[] {
 	return terms.flatMap((term) => [term, ...flattenTerms(term.children ?? [])]);
 }
@@ -123,16 +131,28 @@ export async function getPageBySlug(slug: string) {
 }
 
 export async function getPageByPath(path: string) {
+	const normalizedPath = normalizeContentPath(path);
+	const slug = slugFromPath(normalizedPath);
+	const page = slug ? await getPageBySlug(slug) : null;
+	if (page?.data.path === normalizedPath) return page;
+
 	return (
-		(await getPublishedPages()).find((entry) => entry.data.path === path) ??
-		null
+		(await getPublishedPages()).find(
+			(entry) => entry.data.path === normalizedPath,
+		) ?? null
 	);
 }
 
 export async function getPostByPath(path: string) {
+	const normalizedPath = normalizeContentPath(path);
+	const slug = slugFromPath(normalizedPath);
+	const post = slug ? await getPostBySlug(slug) : null;
+	if (post?.data.path === normalizedPath) return post;
+
 	return (
-		(await getPublishedPosts()).find((entry) => entry.data.path === path) ??
-		null
+		(await getPublishedPosts()).find(
+			(entry) => entry.data.path === normalizedPath,
+		) ?? null
 	);
 }
 

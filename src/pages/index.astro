@@ -5,7 +5,6 @@ import Base from "../layouts/Base.astro";
 import { getPageBySlug, getPublishedProjects } from "../lib/content";
 import { searchSite } from "../lib/search";
 import {
-	getEditModeEntryBySlug,
 	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
@@ -17,11 +16,7 @@ import {
 } from "../lib/site";
 import type { ContentEntry, ProjectData } from "../lib/types";
 
-const home = await getEditModeEntryBySlug(
-	"pages",
-	"home",
-	await getPageBySlug("home"),
-);
+const home = await getPageBySlug("home");
 const projects = (await getPublishedProjects()) as ContentEntry<ProjectData>[];
 const highlightedProjects = sortByPublishedOn(
 	projects.filter((project) => project.data.highlight),

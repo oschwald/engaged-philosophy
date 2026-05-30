@@ -7,7 +7,6 @@ import {
 	getTaxonomyTerm,
 } from "../../lib/content";
 import {
-	getEditModeEntryByPath,
 	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
@@ -19,27 +18,22 @@ import RichContent from "../../components/RichContent.astro";
 
 const { taxonomy = "", slug = "" } = Astro.params;
 const pagePath = `${taxonomy}/${slug}`;
-const page = await getEditModeEntryByPath(
-	"pages",
-	pagePath,
-	await getPageByPath(pagePath),
-);
+const isProjectArchive = isProjectTaxonomy(taxonomy);
+const page = isProjectArchive ? null : await getPageByPath(pagePath);
 
-if (!isProjectTaxonomy(taxonomy)) {
+if (!isProjectArchive) {
 	if (!page) {
 		return Astro.redirect("/404");
 	}
 }
 
-const term = isProjectTaxonomy(taxonomy)
-	? await getTaxonomyTerm(taxonomy, slug)
-	: null;
+const term = isProjectArchive ? await getTaxonomyTerm(taxonomy, slug) : null;
 
-if (isProjectTaxonomy(taxonomy) && !term) {
+if (isProjectArchive && !term) {
 	return Astro.redirect("/404");
 }
 
-const projects = isProjectTaxonomy(taxonomy)
+const projects = isProjectArchive
 	? sortByPublishedOn(
 			(await getProjectsByTaxonomy(
 				taxonomy,

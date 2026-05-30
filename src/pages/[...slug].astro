@@ -3,8 +3,6 @@ import RichContent from "../components/RichContent.astro";
 import Base from "../layouts/Base.astro";
 import { getPageByPath, getPageBySlug } from "../lib/content";
 import {
-	getEditModeEntryBySlug,
-	getEditModeEntryByPath,
 	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryContentField,
@@ -14,13 +12,10 @@ import {
 const slugParts = Astro.params.slug?.split("/").filter(Boolean) ?? [];
 const path = joinPath(slugParts);
 
-const runtimePage =
-	(await getPageByPath(path)) ??
-	(slugParts.length === 1 ? await getPageBySlug(path) : null);
 const page =
 	slugParts.length === 1
-		? await getEditModeEntryBySlug("pages", path, runtimePage)
-		: await getEditModeEntryByPath("pages", path, runtimePage);
+		? await getPageBySlug(path)
+		: await getPageByPath(path);
 
 if (!page) {
 	return Astro.redirect("/404");
