@@ -2,7 +2,6 @@
 import { getEditMeta } from "emdash";
 import { PortableText } from "emdash/ui";
 
-import EmDashInlineEditor from "./EmDashInlineEditor";
 import HtmlContent from "./HtmlContent.astro";
 import RichTextNumberedHeading from "./rich-text/RichTextNumberedHeading.astro";
 import RichTextEmbed from "./rich-text/RichTextEmbed.astro";
@@ -72,30 +71,20 @@ const normalizedValue =
 {
 	isPortableTextValue(normalizedValue) ? (
 		<div class:list={["legacy-content", className]}>
-			{editMeta ? (
-				<EmDashInlineEditor
-					client:only="react"
-					value={normalizedValue}
-					collection={editMeta.collection}
-					entryId={editMeta.id}
-					field={editMeta.field}
-				/>
-			) : (
-				<PortableText
-					value={normalizedValue}
-					components={{
-						type: {
-							numberedHeading: RichTextNumberedHeading,
-							legacyEmbed: RichTextEmbed,
-							image: RichTextImage,
-							legacyImage: RichTextImage,
-							gallery: RichTextGallery,
-							legacyPageList: RichTextPageList,
-							legacyVideo: RichTextVideo,
-						},
-					}}
-				/>
-			)}
+			<PortableText
+				value={normalizedValue}
+				components={{
+					type: {
+						numberedHeading: RichTextNumberedHeading,
+						legacyEmbed: RichTextEmbed,
+						image: RichTextImage,
+						legacyImage: RichTextImage,
+						gallery: RichTextGallery,
+						legacyPageList: RichTextPageList,
+						legacyVideo: RichTextVideo,
+					},
+				}}
+			/>
 		</div>
 	) : (
 		<HtmlContent
