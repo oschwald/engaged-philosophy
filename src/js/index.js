@@ -9,6 +9,7 @@ window.bootstrap = bootstrap;
 import "./theme-scripts.js";
 import "./carousel.js";
 import "./custom-header.js";
+import "./emdash-save-gate.js";
 
 // Initialize theme functionality
 document.addEventListener("DOMContentLoaded", function () {

@@ -13,6 +13,7 @@ const DEFAULT_PATHS = {
 	taxonomy: "/topic/organize-an-activity/",
 	video: "/project/3119/",
 	youtube: "/the-ethics-of-psytrance/",
+	saveGate: "/emdash-save-gate/",
 };
 
 const DEFAULTS = {
@@ -21,6 +22,11 @@ const DEFAULTS = {
 	headed: false,
 	timeout: 12000,
 };
+
+const SAVE_GATE_SCRIPT = fs.readFileSync(
+	new URL("../src/js/emdash-save-gate.js", import.meta.url),
+	"utf8",
+);
 
 function parseArgs(argv) {
 	const options = { ...DEFAULTS };
@@ -117,6 +123,72 @@ function fixtureShell(title, body) {
 </html>`;
 }
 
+function saveGateFixtureShell() {
+	return `<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Save Gate - Engaged Philosophy</title>
+	</head>
+	<body>
+		<div id="emdash-toolbar" data-edit-mode="true">
+			<input type="checkbox" id="emdash-edit-toggle" checked />
+			<span id="emdash-tb-status"></span>
+			<span id="emdash-tb-save-status"></span>
+			<button id="emdash-tb-publish" type="button">Publish</button>
+		</div>
+		<main>
+			<article data-emdash-ref='{"collection":"pages","id":"about","status":"published","hasDraft":true}'>
+				<div id="editor" class="emdash-inline-editor" contenteditable="true">Original content</div>
+			</article>
+		</main>
+		<script>${SAVE_GATE_SCRIPT}</script>
+		<script>
+			const editor = document.getElementById("editor");
+			let originalValue = editor.textContent;
+
+			editor.addEventListener("input", () => {
+				document.dispatchEvent(new CustomEvent("emdash:save", { detail: { state: "unsaved" } }));
+			});
+
+			editor.addEventListener("blur", () => {
+				if (editor.textContent === originalValue) return;
+				fetch("/_emdash/api/content/pages/about", {
+					method: "PUT",
+					credentials: "same-origin",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ data: { content: editor.textContent } }),
+				}).then((response) => {
+					if (response.ok) {
+						originalValue = editor.textContent;
+						document.dispatchEvent(new CustomEvent("emdash:save", { detail: { state: "saved" } }));
+					} else {
+						document.dispatchEvent(new CustomEvent("emdash:save", { detail: { state: "error" } }));
+					}
+				}).catch(() => {
+					document.dispatchEvent(new CustomEvent("emdash:save", { detail: { state: "error" } }));
+				});
+			});
+
+			document.getElementById("emdash-tb-publish").onclick = () => {
+				window.__originalPublishHandlerRan = true;
+				fetch("/_emdash/api/content/pages/about/publish", {
+					method: "POST",
+					credentials: "same-origin",
+					headers: { "X-EmDash-Request": "1" },
+				});
+			};
+
+			document.getElementById("emdash-edit-toggle").addEventListener("change", () => {
+				window.__originalToggleHandlerRan = true;
+				location.replace(location.href);
+			});
+		</script>
+	</body>
+</html>`;
+}
+
 const FIXTURES = {
 	[DEFAULT_PATHS.about]: fixtureShell(
 		"About",
@@ -194,9 +266,45 @@ const FIXTURES = {
 };
 
 async function createFixtureServer() {
+	const apiEvents = [];
 	const server = createServer((request, response) => {
 		const requestUrl = new URL(request.url ?? "/", "http://127.0.0.1");
 		const pathname = normalizePath(requestUrl.pathname);
+		if (pathname === DEFAULT_PATHS.saveGate) {
+			apiEvents.push({ type: "page", time: Date.now() });
+			response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+			response.end(saveGateFixtureShell());
+			return;
+		}
+		if (
+			request.method === "PUT" &&
+			requestUrl.pathname === "/_emdash/api/content/pages/about"
+		) {
+			apiEvents.push({ type: "save-start", time: Date.now() });
+			request.resume();
+			request.on("end", () => {
+				setTimeout(() => {
+					apiEvents.push({ type: "save-finish", time: Date.now() });
+					response.writeHead(200, {
+						"content-type": "application/json; charset=utf-8",
+					});
+					response.end(JSON.stringify({ success: true }));
+				}, 400);
+			});
+			return;
+		}
+		if (
+			request.method === "POST" &&
+			requestUrl.pathname === "/_emdash/api/content/pages/about/publish"
+		) {
+			apiEvents.push({ type: "publish-start", time: Date.now() });
+			request.resume();
+			response.writeHead(200, {
+				"content-type": "application/json; charset=utf-8",
+			});
+			response.end(JSON.stringify({ success: true }));
+			return;
+		}
 		const html = FIXTURES[pathname];
 		if (!html) {
 			response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
@@ -211,6 +319,10 @@ async function createFixtureServer() {
 	return {
 		base: `http://127.0.0.1:${address.port}`,
 		close: () => new Promise((resolve) => server.close(resolve)),
+		getApiEvents: () => [...apiEvents],
+		resetApiEvents: () => {
+			apiEvents.length = 0;
+		},
 	};
 }
 
@@ -358,6 +470,81 @@ async function checkMobileNav(browser, base, timeout) {
 	}
 }
 
+async function waitForFixtureEvent(fixture, predicate, timeout) {
+	const startedAt = Date.now();
+	while (Date.now() - startedAt < timeout) {
+		const events = fixture.getApiEvents();
+		if (predicate(events)) return events;
+		await new Promise((resolve) => setTimeout(resolve, 25));
+	}
+	throw new Error("Timed out waiting for fixture event");
+}
+
+function assertOrderedEvents(events, expectedOrder) {
+	const positions = expectedOrder.map((type) =>
+		events.findIndex((event) => event.type === type),
+	);
+	for (const [index, position] of positions.entries()) {
+		if (position < 0) {
+			throw new Error(`Missing fixture event: ${expectedOrder[index]}`);
+		}
+		if (index > 0 && position <= positions[index - 1]) {
+			throw new Error(
+				`Expected event order ${expectedOrder.join(" -> ")}, got ${events
+					.map((event) => event.type)
+					.join(" -> ")}`,
+			);
+		}
+	}
+}
+
+async function checkEditSaveGate(browser, base, timeout, fixture) {
+	fixture.resetApiEvents();
+	let page = await openPage(browser, base, DEFAULT_PATHS.saveGate, timeout);
+	try {
+		await page.locator("#editor").click();
+		await page.keyboard.type(" changed");
+		await page.locator("#emdash-tb-publish").click();
+		const publishEvents = await waitForFixtureEvent(
+			fixture,
+			(events) => events.some((event) => event.type === "publish-start"),
+			timeout,
+		);
+		assertOrderedEvents(publishEvents, [
+			"save-start",
+			"save-finish",
+			"publish-start",
+		]);
+	} finally {
+		await page.close();
+	}
+
+	fixture.resetApiEvents();
+	page = await openPage(browser, base, DEFAULT_PATHS.saveGate, timeout);
+	try {
+		await page.locator("#editor").click();
+		await page.keyboard.type(" changed");
+		await page.locator("#emdash-edit-toggle").click();
+		const toggleEvents = await waitForFixtureEvent(
+			fixture,
+			(events) => events.filter((event) => event.type === "page").length >= 2,
+			timeout,
+		);
+		assertOrderedEvents(toggleEvents, ["save-start", "save-finish"]);
+		const secondPagePosition = toggleEvents.findIndex(
+			(event, index) => event.type === "page" && index > 0,
+		);
+		const saveFinishPosition = toggleEvents.findIndex(
+			(event) => event.type === "save-finish",
+		);
+		if (saveFinishPosition > secondPagePosition) {
+			throw new Error("Edit mode toggled before the inline save finished");
+		}
+	} finally {
+		await page.close();
+	}
+}
+
 async function runCheck(name, callback, failures) {
 	try {
 		await callback();
@@ -417,6 +604,13 @@ async function main() {
 		() => checkMobileNav(browser, base, options.timeout),
 		failures,
 	);
+	if (fixture) {
+		await runCheck(
+			"edit toolbar waits for inline saves",
+			() => checkEditSaveGate(browser, base, options.timeout, fixture),
+			failures,
+		);
+	}
 
 	await browser.close();
 	if (fixture) await fixture.close();
