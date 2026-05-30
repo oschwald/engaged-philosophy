@@ -28,6 +28,7 @@ pids
 *.pid.lock
 
 # Local content and exports
+.migration/
 seed/seed.json
 engagedphilosophy.WordPress*.xml
 engaged-philosophy-*.zip

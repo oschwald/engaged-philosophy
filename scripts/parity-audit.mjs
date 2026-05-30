@@ -9,7 +9,11 @@ import pixelmatch from "pixelmatch";
 import { chromium } from "playwright";
 import { PNG } from "pngjs";
 
-import seed from "../seed/seed.json" with { type: "json" };
+import {
+	DEFAULT_MIGRATION_SEED_PATH,
+	readSeedFile,
+	resolveSeedPath,
+} from "./lib/migration-seed-path.mjs";
 
 const ROOT = process.cwd();
 const DEFAULTS = {
@@ -24,6 +28,7 @@ const DEFAULTS = {
 	configPath: path.join(ROOT, "scripts", "parity-audit.config.json"),
 	browserPath: process.env.PARITY_AUDIT_BROWSER_PATH || "",
 	route: "",
+	seedPath: DEFAULT_MIGRATION_SEED_PATH,
 };
 
 const VIEWPORTS = [
@@ -84,6 +89,9 @@ function parseArgs(argv) {
 		} else if ((arg === "--route" || arg === "--path") && next) {
 			options.route = normalizePath(next);
 			i += 1;
+		} else if (arg === "--seed" && next) {
+			options.seedPath = resolveSeedPath(next);
+			i += 1;
 		} else if (arg === "--base" && next) {
 			options.live = next;
 			i += 1;
@@ -139,7 +147,7 @@ function shouldIgnore(pathname) {
 	return !pathname || IGNORE_PATTERNS.some((pattern) => pattern.test(pathname));
 }
 
-function getSeedRoutes() {
+function getSeedRoutes(seed) {
 	const routes = new Set(["/", "/blog/", "/project/"]);
 	for (const collection of ["pages", "posts", "projects"]) {
 		for (const entry of seed.content?.[collection] ?? []) {
@@ -859,7 +867,8 @@ async function main() {
 	const config = readConfig(options.configPath);
 	ensureDir(options.outputDir);
 
-	const starts = options.route ? [options.route] : getSeedRoutes();
+	const seed = readSeedFile(options.seedPath);
+	const starts = options.route ? [options.route] : getSeedRoutes(seed);
 	const crawlOptions = {
 		followLinks: !options.route,
 	};

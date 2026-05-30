@@ -1,12 +1,12 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { DEFAULT_MIGRATION_SEED_PATH } from "./lib/migration-seed-path.mjs";
 import { htmlToPortableText } from "./lib/portable-text.mjs";
 
 const ROOT = process.cwd();
 const WXR_PATH = path.join(ROOT, "engagedphilosophy.WordPress.2026-05-25.xml");
-const SEED_DIR = path.join(ROOT, "seed");
-const SEED_PATH = path.join(SEED_DIR, "seed.json");
+const SEED_PATH = DEFAULT_MIGRATION_SEED_PATH;
 
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g;
 const ITEM_RE = /<item>([\s\S]*?)<\/item>/g;
@@ -911,7 +911,7 @@ const seed = {
 	},
 };
 
-fs.mkdirSync(SEED_DIR, { recursive: true });
+fs.mkdirSync(path.dirname(SEED_PATH), { recursive: true });
 fs.writeFileSync(SEED_PATH, `${JSON.stringify(seed, null, 2)}\n`);
 
 console.log(`Wrote ${SEED_PATH}`);

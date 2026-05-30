@@ -3,18 +3,26 @@
 import fs from "node:fs";
 import path from "node:path";
 import { spawn } from "node:child_process";
-import seed from "../seed/seed.json" with { type: "json" };
+
+import {
+	DEFAULT_MIGRATION_SEED_PATH,
+	readSeedFile,
+	resolveSeedPath,
+} from "./lib/migration-seed-path.mjs";
 
 const PORT = "8791";
 const BASE_URL = `http://127.0.0.1:${PORT}`;
 
 function parseArgs(argv) {
-	const options = { dir: "" };
+	const options = { dir: "", seedPath: DEFAULT_MIGRATION_SEED_PATH };
 	for (let i = 0; i < argv.length; i += 1) {
 		const arg = argv[i];
 		const next = argv[i + 1];
 		if (arg === "--dir" && next) {
 			options.dir = next;
+			i += 1;
+		} else if (arg === "--seed" && next) {
+			options.seedPath = resolveSeedPath(next);
 			i += 1;
 		}
 	}
@@ -35,7 +43,7 @@ function normalizePath(inputPath) {
 	return value;
 }
 
-function getSeedRoutes() {
+function getSeedRoutes(seed) {
 	const routes = new Set(["/", "/blog/", "/project/"]);
 	for (const page of seed.content.pages ?? []) {
 		if (page.status === "published") {
@@ -89,7 +97,8 @@ async function run() {
 	const targetDir = path.resolve(options.dir);
 	fs.mkdirSync(targetDir, { recursive: true });
 
-	const routes = getSeedRoutes();
+	const seed = readSeedFile(options.seedPath);
+	const routes = getSeedRoutes(seed);
 	console.log(`Found ${routes.length} routes to snapshot.`);
 
 	console.log(`Starting Astro dev server on port ${PORT}...`);

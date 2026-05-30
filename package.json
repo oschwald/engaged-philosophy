@@ -4,9 +4,6 @@
 	"private": true,
 	"type": "module",
 	"description": "Engaged Philosophy migrated to Astro + EmDash on Cloudflare Workers",
-	"emdash": {
-		"seed": "seed/seed.json"
-	},
 	"scripts": {
 		"generate:seed": "node scripts/generate-seed.mjs",
 		"migrate:media": "node scripts/migrate-media-to-r2.mjs",
@@ -15,7 +12,7 @@
 		"sync:seed-d1": "node scripts/sync-seed-to-d1.mjs",
 		"parity:audit": "node scripts/parity-audit.mjs",
 		"dev": "astro dev",
-		"build": "astro build",
+		"build": "node scripts/assert-no-emdash-seed.mjs && astro build",
 		"ci": "npm run lint && npm test && npm run typecheck && npm run build",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
@@ -25,7 +22,7 @@
 		"test": "npm run test:portable-text",
 		"test:portable-text": "node scripts/test-portable-text.mjs",
 		"preview": "astro preview",
-		"deploy": "astro build && wrangler deploy",
+		"deploy": "npm run build && wrangler deploy",
 		"typecheck": "astro check"
 	},
 	"dependencies": {

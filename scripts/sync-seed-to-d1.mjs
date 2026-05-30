@@ -3,13 +3,15 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
-import seed from "../seed/seed.json" with { type: "json" };
+import { parseSeedPathArg, readSeedFile } from "./lib/migration-seed-path.mjs";
 
 const ROOT = process.cwd();
 const DATABASE_NAME = "engaged-philosophy";
 const CHUNK_SIZE = 750_000;
 const INSERT_BATCH_SIZE = 1;
 const DEFAULT_LOCALE = "en";
+const seedPath = parseSeedPathArg(process.argv.slice(2));
+const seed = readSeedFile(seedPath);
 const mode = process.argv.includes("--remote")
 	? "--remote"
 	: process.argv.includes("--local")
@@ -333,6 +335,7 @@ console.log(
 		{
 			mode: mode.slice(2),
 			dryRun,
+			seedPath: path.relative(ROOT, seedPath),
 			before,
 			expected,
 		},
@@ -504,6 +507,7 @@ console.log(
 	JSON.stringify(
 		{
 			mode: mode.slice(2),
+			seedPath: path.relative(ROOT, seedPath),
 			after,
 			expected,
 		},

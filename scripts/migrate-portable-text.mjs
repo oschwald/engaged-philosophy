@@ -3,8 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
-import seed from "../seed/seed.json" with { type: "json" };
-
+import { parseSeedPathArg, readSeedFile } from "./lib/migration-seed-path.mjs";
 import {
 	htmlToPortableText,
 	isPortableTextJson,
@@ -12,6 +11,8 @@ import {
 
 const ROOT = process.cwd();
 const DATABASE_NAME = "engaged-philosophy";
+const seedPath = parseSeedPathArg(process.argv.slice(2));
+const seed = readSeedFile(seedPath);
 const FIELD_MAP = {
 	pages: [
 		"content",

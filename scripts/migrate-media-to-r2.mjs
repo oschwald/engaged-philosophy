@@ -3,8 +3,10 @@ import os from "node:os";
 import path from "node:path";
 import { spawn } from "node:child_process";
 
+import { DEFAULT_MIGRATION_SEED_PATH } from "./lib/migration-seed-path.mjs";
+
 const ROOT = process.cwd();
-const DEFAULT_SEED_PATH = path.join(ROOT, "seed", "seed.json");
+const DEFAULT_SEED_PATH = DEFAULT_MIGRATION_SEED_PATH;
 const DEFAULT_SITE_URL = "https://www.engagedphilosophy.com";
 const DEFAULT_CONCURRENCY = 4;
 const DEFAULT_WRANGLER_CONFIG = path.join(ROOT, "wrangler.jsonc");
@@ -28,7 +30,7 @@ function printUsage() {
 
 Options:
   --bucket <name>         R2 bucket name. Defaults to the first bucket in wrangler.jsonc.
-  --seed <path>           Seed file to scan. Default: seed/seed.json
+  --seed <path>           Seed file to scan. Default: .migration/seed.json
   --site-url <url>        Base URL for relative uploads. Default: ${DEFAULT_SITE_URL}
   --concurrency <number>  Parallel downloads/uploads. Default: ${DEFAULT_CONCURRENCY}
   --limit <number>        Stop after N files.
