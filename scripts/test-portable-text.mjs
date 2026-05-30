@@ -54,3 +54,37 @@ assert.equal(
 	linkedImage.href,
 	"https://media.engagedphilosophy.com/wp-content/uploads/2024/05/full.jpg",
 );
+
+const shortcodeMedia = {
+	10: {
+		url: "https://www.engagedphilosophy.com/wp-content/uploads/2024/05/ten.jpg",
+		alt: "Ten",
+	},
+	20: {
+		url: "https://www.engagedphilosophy.com/wp-content/uploads/2024/05/twenty.jpg",
+		alt: "Twenty",
+	},
+};
+
+for (const columns of [1, 2, 4]) {
+	const [shortcodeGallery] = htmlToPortableText(
+		`[gallery ids="10,20" columns="${columns}"]`,
+		shortcodeMedia,
+	);
+	assert.equal(shortcodeGallery._type, "gallery");
+	assert.equal(shortcodeGallery.layout, "shortcode");
+	assert.equal(shortcodeGallery.columns, columns);
+	assert.equal(shortcodeGallery.images.length, 2);
+}
+
+const [defaultColumnsGallery] = htmlToPortableText(
+	`[gallery ids="10,20"]`,
+	shortcodeMedia,
+);
+assert.equal(defaultColumnsGallery.columns, 3);
+
+const [invalidColumnsGallery] = htmlToPortableText(
+	`[gallery ids="10,20" columns="banana"]`,
+	shortcodeMedia,
+);
+assert.equal(invalidColumnsGallery.columns, 3);

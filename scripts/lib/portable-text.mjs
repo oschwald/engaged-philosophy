@@ -699,10 +699,12 @@ function htmlFragmentToPortableText(html) {
 }
 
 function galleryShortcodeToPortableText(shortcode, mediaById) {
-	const idsMatch = shortcode.match(/ids="([^"]+)"/i);
-	if (!idsMatch) return [];
+	const attributes = parseAttributes(shortcode);
+	const ids = attributes.ids || "";
+	if (!ids) return [];
+	const columns = Number.parseInt(attributes.columns || "", 10);
 
-	const images = idsMatch[1]
+	const images = ids
 		.split(",")
 		.map((value) => value.trim())
 		.filter(Boolean)
@@ -732,7 +734,8 @@ function galleryShortcodeToPortableText(shortcode, mediaById) {
 			_type: "gallery",
 			_key: generateKey(),
 			layout: "shortcode",
-			columns: 3,
+			columns:
+				Number.isInteger(columns) && columns >= 1 && columns <= 9 ? columns : 3,
 			images,
 		},
 	];
