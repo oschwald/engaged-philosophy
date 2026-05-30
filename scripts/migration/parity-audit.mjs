@@ -25,7 +25,12 @@ const DEFAULTS = {
 	lengthThreshold: 0.12,
 	visualLimit: 25,
 	outputDir: path.join(ROOT, ".parity-audit"),
-	configPath: path.join(ROOT, "scripts", "parity-audit.config.json"),
+	configPath: path.join(
+		ROOT,
+		"scripts",
+		"migration",
+		"parity-audit.config.json",
+	),
 	browserPath: process.env.PARITY_AUDIT_BROWSER_PATH || "",
 	route: "",
 	seedPath: DEFAULT_MIGRATION_SEED_PATH,
