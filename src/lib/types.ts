@@ -12,7 +12,6 @@ export interface PageData {
 	title?: string;
 	path?: string;
 	content?: RichTextValue;
-	content_html?: RichTextValue;
 	featured_image?: MediaField;
 	template?: string;
 	about_html?: RichTextValue;
@@ -29,9 +28,7 @@ export interface PostData {
 	title?: string;
 	path?: string;
 	excerpt?: RichTextValue;
-	excerpt_html?: RichTextValue;
 	content?: RichTextValue;
-	content_html?: RichTextValue;
 	featured_image?: MediaField;
 	published_on?: string;
 }

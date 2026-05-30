@@ -32,9 +32,7 @@ type RichTextFieldValue = string | PortableTextBlock[] | null | undefined;
 
 interface RichTextEntryData {
 	content?: RichTextFieldValue;
-	content_html?: RichTextFieldValue;
 	excerpt?: RichTextFieldValue;
-	excerpt_html?: RichTextFieldValue;
 }
 
 export const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
@@ -156,15 +154,15 @@ function getRichTextValue(value: RichTextFieldValue) {
 }
 
 export function getEntryContent(data?: RichTextEntryData | null) {
-	return getRichTextValue(data?.content ?? data?.content_html);
+	return getRichTextValue(data?.content);
 }
 
 export function getEntryExcerpt(data?: RichTextEntryData | null) {
-	return getRichTextValue(data?.excerpt ?? data?.excerpt_html);
+	return getRichTextValue(data?.excerpt);
 }
 
-export function getEntryContentField(data?: RichTextEntryData | null) {
-	return data && Object.hasOwn(data, "content") ? "content" : "content_html";
+export function getEntryContentField(_data?: RichTextEntryData | null) {
+	return "content";
 }
 
 export function decodeHtmlEntities(value?: string | null) {
