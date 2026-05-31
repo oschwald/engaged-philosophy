@@ -281,6 +281,21 @@ export function getAssetSrc(
 	getPublicMediaUrl?: ((key: string) => string) | null,
 ) {
 	const url = asset?.url ?? fallbackUrl ?? "";
+	const internalMediaKey = url.startsWith("/_emdash/api/media/file/")
+		? decodeURIComponent(
+				url.replace(/^\/_emdash\/api\/media\/file\//, "").split(/[?#]/)[0] ??
+					"",
+			)
+		: "";
+	if (internalMediaKey && getPublicMediaUrl) {
+		try {
+			const resolved = getPublicMediaUrl(internalMediaKey);
+			if (resolved) return resolved;
+		} catch (e) {
+			console.error("Failed to resolve public media URL:", e);
+		}
+	}
+
 	if (isWordPressUploadUrl(url)) {
 		return rewriteWordPressUploadUrl(url, getMediaUrlPrefix());
 	}

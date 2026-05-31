@@ -14,6 +14,7 @@ export interface RichTextRequiredAssetRef extends RichTextAssetRef {
 export interface RichTextImageNode {
 	_type: "image";
 	_key: string;
+	id?: string;
 	asset?: RichTextAssetRef;
 	url?: string;
 	alt?: string;

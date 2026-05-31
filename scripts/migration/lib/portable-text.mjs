@@ -495,9 +495,11 @@ function normalizeLegacyImageBlock(block) {
 	const sourceUrl =
 		typeof block?.url === "string"
 			? block.url
-			: typeof block?.asset?.url === "string"
-				? block.asset.url
-				: "";
+			: typeof block?.id === "string"
+				? block.id
+				: typeof block?.asset?.url === "string"
+					? block.asset.url
+					: "";
 	if (!sourceUrl || shouldIgnoreImageUrl(sourceUrl)) {
 		return null;
 	}

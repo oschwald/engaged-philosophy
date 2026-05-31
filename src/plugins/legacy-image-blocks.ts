@@ -15,7 +15,7 @@ export function createPlugin() {
 					fields: [
 						{
 							type: "media_picker",
-							action_id: "url",
+							action_id: "id",
 							label: "Image",
 							placeholder: "Choose an image",
 						},

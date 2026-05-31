@@ -24,14 +24,15 @@ const { node } = Astro.props;
 const getPublicMediaUrl = Astro.locals.emdash?.getPublicMediaUrl;
 
 const isLegacyNode = node._type === "legacyImage";
-const src = getAssetSrc(node.asset, node.url, getPublicMediaUrl);
+const imageUrl = node.url || node.id;
+const src = getAssetSrc(node.asset, imageUrl, getPublicMediaUrl);
 const href = node.href ? getAssetSrc(null, node.href, getPublicMediaUrl) : "";
 const hasLegacyFeatures = Boolean(
 	node.align ||
 	node.href ||
 	node.shape ||
 	isLegacyNode ||
-	isWordPressUploadUrl(node.asset?.url ?? node.url),
+	isWordPressUploadUrl(node.asset?.url ?? imageUrl),
 );
 
 const alignmentClass =
