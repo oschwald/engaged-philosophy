@@ -24,6 +24,8 @@ const DEFAULTS = {
 	textThreshold: 0.93,
 	lengthThreshold: 0.12,
 	visualLimit: 25,
+	requestTimeout: 15000,
+	followLinks: true,
 	outputDir: path.join(ROOT, ".parity-audit"),
 	configPath: path.join(
 		ROOT,
@@ -40,6 +42,11 @@ const VIEWPORTS = [
 	{ id: "desktop", width: 1440, height: 1600 },
 	{ id: "mobile", width: 390, height: 844 },
 ];
+const EXCLUDED_PUBLIC_PATHS = new Set([
+	"/1477/",
+	"/project-guidelines-critical-thinking-3/",
+	"/project/photos-for-our-furry-friends-2/",
+]);
 
 const CONTENT_BLOCK_SELECTOR =
 	"p, h1, h2, h3, h4, h5, h6, ul, ol, li, hr, figure, img, video, iframe, blockquote";
@@ -82,6 +89,11 @@ function parseArgs(argv) {
 		} else if (arg === "--visual-limit" && next) {
 			options.visualLimit = Number(next);
 			i += 1;
+		} else if (arg === "--request-timeout" && next) {
+			options.requestTimeout = Number(next);
+			i += 1;
+		} else if (arg === "--no-follow") {
+			options.followLinks = false;
 		} else if (arg === "--output-dir" && next) {
 			options.outputDir = path.resolve(ROOT, next);
 			i += 1;
@@ -166,7 +178,9 @@ function getSeedRoutes(seed) {
 			routes.add(normalizePath(`/${taxonomy.name}/${term.slug}/`));
 		}
 	}
-	return [...routes].sort();
+	return [...routes]
+		.filter((pathname) => !EXCLUDED_PUBLIC_PATHS.has(pathname))
+		.sort();
 }
 
 function classifyRoute(pathname) {
@@ -225,9 +239,23 @@ function readConfig(configPath) {
 	return JSON.parse(fs.readFileSync(configPath, "utf8"));
 }
 
-async function fetchPage(base, pathname) {
-	const response = await fetch(`${base}${pathname}`, { redirect: "follow" });
-	const html = await response.text();
+async function fetchPage(base, pathname, options = {}) {
+	const controller = new AbortController();
+	const timeout = setTimeout(
+		() => controller.abort(),
+		options.requestTimeout ?? DEFAULTS.requestTimeout,
+	);
+	let response;
+	let html;
+	try {
+		response = await fetch(`${base}${pathname}`, {
+			redirect: "follow",
+			signal: controller.signal,
+		});
+		html = await response.text();
+	} finally {
+		clearTimeout(timeout);
+	}
 	const links = new Set();
 	const $ = load(html);
 	$("a[href]").each((_, element) => {
@@ -266,7 +294,7 @@ async function crawl(base, starts, limit, concurrency, options = {}) {
 				if (seen.has(pathname) || shouldIgnore(pathname)) continue;
 				seen.add(pathname);
 				active += 1;
-				fetchPage(base, pathname)
+				fetchPage(base, pathname, options)
 					.then((page) => {
 						pages.set(pathname, page);
 						if (followLinks && page.status === 200) {
@@ -419,6 +447,9 @@ function summarizeHtml(html) {
 	const contentHtml = contentRoot.html() || "";
 	const contentText = normalizeText(contentRoot.text());
 	const { blocks, counts, images, links } = summarizeBlocks($, contentRoot);
+	counts.alignleft = contentRoot.find(".alignleft").length;
+	counts.alignright = contentRoot.find(".alignright").length;
+	counts.aligncenter = contentRoot.find(".aligncenter").length;
 	const blockSequence = blocks.map((block) => block.tag);
 	const sampleBlocks = blocks.slice(0, 30);
 	const markdownLeak =
@@ -875,7 +906,8 @@ async function main() {
 	const seed = readSeedFile(options.seedPath);
 	const starts = options.route ? [options.route] : getSeedRoutes(seed);
 	const crawlOptions = {
-		followLinks: !options.route,
+		followLinks: options.followLinks && !options.route,
+		requestTimeout: options.requestTimeout,
 	};
 	const livePages = await crawl(
 		options.live,

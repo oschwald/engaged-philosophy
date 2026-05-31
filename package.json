@@ -11,6 +11,7 @@
 		"migrate:portable-text": "node scripts/migration/migrate-portable-text.mjs",
 		"sync:seed-d1": "node scripts/migration/sync-seed-to-d1.mjs",
 		"audit:migration": "node scripts/migration/audit-migration.mjs",
+		"audit:wordpress-transforms": "node scripts/migration/audit-wordpress-transforms.mjs",
 		"parity:audit": "node scripts/migration/parity-audit.mjs",
 		"dev": "astro dev",
 		"build": "node scripts/assert-no-emdash-seed.mjs && astro build",
