@@ -2,6 +2,9 @@ const DATE_PATH_RE = /^(\d{4})\/(\d{2})\/(\d{2})(?:\/|$)/;
 
 type DateValue = Date | string | number | null | undefined;
 
+// Canonical URL rules mirror the migrated WordPress shape:
+// pages keep their existing parent path and replace only the leaf slug,
+// posts live under YYYY/MM/DD, and projects live under /project/{slug}/.
 export function normalizeContentPath(path?: string | null) {
 	return (path ?? "").replace(/^\/+|\/+$/g, "");
 }
