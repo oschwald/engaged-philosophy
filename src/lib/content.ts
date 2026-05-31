@@ -46,28 +46,47 @@ function normalizeMediaField(
 	return undefined;
 }
 
+function normalizeContentPath(path?: string | null) {
+	return (path ?? "").replace(/^\/+|\/+$/g, "");
+}
+
+function slugFromPath(path?: string | null) {
+	return normalizeContentPath(path).split("/").filter(Boolean).at(-1) ?? "";
+}
+
+function normalizeProjectPath(path?: string | null, slug?: string | null) {
+	const normalizedPath = normalizeContentPath(path);
+	if (normalizedPath.startsWith("project/")) return normalizedPath;
+
+	const projectSlug = slugFromPath(slug) || slugFromPath(normalizedPath);
+	return projectSlug ? `project/${projectSlug}` : normalizedPath;
+}
+
 function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 	entry: EmDashContentEntry<T>,
+	collection?: string,
 ): RuntimeEntry<Omit<T, "featured_image"> & { featured_image?: MediaField }> {
+	const data = {
+		...entry.data,
+		featured_image: normalizeMediaField(entry.data.featured_image),
+	} as Omit<T, "featured_image"> & {
+		featured_image?: MediaField;
+		path?: string;
+		slug?: string;
+	};
+
+	if (collection === "projects") {
+		data.path = normalizeProjectPath(data.path, data.slug || entry.id);
+	}
+
 	return {
 		...entry,
-		data: {
-			...entry.data,
-			featured_image: normalizeMediaField(entry.data.featured_image),
-		},
+		data,
 	};
 }
 
 function isPublicEntry(entry: { data: { path?: string } }) {
 	return isPublicContentPath(entry.data.path);
-}
-
-function normalizeContentPath(path: string) {
-	return path.replace(/^\/+|\/+$/g, "");
-}
-
-function slugFromPath(path: string) {
-	return normalizeContentPath(path).split("/").filter(Boolean).at(-1) ?? "";
 }
 
 function flattenTerms<T extends { children?: T[] }>(terms: T[]): T[] {
@@ -82,7 +101,9 @@ async function getPublishedCollection<
 		limit: COLLECTION_LIMIT,
 	});
 	return entries
-		.map((entry) => normalizeEntry(entry as unknown as EmDashContentEntry<T>))
+		.map((entry) =>
+			normalizeEntry(entry as unknown as EmDashContentEntry<T>, collection),
+		)
 		.filter(isPublicEntry);
 }
 
@@ -95,7 +116,9 @@ async function getPublishedCollectionByTerm<
 		where: { [taxonomy]: slug },
 	});
 	return entries
-		.map((entry) => normalizeEntry(entry as unknown as EmDashContentEntry<T>))
+		.map((entry) =>
+			normalizeEntry(entry as unknown as EmDashContentEntry<T>, collection),
+		)
 		.filter(isPublicEntry);
 }
 
@@ -122,7 +145,10 @@ export async function getPublishedProjects() {
 export async function getPageBySlug(slug: string) {
 	const { entry } = await getEmDashEntry("pages", slug);
 	if (!entry) return null;
-	const page = normalizeEntry(entry as unknown as EmDashContentEntry<PageData>);
+	const page = normalizeEntry(
+		entry as unknown as EmDashContentEntry<PageData>,
+		"pages",
+	);
 	return isPublicEntry(page) ? page : null;
 }
 
@@ -155,7 +181,10 @@ export async function getPostByPath(path: string) {
 export async function getPostBySlug(slug: string) {
 	const { entry } = await getEmDashEntry("posts", slug);
 	if (!entry) return null;
-	const post = normalizeEntry(entry as unknown as EmDashContentEntry<PostData>);
+	const post = normalizeEntry(
+		entry as unknown as EmDashContentEntry<PostData>,
+		"posts",
+	);
 	return isPublicEntry(post) ? post : null;
 }
 
@@ -168,6 +197,7 @@ export async function getProjectBySlug(slug: string) {
 	if (!entry) return null;
 	const project = normalizeEntry(
 		entry as unknown as EmDashContentEntry<ProjectData>,
+		"projects",
 	);
 	return isPublicEntry(project) ? project : null;
 }

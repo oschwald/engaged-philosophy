@@ -1,7 +1,7 @@
 ---
 import RichContent from "../components/RichContent.astro";
 import Base from "../layouts/Base.astro";
-import { getPageByPath, getPageBySlug } from "../lib/content";
+import { getPageByPath, getPageBySlug, getProjectBySlug } from "../lib/content";
 import {
 	getEmDashEditEntryAttrs,
 	getEntryContent,
@@ -17,6 +17,10 @@ const page =
 		: await getPageByPath(path);
 
 if (!page) {
+	const project = slugParts.length === 1 ? await getProjectBySlug(path) : null;
+	if (project?.data.path) {
+		return Astro.redirect(`/${project.data.path}/`);
+	}
 	return Astro.redirect("/404");
 }
 
