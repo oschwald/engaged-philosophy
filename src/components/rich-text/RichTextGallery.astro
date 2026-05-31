@@ -3,6 +3,7 @@ import { Gallery as EmDashGallery } from "emdash/ui";
 
 import { getAssetSrc } from "../../lib/media";
 import type { RichTextGalleryNode } from "../../lib/rich-text-types";
+import RichTextBlockGalleryGrid from "./RichTextBlockGalleryGrid.astro";
 
 interface Props {
 	node: RichTextGalleryNode;
@@ -69,77 +70,16 @@ const getImageShapeClass = (shape?: string) =>
 			</div>
 		) : node.caption ? (
 			<figure class:list={["legacy-gallery", alignmentClass]}>
-				<ul
-					class:list={[
-						"blocks-gallery-grid",
-						node.columns ? `columns-${node.columns}` : undefined,
-					]}
-				>
-					{images.map((image) => {
-						const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
-						const shapeClass = getImageShapeClass(image.shape);
-						return (
-							<li class="blocks-gallery-item">
-								<figure>
-									<a href={src}>
-										<img
-											class={shapeClass || undefined}
-											src={src}
-											alt={image.alt || image.caption || ""}
-											width={image.width}
-											height={image.height}
-											loading="lazy"
-											decoding="async"
-										/>
-									</a>
-									{image.caption && (
-										<figcaption class="blocks-gallery-item__caption">
-											{image.caption}
-										</figcaption>
-									)}
-								</figure>
-							</li>
-						);
-					})}
-				</ul>
+				<RichTextBlockGalleryGrid images={images} columns={node.columns} />
 				<figcaption class="blocks-gallery-caption">{node.caption}</figcaption>
 			</figure>
 		) : (
-			<ul
-				class:list={[
-					"legacy-gallery",
-					"blocks-gallery-grid",
-					node.columns ? `columns-${node.columns}` : undefined,
-					alignmentClass,
-				]}
-			>
-				{images.map((image) => {
-					const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
-					const shapeClass = getImageShapeClass(image.shape);
-					return (
-						<li class="blocks-gallery-item">
-							<figure>
-								<a href={src}>
-									<img
-										class={shapeClass || undefined}
-										src={src}
-										alt={image.alt || image.caption || ""}
-										width={image.width}
-										height={image.height}
-										loading="lazy"
-										decoding="async"
-									/>
-								</a>
-								{image.caption && (
-									<figcaption class="blocks-gallery-item__caption">
-										{image.caption}
-									</figcaption>
-								)}
-							</figure>
-						</li>
-					);
-				})}
-			</ul>
+			<RichTextBlockGalleryGrid
+				images={images}
+				columns={node.columns}
+				alignmentClass={alignmentClass}
+				includeLegacyClass
+			/>
 		)
 	) : (
 		<EmDashGallery node={node} />
