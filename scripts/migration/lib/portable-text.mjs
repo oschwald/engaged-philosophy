@@ -11,8 +11,18 @@ const LEGACY_SITE_HOST_RE = /^(?:www\.)?engagedphilosophy\.com$/i;
 const PUBLIC_MEDIA_URL = (
 	process.env.PUBLIC_MEDIA_URL || "https://media.engagedphilosophy.com"
 ).replace(/\/+$/, "");
-const TOKEN_RE =
-	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[playlist[^\]]*\]|\[youtube[^\]]*\]|\[list-pages[^\]]*\]|\[embed\][\s\S]*?\[\/embed\]|\[caption[^\]]*\][\s\S]*?\[\/caption\])/gi;
+const EMBEDDABLE_URL_RE =
+	/https?:\/\/(?:youtu\.be|(?:www\.)?youtube(?:-nocookie)?\.com|(?:www\.)?vimeo\.com|(?:www\.)?animoto\.com)\/[^\s<\]]+/i;
+const EMBEDDABLE_URL_SOURCE =
+	"https?:\\/\\/(?:youtu\\.be|(?:www\\.)?youtube(?:-nocookie)?\\.com|(?:www\\.)?vimeo\\.com|(?:www\\.)?animoto\\.com)\\/[^\\s<\\]]+";
+const BASE_TOKEN_SOURCE =
+	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[playlist[^\]]*\]|\[youtube[^\]]*\]|\[list-pages[^\]]*\]|\[embed\][\s\S]*?\[\/embed\]|\[caption[^\]]*\][\s\S]*?\[\/caption\])/
+		.source;
+const TOKEN_RE = new RegExp(BASE_TOKEN_SOURCE, "gi");
+const TOKEN_WITH_AUTO_EMBEDS_RE = new RegExp(
+	`${BASE_TOKEN_SOURCE}|(?:^|[\\r\\n])\\s*${EMBEDDABLE_URL_SOURCE}\\s*(?=$|[\\r\\n])`,
+	"gi",
+);
 
 const turndown = new TurndownService({
 	codeBlockStyle: "fenced",
@@ -114,6 +124,35 @@ function parseAttributes(source) {
 	}
 
 	return attributes;
+}
+
+function decodeHtmlEntities(value) {
+	const namedEntities = {
+		amp: "&",
+		apos: "'",
+		quot: '"',
+		nbsp: " ",
+	};
+
+	return (value || "").replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (entity, token) => {
+		const lowerToken = token.toLowerCase();
+		if (lowerToken.startsWith("#x")) {
+			const codePoint = Number.parseInt(lowerToken.slice(2), 16);
+			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
+		}
+		if (lowerToken.startsWith("#")) {
+			const codePoint = Number.parseInt(lowerToken.slice(1), 10);
+			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
+		}
+		return namedEntities[lowerToken] ?? entity;
+	});
+}
+
+function cleanEmbedUrl(value) {
+	return decodeHtmlEntities(value || "")
+		.trim()
+		.replace(/^https?:\/\/(https?:\/\/)/i, "$1")
+		.replace(/[)\].,;]+$/g, "");
 }
 
 function guessMimeType(url) {
@@ -879,7 +918,7 @@ function playlistShortcodeToPortableText(shortcode, mediaById) {
 
 function shortcodeUrlToPortableText(url) {
 	if (!url) return [];
-	const cleanUrl = url.replace(/^https?:\/\/(https?:\/\/)/i, "$1");
+	const cleanUrl = cleanEmbedUrl(url);
 	const mimeType = guessMimeType(cleanUrl);
 
 	if (mimeType.startsWith("video/")) {
@@ -907,6 +946,12 @@ function shortcodeUrlToPortableText(url) {
 	return normalizePortableTextBlocks(
 		markdownToPortableText(`[${cleanUrl}](${cleanUrl})`),
 	);
+}
+
+function standaloneEmbedUrlToPortableText(token) {
+	const url = cleanEmbedUrl(token);
+	if (!EMBEDDABLE_URL_RE.test(url) || !getLegacyEmbed(url)) return [];
+	return shortcodeUrlToPortableText(url);
 }
 
 function embedShortcodeToPortableText(shortcode) {
@@ -1113,16 +1158,21 @@ function horizontalRuleToPortableText() {
 	];
 }
 
-export function htmlToPortableText(html, mediaById = {}) {
+export function htmlToPortableText(html, mediaById = {}, options = {}) {
 	const source = (html || "").trim();
 	if (!source) return [];
 
 	const blocks = [];
 	let lastIndex = 0;
+	const tokenPattern =
+		options.autoEmbedStandaloneUrls === false
+			? TOKEN_RE
+			: TOKEN_WITH_AUTO_EMBEDS_RE;
 
-	for (const match of source.matchAll(TOKEN_RE)) {
+	for (const match of source.matchAll(tokenPattern)) {
 		const [token] = match;
 		const index = match.index ?? 0;
+		const trimmedToken = token.trim();
 
 		if (index > lastIndex) {
 			blocks.push(
@@ -1130,7 +1180,9 @@ export function htmlToPortableText(html, mediaById = {}) {
 			);
 		}
 
-		if (/\bwp-block-gallery\b/i.test(token)) {
+		if (/^https?:\/\//i.test(trimmedToken)) {
+			blocks.push(...standaloneEmbedUrlToPortableText(trimmedToken));
+		} else if (/\bwp-block-gallery\b/i.test(token)) {
 			blocks.push(...galleryFigureToPortableText(token));
 		} else if (/\bwp-block-jetpack-tiled-gallery\b/i.test(token)) {
 			blocks.push(...imageHtmlToPortableText(token, { align: "center" }));

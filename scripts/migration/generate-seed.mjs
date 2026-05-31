@@ -729,6 +729,7 @@ for (const entry of posts) {
 	entry.data.excerpt = htmlToPortableText(
 		entry.data.excerpt,
 		portableTextMedia,
+		{ autoEmbedStandaloneUrls: false },
 	);
 }
 
@@ -760,6 +761,7 @@ for (const entry of projects) {
 	entry.data.excerpt = htmlToPortableText(
 		entry.data.excerpt,
 		portableTextMedia,
+		{ autoEmbedStandaloneUrls: false },
 	);
 }
 

@@ -139,6 +139,28 @@ assert.equal(
 	"https://www.youtube.com/embed/LFi0DJxA9lg?start=1",
 );
 
+const standaloneYoutubeBlocks = htmlToPortableText(
+	`Intro paragraph.\n\nhttps://youtu.be/VwZO9oBPbtg\n\nOutro paragraph.`,
+);
+assert.equal(standaloneYoutubeBlocks.length, 3);
+assert.equal(standaloneYoutubeBlocks[1]._type, "legacyEmbed");
+assert.equal(standaloneYoutubeBlocks[1].provider, "youtube");
+assert.equal(
+	standaloneYoutubeBlocks[1].embedUrl,
+	"https://www.youtube.com/embed/VwZO9oBPbtg",
+);
+
+const [plainStandaloneYoutube] = htmlToPortableText(
+	`https://youtu.be/VwZO9oBPbtg`,
+	{},
+	{ autoEmbedStandaloneUrls: false },
+);
+assert.equal(plainStandaloneYoutube._type, "block");
+assert.equal(
+	plainStandaloneYoutube.children.map((child) => child.text).join(""),
+	"https://youtu.be/VwZO9oBPbtg",
+);
+
 const [malformedYoutubeEmbed] = htmlToPortableText(
 	`[embed]http://https://youtu.be/OTRLMgHMn4s[/embed]`,
 );
