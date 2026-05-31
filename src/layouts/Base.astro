@@ -25,6 +25,9 @@ const faviconType =
 const menuItems = await getPrimaryMenu();
 const currentPath = Astro.url.pathname;
 const mediaUrlPrefix = getMediaUrlPrefix();
+const logo = settings?.logo;
+const logoSrc = logo?.url || `${mediaUrlPrefix}/img/logo.png`;
+const logoAlt = logo?.alt || `${siteTitle} Logo`;
 ---
 
 <!doctype html>
@@ -59,8 +62,10 @@ const mediaUrlPrefix = getMediaUrlPrefix();
 			<header id="branding" class="text-center py-3">
 				<a id="header-image" href="/" title={siteTitle} rel="home">
 					<img
-						src={`${mediaUrlPrefix}/img/logo.png`}
-						alt={`${siteTitle} Logo`}
+						src={logoSrc}
+						alt={logoAlt}
+						width={logo?.width}
+						height={logo?.height}
 					/>
 				</a>
 			</header>
