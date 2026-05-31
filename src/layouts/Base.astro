@@ -18,6 +18,10 @@ const pageTitle =
 	title && title !== "Home"
 		? `${title} – ${siteTitle}`
 		: `${siteTitle} – ${siteDescription}`;
+const favicon = settings?.favicon;
+const faviconHref = favicon?.url || "/favicon.svg";
+const faviconType =
+	favicon?.contentType || (favicon?.url ? undefined : "image/svg+xml");
 const menuItems = await getPrimaryMenu();
 const currentPath = Astro.url.pathname;
 const mediaUrlPrefix = getMediaUrlPrefix();
@@ -31,12 +35,16 @@ const mediaUrlPrefix = getMediaUrlPrefix();
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>{pageTitle}</title>
 		<meta name="description" content={description || siteDescription} />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link
-			rel="alternate icon"
-			type="image/svg+xml"
-			href="/favicon-simple.svg"
-		/>
+		<link rel="icon" type={faviconType} href={faviconHref} />
+		{
+			!favicon?.url && (
+				<link
+					rel="alternate icon"
+					type="image/svg+xml"
+					href="/favicon-simple.svg"
+				/>
+			)
+		}
 		<link rel="manifest" href="/site.webmanifest" />
 		<meta name="theme-color" content="#fd7e14" />
 		<meta name="msapplication-TileColor" content="#fd7e14" />
