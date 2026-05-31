@@ -2,7 +2,7 @@
 import SearchResults from "../../components/SearchResults.astro";
 import Base from "../../layouts/Base.astro";
 import { searchSite } from "../../lib/search";
-import { getMediaUrlPrefix } from "../../lib/site";
+import { getMediaUrlPrefix } from "../../lib/media";
 
 const pageNumber = Number(Astro.params.page ?? "1");
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";

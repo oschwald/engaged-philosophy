@@ -1,6 +1,6 @@
 ---
 import { getPublishedPosts } from "../lib/content";
-import { formatPathDate, sortByPublishedOn } from "../lib/site";
+import { formatPathDate, sortByPublishedOn } from "../lib/path-utils";
 
 const recentPosts = sortByPublishedOn(await getPublishedPosts()).slice(0, 25);
 ---

@@ -4,15 +4,14 @@ import SearchResults from "../components/SearchResults.astro";
 import Base from "../layouts/Base.astro";
 import { getPageBySlug, getPublishedProjects } from "../lib/content";
 import { searchSite } from "../lib/search";
+import { getEmDashEditEntryAttrs } from "../lib/editing";
+import { getMediaUrlPrefix, rewriteWordPressUploadUrl } from "../lib/media";
+import { sortByPublishedOn } from "../lib/path-utils";
 import {
-	getEmDashEditEntryAttrs,
 	getEntryContent,
 	getEntryExcerpt,
 	getExcerptText,
-	getMediaUrlPrefix,
-	rewriteWordPressUploadUrl,
-	sortByPublishedOn,
-} from "../lib/site";
+} from "../lib/rich-text";
 import type { ContentEntry, ProjectData } from "../lib/types";
 
 const home = await getPageBySlug("home");

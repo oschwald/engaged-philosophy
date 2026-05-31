@@ -6,12 +6,10 @@ import {
 	getProjectsByTaxonomy,
 	getTaxonomyTerm,
 } from "../../lib/content";
-import {
-	getEmDashEditEntryAttrs,
-	getEntryContent,
-	isProjectTaxonomy,
-	sortByPublishedOn,
-} from "../../lib/site";
+import { getEmDashEditEntryAttrs } from "../../lib/editing";
+import { sortByPublishedOn } from "../../lib/path-utils";
+import { getEntryContent } from "../../lib/rich-text";
+import { isProjectTaxonomy } from "../../lib/taxonomy-utils";
 import type { ContentEntry, ProjectData } from "../../lib/types";
 import RichContent from "../../components/RichContent.astro";
 

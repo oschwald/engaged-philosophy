@@ -2,7 +2,8 @@
 import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
 import { getEntryTerms, getProjectBySlug } from "../../lib/content";
-import { getEmDashEditEntryAttrs, getEntryContent } from "../../lib/site";
+import { getEmDashEditEntryAttrs } from "../../lib/editing";
+import { getEntryContent } from "../../lib/rich-text";
 
 const { slug } = Astro.params;
 const project = await getProjectBySlug(slug ?? "");

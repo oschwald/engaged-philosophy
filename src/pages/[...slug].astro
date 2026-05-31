@@ -2,11 +2,9 @@
 import RichContent from "../components/RichContent.astro";
 import Base from "../layouts/Base.astro";
 import { getPageByPath, getPageBySlug, getProjectBySlug } from "../lib/content";
-import {
-	getEmDashEditEntryAttrs,
-	getEntryContent,
-	joinPath,
-} from "../lib/site";
+import { getEmDashEditEntryAttrs } from "../lib/editing";
+import { joinPath } from "../lib/path-utils";
+import { getEntryContent } from "../lib/rich-text";
 
 const slugParts = Astro.params.slug?.split("/").filter(Boolean) ?? [];
 const path = joinPath(slugParts);

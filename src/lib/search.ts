@@ -3,13 +3,13 @@ import {
 	getPublishedPosts,
 	getPublishedProjects,
 } from "./content";
+import { rewriteWordPressUploadUrl } from "./media";
 import {
 	getEntryContent,
 	getEntryExcerpt,
 	getExcerptText,
-	rewriteWordPressUploadUrl,
 	stripHtml,
-} from "./site";
+} from "./rich-text";
 import type { ContentEntry, PageData, PostData, ProjectData } from "./types";
 
 export interface SearchResult {

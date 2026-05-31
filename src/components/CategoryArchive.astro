@@ -1,13 +1,12 @@
 ---
 import ThemeSidebar from "./ThemeSidebar.astro";
 import { getPostsByCategory } from "../lib/content";
+import { formatPathDate, sortByPublishedOn } from "../lib/path-utils";
 import {
-	formatPathDate,
 	getEntryContent,
 	getEntryExcerpt,
 	getExcerptText,
-	sortByPublishedOn,
-} from "../lib/site";
+} from "../lib/rich-text";
 
 interface Props {
 	slug: string;

@@ -7,11 +7,9 @@ import {
 	getPostByPath,
 	getTermsBySlugs,
 } from "../../../../lib/content";
-import {
-	getEmDashEditEntryAttrs,
-	getEntryContent,
-	joinPath,
-} from "../../../../lib/site";
+import { getEmDashEditEntryAttrs } from "../../../../lib/editing";
+import { joinPath } from "../../../../lib/path-utils";
+import { getEntryContent } from "../../../../lib/rich-text";
 
 const { year = "", month = "", day = "", slug = "" } = Astro.params;
 const path = joinPath([year, month, day, slug]);

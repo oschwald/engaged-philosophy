@@ -5,7 +5,8 @@ import {
 	getProjectsByTaxonomy,
 	getTaxonomyTerm,
 } from "../../../../lib/content";
-import { isProjectTaxonomy, sortByPublishedOn } from "../../../../lib/site";
+import { sortByPublishedOn } from "../../../../lib/path-utils";
+import { isProjectTaxonomy } from "../../../../lib/taxonomy-utils";
 import type { ContentEntry, ProjectData } from "../../../../lib/types";
 
 const { taxonomy = "", slug = "", page = "1" } = Astro.params;
