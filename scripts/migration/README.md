@@ -8,6 +8,7 @@ Common commands:
 
 - `npm run generate:seed`
 - `npm run audit:migration`
+- `npm run audit:legacy-blocks`
 - `npm run audit:wordpress-transforms`
 - `npm run parity:audit`
 - `npm run sync:seed-d1 -- --local`

@@ -12,6 +12,7 @@
 		"migrate:derived-path-fields": "node scripts/migration/hide-derived-path-fields.mjs",
 		"sync:seed-d1": "node scripts/migration/sync-seed-to-d1.mjs",
 		"audit:migration": "node scripts/migration/audit-migration.mjs",
+		"audit:legacy-blocks": "node scripts/migration/audit-legacy-blocks.mjs",
 		"audit:wordpress-transforms": "node scripts/migration/audit-wordpress-transforms.mjs",
 		"parity:audit": "node scripts/migration/parity-audit.mjs",
 		"dev": "astro dev",
