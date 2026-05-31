@@ -48,6 +48,15 @@ export function createPlugin() {
 							],
 						},
 						{
+							type: "select",
+							action_id: "shape",
+							label: "Shape",
+							options: [
+								{ label: "None", value: "none" },
+								{ label: "Rounded", value: "rounded" },
+							],
+						},
+						{
 							type: "number_input",
 							action_id: "width",
 							label: "Width",
