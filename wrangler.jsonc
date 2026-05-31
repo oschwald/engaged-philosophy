@@ -4,6 +4,17 @@
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-05-25",
 	"compatibility_flags": ["nodejs_compat"],
+	"observability": {
+		"traces": {
+			"enabled": true,
+			"head_sampling_rate": 0.05,
+		},
+		"logs": {
+			"enabled": true,
+			"head_sampling_rate": 1,
+			"invocation_logs": false,
+		},
+	},
 	"vars": {
 		"PUBLIC_MEDIA_URL": "https://media.engagedphilosophy.com",
 	},
