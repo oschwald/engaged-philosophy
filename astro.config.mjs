@@ -1,6 +1,6 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
-import { d1, r2 } from "@emdash-cms/cloudflare";
+import { access, d1, r2 } from "@emdash-cms/cloudflare";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
@@ -77,6 +77,11 @@ export default defineConfig({
 		emdash({
 			database: d1({ binding: "DB", session: "primary-first" }),
 			storage: r2({ binding: "MEDIA" }),
+			auth: access({
+				teamDomain: "engaged-philosophy.cloudflareaccess.com",
+				audienceEnvVar: "CF_ACCESS_AUDIENCE",
+				autoProvision: false,
+			}),
 			plugins: [
 				{
 					id: "legacy-image-blocks",
