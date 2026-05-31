@@ -4,26 +4,19 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 
 import { DEFAULT_MIGRATION_SEED_PATH } from "./lib/migration-seed-path.mjs";
+import {
+	DEFAULT_WORDPRESS_SITE_URL,
+	uploadStorageKeyFromUrl,
+} from "./lib/wordpress-media.mjs";
 
 const ROOT = process.cwd();
 const DEFAULT_SEED_PATH = DEFAULT_MIGRATION_SEED_PATH;
-const DEFAULT_SITE_URL = "https://www.engagedphilosophy.com";
+const DEFAULT_SITE_URL = DEFAULT_WORDPRESS_SITE_URL;
 const DEFAULT_CONCURRENCY = 4;
 const DEFAULT_WRANGLER_CONFIG = path.join(ROOT, "wrangler.jsonc");
 const UPLOAD_URL_RE =
 	/https?:\/\/[^"'()\s<>]+|(?:^|[\s"'(=])(\/wp-content\/uploads\/[^"'()\s<>]+)/gi;
-const INTERNAL_UPLOAD_HOSTS = new Set([
-	"engagedphilosophy.com",
-	"www.engagedphilosophy.com",
-]);
 const DOWNLOAD_RETRIES = 3;
-
-function sanitizeObjectKey(key) {
-	return key
-		.split("/")
-		.map((segment) => segment.replace(/\.\.+/g, "."))
-		.join("/");
-}
 
 function printUsage() {
 	console.log(`Usage: npm run migrate:media -- [options]
@@ -117,25 +110,14 @@ function walkStrings(value, visit) {
 
 function normalizeUploadUrl(rawValue, siteUrl) {
 	const trimmed = rawValue.trim();
-	if (trimmed.startsWith("/wp-content/uploads/")) {
-		const absoluteUrl = new URL(trimmed, siteUrl).toString();
-		return {
-			absoluteUrl,
-			key: sanitizeObjectKey(trimmed.replace(/^\/+/, "")),
-		};
-	}
-
-	const parsed = new URL(trimmed);
-	if (
-		!INTERNAL_UPLOAD_HOSTS.has(parsed.hostname.toLowerCase()) ||
-		!parsed.pathname.startsWith("/wp-content/uploads/")
-	) {
-		return null;
-	}
-	const key = parsed.pathname.replace(/^\/+/, "");
+	const key = uploadStorageKeyFromUrl(trimmed, siteUrl);
+	if (!key) return null;
+	const absoluteUrl = trimmed.startsWith("/wp-content/uploads/")
+		? new URL(trimmed, siteUrl).toString()
+		: trimmed;
 	return {
-		absoluteUrl: parsed.toString(),
-		key: sanitizeObjectKey(key),
+		absoluteUrl,
+		key,
 	};
 }
 

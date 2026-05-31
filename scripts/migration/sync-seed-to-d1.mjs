@@ -4,12 +4,20 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 
 import { parseSeedPathArg, readSeedFile } from "./lib/migration-seed-path.mjs";
+import {
+	filenameFromMediaUrl,
+	guessMimeTypeFromPath,
+	uploadStorageKeyFromUrl,
+	wordpressMediaId,
+	WORDPRESS_MEDIA_ID_PREFIX,
+} from "./lib/wordpress-media.mjs";
 
 const ROOT = process.cwd();
 const DATABASE_NAME = "engaged-philosophy";
 const CHUNK_SIZE = 750_000;
 const INSERT_BATCH_SIZE = 1;
 const DEFAULT_LOCALE = "en";
+const IMPORTED_MEDIA_CREATED_AT = "2026-05-26T00:00:00Z";
 const args = process.argv.slice(2);
 const seedPath = parseSeedPathArg(args);
 const mode = args.includes("--remote")
@@ -130,6 +138,24 @@ const COLLECTION_CONFIG = {
 		],
 	},
 };
+
+const MEDIA_COLUMNS = [
+	"id",
+	"filename",
+	"mime_type",
+	"size",
+	"width",
+	"height",
+	"alt",
+	"caption",
+	"storage_key",
+	"content_hash",
+	"created_at",
+	"author_id",
+	"status",
+	"blurhash",
+	"dominant_color",
+];
 
 function runWrangler(args) {
 	const result = spawnSync(
@@ -293,6 +319,37 @@ function buildInsertBatches(
 	return statements;
 }
 
+function buildMediaRows(media = {}) {
+	return Object.entries(media)
+		.map(([id, item]) => {
+			const storageKey = uploadStorageKeyFromUrl(item?.url || "");
+			if (!storageKey) return null;
+			const filename =
+				item.filename || filenameFromMediaUrl(item.url) || `wordpress-${id}`;
+			const mimeType =
+				item.mimeType || guessMimeTypeFromPath(item.filename || item.url);
+
+			return [
+				wordpressMediaId(id),
+				filename,
+				mimeType,
+				null,
+				typeof item.width === "number" ? item.width : null,
+				typeof item.height === "number" ? item.height : null,
+				item.alt || item.title || null,
+				item.caption || null,
+				storageKey,
+				null,
+				IMPORTED_MEDIA_CREATED_AT,
+				null,
+				"ready",
+				null,
+				null,
+			];
+		})
+		.filter(Boolean);
+}
+
 function flattenMenuItems(items, parentId = null, prefix = []) {
 	const flattened = [];
 
@@ -320,8 +377,11 @@ function currentSummary() {
 	const menuCount = executeQuery(
 		`SELECT COUNT(*) AS count FROM _emdash_menu_items WHERE menu_id IN (SELECT id FROM _emdash_menus WHERE name IN (${seed.menus.map((menu) => sqlValue(menu.name)).join(", ")}));`,
 	)[0]?.count;
+	const mediaCount = executeQuery(
+		`SELECT COUNT(*) AS count FROM media WHERE id LIKE ${sqlValue(`${WORDPRESS_MEDIA_ID_PREFIX}%`)};`,
+	)[0]?.count;
 
-	return { counts, termCount, menuCount };
+	return { counts, termCount, menuCount, mediaCount };
 }
 
 function expectedSummary() {
@@ -340,8 +400,9 @@ function expectedSummary() {
 			items.reduce((sum, item) => sum + 1 + countItems(item.children ?? []), 0);
 		return total + countItems(menu.items ?? []);
 	}, 0);
+	const mediaCount = buildMediaRows(seed.media).length;
 
-	return { content, termCount, menuCount };
+	return { content, termCount, menuCount, mediaCount };
 }
 
 const before = currentSummary();
@@ -494,8 +555,15 @@ for (const menu of seed.menus ?? []) {
 	}
 }
 
+const mediaStatements = buildInsertBatches(
+	"media",
+	MEDIA_COLUMNS,
+	buildMediaRows(seed.media),
+);
+
 const cleanupStatements = [
 	"PRAGMA foreign_keys = OFF;",
+	`DELETE FROM media WHERE id LIKE ${sqlValue(`${WORDPRESS_MEDIA_ID_PREFIX}%`)};`,
 	`DELETE FROM content_taxonomies WHERE collection IN ('pages', 'posts', 'projects');`,
 	"DELETE FROM ec_pages;",
 	"DELETE FROM ec_posts;",
@@ -518,6 +586,7 @@ runStatementChunks(revisionStatements, "seed-sync-revisions");
 runStatementChunks(contentStatements, "seed-sync-content");
 runStatementChunks(contentTaxonomyStatements, "seed-sync-content-taxonomies");
 runStatementChunks(menuStatements, "seed-sync-menus");
+runStatementChunks(mediaStatements, "seed-sync-media");
 
 const after = currentSummary();
 console.log(
