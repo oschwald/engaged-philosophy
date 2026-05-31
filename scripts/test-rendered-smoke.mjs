@@ -16,6 +16,7 @@ const DEFAULT_PATHS = {
 	youtube: "/the-ethics-of-psytrance/",
 	saveGate: "/emdash-save-gate/",
 	saveGateInactive: "/emdash-save-gate-inactive/",
+	saveGateStaleUnsaved: "/emdash-save-gate-stale-unsaved/",
 };
 
 const DEFAULTS = {
@@ -220,6 +221,36 @@ function inactiveSaveGateFixtureShell() {
 </html>`;
 }
 
+function staleUnsavedSaveGateFixtureShell() {
+	return `<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Stale Unsaved Save Gate - Engaged Philosophy</title>
+	</head>
+	<body>
+		<div id="emdash-toolbar" data-edit-mode="true">
+			<input type="checkbox" id="emdash-edit-toggle" checked />
+			<span id="emdash-tb-status"></span>
+			<span id="emdash-tb-save-status"></span>
+			<button id="emdash-tb-publish" type="button">Publish</button>
+		</div>
+		<main>
+			<article data-emdash-ref='{"collection":"pages","id":"about","status":"published","hasDraft":false}'>
+				<div id="editor" class="emdash-inline-editor" contenteditable="true">Unchanged content</div>
+			</article>
+		</main>
+		<script>${SAVE_GATE_SCRIPT}</script>
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				document.dispatchEvent(new CustomEvent("emdash:save", { detail: { state: "unsaved" } }));
+			});
+		</script>
+	</body>
+</html>`;
+}
+
 const FIXTURES = {
 	[DEFAULT_PATHS.about]: fixtureShell(
 		"About",
@@ -322,6 +353,12 @@ async function createFixtureServer() {
 		if (pathname === DEFAULT_PATHS.saveGateInactive) {
 			response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
 			response.end(inactiveSaveGateFixtureShell());
+			return;
+		}
+		if (pathname === DEFAULT_PATHS.saveGateStaleUnsaved) {
+			apiEvents.push({ type: "page", time: Date.now() });
+			response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+			response.end(staleUnsavedSaveGateFixtureShell());
 			return;
 		}
 		if (
@@ -605,6 +642,22 @@ async function checkEditSaveGate(browser, base, timeout, fixture) {
 	fixture.resetApiEvents();
 	let page = await openPage(browser, base, DEFAULT_PATHS.saveGate, timeout);
 	try {
+		await page.locator("#emdash-edit-toggle").click();
+		const toggleEvents = await waitForFixtureEvent(
+			fixture,
+			(events) => events.filter((event) => event.type === "page").length >= 2,
+			timeout,
+		);
+		if (toggleEvents.some((event) => event.type === "save-start")) {
+			throw new Error("Edit mode toggle waited for a save with no edits");
+		}
+	} finally {
+		await page.close();
+	}
+
+	fixture.resetApiEvents();
+	page = await openPage(browser, base, DEFAULT_PATHS.saveGate, timeout);
+	try {
 		await page.locator("#editor").click();
 		await page.keyboard.type(" changed");
 		await page.locator("#emdash-tb-publish").click();
@@ -642,6 +695,30 @@ async function checkEditSaveGate(browser, base, timeout, fixture) {
 		);
 		if (saveFinishPosition > secondPagePosition) {
 			throw new Error("Edit mode toggled before the inline save finished");
+		}
+	} finally {
+		await page.close();
+	}
+}
+
+async function checkStaleUnsavedSaveGate(browser, base, timeout, fixture) {
+	fixture.resetApiEvents();
+	const page = await openPage(
+		browser,
+		base,
+		DEFAULT_PATHS.saveGateStaleUnsaved,
+		timeout,
+	);
+	try {
+		await page.locator("#emdash-edit-toggle").click();
+		const events = await waitForFixtureEvent(
+			fixture,
+			(nextEvents) =>
+				nextEvents.filter((event) => event.type === "page").length >= 2,
+			timeout,
+		);
+		if (events.some((event) => event.type === "save-start")) {
+			throw new Error("Stale unsaved state unexpectedly started a save");
 		}
 	} finally {
 		await page.close();
@@ -735,6 +812,11 @@ async function main() {
 		await runCheck(
 			"edit toolbar waits for inline saves",
 			() => checkEditSaveGate(browser, base, options.timeout, fixture),
+			failures,
+		);
+		await runCheck(
+			"edit toolbar ignores stale unsaved state without blocking",
+			() => checkStaleUnsavedSaveGate(browser, base, options.timeout, fixture),
 			failures,
 		);
 		await runCheck(

@@ -108,7 +108,8 @@ async function flushInlineSaves() {
 	}
 
 	if (expectedSave && pendingContentSaves.size === 0) {
-		throw new Error("No save started for the current inline edit");
+		hasUnsavedInlineChanges = false;
+		return;
 	}
 
 	await waitForPendingContentSaves();
@@ -173,6 +174,10 @@ async function publishAfterSave(button) {
 	}
 }
 
+function shouldGateToolbarAction() {
+	return hasUnsavedInlineChanges || pendingContentSaves.size > 0;
+}
+
 async function toggleEditModeAfterSave(toggle) {
 	const nextChecked = toggle.checked;
 	const previousChecked = !nextChecked;
@@ -211,6 +216,7 @@ function installToolbarGuards() {
 		(event) => {
 			const button = event.target?.closest?.("#emdash-tb-publish");
 			if (!button) return;
+			if (!shouldGateToolbarAction()) return;
 			event.preventDefault();
 			event.stopImmediatePropagation();
 			void publishAfterSave(button);
@@ -228,6 +234,7 @@ function installToolbarGuards() {
 			) {
 				return;
 			}
+			if (!shouldGateToolbarAction()) return;
 			event.preventDefault();
 			event.stopImmediatePropagation();
 			void toggleEditModeAfterSave(toggle);
