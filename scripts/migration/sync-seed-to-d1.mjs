@@ -18,6 +18,8 @@ const CHUNK_SIZE = 750_000;
 const INSERT_BATCH_SIZE = 1;
 const DEFAULT_LOCALE = "en";
 const IMPORTED_MEDIA_FALLBACK_CREATED_AT = "2026-05-26T00:00:00Z";
+const IMPORTED_REDIRECT_GROUP = "wordpress-migration";
+const IMPORTED_REDIRECT_CREATED_AT = "2026-05-26T00:00:00Z";
 const args = process.argv.slice(2);
 const seedPath = parseSeedPathArg(args);
 const mode = args.includes("--remote")
@@ -155,6 +157,20 @@ const MEDIA_COLUMNS = [
 	"status",
 	"blurhash",
 	"dominant_color",
+];
+const REDIRECT_COLUMNS = [
+	"id",
+	"source",
+	"destination",
+	"type",
+	"is_pattern",
+	"enabled",
+	"hits",
+	"last_hit_at",
+	"group_name",
+	"auto",
+	"created_at",
+	"updated_at",
 ];
 
 function runWrangler(args) {
@@ -350,6 +366,31 @@ function buildMediaRows(media = {}) {
 		.filter(Boolean);
 }
 
+function redirectIdFor(source) {
+	return `wordpress-redirect:${source}`;
+}
+
+function buildRedirectRows(redirects = []) {
+	return redirects.map((redirect) => {
+		const groupName = redirect.groupName ?? IMPORTED_REDIRECT_GROUP;
+		const enabled = redirect.enabled ?? true;
+		return [
+			redirectIdFor(redirect.source),
+			redirect.source,
+			redirect.destination,
+			redirect.type ?? 301,
+			redirect.source.includes("[") ? 1 : 0,
+			enabled ? 1 : 0,
+			0,
+			null,
+			groupName,
+			0,
+			IMPORTED_REDIRECT_CREATED_AT,
+			IMPORTED_REDIRECT_CREATED_AT,
+		];
+	});
+}
+
 function flattenMenuItems(items, parentId = null, prefix = []) {
 	const flattened = [];
 
@@ -380,8 +421,17 @@ function currentSummary() {
 	const mediaCount = executeQuery(
 		`SELECT COUNT(*) AS count FROM media WHERE id LIKE ${sqlValue(`${WORDPRESS_MEDIA_ID_PREFIX}%`)};`,
 	)[0]?.count;
+	const redirectSources = (seed.redirects ?? []).map((redirect) =>
+		sqlValue(redirect.source),
+	);
+	const redirectCount =
+		redirectSources.length > 0
+			? executeQuery(
+					`SELECT COUNT(*) AS count FROM _emdash_redirects WHERE source IN (${redirectSources.join(", ")});`,
+				)[0]?.count
+			: 0;
 
-	return { counts, termCount, menuCount, mediaCount };
+	return { counts, termCount, menuCount, mediaCount, redirectCount };
 }
 
 function expectedSummary() {
@@ -401,8 +451,9 @@ function expectedSummary() {
 		return total + countItems(menu.items ?? []);
 	}, 0);
 	const mediaCount = buildMediaRows(seed.media).length;
+	const redirectCount = buildRedirectRows(seed.redirects).length;
 
-	return { content, termCount, menuCount, mediaCount };
+	return { content, termCount, menuCount, mediaCount, redirectCount };
 }
 
 const before = currentSummary();
@@ -560,9 +611,36 @@ const mediaStatements = buildInsertBatches(
 	MEDIA_COLUMNS,
 	buildMediaRows(seed.media),
 );
+const redirectStatements = buildInsertBatches(
+	"_emdash_redirects",
+	REDIRECT_COLUMNS,
+	buildRedirectRows(seed.redirects),
+);
+
+const redirectSources = (seed.redirects ?? []).map((redirect) =>
+	sqlValue(redirect.source),
+);
+const redirectGroups = [
+	...new Set(
+		(seed.redirects ?? []).map(
+			(redirect) => redirect.groupName ?? IMPORTED_REDIRECT_GROUP,
+		),
+	),
+].filter(Boolean);
+const redirectCleanupPredicates = [
+	...redirectGroups.map((group) => `group_name = ${sqlValue(group)}`),
+	...(redirectSources.length > 0
+		? [`source IN (${redirectSources.join(", ")})`]
+		: []),
+];
 
 const cleanupStatements = [
 	"PRAGMA foreign_keys = OFF;",
+	...(redirectCleanupPredicates.length > 0
+		? [
+				`DELETE FROM _emdash_redirects WHERE ${redirectCleanupPredicates.join(" OR ")};`,
+			]
+		: []),
 	`DELETE FROM media WHERE id LIKE ${sqlValue(`${WORDPRESS_MEDIA_ID_PREFIX}%`)};`,
 	`DELETE FROM content_taxonomies WHERE collection IN ('pages', 'posts', 'projects');`,
 	"DELETE FROM ec_pages;",
@@ -587,6 +665,7 @@ runStatementChunks(contentStatements, "seed-sync-content");
 runStatementChunks(contentTaxonomyStatements, "seed-sync-content-taxonomies");
 runStatementChunks(menuStatements, "seed-sync-menus");
 runStatementChunks(mediaStatements, "seed-sync-media");
+runStatementChunks(redirectStatements, "seed-sync-redirects");
 
 const after = currentSummary();
 console.log(
