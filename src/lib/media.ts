@@ -35,6 +35,10 @@ function getInternalMediaKey(value?: string | null) {
 	);
 }
 
+function getStorageKeyFromMeta(meta?: Record<string, unknown> | null) {
+	return typeof meta?.storageKey === "string" ? meta.storageKey : "";
+}
+
 function resolvePublicMediaUrl(
 	key: string,
 	getPublicMediaUrl?: ((key: string) => string) | null,
@@ -54,29 +58,36 @@ function isPublicMediaRef(value?: string | null) {
 }
 
 export function getAssetSrc(
-	asset?: { _ref?: string; url?: string } | null,
+	asset?: {
+		_ref?: string;
+		url?: string;
+		meta?: Record<string, unknown>;
+	} | null,
 	fallbackUrl?: string | null,
 	getPublicMediaUrl?: ((key: string) => string) | null,
 ) {
 	const url = asset?.url ?? fallbackUrl ?? "";
-	const internalMediaUrl = resolvePublicMediaUrl(
-		getInternalMediaKey(url),
+	const storageKey =
+		getStorageKeyFromMeta(asset?.meta) ||
+		getInternalMediaKey(asset?.url) ||
+		getInternalMediaKey(fallbackUrl);
+	const resolvedStorageUrl = resolvePublicMediaUrl(
+		storageKey,
 		getPublicMediaUrl,
 	);
-	if (internalMediaUrl) return internalMediaUrl;
-
-	if (isWordPressUploadUrl(url)) {
-		return rewriteWordPressUploadUrl(url, getMediaUrlPrefix());
-	}
+	if (resolvedStorageUrl) return resolvedStorageUrl;
 
 	const mediaRefUrl = asset?._ref
 		? resolvePublicMediaUrl(
-				getInternalMediaKey(asset.url) ||
-					(isPublicMediaRef(asset._ref) ? asset._ref : ""),
+				isPublicMediaRef(asset._ref) ? asset._ref : "",
 				getPublicMediaUrl,
 			)
 		: "";
 	if (mediaRefUrl) return mediaRefUrl;
+
+	if (isWordPressUploadUrl(url)) {
+		return rewriteWordPressUploadUrl(url, getMediaUrlPrefix());
+	}
 
 	return url;
 }
