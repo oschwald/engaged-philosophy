@@ -15,6 +15,9 @@ const legacyImagePluginAdminEntrypoint = fileURLToPath(
 const cloudflareAccessAuthEntrypoint = fileURLToPath(
 	new URL("./src/lib/cloudflare-access-auth.ts", import.meta.url),
 );
+const anonymousCloudflareCacheEntrypoint = fileURLToPath(
+	new URL("./src/lib/anonymous-cloudflare-cache.ts", import.meta.url),
+);
 
 function suppressKnownBuildWarnings(warning, warn) {
 	if (
@@ -44,6 +47,16 @@ viteLogger.warn = (message, options) => {
 export default defineConfig({
 	output: "server",
 	adapter: cloudflare(),
+	experimental: {
+		cache: {
+			provider: {
+				entrypoint: anonymousCloudflareCacheEntrypoint,
+				config: {
+					cacheName: "engaged-philosophy-pages",
+				},
+			},
+		},
+	},
 	vite: {
 		customLogger: viteLogger,
 		css: {
@@ -78,7 +91,7 @@ export default defineConfig({
 	integrations: [
 		react(),
 		emdash({
-			database: d1({ binding: "DB", session: "primary-first" }),
+			database: d1({ binding: "DB", session: "auto" }),
 			storage: r2({ binding: "MEDIA" }),
 			auth: {
 				type: "cloudflare-access",

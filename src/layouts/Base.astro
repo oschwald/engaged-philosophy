@@ -10,6 +10,11 @@ interface Props {
 }
 
 const { title, description, bodyClass = "" } = Astro.props;
+Astro.cache.set({
+	maxAge: 300,
+	swr: 86400,
+	tags: ["pages", "posts", "projects"],
+});
 const settings = await getRuntimeSiteSettings();
 const siteTitle = settings?.title || "Engaged Philosophy";
 const siteDescription =
