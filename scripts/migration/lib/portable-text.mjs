@@ -440,6 +440,20 @@ function normalizeLegacyAlignment(align) {
 		: undefined;
 }
 
+function normalizeLegacyImageShape(shape) {
+	return shape === "rounded" ? shape : undefined;
+}
+
+function getImageShape(...attributeSets) {
+	const className = attributeSets
+		.map((attributes) => attributes?.class || "")
+		.join(" ");
+	if (/\bis-style-(?:rounded|circle-mask)\b/i.test(className)) {
+		return "rounded";
+	}
+	return undefined;
+}
+
 function createLegacyImageBlock({
 	key,
 	url,
@@ -451,6 +465,7 @@ function createLegacyImageBlock({
 	height,
 	displayWidth,
 	displayHeight,
+	shape,
 }) {
 	return {
 		_type: "legacyImage",
@@ -470,6 +485,9 @@ function createLegacyImageBlock({
 		...(typeof height === "number" ? { height } : {}),
 		...(typeof displayWidth === "number" ? { displayWidth } : {}),
 		...(typeof displayHeight === "number" ? { displayHeight } : {}),
+		...(normalizeLegacyImageShape(shape)
+			? { shape: normalizeLegacyImageShape(shape) }
+			: {}),
 	};
 }
 
@@ -497,6 +515,7 @@ function normalizeLegacyImageBlock(block) {
 			typeof block.displayWidth === "number" ? block.displayWidth : undefined,
 		displayHeight:
 			typeof block.displayHeight === "number" ? block.displayHeight : undefined,
+		shape: typeof block.shape === "string" ? block.shape : undefined,
 	});
 }
 
@@ -507,7 +526,11 @@ function normalizeImageBlock(block) {
 	if (shouldIgnoreImageUrl(block.asset.url)) {
 		return null;
 	}
-	if (typeof block.href === "string" || typeof block.align === "string") {
+	if (
+		typeof block.href === "string" ||
+		typeof block.align === "string" ||
+		normalizeLegacyImageShape(block.shape)
+	) {
 		return createLegacyImageBlock({
 			key: block._key,
 			url: block.asset.url,
@@ -523,6 +546,7 @@ function normalizeImageBlock(block) {
 				typeof block.displayHeight === "number"
 					? block.displayHeight
 					: undefined,
+			shape: typeof block.shape === "string" ? block.shape : undefined,
 		});
 	}
 
@@ -549,6 +573,9 @@ function normalizeImageBlock(block) {
 			: {}),
 		...(typeof block.displayHeight === "number"
 			? { displayHeight: block.displayHeight }
+			: {}),
+		...(normalizeLegacyImageShape(block.shape)
+			? { shape: normalizeLegacyImageShape(block.shape) }
 			: {}),
 	};
 }
@@ -1030,6 +1057,10 @@ function imageAttributesToPortableText(
 	);
 	const align =
 		overrides.align || getImageAlignment(imageAttributes) || undefined;
+	const shape =
+		normalizeLegacyImageShape(overrides.shape) ||
+		getImageShape(imageAttributes) ||
+		undefined;
 	const width =
 		Number(
 			imageAttributes.width ||
@@ -1047,7 +1078,7 @@ function imageAttributesToPortableText(
 	const forceImage = overrides.forceImage === true;
 
 	return {
-		...((href || align) && !forceImage
+		...((href || align || shape) && !forceImage
 			? createLegacyImageBlock({
 					url: imageSrc,
 					alt: imageAttributes.alt || imageAttributes["data-image-title"] || "",
@@ -1056,6 +1087,7 @@ function imageAttributesToPortableText(
 					caption: overrides.caption,
 					width,
 					height,
+					shape,
 				})
 			: {
 					_type: "image",
@@ -1068,6 +1100,7 @@ function imageAttributesToPortableText(
 					...(overrides.caption ? { caption: overrides.caption } : {}),
 					...(width ? { width } : {}),
 					...(height ? { height } : {}),
+					...(shape ? { shape } : {}),
 				}),
 	};
 }
@@ -1076,6 +1109,10 @@ function imageHtmlToPortableText(token, overrides = {}) {
 	const anchorMatch = token.match(/^<a\b([^>]*)>([\s\S]*?)<\/a>$/i);
 	const anchorAttributes = anchorMatch ? parseAttributes(anchorMatch[1]) : {};
 	const imageSource = anchorMatch ? anchorMatch[2] : token;
+	const tokenShape = getImageShape(
+		getTagAttributes(token, "div"),
+		getTagAttributes(token, "figure"),
+	);
 	const images = [];
 
 	for (const imageMatch of imageSource.matchAll(/<img\b([^>]*)>/gi)) {
@@ -1083,7 +1120,10 @@ function imageHtmlToPortableText(token, overrides = {}) {
 		const image = imageAttributesToPortableText(
 			imageAttributes,
 			anchorAttributes,
-			overrides,
+			{
+				...overrides,
+				shape: normalizeLegacyImageShape(overrides.shape) || tokenShape,
+			},
 		);
 		if (image) images.push(image);
 	}
@@ -1140,12 +1180,14 @@ function imageFigureToPortableText(token) {
 	if (!figureMatch) return [];
 
 	const figureAttributes = parseAttributes(figureMatch[1]);
+	const wrapperAttributes = getTagAttributes(token, "div");
 	const caption = htmlToPlainText(
 		figureMatch[2].match(/<figcaption\b[^>]*>([\s\S]*?)<\/figcaption>/i)?.[1] ||
 			"",
 	);
 	const align = getImageAlignment(figureAttributes);
-	return imageHtmlToPortableText(figureMatch[2], { align, caption });
+	const shape = getImageShape(wrapperAttributes, figureAttributes);
+	return imageHtmlToPortableText(figureMatch[2], { align, caption, shape });
 }
 
 function horizontalRuleToPortableText() {

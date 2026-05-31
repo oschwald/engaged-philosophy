@@ -29,6 +29,7 @@ const href = node.href ? getAssetSrc(null, node.href, getPublicMediaUrl) : "";
 const hasLegacyFeatures = Boolean(
 	node.align ||
 	node.href ||
+	node.shape ||
 	isLegacyNode ||
 	isWordPressUploadUrl(node.asset?.url ?? node.url),
 );
@@ -41,6 +42,7 @@ const alignmentClass =
 			: node.align === "center"
 				? "aligncenter"
 				: "";
+const shapeClass = node.shape === "rounded" ? "legacy-image--rounded" : "";
 const standardImageNode: StandardImageNode | null =
 	node._type === "image" && node.asset?._ref
 		? {
@@ -62,6 +64,7 @@ const standardImageNode: StandardImageNode | null =
 				...(typeof node.displayHeight === "number"
 					? { displayHeight: node.displayHeight }
 					: {}),
+				...(node.shape ? { shape: node.shape } : {}),
 			}
 		: null;
 ---
@@ -69,7 +72,7 @@ const standardImageNode: StandardImageNode | null =
 {
 	hasLegacyFeatures ? (
 		node?.caption ? (
-			<figure class:list={["emdash-image", alignmentClass]}>
+			<figure class:list={["emdash-image", alignmentClass, shapeClass]}>
 				{href ? (
 					<a href={href}>
 						<img
@@ -98,6 +101,7 @@ const standardImageNode: StandardImageNode | null =
 		) : href ? (
 			<a href={href} class={alignmentClass || undefined}>
 				<img
+					class={shapeClass || undefined}
 					src={src}
 					alt={node?.alt || ""}
 					width={node?.displayWidth || node?.width}
@@ -109,7 +113,7 @@ const standardImageNode: StandardImageNode | null =
 			</a>
 		) : (
 			<img
-				class={alignmentClass || undefined}
+				class:list={[alignmentClass, shapeClass]}
 				src={src}
 				alt={node?.alt || ""}
 				width={node?.displayWidth || node?.width}

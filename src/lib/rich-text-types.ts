@@ -24,6 +24,7 @@ export interface RichTextImageNode {
 	height?: number;
 	displayWidth?: number;
 	displayHeight?: number;
+	shape?: "rounded";
 }
 
 export interface RichTextLegacyImageNode extends Omit<

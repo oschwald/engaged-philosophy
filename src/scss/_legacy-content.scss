@@ -56,6 +56,11 @@
 	caption-side: bottom;
 }
 
+.legacy-image--rounded img,
+img.legacy-image--rounded {
+	border-radius: 9999px;
+}
+
 .alignleft {
 	float: left;
 	margin: 0 20px 20px 0;

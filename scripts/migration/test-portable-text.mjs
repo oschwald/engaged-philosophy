@@ -55,6 +55,22 @@ assert.equal(
 	"https://media.engagedphilosophy.com/wp-content/uploads/2024/05/full.jpg",
 );
 
+const [roundedImage] = htmlToPortableText(`
+<div class="wp-block-image is-style-rounded">
+	<figure class="aligncenter size-full is-resized">
+		<a href="https://www.engagedphilosophy.com/wp-content/uploads/2021/10/Stock-2-1.jpg">
+			<img src="https://www.engagedphilosophy.com/wp-content/uploads/2021/10/Stock-2-1.jpg" alt="" class="wp-image-2954" width="404" height="553"/>
+		</a>
+		<figcaption>The author, Timothy Stock.</figcaption>
+	</figure>
+</div>
+`);
+assert.equal(roundedImage._type, "legacyImage");
+assert.equal(roundedImage.align, "center");
+assert.equal(roundedImage.shape, "rounded");
+assert.equal(roundedImage.width, 404);
+assert.equal(roundedImage.height, 553);
+
 const shortcodeMedia = {
 	10: {
 		url: "https://www.engagedphilosophy.com/wp-content/uploads/2024/05/ten.jpg",

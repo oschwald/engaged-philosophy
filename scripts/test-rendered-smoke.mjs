@@ -85,6 +85,7 @@ function fixtureShell(title, body) {
 			.aligncenter { display: block; margin: 0 auto 20px; }
 			.emdash-image.aligncenter { display: table; max-width: 100%; margin-right: auto; margin-left: auto; }
 			.emdash-image.aligncenter > figcaption { display: table-caption; caption-side: bottom; }
+			.legacy-image--rounded img, img.legacy-image--rounded { border-radius: 9999px; }
 			.alignleft { float: left; margin: 0 20px 20px 0; }
 			.alignright { float: right; margin: 0 0 20px 20px; }
 			.legacy-gallery { margin: 0 0 20px; }
@@ -223,7 +224,7 @@ const FIXTURES = {
 		`<article>
 			<h1 class="entry-title">Timothy Stock</h1>
 			<div class="entry-content">
-				<figure class="emdash-image aligncenter">
+				<figure class="emdash-image aligncenter legacy-image--rounded">
 					<a href="/media/stock.jpg"><img src="/media/stock.jpg" alt="Timothy Stock" width="404" height="553" /></a>
 					<figcaption>The author, Timothy Stock.</figcaption>
 				</figure>
@@ -430,6 +431,17 @@ async function checkCenteredLegacyImage(browser, base, timeout) {
 			throw new Error(
 				`Expected centered legacy image, got ${offset.toFixed(2)}px offset`,
 			);
+		}
+		const roundedImage = page.locator(
+			".entry-content .legacy-image--rounded img",
+		);
+		if ((await roundedImage.count()) > 0) {
+			const radius = await roundedImage
+				.first()
+				.evaluate((image) => getComputedStyle(image).borderTopLeftRadius);
+			if (radius === "0px") {
+				throw new Error("Expected rounded legacy image styling");
+			}
 		}
 	} finally {
 		await page.close();

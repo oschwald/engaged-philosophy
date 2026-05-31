@@ -22,6 +22,8 @@ const alignmentClass =
 			: node.align === "center"
 				? "aligncenter"
 				: "";
+const getImageShapeClass = (shape?: string) =>
+	shape === "rounded" ? "legacy-image--rounded" : "";
 ---
 
 {
@@ -38,6 +40,7 @@ const alignmentClass =
 			>
 				{images.map((image, index) => {
 					const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
+					const shapeClass = getImageShapeClass(image.shape);
 					const size = usesLeadLayout
 						? index === 0
 							? { width: 936, height: 936 }
@@ -52,6 +55,7 @@ const alignmentClass =
 							href={src}
 						>
 							<img
+								class={shapeClass || undefined}
 								src={src}
 								alt={image.alt || image.caption || ""}
 								width={size?.width}
@@ -73,11 +77,13 @@ const alignmentClass =
 				>
 					{images.map((image) => {
 						const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
+						const shapeClass = getImageShapeClass(image.shape);
 						return (
 							<li class="blocks-gallery-item">
 								<figure>
 									<a href={src}>
 										<img
+											class={shapeClass || undefined}
 											src={src}
 											alt={image.alt || image.caption || ""}
 											width={image.width}
@@ -109,11 +115,13 @@ const alignmentClass =
 			>
 				{images.map((image) => {
 					const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
+					const shapeClass = getImageShapeClass(image.shape);
 					return (
 						<li class="blocks-gallery-item">
 							<figure>
 								<a href={src}>
 									<img
+										class={shapeClass || undefined}
 										src={src}
 										alt={image.alt || image.caption || ""}
 										width={image.width}
