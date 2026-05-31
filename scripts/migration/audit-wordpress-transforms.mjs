@@ -117,6 +117,19 @@ function seedEntriesByLegacyId(seed) {
 	return entries;
 }
 
+function mediaByLegacyId(wxr) {
+	const media = {};
+	for (const match of wxr.matchAll(ITEM_RE)) {
+		const item = match[1];
+		if (extractTag(item, "wp:post_type") !== "attachment") continue;
+		const id = extractTag(item, "wp:post_id");
+		const url = extractTag(item, "wp:attachment_url");
+		if (!id || !url) continue;
+		media[id] = { url };
+	}
+	return media;
+}
+
 function walk(value, visit) {
 	visit(value);
 	if (Array.isArray(value)) {
@@ -178,11 +191,11 @@ function isEmbeddableUrl(value) {
 	);
 }
 
-function countIds(value) {
-	return (value || "")
+function getResolvableMediaIds(attributes, mediaById) {
+	return (attributes.ids || "")
 		.split(",")
 		.map((id) => id.trim())
-		.filter(Boolean).length;
+		.filter((id) => Boolean(id && mediaById[id]?.url));
 }
 
 function createExpectations() {
@@ -225,17 +238,22 @@ function countStandaloneEmbeds(source, expectations) {
 	}
 }
 
-function sourceExpectations(source) {
+function sourceExpectations(source, { mediaById, autoEmbedStandaloneUrls }) {
 	const expectations = createExpectations();
 
 	for (const match of (source || "").matchAll(/\[gallery\b([^\]]*)\]/gi)) {
+		const attributes = parseAttributes(match[1]);
+		if (getResolvableMediaIds(attributes, mediaById).length === 0) continue;
 		expectations.shortcodeGallery += 1;
 		pushSample(expectations, "shortcodeGallery", match[0]);
 	}
 
 	for (const match of (source || "").matchAll(/\[playlist\b([^\]]*)\]/gi)) {
 		const attributes = parseAttributes(match[1]);
-		const count = Math.max(1, countIds(attributes.ids));
+		const count = getResolvableMediaIds(attributes, mediaById).filter((id) =>
+			isVideoUrl(mediaById[id].url),
+		).length;
+		if (count === 0) continue;
 		expectations.legacyVideo += count;
 		pushSample(expectations, "legacyVideo", match[0]);
 	}
@@ -263,7 +281,9 @@ function sourceExpectations(source) {
 		pushSample(expectations, "legacyPageList", match[0]);
 	}
 
-	countStandaloneEmbeds(source, expectations);
+	if (autoEmbedStandaloneUrls) {
+		countStandaloneEmbeds(source, expectations);
+	}
 
 	return expectations;
 }
@@ -324,6 +344,7 @@ function getSourceFields(item) {
 	return SOURCE_FIELDS.map((field) => ({
 		label: field.label,
 		seed: field.seed,
+		autoEmbedStandaloneUrls: field.seed !== "excerpt",
 		value: field.source
 			? extractTag(item, field.source)
 			: metas[field.meta] || "",
@@ -337,6 +358,7 @@ function entryLabel(collection, entry) {
 
 function auditWordPressTransforms(seed, wxr) {
 	const seedByLegacyId = seedEntriesByLegacyId(seed);
+	const mediaById = mediaByLegacyId(wxr);
 	const issues = [];
 
 	for (const match of wxr.matchAll(ITEM_RE)) {
@@ -353,7 +375,10 @@ function auditWordPressTransforms(seed, wxr) {
 		const label = entryLabel(seedMatch.collection, seedMatch.entry);
 		for (const field of getSourceFields(item)) {
 			if (!field.value) continue;
-			const sourceCounts = sourceExpectations(field.value);
+			const sourceCounts = sourceExpectations(field.value, {
+				mediaById,
+				autoEmbedStandaloneUrls: field.autoEmbedStandaloneUrls,
+			});
 			if (!hasExpectations(sourceCounts)) continue;
 			const seedCounts = countSeedBlocks(seedMatch.entry.data?.[field.seed]);
 			issues.push(
