@@ -110,7 +110,7 @@ export function rewriteWordPressUploadUrl(
 	try {
 		const url = new URL(normalized);
 		if (
-			/^(?:www\.)?engagedphilosophy\.com$/i.test(url.hostname) &&
+			/^(?:www\.|media\.)?engagedphilosophy\.com$/i.test(url.hostname) &&
 			url.pathname.startsWith("/wp-content/uploads/")
 		) {
 			const pathname = shouldSanitize

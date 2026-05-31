@@ -3,6 +3,10 @@ import path from "node:path";
 
 import { DEFAULT_MIGRATION_SEED_PATH } from "./lib/migration-seed-path.mjs";
 import { htmlToPortableText } from "./lib/portable-text.mjs";
+import {
+	guessMimeTypeFromPath,
+	mediaValueForWordPressAttachment,
+} from "./lib/wordpress-media.mjs";
 
 const ROOT = process.cwd();
 const WXR_PATH = path.join(ROOT, "engagedphilosophy.WordPress.2026-05-25.xml");
@@ -21,7 +25,7 @@ const META_RE =
 const ITEM_CATEGORY_RE =
 	/<category domain="([^"]+)" nicename="([^"]+)"><!\[CDATA\[(.*?)\]\]><\/category>/gs;
 const INTERNAL_UPLOAD_URL_RE =
-	/(https?:\/\/(?:www\.)?engagedphilosophy\.com\/wp-content\/uploads\/[^"'()\s<>]+|\/wp-content\/uploads\/[^"'()\s<>]+)/gi;
+	/(https?:\/\/(?:www\.|media\.)?engagedphilosophy\.com\/wp-content\/uploads\/[^"'()\s<>]+|\/wp-content\/uploads\/[^"'()\s<>]+)/gi;
 
 function readFile(filePath) {
 	return fs.readFileSync(filePath, "utf8").replace(CONTROL_CHARS, "");
@@ -115,15 +119,8 @@ function ensureUnique(value, seen, fallbackPrefix, explicitSet) {
 	return candidate;
 }
 
-function toMediaRef(attachment) {
-	if (!attachment?.url) return undefined;
-	return {
-		$media: {
-			url: attachment.url,
-			alt: attachment.alt || attachment.title || "",
-			filename: attachment.filename,
-		},
-	};
+function toMediaRef(id, attachment) {
+	return mediaValueForWordPressAttachment(id, attachment);
 }
 
 function extractSerializedInt(source, key) {
@@ -383,6 +380,7 @@ for (const item of items) {
 		alt: meta._wp_attachment_image_alt || "",
 		filename,
 		title: extractTag(item, "title"),
+		caption: normalizeHtml(extractTag(item, "excerpt:encoded")),
 		...metadata,
 	});
 }
@@ -511,7 +509,10 @@ for (const item of items) {
 		);
 	}
 
-	const thumbnail = toMediaRef(attachments.get(metas._thumbnail_id));
+	const thumbnail = toMediaRef(
+		metas._thumbnail_id,
+		attachments.get(metas._thumbnail_id),
+	);
 	const baseData = {
 		title,
 		path: contentPath,
@@ -615,6 +616,16 @@ const seedMedia = Object.fromEntries(
 			alt: attachment.alt || "",
 			filename: attachment.filename || "",
 			title: attachment.title || "",
+			...(attachment.caption ? { caption: attachment.caption } : {}),
+			mimeType:
+				attachment.mimeType ||
+				guessMimeTypeFromPath(attachment.filename || attachment.url),
+			...(typeof attachment.width === "number"
+				? { width: attachment.width }
+				: {}),
+			...(typeof attachment.height === "number"
+				? { height: attachment.height }
+				: {}),
 		},
 	]),
 );
@@ -626,7 +637,9 @@ const portableTextMedia = Object.fromEntries(
 			alt: attachment.alt || "",
 			filename: attachment.filename || "",
 			title: attachment.title || "",
-			...(attachment.mimeType ? { mimeType: attachment.mimeType } : {}),
+			mimeType:
+				attachment.mimeType ||
+				guessMimeTypeFromPath(attachment.filename || attachment.url),
 			...(typeof attachment.width === "number"
 				? { width: attachment.width }
 				: {}),

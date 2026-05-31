@@ -4,17 +4,23 @@ import { markdownToPortableText } from "emdash/client";
 import TurndownService from "turndown";
 import turndownPluginGfm from "turndown-plugin-gfm";
 
+import {
+	EMDASH_MEDIA_FILE_PREFIX,
+	internalMediaFileUrlForUpload,
+	wordpressMediaId,
+} from "./wordpress-media.mjs";
+
 const { gfm } = turndownPluginGfm;
 
 const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g;
 const LEGACY_SITE_HOST_RE = /^(?:www\.)?engagedphilosophy\.com$/i;
-const PUBLIC_MEDIA_URL = (
-	process.env.PUBLIC_MEDIA_URL || "https://media.engagedphilosophy.com"
-).replace(/\/+$/, "");
+const LEGACY_UPLOAD_HOST_RE = /^(?:www\.|media\.)?engagedphilosophy\.com$/i;
 const EMBEDDABLE_URL_RE =
 	/https?:\/\/(?:youtu\.be|(?:www\.)?youtube(?:-nocookie)?\.com|(?:www\.)?vimeo\.com|(?:www\.)?animoto\.com)\/[^\s<\]]+/i;
 const EMBEDDABLE_URL_SOURCE =
 	"https?:\\/\\/(?:youtu\\.be|(?:www\\.)?youtube(?:-nocookie)?\\.com|(?:www\\.)?vimeo\\.com|(?:www\\.)?animoto\\.com)\\/[^\\s<\\]]+";
+const EMPTY_UPLOAD_MARKDOWN_LINK_RE =
+	/\[\]\((?:https?:\/\/(?:www\.|media\.)?engagedphilosophy\.com\/wp-content\/uploads\/[^)\s]+|\/wp-content\/uploads\/[^)\s]+)\)/gi;
 const BASE_TOKEN_SOURCE =
 	/(<figure\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>(?:\s*<figcaption\b[\s\S]*?<\/figcaption>)?\s*<\/figure>|<ul\b[^>]*class=(?:"[^"]*\bwp-block-gallery\b[^"]*"|'[^']*\bwp-block-gallery\b[^']*')[\s\S]*?<\/ul>|<div\b[^>]*class=(?:"[^"]*\bwp-block-jetpack-tiled-gallery\b[^"]*"|'[^']*\bwp-block-jetpack-tiled-gallery\b[^']*')[\s\S]*?<\/div>\s*<\/div>\s*<\/div>\s*<\/div>|<div\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>\s*<\/div>|<figure\b[^>]*class=(?:"[^"]*\bwp-block-image\b[^"]*"|'[^']*\bwp-block-image\b[^']*')[\s\S]*?<\/figure>|<figure\b[^>]*class=(?:"[^"]*\btiled-gallery__item\b[^"]*"|'[^']*\btiled-gallery__item\b[^']*')[\s\S]*?<\/figure>|<a\b[^>]*>(?:\s*<img\b[\s\S]*?>\s*)+<\/a>|<img\b[\s\S]*?>|<hr\b[^>]*\/?>|\[gallery[^\]]*\]|\[playlist[^\]]*\]|\[youtube[^\]]*\]|\[list-pages[^\]]*\]|\[embed\][\s\S]*?\[\/embed\]|\[caption[^\]]*\][\s\S]*?\[\/caption\])/
 		.source;
@@ -65,6 +71,10 @@ function normalizeMarkdownLinks(markdown) {
 	);
 }
 
+function stripEmptyUploadMarkdownLinks(markdown) {
+	return markdown.replace(EMPTY_UPLOAD_MARKDOWN_LINK_RE, "");
+}
+
 function wrapEmphasizedMarkdownLinks(markdown) {
 	return markdown.replace(
 		/_((?:\[[^\]]+\]\((?:https?:\/\/|\/)[^)\s]+\)))_/g,
@@ -84,6 +94,7 @@ function normalizeLegacyHref(value) {
 		.trim()
 		.replace(/\s+(?:"[^"]*"|'[^']*')$/, "");
 	if (!normalized) return "";
+	if (normalized.startsWith(EMDASH_MEDIA_FILE_PREFIX)) return normalized;
 	const embeddedUploadMatch = normalized.match(
 		/\/wp-content\/uploads\/[^"'()\s<>]+(?:\?[^"'()\s<>]*)?/i,
 	);
@@ -93,10 +104,13 @@ function normalizeLegacyHref(value) {
 
 	try {
 		const url = new URL(normalized, "https://www.engagedphilosophy.com");
-		if (!LEGACY_SITE_HOST_RE.test(url.hostname)) return normalized;
-		if (url.pathname.startsWith("/wp-content/uploads/")) {
+		if (
+			LEGACY_UPLOAD_HOST_RE.test(url.hostname) &&
+			url.pathname.startsWith("/wp-content/uploads/")
+		) {
 			return `${url.pathname}${url.search}${url.hash}`;
 		}
+		if (!LEGACY_SITE_HOST_RE.test(url.hostname)) return normalized;
 		return `${url.pathname}${url.search}${url.hash}` || "/";
 	} catch {
 		return normalized;
@@ -105,11 +119,7 @@ function normalizeLegacyHref(value) {
 
 function rewriteUploadUrl(value) {
 	const normalized = normalizeLegacyHref(value);
-	if (!normalized.startsWith("/wp-content/uploads/")) {
-		return normalized;
-	}
-
-	return `${PUBLIC_MEDIA_URL}${normalized}`;
+	return internalMediaFileUrlForUpload(normalized) || normalized;
 }
 
 function parseAttributes(source) {
@@ -277,6 +287,25 @@ function getImageAlignment(attributes) {
 	if (/\balignright\b/i.test(className)) return "right";
 	if (/\baligncenter\b/i.test(className)) return "center";
 	return undefined;
+}
+
+function getWordPressImageId(attributes) {
+	const className = attributes.class || "";
+	const classMatch = className.match(/\bwp-image-(\d+)\b/i);
+	const id =
+		classMatch?.[1] ||
+		attributes["data-id"] ||
+		attributes["data-attachment-id"] ||
+		"";
+	return /^\d+$/.test(id) ? id : "";
+}
+
+function normalizeAssetRef(ref, fallbackKey = "") {
+	if (typeof ref === "string" && /^\d+$/.test(ref)) {
+		return wordpressMediaId(ref);
+	}
+	if (fallbackKey) return wordpressMediaId(fallbackKey);
+	return typeof ref === "string" && ref ? ref : generateKey();
 }
 
 function normalizeImageHref(anchorHref, permalink, imageSrc) {
@@ -470,7 +499,7 @@ function createLegacyImageBlock({
 	return {
 		_type: "legacyImage",
 		_key: key || generateKey(),
-		url: rewriteUploadUrl(url),
+		id: rewriteUploadUrl(url),
 		...(typeof alt === "string" && alt ? { alt } : {}),
 		...(typeof caption === "string" && caption.trim()
 			? { caption: caption.trim() }
@@ -557,7 +586,7 @@ function normalizeImageBlock(block) {
 		_key: block._key || generateKey(),
 		asset: {
 			...block.asset,
-			_ref: block.asset._ref || generateKey(),
+			_ref: normalizeAssetRef(block.asset._ref),
 			url: rewriteUploadUrl(block.asset.url),
 		},
 		...(typeof block.alt === "string" ? { alt: block.alt } : {}),
@@ -703,7 +732,7 @@ function normalizePortableTextBlocks(blocks) {
 				const text = child.text;
 				const inheritedMarks = Array.isArray(child.marks) ? child.marks : [];
 				const hasInlineMarkdown =
-					/\[[^\]]+\]\((?:https?:\/\/|\/)/.test(text) ||
+					/\[[^\]]*\]\((?:https?:\/\/|\/)/.test(text) ||
 					/\*\*[^*]+\*\*/.test(text) ||
 					/(^|[^\w])_[^_]+_(?!\w)/.test(text);
 
@@ -815,8 +844,12 @@ function autoWrapParagraphLikeHtml(html) {
 }
 
 function markdownFragmentToPortableText(html) {
-	const markdown = wrapEmphasizedMarkdownLinks(
-		normalizeMarkdownLinks(turndown.turndown(stripAdminLinksHtml(html)).trim()),
+	const markdown = stripEmptyUploadMarkdownLinks(
+		wrapEmphasizedMarkdownLinks(
+			normalizeMarkdownLinks(
+				turndown.turndown(stripAdminLinksHtml(html)).trim(),
+			),
+		),
 	);
 	if (!markdown) return [];
 	return normalizePortableTextBlocks(markdownToPortableText(markdown));
@@ -884,7 +917,7 @@ function galleryShortcodeToPortableText(shortcode, mediaById) {
 			_type: "image",
 			_key: generateKey(),
 			asset: {
-				_ref: id,
+				_ref: wordpressMediaId(id),
 				url: rewriteUploadUrl(media.url),
 			},
 			alt: media.alt || media.title || "",
@@ -955,7 +988,7 @@ function shortcodeUrlToPortableText(url) {
 			{
 				_type: "legacyVideo",
 				_key: generateKey(),
-				url: cleanUrl,
+				url: rewriteUploadUrl(cleanUrl),
 				mimeType,
 			},
 		];
@@ -1095,7 +1128,10 @@ function imageAttributesToPortableText(
 					_type: "image",
 					_key: generateKey(),
 					asset: {
-						_ref: generateKey(),
+						_ref: normalizeAssetRef(
+							undefined,
+							getWordPressImageId(imageAttributes),
+						),
 						url: rewriteUploadUrl(imageSrc),
 					},
 					alt: imageAttributes.alt || imageAttributes["data-image-title"] || "",

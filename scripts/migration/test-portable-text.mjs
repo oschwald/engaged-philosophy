@@ -31,7 +31,7 @@ assert.equal(gallery.images[0]._type, "image");
 assert.ok(gallery.images[0].asset);
 assert.equal(
 	gallery.images[0].asset.url,
-	"https://media.engagedphilosophy.com/wp-content/uploads/2024/05/thumb-one.jpg",
+	"/_emdash/api/media/file/wp-content/uploads/2024/05/thumb-one.jpg",
 );
 assert.equal(gallery.images[0].alt, "One");
 assert.equal(gallery.images[0].caption, "First caption");
@@ -47,12 +47,12 @@ const [linkedImage] = htmlToPortableText(`
 `);
 assert.equal(linkedImage._type, "legacyImage");
 assert.equal(
-	linkedImage.url,
-	"https://media.engagedphilosophy.com/wp-content/uploads/2024/05/thumb.jpg",
+	linkedImage.id,
+	"/_emdash/api/media/file/wp-content/uploads/2024/05/thumb.jpg",
 );
 assert.equal(
 	linkedImage.href,
-	"https://media.engagedphilosophy.com/wp-content/uploads/2024/05/full.jpg",
+	"/_emdash/api/media/file/wp-content/uploads/2024/05/full.jpg",
 );
 
 const [roundedImage] = htmlToPortableText(`
@@ -68,6 +68,10 @@ const [roundedImage] = htmlToPortableText(`
 assert.equal(roundedImage._type, "legacyImage");
 assert.equal(roundedImage.align, "center");
 assert.equal(roundedImage.shape, "rounded");
+assert.equal(
+	roundedImage.id,
+	"/_emdash/api/media/file/wp-content/uploads/2021/10/Stock-2-1.jpg",
+);
 assert.equal(roundedImage.width, 404);
 assert.equal(roundedImage.height, 553);
 
@@ -91,6 +95,7 @@ for (const columns of [1, 2, 4]) {
 	assert.equal(shortcodeGallery.layout, "shortcode");
 	assert.equal(shortcodeGallery.columns, columns);
 	assert.equal(shortcodeGallery.images.length, 2);
+	assert.equal(shortcodeGallery.images[0].asset._ref, "wp-media-10");
 }
 
 const [defaultColumnsGallery] = htmlToPortableText(
@@ -120,7 +125,7 @@ const [shortcodeVideo] = htmlToPortableText(
 assert.equal(shortcodeVideo._type, "legacyVideo");
 assert.equal(
 	shortcodeVideo.url,
-	"https://media.engagedphilosophy.com/wp-content/uploads/2022/02/video.mp4",
+	"/_emdash/api/media/file/wp-content/uploads/2022/02/video.mp4",
 );
 assert.equal(shortcodeVideo.title, "Imported video");
 assert.equal(shortcodeVideo.mimeType, "video/mp4");

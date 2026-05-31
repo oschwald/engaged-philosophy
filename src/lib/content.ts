@@ -35,6 +35,11 @@ type RuntimeEntry<T> = ContentEntry<T> & {
 	};
 };
 type RawMediaField = MediaField & {
+	provider?: string;
+	id?: string;
+	meta?: {
+		storageKey?: string;
+	};
 	$media?: {
 		url?: string;
 		alt?: string;
@@ -48,6 +53,12 @@ function normalizeMediaField(
 ): MediaField | undefined {
 	if (!media) return undefined;
 	if (media.src) return { src: media.src, alt: media.alt };
+	if (media.provider === "local" && media.meta?.storageKey) {
+		return {
+			src: `/_emdash/api/media/file/${media.meta.storageKey}`,
+			alt: media.alt,
+		};
+	}
 	if (media.$media?.url)
 		return { src: media.$media.url, alt: media.$media.alt };
 	return undefined;
