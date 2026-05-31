@@ -96,4 +96,4 @@ export type RichTextBlock =
 	| RichTextPageListNode
 	| RichTextNumberedHeadingNode;
 
-export type RichTextValue = string | RichTextBlock[];
+export type RichTextValue = RichTextBlock[];

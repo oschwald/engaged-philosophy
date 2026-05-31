@@ -2,7 +2,6 @@
 import { getEditMeta } from "emdash";
 import { PortableText } from "emdash/ui";
 
-import HtmlContent from "./HtmlContent.astro";
 import RichTextNumberedHeading from "./rich-text/RichTextNumberedHeading.astro";
 import RichTextEmbed from "./rich-text/RichTextEmbed.astro";
 import RichTextImage from "./rich-text/RichTextImage.astro";
@@ -32,7 +31,7 @@ type NumberedPortableBlock = RichTextBlock & {
 	level?: unknown;
 };
 
-function normalizeLegacyPortableText(blocks: Exclude<RichTextValue, string>) {
+function normalizeLegacyPortableText(blocks: RichTextValue) {
 	let numberedHeadingIndex = 0;
 
 	return blocks.map((block) => {
@@ -69,7 +68,7 @@ const normalizedValue =
 ---
 
 {
-	isPortableTextValue(normalizedValue) ? (
+	isPortableTextValue(normalizedValue) && (
 		<div class:list={["legacy-content", className]}>
 			<PortableText
 				value={normalizedValue}
@@ -86,10 +85,5 @@ const normalizedValue =
 				}}
 			/>
 		</div>
-	) : (
-		<HtmlContent
-			html={typeof normalizedValue === "string" ? normalizedValue : ""}
-			class={className}
-		/>
 	)
 }

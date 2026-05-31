@@ -28,7 +28,7 @@ interface EmDashEditProxy {
 	readonly [field: string]: Partial<EmDashFieldAnnotation>;
 }
 
-type RichTextFieldValue = string | PortableTextBlock[] | null | undefined;
+type RichTextFieldValue = PortableTextBlock[] | null | undefined;
 
 interface RichTextEntryData {
 	content?: RichTextFieldValue;
@@ -150,7 +150,7 @@ export function getEmDashEditEntryAttrs<T extends { id?: string }>(
 }
 
 function getRichTextValue(value: RichTextFieldValue) {
-	return typeof value === "string" || Array.isArray(value) ? value : undefined;
+	return Array.isArray(value) ? value : undefined;
 }
 
 export function getEntryContent(data?: RichTextEntryData | null) {
