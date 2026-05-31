@@ -362,6 +362,9 @@ for (const item of items) {
 	);
 	const filename = attachmentUrl ? attachmentUrl.split("/").pop() : "";
 	const metadata = parseAttachmentMetadata(meta._wp_attachment_metadata);
+	const createdAt = toIsoDate(
+		extractTag(item, "wp:post_date_gmt") || extractTag(item, "wp:post_date"),
+	);
 
 	if (attachmentUrl) {
 		registerUnique(attachmentReplacements, attachmentUrl, attachmentUrl);
@@ -381,6 +384,7 @@ for (const item of items) {
 		filename,
 		title: extractTag(item, "title"),
 		caption: normalizeHtml(extractTag(item, "excerpt:encoded")),
+		...(createdAt ? { createdAt } : {}),
 		...metadata,
 	});
 }
@@ -616,6 +620,7 @@ const seedMedia = Object.fromEntries(
 			alt: attachment.alt || "",
 			filename: attachment.filename || "",
 			title: attachment.title || "",
+			...(attachment.createdAt ? { createdAt: attachment.createdAt } : {}),
 			...(attachment.caption ? { caption: attachment.caption } : {}),
 			mimeType:
 				attachment.mimeType ||

@@ -17,7 +17,7 @@ const DATABASE_NAME = "engaged-philosophy";
 const CHUNK_SIZE = 750_000;
 const INSERT_BATCH_SIZE = 1;
 const DEFAULT_LOCALE = "en";
-const IMPORTED_MEDIA_CREATED_AT = "2026-05-26T00:00:00Z";
+const IMPORTED_MEDIA_FALLBACK_CREATED_AT = "2026-05-26T00:00:00Z";
 const args = process.argv.slice(2);
 const seedPath = parseSeedPathArg(args);
 const mode = args.includes("--remote")
@@ -340,7 +340,7 @@ function buildMediaRows(media = {}) {
 				item.caption || null,
 				storageKey,
 				null,
-				IMPORTED_MEDIA_CREATED_AT,
+				item.createdAt || IMPORTED_MEDIA_FALLBACK_CREATED_AT,
 				null,
 				"ready",
 				null,

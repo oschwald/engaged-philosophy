@@ -15,6 +15,7 @@ const summary = {
 	seedMedia: 0,
 	seedMediaWithStorageKeys: 0,
 	seedMediaWithMimeTypes: 0,
+	seedMediaWithCreatedAt: 0,
 	legacyImages: 0,
 	legacyVideos: 0,
 	standardImages: 0,
@@ -166,6 +167,9 @@ for (const item of Object.values(seed.media ?? {})) {
 	if (item?.mimeType) {
 		summary.seedMediaWithMimeTypes += 1;
 	}
+	if (item?.createdAt) {
+		summary.seedMediaWithCreatedAt += 1;
+	}
 }
 
 walk(seed.content ?? {}, ["content"]);
@@ -187,6 +191,7 @@ if (
 	summary.seedMedia === 0 ||
 	summary.seedMedia !== summary.seedMediaWithStorageKeys ||
 	summary.seedMedia !== summary.seedMediaWithMimeTypes ||
+	summary.seedMedia !== summary.seedMediaWithCreatedAt ||
 	summary.issues.length > 0
 ) {
 	process.exit(1);
