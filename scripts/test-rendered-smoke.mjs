@@ -15,6 +15,7 @@ const DEFAULT_PATHS = {
 	video: "/project/3119/",
 	youtube: "/the-ethics-of-psytrance/",
 	saveGate: "/emdash-save-gate/",
+	saveGateInactive: "/emdash-save-gate-inactive/",
 };
 
 const DEFAULTS = {
@@ -194,6 +195,31 @@ function saveGateFixtureShell() {
 </html>`;
 }
 
+function inactiveSaveGateFixtureShell() {
+	return `<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Inactive Save Gate - Engaged Philosophy</title>
+	</head>
+	<body>
+		<div id="emdash-toolbar" data-edit-mode="false">
+			<input type="checkbox" id="emdash-edit-toggle" />
+			<span id="emdash-tb-status"></span>
+			<span id="emdash-tb-save-status"></span>
+			<button id="emdash-tb-publish" type="button">Publish</button>
+		</div>
+		<main>
+			<article data-emdash-ref='{"collection":"pages","id":"about","status":"published","hasDraft":false}'>
+				<p>View mode content.</p>
+			</article>
+		</main>
+		<script>${SAVE_GATE_SCRIPT}</script>
+	</body>
+</html>`;
+}
+
 const FIXTURES = {
 	[DEFAULT_PATHS.about]: fixtureShell(
 		"About",
@@ -291,6 +317,11 @@ async function createFixtureServer() {
 			apiEvents.push({ type: "page", time: Date.now() });
 			response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
 			response.end(saveGateFixtureShell());
+			return;
+		}
+		if (pathname === DEFAULT_PATHS.saveGateInactive) {
+			response.writeHead(200, { "content-type": "text/html; charset=utf-8" });
+			response.end(inactiveSaveGateFixtureShell());
 			return;
 		}
 		if (
@@ -617,6 +648,25 @@ async function checkEditSaveGate(browser, base, timeout, fixture) {
 	}
 }
 
+async function checkInactiveSaveGate(browser, base, timeout) {
+	const page = await openPage(
+		browser,
+		base,
+		DEFAULT_PATHS.saveGateInactive,
+		timeout,
+	);
+	try {
+		const installed = await page.evaluate(
+			() => window.__engagedPhilosophySaveGateInstalled === true,
+		);
+		if (installed) {
+			throw new Error("Save gate installed outside active edit mode");
+		}
+	} finally {
+		await page.close();
+	}
+}
+
 async function runCheck(name, callback, failures) {
 	try {
 		await callback();
@@ -685,6 +735,11 @@ async function main() {
 		await runCheck(
 			"edit toolbar waits for inline saves",
 			() => checkEditSaveGate(browser, base, options.timeout, fixture),
+			failures,
+		);
+		await runCheck(
+			"save gate stays inactive outside edit mode",
+			() => checkInactiveSaveGate(browser, base, options.timeout),
 			failures,
 		);
 	}

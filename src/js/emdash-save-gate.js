@@ -236,7 +236,31 @@ function installToolbarGuards() {
 	);
 }
 
-if (typeof window !== "undefined") {
+function hasActiveEditingUi() {
+	return Boolean(
+		document.querySelector(
+			[
+				'#emdash-toolbar[data-edit-mode="true"]',
+				'#emdash-playground-toolbar[data-edit-mode="true"]',
+				".emdash-inline-editor",
+				"[data-emdash-editing]",
+			].join(", "),
+		),
+	);
+}
+
+function installSaveGateWhenEditing() {
+	if (!hasActiveEditingUi()) return;
 	installFetchTracker();
 	installToolbarGuards();
+}
+
+if (typeof window !== "undefined") {
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", installSaveGateWhenEditing, {
+			once: true,
+		});
+	} else {
+		installSaveGateWhenEditing();
+	}
 }
