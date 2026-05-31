@@ -91,7 +91,7 @@ export default defineConfig({
 	integrations: [
 		react(),
 		emdash({
-			database: d1({ binding: "DB", session: "auto" }),
+			database: d1({ binding: "DB", session: "disabled" }),
 			storage: r2({
 				binding: "MEDIA",
 				publicUrl: "https://media.engagedphilosophy.com",
