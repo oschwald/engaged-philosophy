@@ -1,6 +1,7 @@
 import { env as cloudflareEnv } from "cloudflare:workers";
 
 export const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
+export const PUBLIC_MEDIA_URL = "https://media.engagedphilosophy.com";
 
 const WORDPRESS_SITE_HOST_RE = /^(?:www\.)?engagedphilosophy\.com$/i;
 const EMDASH_MEDIA_FILE_PREFIX = "/_emdash/api/media/file/";
@@ -43,14 +44,22 @@ function resolvePublicMediaUrl(
 	key: string,
 	getPublicMediaUrl?: ((key: string) => string) | null,
 ) {
-	if (!key || !getPublicMediaUrl) return "";
+	if (!key) return "";
+	let resolvedUrl = "";
 
-	try {
-		return getPublicMediaUrl(key) || "";
-	} catch (e) {
-		console.error("Failed to resolve public media URL:", e);
-		return "";
+	if (getPublicMediaUrl) {
+		try {
+			resolvedUrl = getPublicMediaUrl(key) || "";
+		} catch (e) {
+			console.error("Failed to resolve public media URL:", e);
+		}
 	}
+
+	if (resolvedUrl && !resolvedUrl.startsWith(EMDASH_MEDIA_FILE_PREFIX)) {
+		return resolvedUrl;
+	}
+
+	return getPublicMediaStorageUrl(key);
 }
 
 function isPublicMediaRef(value?: string | null) {
@@ -99,8 +108,28 @@ export function getMediaUrlPrefix(
 	return (
 		runtimeEnv?.PUBLIC_MEDIA_URL ||
 		workerEnv.PUBLIC_MEDIA_URL ||
-		WORDPRESS_SITE_URL
+		PUBLIC_MEDIA_URL
 	).replace(/\/+$/, "");
+}
+
+export function getPublicMediaStorageUrl(
+	key?: string | null,
+	mediaUrlPrefix = getMediaUrlPrefix(),
+) {
+	const normalizedKey = (key ?? "").trim().replace(/^\/+/, "");
+	if (!normalizedKey) return "";
+	const encodedKey = normalizedKey.split("/").map(encodeURIComponent).join("/");
+	return `${normalizeMediaHost(mediaUrlPrefix)}/${encodedKey}`;
+}
+
+export function rewriteInternalMediaFileUrl(
+	value?: string | null,
+	mediaUrlPrefix = getMediaUrlPrefix(),
+) {
+	const storageKey = getInternalMediaKey(value);
+	return storageKey
+		? getPublicMediaStorageUrl(storageKey, mediaUrlPrefix)
+		: (value ?? "");
 }
 
 export function rewriteWordPressUploadUrl(
@@ -109,6 +138,12 @@ export function rewriteWordPressUploadUrl(
 ) {
 	const normalized = (value ?? "").trim();
 	if (!normalized) return "";
+	const internalMediaUrl = rewriteInternalMediaFileUrl(
+		normalized,
+		mediaUrlPrefix,
+	);
+	if (internalMediaUrl !== normalized) return internalMediaUrl;
+
 	const normalizedPrefix = normalizeMediaHost(mediaUrlPrefix);
 	const shouldSanitize = normalizedPrefix !== WORDPRESS_SITE_URL;
 

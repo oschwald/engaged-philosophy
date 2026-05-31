@@ -52,7 +52,7 @@ export default defineConfig({
 			provider: {
 				entrypoint: anonymousCloudflareCacheEntrypoint,
 				config: {
-					cacheName: "engaged-philosophy-pages",
+					cacheName: "engaged-philosophy-pages-v2",
 				},
 			},
 		},
@@ -92,7 +92,10 @@ export default defineConfig({
 		react(),
 		emdash({
 			database: d1({ binding: "DB", session: "auto" }),
-			storage: r2({ binding: "MEDIA" }),
+			storage: r2({
+				binding: "MEDIA",
+				publicUrl: "https://media.engagedphilosophy.com",
+			}),
 			auth: {
 				type: "cloudflare-access",
 				entrypoint: cloudflareAccessAuthEntrypoint,

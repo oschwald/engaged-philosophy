@@ -16,6 +16,7 @@ import {
 	normalizeContentPath,
 	slugFromPath,
 } from "./content-paths";
+import { getPublicMediaStorageUrl, rewriteInternalMediaFileUrl } from "./media";
 import type {
 	ContentEntry,
 	MediaField,
@@ -54,7 +55,7 @@ function normalizeLocalMediaField(
 	if (media.provider !== "local" || !media.meta?.storageKey) return undefined;
 
 	return {
-		src: `/_emdash/api/media/file/${media.meta.storageKey}`,
+		src: getPublicMediaStorageUrl(media.meta.storageKey),
 		alt: media.alt,
 	};
 }
@@ -65,7 +66,10 @@ function normalizeSeedMediaFallback(
 	// Compatibility for older generated seed data. Current imports emit local
 	// EmDash media values before content reaches runtime.
 	if (!media.$media?.url) return undefined;
-	return { src: media.$media.url, alt: media.$media.alt };
+	return {
+		src: rewriteInternalMediaFileUrl(media.$media.url),
+		alt: media.$media.alt,
+	};
 }
 
 function normalizeMediaField(
@@ -74,7 +78,8 @@ function normalizeMediaField(
 	if (!media) return undefined;
 	const localMedia = normalizeLocalMediaField(media);
 	if (localMedia) return localMedia;
-	if (media.src) return { src: media.src, alt: media.alt };
+	if (media.src)
+		return { src: rewriteInternalMediaFileUrl(media.src), alt: media.alt };
 	return normalizeSeedMediaFallback(media);
 }
 

@@ -1,4 +1,5 @@
 import { getRuntimeSiteSettings } from "../lib/content";
+import { rewriteInternalMediaFileUrl } from "../lib/media";
 
 export async function GET() {
 	const settings = await getRuntimeSiteSettings();
@@ -6,7 +7,7 @@ export async function GET() {
 	const favicon = settings?.favicon;
 	const faviconIcon = favicon?.url
 		? {
-				src: favicon.url,
+				src: rewriteInternalMediaFileUrl(favicon.url),
 				sizes:
 					favicon.width && favicon.height
 						? `${favicon.width}x${favicon.height}`

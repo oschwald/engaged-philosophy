@@ -1,6 +1,6 @@
 ---
 import { getPrimaryMenu, getRuntimeSiteSettings } from "../lib/content";
-import { getMediaUrlPrefix } from "../lib/media";
+import { getMediaUrlPrefix, rewriteInternalMediaFileUrl } from "../lib/media";
 import "../scss/style.scss";
 
 interface Props {
@@ -24,14 +24,18 @@ const pageTitle =
 		? `${title} – ${siteTitle}`
 		: `${siteTitle} – ${siteDescription}`;
 const favicon = settings?.favicon;
-const faviconHref = favicon?.url || "/favicon.svg";
+const faviconHref = favicon?.url
+	? rewriteInternalMediaFileUrl(favicon.url)
+	: "/favicon.svg";
 const faviconType =
 	favicon?.contentType || (favicon?.url ? undefined : "image/svg+xml");
 const menuItems = await getPrimaryMenu();
 const currentPath = Astro.url.pathname;
 const mediaUrlPrefix = getMediaUrlPrefix();
 const logo = settings?.logo;
-const logoSrc = logo?.url || `${mediaUrlPrefix}/img/logo.png`;
+const logoSrc = logo?.url
+	? rewriteInternalMediaFileUrl(logo.url, mediaUrlPrefix)
+	: `${mediaUrlPrefix}/img/logo.png`;
 const logoAlt = logo?.alt || `${siteTitle} Logo`;
 ---
 
