@@ -21,10 +21,15 @@ const dryRun = args.includes("--dry-run");
 const remoteConfirmed =
 	args.includes("--confirm") &&
 	args[args.indexOf("--confirm") + 1] === "remote";
+const remoteEnvConfirmed = process.env.ALLOW_REMOTE_SEED_SYNC === "1";
 
-if (mode === "--remote" && !dryRun && !remoteConfirmed) {
+if (
+	mode === "--remote" &&
+	!dryRun &&
+	(!remoteConfirmed || !remoteEnvConfirmed)
+) {
 	console.error(
-		"Refusing to overwrite remote D1 without --confirm remote. Use --dry-run to inspect remote counts without confirmation.",
+		"Refusing to overwrite remote D1 without --confirm remote and ALLOW_REMOTE_SEED_SYNC=1. Use --dry-run to inspect remote counts without confirmation.",
 	);
 	process.exit(1);
 }

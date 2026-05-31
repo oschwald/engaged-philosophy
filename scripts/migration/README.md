@@ -11,7 +11,7 @@ Common commands:
 - `npm run audit:wordpress-transforms`
 - `npm run parity:audit`
 - `npm run sync:seed-d1 -- --local`
-- `npm run sync:seed-d1 -- --remote --confirm remote`
+- `ALLOW_REMOTE_SEED_SYNC=1 npm run sync:seed-d1 -- --remote --confirm remote`
 
 Keep new runtime or theme-maintenance scripts in `scripts/` unless they depend on
 the WordPress export, migration seed, or migration-only Portable Text importer.
