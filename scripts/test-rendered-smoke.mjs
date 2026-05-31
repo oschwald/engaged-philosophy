@@ -8,6 +8,7 @@ import { chromium } from "playwright";
 
 const DEFAULT_PATHS = {
 	about: "/about/",
+	centeredImage: "/2021/10/19/timothy-stock/",
 	gallery: "/about-ce-projects/about-e-portfolios/",
 	sitemap: "/sitemap/",
 	taxonomy: "/topic/organize-an-activity/",
@@ -81,6 +82,9 @@ function fixtureShell(title, body) {
 			.collapse { display: none; }
 			.collapse.show { display: block; }
 			.entry-content::after { clear: both; content: ""; display: table; }
+			.aligncenter { display: block; margin: 0 auto 20px; }
+			.emdash-image.aligncenter { display: table; max-width: 100%; margin-right: auto; margin-left: auto; }
+			.emdash-image.aligncenter > figcaption { display: table-caption; caption-side: bottom; }
 			.alignleft { float: left; margin: 0 20px 20px 0; }
 			.alignright { float: right; margin: 0 0 20px 20px; }
 			.legacy-gallery { margin: 0 0 20px; }
@@ -211,6 +215,18 @@ const FIXTURES = {
 					<a class="gallery-item" href="/media/gallery-2.jpg"><img src="/media/gallery-2.jpg" alt="Gallery item 2" /></a>
 					<a class="gallery-item" href="/media/gallery-3.jpg"><img src="/media/gallery-3.jpg" alt="Gallery item 3" /></a>
 				</div>
+			</div>
+		</article>`,
+	),
+	[DEFAULT_PATHS.centeredImage]: fixtureShell(
+		"Timothy Stock",
+		`<article>
+			<h1 class="entry-title">Timothy Stock</h1>
+			<div class="entry-content">
+				<figure class="emdash-image aligncenter">
+					<a href="/media/stock.jpg"><img src="/media/stock.jpg" alt="Timothy Stock" width="404" height="553" /></a>
+					<figcaption>The author, Timothy Stock.</figcaption>
+				</figure>
 			</div>
 		</article>`,
 	),
@@ -370,6 +386,50 @@ async function checkAboutImageWrap(browser, base, timeout) {
 		}
 		if (!result.hasParagraph) {
 			throw new Error("Expected article text near the floated image");
+		}
+	} finally {
+		await page.close();
+	}
+}
+
+async function checkCenteredLegacyImage(browser, base, timeout) {
+	const page = await openPage(
+		browser,
+		base,
+		DEFAULT_PATHS.centeredImage,
+		timeout,
+	);
+	try {
+		await expectVisible(
+			page,
+			".entry-content .emdash-image.aligncenter img",
+			"centered legacy image",
+		);
+		const result = await page
+			.locator(".entry-content .emdash-image.aligncenter")
+			.first()
+			.evaluate((figure) => {
+				const content = figure.closest(".entry-content");
+				const image = figure.querySelector("img");
+				if (!content || !image) {
+					return { missing: true };
+				}
+				const contentBox = content.getBoundingClientRect();
+				const imageBox = image.getBoundingClientRect();
+				return {
+					missing: false,
+					contentCenter: contentBox.left + contentBox.width / 2,
+					imageCenter: imageBox.left + imageBox.width / 2,
+				};
+			});
+		if (result.missing) {
+			throw new Error("Expected a centered legacy image inside entry content");
+		}
+		const offset = Math.abs(result.contentCenter - result.imageCenter);
+		if (offset > 2) {
+			throw new Error(
+				`Expected centered legacy image, got ${offset.toFixed(2)}px offset`,
+			);
 		}
 	} finally {
 		await page.close();
@@ -572,6 +632,11 @@ async function main() {
 	await runCheck(
 		"about page keeps floated image wrapping",
 		() => checkAboutImageWrap(browser, base, options.timeout),
+		failures,
+	);
+	await runCheck(
+		"centered legacy images align with content",
+		() => checkCenteredLegacyImage(browser, base, options.timeout),
 		failures,
 	);
 	await runCheck(
