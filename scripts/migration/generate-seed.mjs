@@ -240,6 +240,15 @@ function buildMenuTree(itemsById, parentId = "0") {
 		});
 }
 
+function hiddenField(slug, label, type) {
+	return {
+		slug,
+		label,
+		type,
+		widget: "legacy-image-blocks:hidden",
+	};
+}
+
 const rawXml = readFile(WXR_PATH);
 const siteTitle =
 	rawXml.match(/<channel>\s*<title>([\s\S]*?)<\/title>/)?.[1]?.trim() ||
@@ -833,8 +842,8 @@ const seed = {
 				{ slug: "box_middle_html", label: "Middle Box", type: "portableText" },
 				{ slug: "box_right_title", label: "Right Box Title", type: "string" },
 				{ slug: "box_right_html", label: "Right Box", type: "portableText" },
-				{ slug: "author_name", label: "Author Name", type: "string" },
-				{ slug: "legacy_wp_id", label: "Legacy WordPress ID", type: "integer" },
+				hiddenField("author_name", "Author Name", "string"),
+				hiddenField("legacy_wp_id", "Legacy WordPress ID", "integer"),
 			],
 		},
 		{
@@ -855,8 +864,8 @@ const seed = {
 				{ slug: "content", label: "Content", type: "portableText" },
 				{ slug: "featured_image", label: "Featured Image", type: "image" },
 				{ slug: "published_on", label: "Published On", type: "datetime" },
-				{ slug: "author_name", label: "Author Name", type: "string" },
-				{ slug: "legacy_wp_id", label: "Legacy WordPress ID", type: "integer" },
+				hiddenField("author_name", "Author Name", "string"),
+				hiddenField("legacy_wp_id", "Legacy WordPress ID", "integer"),
 			],
 		},
 		{
@@ -889,8 +898,8 @@ const seed = {
 					defaultValue: 0,
 				},
 				{ slug: "published_on", label: "Published On", type: "datetime" },
-				{ slug: "author_name", label: "Author Name", type: "string" },
-				{ slug: "legacy_wp_id", label: "Legacy WordPress ID", type: "integer" },
+				hiddenField("author_name", "Author Name", "string"),
+				hiddenField("legacy_wp_id", "Legacy WordPress ID", "integer"),
 			],
 		},
 	],
