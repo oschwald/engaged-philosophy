@@ -26,6 +26,17 @@ const ITEM_CATEGORY_RE =
 	/<category domain="([^"]+)" nicename="([^"]+)"><!\[CDATA\[(.*?)\]\]><\/category>/gs;
 const INTERNAL_UPLOAD_URL_RE =
 	/(https?:\/\/(?:www\.|media\.)?engagedphilosophy\.com\/wp-content\/uploads\/[^"'()\s<>]+|\/wp-content\/uploads\/[^"'()\s<>]+)/gi;
+const LEGACY_SITE_URL_RE =
+	/\bhttps?:\/\/(?:www\.)?engagedphilosophy\.com(?=\/|[?#]|$)([^"'()\s<>]*)/gi;
+const NON_DURABLE_MEDIA_ATTR_RE =
+	/\b(?:src|href)=["'](?:blob:|data:image\/|https?:\/\/attachments\.office\.net\/)/i;
+const WP_IMAGE_BLOCK_RE = /<!--\s*wp:image\b[\s\S]*?<!--\s*\/wp:image\s*-->/gi;
+const NON_DURABLE_LINKED_IMAGE_RE =
+	/<a\b[^>]*>\s*<img\b[^>]*(?:src|href)=["'](?:blob:|data:image\/|https?:\/\/attachments\.office\.net\/)[\s\S]*?>\s*<\/a>/gi;
+const NON_DURABLE_IMAGE_RE =
+	/<img\b[^>]*(?:src|href)=["'](?:blob:|data:image\/|https?:\/\/attachments\.office\.net\/)[\s\S]*?>/gi;
+const EMPTY_ANCHOR_RE = /<a\b[^>]*>\s*(?:&nbsp;|\u00a0|\s)*<\/a>/gi;
+const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
 
 function readFile(filePath) {
 	return fs.readFileSync(filePath, "utf8").replace(CONTROL_CHARS, "");
@@ -221,6 +232,98 @@ function repairMalformedInternalLinks(value, postsBySlug) {
 	);
 }
 
+function normalizeInternalSiteLinks(value) {
+	return (value || "").replace(LEGACY_SITE_URL_RE, (_match, suffix = "") => {
+		const path = suffix || "/";
+		return path.startsWith("/") ? path : `/${path}`;
+	});
+}
+
+function stripNonDurableMedia(value) {
+	return (value || "")
+		.replace(WP_IMAGE_BLOCK_RE, (block) =>
+			NON_DURABLE_MEDIA_ATTR_RE.test(block) ? "" : block,
+		)
+		.replace(NON_DURABLE_LINKED_IMAGE_RE, "")
+		.replace(NON_DURABLE_IMAGE_RE, "")
+		.replace(EMPTY_ANCHOR_RE, "");
+}
+
+function prepareRichTextHtml(
+	value,
+	postsBySlug,
+	exactReplacements,
+	filenameReplacements,
+	siteUrl,
+) {
+	let html = stripNonDurableMedia(value);
+	html = repairMalformedInternalLinks(html, postsBySlug);
+	html = normalizeInternalSiteLinks(html);
+	html = repairInternalUploadLinks(
+		html,
+		exactReplacements,
+		filenameReplacements,
+		siteUrl,
+	);
+	return html;
+}
+
+function normalizeRedirectPath(value) {
+	const normalized = (value || "").replace(/^\/+|\/+$/g, "");
+	return normalized ? `/${normalized}` : "/";
+}
+
+function trailingSlashPath(value) {
+	const normalized = normalizeRedirectPath(value);
+	return normalized === "/" || normalized.endsWith("/")
+		? normalized
+		: `${normalized}/`;
+}
+
+function addLegacyRedirect(redirects, sourcePath, destinationPath) {
+	const destination = trailingSlashPath(destinationPath);
+	const source = trailingSlashPath(sourcePath);
+	if (source === destination) return;
+
+	const variants = source === "/" ? [source] : [source, source.slice(0, -1)];
+	for (const variant of variants) {
+		if (variant && variant !== destination && !redirects.has(variant)) {
+			redirects.set(variant, {
+				source: variant,
+				destination,
+				type: 301,
+				enabled: true,
+				groupName: "wordpress-migration",
+			});
+		}
+	}
+}
+
+function addOldSlugRedirect(redirects, postType, oldSlug, contentPath) {
+	const slug = slugify(oldSlug, "");
+	if (!slug || !contentPath) return;
+
+	const segments = contentPath.split("/").filter(Boolean);
+	segments.pop();
+	const source =
+		postType === "project" ? `project/${slug}` : [...segments, slug].join("/");
+	addLegacyRedirect(redirects, source, contentPath);
+}
+
+function addOldDateRedirect(redirects, postType, oldDate, contentPath) {
+	if (postType !== "post" || !contentPath) return;
+	const match = DATE_RE.exec(oldDate || "");
+	if (!match) return;
+
+	const slug = contentPath.split("/").filter(Boolean).at(-1);
+	if (!slug) return;
+	addLegacyRedirect(
+		redirects,
+		`${match[1]}/${match[2]}/${match[3]}/${slug}`,
+		contentPath,
+	);
+}
+
 function buildMenuTree(itemsById, parentId = "0") {
 	return Object.values(itemsById)
 		.filter((item) => item.parentId === parentId)
@@ -393,6 +496,7 @@ const pages = [];
 const posts = [];
 const projects = [];
 const pageMap = new Map();
+const legacyRedirects = new Map();
 const rawMenuItems = [];
 const usedPaths = new Set();
 const usedSlugs = {
@@ -526,6 +630,19 @@ for (const item of items) {
 		...(thumbnail ? { featured_image: thumbnail } : {}),
 	};
 
+	addOldSlugRedirect(
+		legacyRedirects,
+		postType,
+		metas._wp_old_slug,
+		contentPath,
+	);
+	addOldDateRedirect(
+		legacyRedirects,
+		postType,
+		metas._wp_old_date,
+		contentPath,
+	);
+
 	if (postType === "page") {
 		const entry = {
 			id: `page-${postId}`,
@@ -656,52 +773,37 @@ const portableTextMedia = Object.fromEntries(
 );
 
 for (const entry of pages) {
-	entry.data.content = repairMalformedInternalLinks(
+	entry.data.content = prepareRichTextHtml(
 		entry.data.content,
 		postPathsBySlug,
-	);
-	entry.data.content = repairInternalUploadLinks(
-		entry.data.content,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.about_html = repairMalformedInternalLinks(
+	entry.data.about_html = prepareRichTextHtml(
 		entry.data.about_html,
 		postPathsBySlug,
-	);
-	entry.data.about_html = repairInternalUploadLinks(
-		entry.data.about_html,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.box_left_html = repairMalformedInternalLinks(
+	entry.data.box_left_html = prepareRichTextHtml(
 		entry.data.box_left_html,
 		postPathsBySlug,
-	);
-	entry.data.box_left_html = repairInternalUploadLinks(
-		entry.data.box_left_html,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.box_middle_html = repairMalformedInternalLinks(
+	entry.data.box_middle_html = prepareRichTextHtml(
 		entry.data.box_middle_html,
 		postPathsBySlug,
-	);
-	entry.data.box_middle_html = repairInternalUploadLinks(
-		entry.data.box_middle_html,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.box_right_html = repairMalformedInternalLinks(
+	entry.data.box_right_html = prepareRichTextHtml(
 		entry.data.box_right_html,
 		postPathsBySlug,
-	);
-	entry.data.box_right_html = repairInternalUploadLinks(
-		entry.data.box_right_html,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
@@ -729,22 +831,16 @@ for (const entry of pages) {
 }
 
 for (const entry of posts) {
-	entry.data.content = repairMalformedInternalLinks(
+	entry.data.content = prepareRichTextHtml(
 		entry.data.content,
 		postPathsBySlug,
-	);
-	entry.data.content = repairInternalUploadLinks(
-		entry.data.content,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.excerpt = repairMalformedInternalLinks(
+	entry.data.excerpt = prepareRichTextHtml(
 		entry.data.excerpt,
 		postPathsBySlug,
-	);
-	entry.data.excerpt = repairInternalUploadLinks(
-		entry.data.excerpt,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
@@ -761,22 +857,16 @@ for (const entry of posts) {
 }
 
 for (const entry of projects) {
-	entry.data.content = repairMalformedInternalLinks(
+	entry.data.content = prepareRichTextHtml(
 		entry.data.content,
 		postPathsBySlug,
-	);
-	entry.data.content = repairInternalUploadLinks(
-		entry.data.content,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
 	);
-	entry.data.excerpt = repairMalformedInternalLinks(
+	entry.data.excerpt = prepareRichTextHtml(
 		entry.data.excerpt,
 		postPathsBySlug,
-	);
-	entry.data.excerpt = repairInternalUploadLinks(
-		entry.data.excerpt,
 		attachmentReplacements,
 		attachmentReplacementsByFilename,
 		siteUrl,
@@ -956,6 +1046,9 @@ const seed = {
 			items: buildMenuTree(pageItemsById),
 		},
 	],
+	redirects: Array.from(legacyRedirects.values()).sort((a, b) =>
+		a.source.localeCompare(b.source),
+	),
 	media: seedMedia,
 	content: {
 		pages: pages.sort((a, b) => a.data.path.localeCompare(b.data.path)),
