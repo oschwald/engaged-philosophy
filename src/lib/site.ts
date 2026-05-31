@@ -161,10 +161,6 @@ export function getEntryExcerpt(data?: RichTextEntryData | null) {
 	return getRichTextValue(data?.excerpt);
 }
 
-export function getEntryContentField(_data?: RichTextEntryData | null) {
-	return "content";
-}
-
 export function decodeHtmlEntities(value?: string | null) {
 	const namedEntities: Record<string, string> = {
 		amp: "&",

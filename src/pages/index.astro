@@ -7,7 +7,6 @@ import { searchSite } from "../lib/search";
 import {
 	getEmDashEditEntryAttrs,
 	getEntryContent,
-	getEntryContentField,
 	getEntryExcerpt,
 	getExcerptText,
 	getMediaUrlPrefix,
@@ -119,11 +118,7 @@ const homeBoxes = home
 							<div
 								class="lead-home"
 								{...(home
-									? getEmDashEditEntryAttrs(
-											"pages",
-											home,
-											getEntryContentField(home.data),
-										)
+									? getEmDashEditEntryAttrs("pages", home, "content")
 									: {})}
 							>
 								<RichContent

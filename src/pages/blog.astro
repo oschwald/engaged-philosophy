@@ -2,11 +2,7 @@
 import Base from "../layouts/Base.astro";
 import RichContent from "../components/RichContent.astro";
 import { getPageByPath, getPageBySlug } from "../lib/content";
-import {
-	getEmDashEditEntryAttrs,
-	getEntryContent,
-	getEntryContentField,
-} from "../lib/site";
+import { getEmDashEditEntryAttrs, getEntryContent } from "../lib/site";
 
 const page = (await getPageBySlug("blog")) ?? (await getPageByPath("blog"));
 ---
@@ -29,13 +25,7 @@ const page = (await getPageBySlug("blog")) ?? (await getPageByPath("blog"));
 					</header>
 					<div
 						class="entry-content"
-						{...page
-							? getEmDashEditEntryAttrs(
-									"pages",
-									page,
-									getEntryContentField(page.data),
-								)
-							: {}}
+						{...page ? getEmDashEditEntryAttrs("pages", page, "content") : {}}
 					>
 						<RichContent
 							value={page ? getEntryContent(page.data) : undefined}

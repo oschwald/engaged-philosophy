@@ -9,7 +9,6 @@ import {
 import {
 	getEmDashEditEntryAttrs,
 	getEntryContent,
-	getEntryContentField,
 	isProjectTaxonomy,
 	sortByPublishedOn,
 } from "../../lib/site";
@@ -59,11 +58,7 @@ const projects = isProjectArchive
 						</header>
 						<div
 							class="entry-content"
-							{...getEmDashEditEntryAttrs(
-								"pages",
-								page,
-								getEntryContentField(page.data),
-							)}
+							{...getEmDashEditEntryAttrs("pages", page, "content")}
 						>
 							<RichContent value={getEntryContent(page.data)} />
 						</div>
