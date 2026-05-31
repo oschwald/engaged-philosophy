@@ -27,6 +27,25 @@ const ALLOWED_BLOCK_TYPES = new Set([
 	"numberedHeading",
 	"link",
 ]);
+const RICH_TEXT_FIELDS_BY_COLLECTION = new Map([
+	[
+		"pages",
+		[
+			"content",
+			"about_html",
+			"box_left_html",
+			"box_middle_html",
+			"box_right_html",
+		],
+	],
+	["posts", ["content", "excerpt"]],
+	["projects", ["content", "excerpt"]],
+]);
+const REQUIRED_RICH_TEXT_FIELDS_BY_COLLECTION = new Map([
+	["pages", ["content"]],
+	["posts", ["content", "excerpt"]],
+	["projects", ["content", "excerpt"]],
+]);
 
 function isContentEntry(value) {
 	return Boolean(value?.id && value?.data && typeof value.data === "object");
@@ -66,7 +85,66 @@ function getAssetUrl(image) {
 	return image?.asset?.url || image?.url || "";
 }
 
+function getValueType(value) {
+	if (Array.isArray(value)) return "array";
+	if (value === null) return "null";
+	return typeof value;
+}
+
+function auditRichTextFieldShape(collection, entry, issues) {
+	const fields = RICH_TEXT_FIELDS_BY_COLLECTION.get(collection);
+	if (!fields) return;
+
+	const requiredFields = new Set(
+		REQUIRED_RICH_TEXT_FIELDS_BY_COLLECTION.get(collection) ?? [],
+	);
+	for (const field of fields) {
+		const hasField = Object.hasOwn(entry.data, field);
+		const value = entry.data[field];
+		const fieldPath = `data.${field}`;
+
+		if (!hasField || value == null) {
+			if (requiredFields.has(field)) {
+				issues.push({
+					type: "richTextFieldShape",
+					entry: entryLabel(collection, entry),
+					path: fieldPath,
+					value: "missing",
+				});
+			}
+			continue;
+		}
+
+		if (!Array.isArray(value)) {
+			issues.push({
+				type: "richTextFieldShape",
+				entry: entryLabel(collection, entry),
+				path: fieldPath,
+				value: `expected Portable Text array, got ${getValueType(value)}`,
+			});
+			continue;
+		}
+
+		for (const [index, block] of value.entries()) {
+			if (
+				!block ||
+				typeof block !== "object" ||
+				typeof block._type !== "string"
+			) {
+				issues.push({
+					type: "richTextFieldShape",
+					entry: entryLabel(collection, entry),
+					path: `${fieldPath}.${index}`,
+					value: `expected Portable Text block, got ${getValueType(block)}`,
+				});
+			}
+		}
+	}
+}
+
 function auditEntry(collection, entry, issues) {
+	auditRichTextFieldShape(collection, entry, issues);
+
 	walk(entry, (value, pathParts) => {
 		if (typeof value === "string") {
 			if (KNOWN_SHORTCODE_RE.test(value)) {
