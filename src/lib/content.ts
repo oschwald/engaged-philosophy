@@ -48,20 +48,34 @@ type RawMediaField = MediaField & {
 
 const COLLECTION_LIMIT = 1000;
 
+function normalizeLocalMediaField(
+	media: RawMediaField,
+): MediaField | undefined {
+	if (media.provider !== "local" || !media.meta?.storageKey) return undefined;
+
+	return {
+		src: `/_emdash/api/media/file/${media.meta.storageKey}`,
+		alt: media.alt,
+	};
+}
+
+function normalizeSeedMediaFallback(
+	media: RawMediaField,
+): MediaField | undefined {
+	// Compatibility for older generated seed data. Current imports emit local
+	// EmDash media values before content reaches runtime.
+	if (!media.$media?.url) return undefined;
+	return { src: media.$media.url, alt: media.$media.alt };
+}
+
 function normalizeMediaField(
 	media?: RawMediaField | null,
 ): MediaField | undefined {
 	if (!media) return undefined;
+	const localMedia = normalizeLocalMediaField(media);
+	if (localMedia) return localMedia;
 	if (media.src) return { src: media.src, alt: media.alt };
-	if (media.provider === "local" && media.meta?.storageKey) {
-		return {
-			src: `/_emdash/api/media/file/${media.meta.storageKey}`,
-			alt: media.alt,
-		};
-	}
-	if (media.$media?.url)
-		return { src: media.$media.url, alt: media.$media.alt };
-	return undefined;
+	return normalizeSeedMediaFallback(media);
 }
 
 function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
