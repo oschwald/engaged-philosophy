@@ -75,10 +75,10 @@ export function createPlugin() {
 					category: "Media",
 					fields: [
 						{
-							type: "media_picker",
+							type: "text_input",
 							action_id: "url",
-							label: "Video",
-							placeholder: "Choose a video",
+							label: "Video URL",
+							placeholder: "https://...",
 						},
 						{
 							type: "text_input",
