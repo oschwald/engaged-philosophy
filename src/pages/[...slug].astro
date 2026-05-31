@@ -24,6 +24,10 @@ if (!page) {
 	return Astro.redirect("/404");
 }
 
+if (page.data.path !== path) {
+	return Astro.redirect(page.data.path ? `/${page.data.path}/` : "/");
+}
+
 const useFullWidthTemplate =
 	page.data.template === "templates/_full_width.php" &&
 	page.data.path !== "faq";

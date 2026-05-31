@@ -9,6 +9,13 @@ import {
 } from "emdash";
 
 import { isPublicContentPath } from "./content-visibility";
+import {
+	derivePagePath,
+	derivePostPath,
+	deriveProjectPath,
+	normalizeContentPath,
+	slugFromPath,
+} from "./content-paths";
 import type {
 	ContentEntry,
 	MediaField,
@@ -46,22 +53,6 @@ function normalizeMediaField(
 	return undefined;
 }
 
-function normalizeContentPath(path?: string | null) {
-	return (path ?? "").replace(/^\/+|\/+$/g, "");
-}
-
-function slugFromPath(path?: string | null) {
-	return normalizeContentPath(path).split("/").filter(Boolean).at(-1) ?? "";
-}
-
-function normalizeProjectPath(path?: string | null, slug?: string | null) {
-	const normalizedPath = normalizeContentPath(path);
-	if (normalizedPath.startsWith("project/")) return normalizedPath;
-
-	const projectSlug = slugFromPath(slug) || slugFromPath(normalizedPath);
-	return projectSlug ? `project/${projectSlug}` : normalizedPath;
-}
-
 function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 	entry: EmDashContentEntry<T>,
 	collection?: string,
@@ -73,10 +64,23 @@ function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 		featured_image?: MediaField;
 		path?: string;
 		slug?: string;
+		published_on?: string;
+		publishedAt?: Date | string | null;
+		createdAt?: Date | string | null;
 	};
 
-	if (collection === "projects") {
-		data.path = normalizeProjectPath(data.path, data.slug || entry.id);
+	if (collection === "pages") {
+		data.path = derivePagePath(data.path, data.slug || entry.id);
+	} else if (collection === "posts") {
+		data.path = derivePostPath(
+			data.path,
+			data.slug || entry.id,
+			data.published_on,
+			data.publishedAt,
+			data.createdAt,
+		);
+	} else if (collection === "projects") {
+		data.path = deriveProjectPath(data.path, data.slug || entry.id);
 	}
 
 	return {

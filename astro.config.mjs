@@ -9,6 +9,9 @@ import { createLogger } from "vite";
 const legacyImagePluginEntrypoint = fileURLToPath(
 	new URL("./src/plugins/legacy-image-blocks.ts", import.meta.url),
 );
+const legacyImagePluginAdminEntrypoint = fileURLToPath(
+	new URL("./src/plugins/legacy-image-blocks-admin.ts", import.meta.url),
+);
 
 function suppressKnownBuildWarnings(warning, warn) {
 	if (
@@ -79,6 +82,7 @@ export default defineConfig({
 					id: "legacy-image-blocks",
 					version: "0.1.0",
 					entrypoint: legacyImagePluginEntrypoint,
+					adminEntry: legacyImagePluginAdminEntrypoint,
 				},
 			],
 		}),
