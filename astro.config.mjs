@@ -1,6 +1,6 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
-import { access, d1, r2 } from "@emdash-cms/cloudflare";
+import { d1, r2 } from "@emdash-cms/cloudflare";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
@@ -11,6 +11,9 @@ const legacyImagePluginEntrypoint = fileURLToPath(
 );
 const legacyImagePluginAdminEntrypoint = fileURLToPath(
 	new URL("./src/plugins/legacy-image-blocks-admin.ts", import.meta.url),
+);
+const cloudflareAccessAuthEntrypoint = fileURLToPath(
+	new URL("./src/lib/cloudflare-access-auth.ts", import.meta.url),
 );
 
 function suppressKnownBuildWarnings(warning, warn) {
@@ -77,11 +80,15 @@ export default defineConfig({
 		emdash({
 			database: d1({ binding: "DB", session: "primary-first" }),
 			storage: r2({ binding: "MEDIA" }),
-			auth: access({
-				teamDomain: "engaged-philosophy.cloudflareaccess.com",
-				audienceEnvVar: "CF_ACCESS_AUDIENCE",
-				autoProvision: false,
-			}),
+			auth: {
+				type: "cloudflare-access",
+				entrypoint: cloudflareAccessAuthEntrypoint,
+				config: {
+					teamDomain: "engaged-philosophy.cloudflareaccess.com",
+					audienceEnvVar: "CF_ACCESS_AUDIENCE",
+					autoProvision: false,
+				},
+			},
 			plugins: [
 				{
 					id: "legacy-image-blocks",
