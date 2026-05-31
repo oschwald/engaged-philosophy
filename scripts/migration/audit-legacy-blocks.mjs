@@ -8,6 +8,10 @@ import {
 	readSeedFile,
 	ROOT,
 } from "./lib/migration-seed-path.mjs";
+import {
+	EMDASH_MEDIA_FILE_PREFIX,
+	uploadStorageKeyFromUrl,
+} from "./lib/wordpress-media.mjs";
 
 const TRACKED_BLOCK_TYPES = [
 	"legacyImage",
@@ -64,9 +68,36 @@ function hasAssetRef(node) {
 	return typeof node?.asset?._ref === "string" && node.asset._ref.length > 0;
 }
 
+function getLegacyImageSource(node) {
+	return (
+		(typeof node?.id === "string" && node.id) ||
+		(typeof node?.url === "string" && node.url) ||
+		(typeof node?.asset?.url === "string" && node.asset.url) ||
+		""
+	);
+}
+
+function isInternalMediaUrl(value) {
+	return (
+		typeof value === "string" && value.startsWith(EMDASH_MEDIA_FILE_PREFIX)
+	);
+}
+
+function hasMediaReference(node) {
+	return hasAssetRef(node) || isInternalMediaUrl(getLegacyImageSource(node));
+}
+
+function hasRawUploadSource(node) {
+	const source = getLegacyImageSource(node);
+	return Boolean(
+		source && !isInternalMediaUrl(source) && uploadStorageKeyFromUrl(source),
+	);
+}
+
 function legacyImageReductionBlockers(node) {
 	const blockers = [];
-	if (!hasAssetRef(node)) blockers.push("missing asset ref");
+	if (!hasMediaReference(node)) blockers.push("missing media ref");
+	if (hasRawUploadSource(node)) blockers.push("raw upload source");
 	if (isSet(node.align)) blockers.push("alignment");
 	if (isSet(node.href)) blockers.push("link");
 	if (isSet(node.shape)) blockers.push("shape");
@@ -96,6 +127,8 @@ function auditSeed(seed) {
 		byCollection: {},
 		legacyImage: {
 			total: 0,
+			mediaBacked: 0,
+			rawUploadSource: 0,
 			standardImageCandidates: 0,
 			blockedByFeature: {},
 			candidateSamples: [],
@@ -119,6 +152,12 @@ function auditSeed(seed) {
 					if (type !== "legacyImage") return;
 
 					summary.legacyImage.total += 1;
+					if (hasMediaReference(block)) {
+						summary.legacyImage.mediaBacked += 1;
+					}
+					if (hasRawUploadSource(block)) {
+						summary.legacyImage.rawUploadSource += 1;
+					}
 					const blockers = legacyImageReductionBlockers(block);
 					if (blockers.length === 0) {
 						summary.legacyImage.standardImageCandidates += 1;
@@ -157,6 +196,9 @@ function printSummary(seedPath, summary) {
 	console.log(formatCounts(summary.total));
 	console.log(
 		`legacyImage standard-image candidates=${summary.legacyImage.standardImageCandidates}/${summary.legacyImage.total}`,
+	);
+	console.log(
+		`legacyImage media-backed=${summary.legacyImage.mediaBacked}/${summary.legacyImage.total}, raw upload source=${summary.legacyImage.rawUploadSource}`,
 	);
 
 	const blockers = Object.entries(summary.legacyImage.blockedByFeature)
