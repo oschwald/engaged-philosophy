@@ -1,6 +1,7 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { d1, r2 } from "@emdash-cms/cloudflare";
+import auditLogPlugin from "@emdash-cms/plugin-audit-log";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
@@ -106,6 +107,7 @@ export default defineConfig({
 				},
 			},
 			plugins: [
+				auditLogPlugin,
 				{
 					id: "legacy-image-blocks",
 					version: "0.1.0",

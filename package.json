@@ -44,6 +44,7 @@
 		"@astrojs/cloudflare": "^13.5.4",
 		"@astrojs/react": "^5.0.5",
 		"@emdash-cms/cloudflare": "^0.15.0",
+		"@emdash-cms/plugin-audit-log": "^0.2.0",
 		"astro": "^6.3.7",
 		"bootstrap": "^5.3.3",
 		"emdash": "^0.15.0",
