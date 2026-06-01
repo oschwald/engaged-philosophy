@@ -20,6 +20,9 @@ const cloudflareAccessAuthEntrypoint = fileURLToPath(
 const anonymousCloudflareCacheEntrypoint = fileURLToPath(
 	new URL("./src/lib/anonymous-cloudflare-cache.ts", import.meta.url),
 );
+const cloudflareAccessInviteRouteEntrypoint = fileURLToPath(
+	new URL("./src/emdash-routes/cloudflare-access-invite.ts", import.meta.url),
+);
 
 function suppressKnownBuildWarnings(warning, warn) {
 	if (
@@ -45,6 +48,20 @@ viteLogger.warn = (message, options) => {
 
 	viteWarn(message, options);
 };
+
+function cloudflareAccessInviteRoute() {
+	return {
+		name: "engaged-philosophy-cloudflare-access-invite-route",
+		hooks: {
+			"astro:config:setup": ({ injectRoute }) => {
+				injectRoute({
+					pattern: "/_emdash/api/auth/invite",
+					entrypoint: cloudflareAccessInviteRouteEntrypoint,
+				});
+			},
+		},
+	};
+}
 
 export default defineConfig({
 	output: "server",
@@ -92,6 +109,7 @@ export default defineConfig({
 	},
 	integrations: [
 		react(),
+		cloudflareAccessInviteRoute(),
 		emdash({
 			database: d1({ binding: "DB", session: "disabled" }),
 			storage: r2({
