@@ -51,8 +51,8 @@
 		"astro": "^6.3.7",
 		"bootstrap": "^5.3.3",
 		"emdash": "^0.16.1",
-		"react": "^18.3.1",
-		"react-dom": "^18.3.1",
+		"react": "^19.2.7",
+		"react-dom": "^19.2.7",
 		"sass": "^1.89.0"
 	},
 	"devDependencies": {
@@ -71,7 +71,7 @@
 		"prettier-plugin-astro": "^0.14.1",
 		"turndown": "^7.2.4",
 		"turndown-plugin-gfm": "^1.0.2",
-		"typescript": "^5.8.3",
+		"typescript": "^6.0.3",
 		"vite": "^7.3.3",
 		"wrangler": "^4.17.0"
 	},
