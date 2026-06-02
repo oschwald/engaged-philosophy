@@ -45,12 +45,12 @@
 	"dependencies": {
 		"@astrojs/cloudflare": "^13.5.4",
 		"@astrojs/react": "^5.0.5",
-		"@emdash-cms/cloudflare": "^0.15.0",
+		"@emdash-cms/cloudflare": "^0.16.1",
 		"@emdash-cms/plugin-audit-log": "^0.2.0",
-		"@emdash-cms/plugin-embeds": "^0.1.16",
+		"@emdash-cms/plugin-embeds": "^0.1.18",
 		"astro": "^6.3.7",
 		"bootstrap": "^5.3.3",
-		"emdash": "^0.15.0",
+		"emdash": "^0.16.1",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
 		"sass": "^1.89.0"
@@ -74,5 +74,13 @@
 		"typescript": "^5.8.3",
 		"vite": "^7.3.3",
 		"wrangler": "^4.17.0"
+	},
+	"overrides": {
+		"@astro-community/astro-embed-integration": {
+			"astro-auto-import": "^0.5.1"
+		},
+		"yaml-language-server": {
+			"yaml": "^2.8.3"
+		}
 	}
 }
