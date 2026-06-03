@@ -24,11 +24,6 @@
 			"id": "933be9ebf8f14f78934b855dc054f7f8",
 		},
 	],
-	"worker_loaders": [
-		{
-			"binding": "LOADER",
-		},
-	],
 	"d1_databases": [
 		{
 			"binding": "DB",
