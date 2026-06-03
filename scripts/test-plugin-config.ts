@@ -1,10 +1,12 @@
 import assert from "node:assert/strict";
 
+import { createPlugin as createAuditLogPlugin } from "../src/plugins/audit-log.ts";
 import { createPlugin as createEmbedsPlugin } from "../src/plugins/embeds.ts";
 import { createPlugin } from "../src/plugins/legacy-image-blocks.ts";
 
 const plugin = createPlugin();
 const blocks = plugin.admin?.portableTextBlocks ?? [];
+const auditLogPlugin = createAuditLogPlugin();
 const embedsPlugin = createEmbedsPlugin({ types: ["youtube", "vimeo"] });
 const embedBlocks = embedsPlugin.admin?.portableTextBlocks ?? [];
 
@@ -30,5 +32,18 @@ assert.equal(legacyVideoSource.label, "Video URL");
 
 assert.equal(getBlock("youtube", embedBlocks).label, "YouTube Video");
 assert.equal(getBlock("vimeo", embedBlocks).label, "Vimeo Video");
+
+assert.equal(auditLogPlugin.id, "audit-log");
+assert.deepEqual(auditLogPlugin.capabilities, ["content:read"]);
+assert.deepEqual(auditLogPlugin.allowedHosts, []);
+assert.deepEqual(auditLogPlugin.storage.entries.indexes, [
+	"timestamp",
+	"action",
+	"resourceType",
+	"collection",
+]);
+assert.equal(auditLogPlugin.admin.pages?.[0]?.path, "/history");
+assert.equal(auditLogPlugin.admin.widgets?.[0]?.id, "recent-activity");
+assert.equal(typeof auditLogPlugin.routes.admin?.handler, "function");
 
 console.log("Plugin config tests passed.");

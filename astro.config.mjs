@@ -9,6 +9,9 @@ import { createLogger } from "vite";
 const embedsPluginEntrypoint = fileURLToPath(
 	new URL("./src/plugins/embeds.ts", import.meta.url),
 );
+const auditLogPluginEntrypoint = fileURLToPath(
+	new URL("./src/plugins/audit-log.ts", import.meta.url),
+);
 const legacyImagePluginEntrypoint = fileURLToPath(
 	new URL("./src/plugins/legacy-image-blocks.ts", import.meta.url),
 );
@@ -127,6 +130,11 @@ export default defineConfig({
 				},
 			},
 			plugins: [
+				{
+					id: "audit-log",
+					version: "0.2.0",
+					entrypoint: auditLogPluginEntrypoint,
+				},
 				{
 					id: "embeds",
 					version: "0.0.1",
