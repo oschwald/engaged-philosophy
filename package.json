@@ -19,7 +19,7 @@
 		"parity:audit": "node scripts/migration/parity-audit.mjs",
 		"dev": "astro dev",
 		"build": "node scripts/assert-no-emdash-seed.mjs && astro build",
-		"ci": "npm run lint && npm test && npm run typecheck && npm run build && npm run test:worker-bundle",
+		"ci": "npm run lint && npm test && npm run typecheck && npm run build && npm run test:worker-bundle && npm run test:worker-runtime",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
 		"lint:eslint": "eslint eslint.config.js \"scripts/**/*.mjs\" \"src/**/*.{js,ts,astro}\"",
@@ -39,6 +39,7 @@
 		"test:portable-text": "node scripts/migration/test-portable-text.mjs",
 		"test:wordpress-media": "node scripts/migration/test-wordpress-media.mjs",
 		"test:worker-bundle": "node scripts/test-worker-bundle.mjs",
+		"test:worker-runtime": "node scripts/test-worker-runtime.mjs",
 		"preview": "astro preview",
 		"deploy": "npm run build && wrangler deploy",
 		"typecheck": "astro check"
