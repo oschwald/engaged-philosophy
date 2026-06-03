@@ -1,7 +1,6 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { d1, r2 } from "@emdash-cms/cloudflare";
-import auditLogPlugin from "@emdash-cms/plugin-audit-log";
 import { embedsPlugin } from "@emdash-cms/plugin-embeds";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
@@ -23,17 +22,6 @@ const anonymousCloudflareCacheEntrypoint = fileURLToPath(
 const cloudflareAccessInviteRouteEntrypoint = fileURLToPath(
 	new URL("./src/emdash-routes/cloudflare-access-invite.ts", import.meta.url),
 );
-
-const auditLogPluginWithHookCapabilities = {
-	...auditLogPlugin,
-	capabilities: [
-		...new Set([
-			...(auditLogPlugin.capabilities ?? []),
-			"content:write",
-			"media:read",
-		]),
-	],
-};
 
 function suppressKnownBuildWarnings(warning, warn) {
 	if (
@@ -137,7 +125,6 @@ export default defineConfig({
 				},
 			},
 			plugins: [
-				auditLogPluginWithHookCapabilities,
 				embedsPlugin({ types: ["youtube", "vimeo"] }),
 				{
 					id: "legacy-image-blocks",
