@@ -1,7 +1,6 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { d1, r2 } from "@emdash-cms/cloudflare";
-import { embedsPlugin } from "@emdash-cms/plugin-embeds";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
@@ -125,7 +124,6 @@ export default defineConfig({
 				},
 			},
 			plugins: [
-				embedsPlugin({ types: ["youtube", "vimeo"] }),
 				{
 					id: "legacy-image-blocks",
 					version: "0.1.0",
