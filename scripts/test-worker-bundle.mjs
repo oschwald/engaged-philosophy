@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { readdir, rm } from "node:fs/promises";
+import { readFile, readdir, rm } from "node:fs/promises";
 import { registerHooks } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -54,9 +54,20 @@ async function findChunk(prefix) {
 	return path.join(chunksDir, chunk);
 }
 
+async function assertNoWorkerLoaders(configPath) {
+	const config = JSON.parse(await readFile(configPath, "utf8"));
+	assert.deepEqual(
+		config.worker_loaders ?? [],
+		[],
+		"Generated Wrangler config must not require Worker Loader/Dynamic Workers.",
+	);
+}
+
 if (!existsSync(DIST_WRANGLER_CONFIG)) {
 	throw new Error("Run npm run build before npm run test:worker-bundle.");
 }
+
+await assertNoWorkerLoaders(DIST_WRANGLER_CONFIG);
 
 await rm(OUT_DIR, { recursive: true, force: true });
 
