@@ -6,6 +6,9 @@ import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
 import { createLogger } from "vite";
 
+const embedsPluginEntrypoint = fileURLToPath(
+	new URL("./src/plugins/embeds.ts", import.meta.url),
+);
 const legacyImagePluginEntrypoint = fileURLToPath(
 	new URL("./src/plugins/legacy-image-blocks.ts", import.meta.url),
 );
@@ -124,6 +127,13 @@ export default defineConfig({
 				},
 			},
 			plugins: [
+				{
+					id: "embeds",
+					version: "0.0.1",
+					entrypoint: embedsPluginEntrypoint,
+					componentsEntry: "@emdash-cms/plugin-embeds/astro",
+					options: { types: ["youtube", "vimeo"] },
+				},
 				{
 					id: "legacy-image-blocks",
 					version: "0.1.0",
