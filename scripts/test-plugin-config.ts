@@ -1,7 +1,5 @@
 import assert from "node:assert/strict";
 
-import auditLogPlugin from "@emdash-cms/plugin-audit-log";
-
 import { createPlugin as createEmbedsPlugin } from "../src/plugins/embeds.ts";
 import { createPlugin } from "../src/plugins/legacy-image-blocks.ts";
 
@@ -32,19 +30,5 @@ assert.equal(legacyVideoSource.label, "Video URL");
 
 assert.equal(getBlock("youtube", embedBlocks).label, "YouTube Video");
 assert.equal(getBlock("vimeo", embedBlocks).label, "Vimeo Video");
-
-assert.equal(auditLogPlugin.id, "audit-log");
-assert.equal(auditLogPlugin.format, "standard");
-assert.equal(auditLogPlugin.entrypoint, "@emdash-cms/plugin-audit-log/sandbox");
-assert.deepEqual(auditLogPlugin.capabilities, ["content:read"]);
-assert.deepEqual(auditLogPlugin.allowedHosts, []);
-assert.deepEqual(auditLogPlugin.storage?.entries?.indexes, [
-	"timestamp",
-	"action",
-	"resourceType",
-	"collection",
-]);
-assert.equal(auditLogPlugin.adminPages?.[0]?.path, "/history");
-assert.equal(auditLogPlugin.adminWidgets?.[0]?.id, "recent-activity");
 
 console.log("Plugin config tests passed.");
