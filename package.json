@@ -43,21 +43,21 @@
 		"typecheck": "astro check"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "^13.5.4",
-		"@astrojs/react": "^5.0.5",
-		"@emdash-cms/cloudflare": "^0.16.1",
+		"@astrojs/cloudflare": "^13.6.1",
+		"@astrojs/react": "^5.0.7",
+		"@emdash-cms/cloudflare": "^0.17.0",
 		"@emdash-cms/plugin-audit-log": "^0.2.0",
-		"@emdash-cms/plugin-embeds": "^0.1.18",
-		"astro": "^6.3.7",
+		"@emdash-cms/plugin-embeds": "^0.1.19",
+		"astro": "^6.4.4",
 		"bootstrap": "^5.3.3",
-		"emdash": "^0.16.1",
+		"emdash": "^0.17.0",
 		"react": "^19.2.7",
 		"react-dom": "^19.2.7",
 		"sass": "^1.89.0"
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.4",
-		"@cloudflare/workers-types": "^4.20250525.0",
+		"@cloudflare/workers-types": "^4.20260603.1",
 		"@typescript-eslint/eslint-plugin": "^8.60.0",
 		"@typescript-eslint/parser": "^8.60.0",
 		"astro-eslint-parser": "^1.4.0",
@@ -73,7 +73,7 @@
 		"turndown-plugin-gfm": "^1.0.2",
 		"typescript": "^6.0.3",
 		"vite": "^7.3.3",
-		"wrangler": "^4.17.0"
+		"wrangler": "^4.97.0"
 	},
 	"overrides": {
 		"@astro-community/astro-embed-integration": {
