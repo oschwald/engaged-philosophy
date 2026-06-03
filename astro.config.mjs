@@ -1,6 +1,7 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
-import { d1, r2 } from "@emdash-cms/cloudflare";
+import { d1, r2, sandbox } from "@emdash-cms/cloudflare";
+import auditLogPlugin from "@emdash-cms/plugin-audit-log";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
@@ -117,6 +118,7 @@ export default defineConfig({
 				binding: "MEDIA",
 				publicUrl: "https://media.engagedphilosophy.com",
 			}),
+			sandboxRunner: sandbox(),
 			auth: {
 				type: "cloudflare-access",
 				entrypoint: cloudflareAccessAuthEntrypoint,
@@ -126,6 +128,7 @@ export default defineConfig({
 					autoProvision: false,
 				},
 			},
+			sandboxed: [auditLogPlugin],
 			plugins: [
 				{
 					id: "embeds",
