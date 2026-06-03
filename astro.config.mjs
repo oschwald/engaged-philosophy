@@ -24,6 +24,17 @@ const cloudflareAccessInviteRouteEntrypoint = fileURLToPath(
 	new URL("./src/emdash-routes/cloudflare-access-invite.ts", import.meta.url),
 );
 
+const auditLogPluginWithHookCapabilities = {
+	...auditLogPlugin,
+	capabilities: [
+		...new Set([
+			...(auditLogPlugin.capabilities ?? []),
+			"content:write",
+			"media:read",
+		]),
+	],
+};
+
 function suppressKnownBuildWarnings(warning, warn) {
 	if (
 		warning.code === "UNUSED_EXTERNAL_IMPORT" &&
@@ -126,7 +137,7 @@ export default defineConfig({
 				},
 			},
 			plugins: [
-				auditLogPlugin,
+				auditLogPluginWithHookCapabilities,
 				embedsPlugin({ types: ["youtube", "vimeo"] }),
 				{
 					id: "legacy-image-blocks",
