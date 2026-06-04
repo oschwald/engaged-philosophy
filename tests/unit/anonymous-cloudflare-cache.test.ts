@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
 	hasStatefulCookie,
 	isAnonymousPageCacheCandidate,
+	normalizePageCacheInvalidationKeys,
 	normalizePageCacheKey,
 } from "../../src/lib/anonymous-cloudflare-cache";
 
@@ -23,7 +24,14 @@ describe("anonymous Cloudflare page cache", () => {
 			normalizePageCacheKey(
 				new URL("https://example.com/about/?utm_source=test&b=2&a=1"),
 			),
-		).toBe("https://example.com/about/?a=1&b=2");
+		).toBe("https://engaged-philosophy-cache.local/about/?a=1&b=2");
+		expect(
+			normalizePageCacheKey(
+				new URL(
+					"https://engaged-philosophy.ramona75.workers.dev/about/?utm_source=test",
+				),
+			),
+		).toBe("https://engaged-philosophy-cache.local/about/");
 	});
 
 	test("rejects non-page and signed-in requests", () => {
@@ -60,5 +68,22 @@ describe("anonymous Cloudflare page cache", () => {
 		expect(hasStatefulCookie("foo=bar; astro-session=abc")).toBe(true);
 		expect(hasStatefulCookie("foo=bar; __em_d1_bookmark=abc")).toBe(true);
 		expect(hasStatefulCookie("foo=bar; _ga=abc")).toBe(false);
+	});
+
+	test("normalizes path invalidation to stored cache keys", () => {
+		expect(normalizePageCacheInvalidationKeys("/about/")).toEqual([
+			"https://engaged-philosophy-cache.local/about/",
+			"https://engaged-philosophy-cache.local/about",
+		]);
+		expect(normalizePageCacheInvalidationKeys("about")).toEqual([
+			"https://engaged-philosophy-cache.local/about",
+			"https://engaged-philosophy-cache.local/about/",
+		]);
+		expect(
+			normalizePageCacheInvalidationKeys("/about/?utm_source=test"),
+		).toEqual([
+			"https://engaged-philosophy-cache.local/about/",
+			"https://engaged-philosophy-cache.local/about",
+		]);
 	});
 });

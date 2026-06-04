@@ -7,6 +7,7 @@ const INTERNAL_HEADERS = [STORED_AT_HEADER, MAX_AGE_HEADER, SWR_HEADER];
 const MAX_AGE_REGEX = /max-age=(\d+)/;
 const SWR_REGEX = /stale-while-revalidate=(\d+)/;
 const HTML_CONTENT_TYPE_REGEX = /(?:^|;)\s*text\/html(?:;|$)/i;
+const CACHE_KEY_ORIGIN = "https://engaged-philosophy-cache.local";
 
 const TRACKING_PARAMS = [
 	"utm_source",
@@ -103,12 +104,38 @@ export function isAnonymousPageCacheCandidate(
 }
 
 export function normalizePageCacheKey(url: URL): string {
-	const normalized = new URL(url.toString());
+	const normalized = new URL(`${url.pathname}${url.search}`, CACHE_KEY_ORIGIN);
 	for (const param of TRACKING_PARAMS) {
 		normalized.searchParams.delete(param);
 	}
 	normalized.searchParams.sort();
 	return normalized.toString();
+}
+
+function cacheUrlFromPath(path: string) {
+	const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+	return new URL(normalizedPath, CACHE_KEY_ORIGIN);
+}
+
+export function normalizePageCacheInvalidationKeys(path: string): string[] {
+	const url = cacheUrlFromPath(path);
+	const keys = new Set([normalizePageCacheKey(url)]);
+
+	if (url.search) {
+		url.search = "";
+		keys.add(normalizePageCacheKey(url));
+	}
+
+	const hasExtension = /\.[a-z0-9]+$/i.test(url.pathname);
+	if (!hasExtension && url.pathname !== "/") {
+		const slashVariant = new URL(url.toString());
+		slashVariant.pathname = slashVariant.pathname.endsWith("/")
+			? slashVariant.pathname.slice(0, -1)
+			: `${slashVariant.pathname}/`;
+		keys.add(normalizePageCacheKey(slashVariant));
+	}
+
+	return [...keys];
 }
 
 function parseCdnCacheControl(header: string | null): {
@@ -240,7 +267,11 @@ const factory: CacheProviderFactory<AnonymousCloudflareCacheConfig> = (
 		async invalidate(options) {
 			if (options.path) {
 				const cache = await getCache();
-				await cache.delete(options.path);
+				for (const cacheKey of normalizePageCacheInvalidationKeys(
+					options.path,
+				)) {
+					await cache.delete(cacheKey);
+				}
 			}
 			// Tag invalidation for Workers Cache API requires a zone-level purge
 			// token. Without one, keep publishes working and let short max-age
