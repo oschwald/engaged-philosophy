@@ -1,7 +1,8 @@
 import { env as cloudflareEnv } from "cloudflare:workers";
 
-export const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
-export const PUBLIC_MEDIA_URL = "https://media.engagedphilosophy.com";
+import { PUBLIC_MEDIA_URL, WORDPRESS_SITE_URL } from "./site-config";
+
+export { PUBLIC_MEDIA_URL, WORDPRESS_SITE_URL };
 
 const WORDPRESS_SITE_HOST_RE = /^(?:www\.)?engagedphilosophy\.com$/i;
 const EMDASH_MEDIA_FILE_PREFIX = "/_emdash/api/media/file/";

@@ -1,9 +1,10 @@
 import { getRuntimeSiteSettings } from "../lib/content";
 import { rewriteInternalMediaFileUrl } from "../lib/media";
+import { SITE_TAGLINE_FALLBACK, SITE_TITLE_FALLBACK } from "../lib/site-config";
 
 export async function GET() {
 	const settings = await getRuntimeSiteSettings();
-	const siteTitle = settings?.title || "Engaged Philosophy";
+	const siteTitle = settings?.title || SITE_TITLE_FALLBACK;
 	const favicon = settings?.favicon;
 	const faviconIcon = favicon?.url
 		? {
@@ -25,9 +26,8 @@ export async function GET() {
 			{
 				name: siteTitle,
 				short_name:
-					siteTitle === "Engaged Philosophy" ? "EngagedPhil" : siteTitle,
-				description:
-					settings?.tagline || "Civic Engagement in Philosophy Classes",
+					siteTitle === SITE_TITLE_FALLBACK ? "EngagedPhil" : siteTitle,
+				description: settings?.tagline || SITE_TAGLINE_FALLBACK,
 				icons: [faviconIcon],
 				theme_color: "#fd7e14",
 				background_color: "#ffffff",

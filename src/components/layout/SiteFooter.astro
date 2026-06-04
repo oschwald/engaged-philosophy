@@ -1,4 +1,6 @@
 ---
+import { CONTACT_EMAIL, FACEBOOK_PAGE_URL } from "../../lib/site-config";
+
 interface Props {
 	siteTitle: string;
 }
@@ -17,7 +19,7 @@ const { siteTitle } = Astro.props;
 		<div class="d-flex align-items-center gap-2">
 			<div
 				class="fb-like"
-				data-href="https://www.facebook.com/engagedphilosophy"
+				data-href={FACEBOOK_PAGE_URL}
 				data-width="200"
 				data-layout="button_count"
 				data-action="like"
@@ -25,7 +27,7 @@ const { siteTitle } = Astro.props;
 				data-share="false"
 			>
 			</div>
-			<a href="mailto:info@engagedphilosophy.com">info@engagedphilosophy.com</a>
+			<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
 		</div>
 	</div>
 </footer>

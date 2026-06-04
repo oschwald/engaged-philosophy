@@ -5,6 +5,7 @@ import SiteHead from "../components/layout/SiteHead.astro";
 import SiteHeader from "../components/layout/SiteHeader.astro";
 import { getPrimaryMenu, getRuntimeSiteSettings } from "../lib/content";
 import { getMediaUrlPrefix, rewriteInternalMediaFileUrl } from "../lib/media";
+import { SITE_TAGLINE_FALLBACK, SITE_TITLE_FALLBACK } from "../lib/site-config";
 import "../scss/style.scss";
 
 interface Props {
@@ -20,9 +21,8 @@ Astro.cache.set({
 	tags: ["pages", "posts", "projects"],
 });
 const settings = await getRuntimeSiteSettings();
-const siteTitle = settings?.title || "Engaged Philosophy";
-const siteDescription =
-	settings?.tagline || "Civic Engagement in Philosophy Classes";
+const siteTitle = settings?.title || SITE_TITLE_FALLBACK;
+const siteDescription = settings?.tagline || SITE_TAGLINE_FALLBACK;
 const pageTitle =
 	title && title !== "Home"
 		? `${title} – ${siteTitle}`
