@@ -6,6 +6,8 @@ Cloudflare constraints.
 
 ## Runtime
 
+- `src/lib/site-config.ts` is the shared source for non-secret site constants
+  used by both the theme and Astro/EmDash configuration.
 - `src/lib/cloudflare-access-auth.ts` authenticates EmDash users from Cloudflare
   Access JWTs. EmDash users still need to exist in the EmDash auth tables.
 - `src/emdash-routes/cloudflare-access-invite.ts` replaces the default email

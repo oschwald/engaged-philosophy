@@ -6,6 +6,12 @@ import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
 import { createLogger } from "vite";
 
+import {
+	ANONYMOUS_PAGE_CACHE_NAME,
+	CLOUDFLARE_ACCESS_TEAM_DOMAIN,
+	PUBLIC_MEDIA_URL,
+} from "./src/lib/site-config.ts";
+
 const embedsPluginEntrypoint = fileURLToPath(
 	new URL("./src/plugins/embeds.ts", import.meta.url),
 );
@@ -79,7 +85,7 @@ export default defineConfig({
 			provider: {
 				entrypoint: anonymousCloudflareCacheEntrypoint,
 				config: {
-					cacheName: "engaged-philosophy-pages-v2",
+					cacheName: ANONYMOUS_PAGE_CACHE_NAME,
 				},
 			},
 		},
@@ -122,7 +128,7 @@ export default defineConfig({
 			database: d1({ binding: "DB", session: "disabled" }),
 			storage: r2({
 				binding: "MEDIA",
-				publicUrl: "https://media.engagedphilosophy.com",
+				publicUrl: PUBLIC_MEDIA_URL,
 			}),
 			auth: useTestAuth
 				? {
@@ -137,7 +143,7 @@ export default defineConfig({
 						type: "cloudflare-access",
 						entrypoint: cloudflareAccessAuthEntrypoint,
 						config: {
-							teamDomain: "engaged-philosophy.cloudflareaccess.com",
+							teamDomain: CLOUDFLARE_ACCESS_TEAM_DOMAIN,
 							audienceEnvVar: "CF_ACCESS_AUDIENCE",
 							autoProvision: false,
 						},
