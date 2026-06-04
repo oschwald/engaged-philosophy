@@ -34,7 +34,11 @@ assert.equal(getBlock("youtube", embedBlocks).label, "YouTube Video");
 assert.equal(getBlock("vimeo", embedBlocks).label, "Vimeo Video");
 
 assert.equal(auditLogPlugin.id, "audit-log");
-assert.deepEqual(auditLogPlugin.capabilities, ["content:read"]);
+assert.deepEqual(auditLogPlugin.capabilities, [
+	"content:read",
+	"content:write",
+	"media:read",
+]);
 assert.deepEqual(auditLogPlugin.allowedHosts, []);
 assert.deepEqual(auditLogPlugin.storage.entries.indexes, [
 	"timestamp",

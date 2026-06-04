@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 
+import { createHookPipeline } from "emdash";
+
 import { createPlugin } from "../src/plugins/audit-log.ts";
 
 function createStorage() {
@@ -66,6 +68,16 @@ function hookHandler(entry) {
 }
 
 const plugin = createPlugin();
+
+assert.deepEqual(plugin.capabilities, [
+	"content:read",
+	"content:write",
+	"media:read",
+]);
+assert.doesNotThrow(() => createHookPipeline([plugin]));
+assert.deepEqual(plugin.hooks["content:beforeSave"].dependencies, []);
+assert.equal(plugin.hooks["content:beforeSave"].pluginId, "audit-log");
+
 const beforeSaveHook = hookHandler(plugin.hooks["content:beforeSave"]);
 const afterSaveHook = hookHandler(plugin.hooks["content:afterSave"]);
 const adminRoute = plugin.routes.admin;
