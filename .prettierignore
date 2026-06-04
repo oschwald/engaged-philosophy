@@ -13,4 +13,6 @@ debug-crawl-parity.js
 *.zip
 emdash.md
 review.md
+.migration/
+.parity-audit/
 .snapshot/

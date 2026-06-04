@@ -20,5 +20,7 @@ browser timing in `e2e-static/`, and admin/public workflows in `e2e/`.
 - `npm test` runs Vitest and static Playwright tests.
 - `npm run test:seed` runs only the checked-in seed guard.
 - `npm run test:e2e` runs the Worker-backed Playwright suite.
+- `npm run smoke:live` runs lightweight checks against a deployed site. Set
+  `LIVE_BASE_URL` to target a non-default hostname.
 - `npm run ci` runs linting, fast tests, typecheck, build, Worker checks, and
   Worker-backed Playwright.
