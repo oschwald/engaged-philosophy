@@ -11,11 +11,13 @@ a built Worker.
   process.
 - `support/` contains shared fixtures and test helpers.
 
-Keep browser-visible behavior in `e2e/` Playwright specs. Keep build, Worker,
-and full rendered-site smoke checks in their existing script runners unless
-they become cheap, deterministic Node tests.
+Keep browser-visible behavior in Playwright specs: `e2e-static/` for browser
+fixtures that do not need a Worker, and `e2e/` for real Worker-backed public
+site and admin workflows. Keep build and Worker startup checks in their script
+runners.
 
 ## Commands
 
 - `npm run test:unit` runs the Vitest suite once.
+- `npm run test:seed` runs only the checked-in EmDash seed guard.
 - `npm run test:unit:watch` runs Vitest in watch mode.

@@ -4,6 +4,9 @@ dist/
 .wrangler/
 node_modules/
 src/node_modules/
+playwright-report/
+playwright-report-static/
+test-results/
 seed/seed.json
 engagedphilosophy.WordPress*.xml
 debug-crawl-parity.js

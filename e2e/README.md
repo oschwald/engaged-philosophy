@@ -1,10 +1,10 @@
 # E2E Tests
 
 End-to-end tests live under `e2e/` and use the standard Playwright runner.
-These tests cover browser-visible behavior and Cloudflare Worker integration.
-Prefer user-facing page tests for admin and public workflows. Use API helpers
-for setup or focused assertions when browser setup would obscure the behavior
-being covered.
+These tests cover browser-visible behavior through the built Cloudflare Worker.
+Prefer user-facing page tests for admin and public workflows. Use API helpers for
+setup or focused assertions when browser setup would obscure the behavior being
+covered.
 
 ## Layout
 
@@ -14,8 +14,8 @@ being covered.
 - `specs/admin/` covers EmDash admin pages and APIs.
 - `specs/editing/` covers visual editing and save/publish flows.
 
-Keep pure transform, seed, config, and migration checks in the existing script
-tests unless they need a real browser or Worker runtime.
+Keep pure transform, seed, config, and migration checks in `tests/`. Put small
+browser fixtures that do not need the Worker in `e2e-static/`.
 
 ## Commands
 
