@@ -21,6 +21,8 @@ dist/
 .astro/
 .wrangler/
 coverage/
+playwright-report/
+test-results/
 logs/
 *.log
 pids
