@@ -1,4 +1,8 @@
 ---
+import PrimaryNav from "../components/layout/PrimaryNav.astro";
+import SiteFooter from "../components/layout/SiteFooter.astro";
+import SiteHead from "../components/layout/SiteHead.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
 import { getPrimaryMenu, getRuntimeSiteSettings } from "../lib/content";
 import { getMediaUrlPrefix, rewriteInternalMediaFileUrl } from "../lib/media";
 import "../scss/style.scss";
@@ -41,196 +45,29 @@ const logoAlt = logo?.alt || `${siteTitle} Logo`;
 
 <!doctype html>
 <html class="no-js" lang="en-US">
-	<head>
-		<link rel="profile" href="https://gmpg.org/xfn/11" />
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>{pageTitle}</title>
-		<meta name="description" content={description || siteDescription} />
-		<link rel="icon" type={faviconType} href={faviconHref} />
-		{
-			!favicon?.url && (
-				<link
-					rel="alternate icon"
-					type="image/svg+xml"
-					href="/favicon-simple.svg"
-				/>
-			)
-		}
-		<link rel="manifest" href="/site.webmanifest" />
-		<meta name="theme-color" content="#fd7e14" />
-		<meta name="msapplication-TileColor" content="#fd7e14" />
-		<link
-			rel="stylesheet"
-			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
-		/>
-	</head>
+	<SiteHead
+		pageTitle={pageTitle}
+		description={description || siteDescription}
+		faviconHref={faviconHref}
+		faviconType={faviconType}
+		hasCustomFavicon={Boolean(favicon?.url)}
+	/>
 	<body class={bodyClass}>
 		<div id="fb-root"></div>
 		<div class="container">
-			<header id="branding" class="text-center py-3">
-				<a id="header-image" href="/" title={siteTitle} rel="home">
-					<img
-						src={logoSrc}
-						alt={logoAlt}
-						width={logo?.width}
-						height={logo?.height}
-					/>
-				</a>
-			</header>
+			<SiteHeader
+				siteTitle={siteTitle}
+				logoSrc={logoSrc}
+				logoAlt={logoAlt}
+				logoWidth={logo?.width}
+				logoHeight={logo?.height}
+			/>
 
-			<nav id="access" aria-label="Main navigation">
-				<h3 class="visually-hidden">Main menu</h3>
-				<div class="skip-link">
-					<a
-						class="visually-hidden"
-						href="#content"
-						title="Skip to primary content"
-					>
-						Skip to primary content
-					</a>
-				</div>
-				<div class="skip-link">
-					<a
-						class="visually-hidden"
-						href="#secondary"
-						title="Skip to secondary content"
-					>
-						Skip to secondary content
-					</a>
-				</div>
-				<div class="navbar navbar-expand-lg navbar-dark bg-dark">
-					<button
-						class="navbar-toggler"
-						type="button"
-						data-bs-toggle="collapse"
-						data-bs-target="#navbarNav"
-						aria-controls="navbarNav"
-						aria-expanded="false"
-						aria-label="Toggle navigation"
-					>
-						<span class="navbar-toggler-icon"></span>
-					</button>
-
-					<div class="collapse navbar-collapse" id="navbarNav">
-						<div class="menu-main-menu-container">
-							<ul id="menu-main-menu" class="navbar-nav ms-auto">
-								{
-									menuItems.map((item) => {
-										const hasChildren = (item.children?.length ?? 0) > 0;
-										const isActive =
-											item.url === currentPath ||
-											item.url === `${currentPath}/`;
-										const isBranchActive =
-											hasChildren &&
-											item.children?.some(
-												(child) =>
-													child.url === currentPath ||
-													child.url === `${currentPath}/`,
-											);
-										return (
-											<li
-												class:list={[
-													"menu-item",
-													"nav-item",
-													hasChildren && "dropdown",
-													(isActive || isBranchActive) && "active",
-												]}
-											>
-												<a
-													class:list={[
-														"nav-link",
-														hasChildren && "dropdown-toggle",
-													]}
-													href={hasChildren ? "#" : item.url}
-													target={item.target}
-													{...(hasChildren
-														? {
-																"data-bs-toggle": "dropdown",
-																"aria-expanded": "false",
-																"aria-haspopup": "true",
-															}
-														: {})}
-												>
-													{item.label}
-												</a>
-												{hasChildren && (
-													<ul class="dropdown-menu">
-														{(item.children ?? []).map((child) => (
-															<li class="menu-item nav-item">
-																<a
-																	class="dropdown-item"
-																	href={child.url}
-																	target={child.target}
-																>
-																	{child.label}
-																</a>
-															</li>
-														))}
-													</ul>
-												)}
-											</li>
-										);
-									})
-								}
-							</ul>
-						</div>
-						<form
-							id="searchform"
-							class="d-flex ms-auto"
-							method="get"
-							action="/"
-							role="search"
-							aria-label="Search the site"
-						>
-							<label for="s" class="visually-hidden">Search</label>
-							<input
-								type="search"
-								class="form-control"
-								name="s"
-								id="s"
-								placeholder="Search"
-								aria-label="Search the site"
-							/>
-							<button
-								type="submit"
-								class="btn btn-outline-secondary ms-1"
-								aria-label="Submit search"
-							>
-								<i class="bi bi-search"></i>
-							</button>
-						</form>
-					</div>
-				</div>
-			</nav>
+			<PrimaryNav menuItems={menuItems} currentPath={currentPath} />
 
 			<div id="page" class="hfeed row">
 				<slot />
-				<footer id="colophon" class="col-12">
-					<div
-						id="page-footer"
-						class="footer-custom d-flex align-items-center justify-content-between px-3 py-3"
-					>
-						<span class="credits alignleft"
-							>&copy; 2026 <a href="/">{siteTitle}</a>, all rights reserved.</span
-						>
-						<div class="d-flex align-items-center gap-2">
-							<div
-								class="fb-like"
-								data-href="https://www.facebook.com/engagedphilosophy"
-								data-width="200"
-								data-layout="button_count"
-								data-action="like"
-								data-show-faces="false"
-								data-share="false"
-							>
-							</div>
-							<a href="mailto:info@engagedphilosophy.com"
-								>info@engagedphilosophy.com</a
-							>
-						</div>
-					</div>
-				</footer>
+				<SiteFooter siteTitle={siteTitle} />
 			</div>
 		</div>
 		<script>

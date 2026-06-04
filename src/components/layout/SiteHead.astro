@@ -1,0 +1,42 @@
+---
+interface Props {
+	pageTitle: string;
+	description: string;
+	faviconHref: string;
+	faviconType?: string;
+	hasCustomFavicon?: boolean;
+}
+
+const {
+	pageTitle,
+	description,
+	faviconHref,
+	faviconType,
+	hasCustomFavicon = false,
+} = Astro.props;
+---
+
+<head>
+	<link rel="profile" href="https://gmpg.org/xfn/11" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>{pageTitle}</title>
+	<meta name="description" content={description} />
+	<link rel="icon" type={faviconType} href={faviconHref} />
+	{
+		!hasCustomFavicon && (
+			<link
+				rel="alternate icon"
+				type="image/svg+xml"
+				href="/favicon-simple.svg"
+			/>
+		)
+	}
+	<link rel="manifest" href="/site.webmanifest" />
+	<meta name="theme-color" content="#fd7e14" />
+	<meta name="msapplication-TileColor" content="#fd7e14" />
+	<link
+		rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css"
+	/>
+</head>
