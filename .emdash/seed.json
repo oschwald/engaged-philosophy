@@ -1,0 +1,847 @@
+{
+	"$schema": "https://emdashcms.com/seed.schema.json",
+	"version": "1",
+	"meta": {
+		"name": "Exported Seed",
+		"description": "Exported from existing EmDash database"
+	},
+	"settings": {
+		"favicon": {
+			"mediaId": "01KSKNR8TJ18J352FQZ3GKSJ07"
+		},
+		"logo": {
+			"mediaId": "01KSH36MHS36YJTKSN4PQHR2P0",
+			"alt": ""
+		},
+		"title": "Engaged Philosophy",
+		"tagline": "Civic Engagement in Philosophy Classes"
+	},
+	"collections": [
+		{
+			"slug": "pages",
+			"label": "Pages",
+			"labelSingular": "Page",
+			"supports": ["drafts", "revisions", "search"],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "path",
+					"label": "Path",
+					"type": "string",
+					"unique": true,
+					"widget": "legacy-image-blocks:hidden"
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText",
+					"widget": "portableText"
+				},
+				{
+					"slug": "featured_image",
+					"label": "Featured Image",
+					"type": "image"
+				},
+				{
+					"slug": "template",
+					"label": "Template",
+					"type": "string"
+				},
+				{
+					"slug": "about_html",
+					"label": "About HTML",
+					"type": "portableText",
+					"widget": "portableText"
+				},
+				{
+					"slug": "box_left_title",
+					"label": "Left Box Title",
+					"type": "string"
+				},
+				{
+					"slug": "box_left_html",
+					"label": "Left Box HTML",
+					"type": "portableText",
+					"widget": "portableText"
+				},
+				{
+					"slug": "box_middle_title",
+					"label": "Middle Box Title",
+					"type": "string"
+				},
+				{
+					"slug": "box_middle_html",
+					"label": "Middle Box HTML",
+					"type": "portableText",
+					"widget": "portableText"
+				},
+				{
+					"slug": "box_right_title",
+					"label": "Right Box Title",
+					"type": "string"
+				},
+				{
+					"slug": "box_right_html",
+					"label": "Right Box HTML",
+					"type": "portableText",
+					"widget": "portableText"
+				},
+				{
+					"slug": "author_name",
+					"label": "Author Name",
+					"type": "string"
+				},
+				{
+					"slug": "legacy_wp_id",
+					"label": "Legacy WordPress ID",
+					"type": "integer"
+				}
+			]
+		},
+		{
+			"slug": "posts",
+			"label": "Posts",
+			"labelSingular": "Post",
+			"supports": ["drafts", "revisions", "search"],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "path",
+					"label": "Path",
+					"type": "string",
+					"unique": true,
+					"widget": "legacy-image-blocks:hidden"
+				},
+				{
+					"slug": "excerpt",
+					"label": "Excerpt",
+					"type": "portableText",
+					"widget": "portableText"
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText",
+					"widget": "portableText"
+				},
+				{
+					"slug": "featured_image",
+					"label": "Featured Image",
+					"type": "image"
+				},
+				{
+					"slug": "published_on",
+					"label": "Published On",
+					"type": "datetime"
+				},
+				{
+					"slug": "author_name",
+					"label": "Author Name",
+					"type": "string"
+				},
+				{
+					"slug": "legacy_wp_id",
+					"label": "Legacy WordPress ID",
+					"type": "integer"
+				}
+			]
+		},
+		{
+			"slug": "projects",
+			"label": "Projects",
+			"labelSingular": "Project",
+			"supports": ["drafts", "revisions", "search"],
+			"fields": [
+				{
+					"slug": "title",
+					"label": "Title",
+					"type": "string",
+					"required": true
+				},
+				{
+					"slug": "path",
+					"label": "Path",
+					"type": "string",
+					"unique": true,
+					"widget": "legacy-image-blocks:hidden"
+				},
+				{
+					"slug": "excerpt",
+					"label": "Excerpt",
+					"type": "portableText",
+					"widget": "portableText"
+				},
+				{
+					"slug": "content",
+					"label": "Content",
+					"type": "portableText",
+					"widget": "portableText"
+				},
+				{
+					"slug": "featured_image",
+					"label": "Featured Image",
+					"type": "image"
+				},
+				{
+					"slug": "highlight",
+					"label": "Highlight",
+					"type": "boolean",
+					"defaultValue": false
+				},
+				{
+					"slug": "menu_order",
+					"label": "Menu Order",
+					"type": "integer",
+					"defaultValue": 0
+				},
+				{
+					"slug": "published_on",
+					"label": "Published On",
+					"type": "datetime"
+				},
+				{
+					"slug": "author_name",
+					"label": "Author Name",
+					"type": "string"
+				},
+				{
+					"slug": "legacy_wp_id",
+					"label": "Legacy WordPress ID",
+					"type": "integer"
+				}
+			]
+		}
+	],
+	"taxonomies": [
+		{
+			"id": "tax:category",
+			"name": "category",
+			"label": "Categories",
+			"labelSingular": "Category",
+			"hierarchical": true,
+			"collections": ["posts"],
+			"terms": [
+				{
+					"id": "term:category:uncategorized",
+					"slug": "uncategorized",
+					"label": "Uncategorized"
+				}
+			]
+		},
+		{
+			"id": "tax:courses",
+			"name": "courses",
+			"label": "Courses",
+			"labelSingular": "Course",
+			"hierarchical": true,
+			"collections": ["projects"],
+			"terms": [
+				{
+					"id": "term:courses:critical-thinking",
+					"slug": "critical-thinking",
+					"label": "Critical Thinking"
+				},
+				{
+					"id": "term:courses:ethics",
+					"slug": "ethics",
+					"label": "Ethics"
+				},
+				{
+					"id": "term:courses:ethics-and-society",
+					"slug": "ethics-and-society",
+					"label": "Ethics and Society"
+				},
+				{
+					"id": "term:courses:introduction-to-ethics",
+					"slug": "introduction-to-ethics",
+					"label": "Introduction to Ethics"
+				},
+				{
+					"id": "term:courses:practicum-in-ethics",
+					"slug": "practicum-in-ethics",
+					"label": "Practicum in Ethics"
+				},
+				{
+					"id": "term:courses:socially-engaged-philosophy",
+					"slug": "socially-engaged-philosophy",
+					"label": "Socially Engaged Philosophy"
+				}
+			]
+		},
+		{
+			"id": "tax:professors",
+			"name": "professors",
+			"label": "Professors",
+			"labelSingular": "Professor",
+			"hierarchical": true,
+			"collections": ["projects"],
+			"terms": [
+				{
+					"id": "term:professors:ben-hole",
+					"slug": "ben-hole",
+					"label": "Ben Hole"
+				},
+				{
+					"id": "term:professors:chad-wiener",
+					"slug": "chad-wiener",
+					"label": "Chad Wiener"
+				},
+				{
+					"id": "term:professors:monica-janzen",
+					"slug": "monica-janzen",
+					"label": "Monica \"Mo\" Janzen"
+				},
+				{
+					"id": "term:professors:ramona-ilea",
+					"slug": "ramona-ilea",
+					"label": "Ramona Ilea"
+				},
+				{
+					"id": "term:professors:susan-hawthorne",
+					"slug": "susan-hawthorne",
+					"label": "Susan Hawthorne"
+				}
+			]
+		},
+		{
+			"id": "tax:schools",
+			"name": "schools",
+			"label": "Schools",
+			"labelSingular": "School",
+			"hierarchical": true,
+			"collections": ["projects"],
+			"terms": [
+				{
+					"id": "term:schools:anoka-ramsey-community-college",
+					"slug": "anoka-ramsey-community-college",
+					"label": "Anoka Ramsey Community College"
+				},
+				{
+					"id": "term:schools:hennepin",
+					"slug": "hennepin",
+					"label": "Hennepin Technical College"
+				},
+				{
+					"id": "term:schools:pacific",
+					"slug": "pacific",
+					"label": "Pacific University"
+				},
+				{
+					"id": "term:schools:stkate",
+					"slug": "stkate",
+					"label": "St. Catherine University"
+				}
+			]
+		},
+		{
+			"id": "tax:semesters",
+			"name": "semesters",
+			"label": "Semesters",
+			"labelSingular": "Semester",
+			"hierarchical": true,
+			"collections": ["projects"],
+			"terms": [
+				{
+					"id": "term:semesters:fall-2008",
+					"slug": "fall-2008",
+					"label": "Fall 2008"
+				},
+				{
+					"id": "term:semesters:fall-2009",
+					"slug": "fall-2009",
+					"label": "Fall 2009"
+				},
+				{
+					"id": "term:semesters:fall-2011",
+					"slug": "fall-2011",
+					"label": "Fall 2011"
+				},
+				{
+					"id": "term:semesters:fall-2012",
+					"slug": "fall-2012",
+					"label": "Fall 2012"
+				},
+				{
+					"id": "term:semesters:fall-2013",
+					"slug": "fall-2013",
+					"label": "Fall 2013"
+				},
+				{
+					"id": "term:semesters:fall-2014",
+					"slug": "fall-2014",
+					"label": "Fall 2014"
+				},
+				{
+					"id": "term:semesters:fall-2015",
+					"slug": "fall-2015",
+					"label": "Fall 2015"
+				},
+				{
+					"id": "term:semesters:fall-2016",
+					"slug": "fall-2016",
+					"label": "Fall 2016"
+				},
+				{
+					"id": "term:semesters:fall-2017",
+					"slug": "fall-2017",
+					"label": "Fall 2017"
+				},
+				{
+					"id": "term:semesters:fall-2018",
+					"slug": "fall-2018",
+					"label": "Fall 2018"
+				},
+				{
+					"id": "term:semesters:fall-2019",
+					"slug": "fall-2019",
+					"label": "Fall 2019"
+				},
+				{
+					"id": "term:semesters:fall-2020",
+					"slug": "fall-2020",
+					"label": "Fall 2020"
+				},
+				{
+					"id": "term:semesters:fall-2021",
+					"slug": "fall-2021",
+					"label": "Fall 2021"
+				},
+				{
+					"id": "term:semesters:fall-2023",
+					"slug": "fall-2023",
+					"label": "Fall 2023"
+				},
+				{
+					"id": "term:semesters:spring-2010",
+					"slug": "spring-2010",
+					"label": "Spring 2010"
+				},
+				{
+					"id": "term:semesters:spring-2011",
+					"slug": "spring-2011",
+					"label": "Spring 2011"
+				},
+				{
+					"id": "term:semesters:spring-2012",
+					"slug": "spring-2012",
+					"label": "Spring 2012"
+				},
+				{
+					"id": "term:semesters:spring-2013",
+					"slug": "spring-2013",
+					"label": "Spring 2013"
+				},
+				{
+					"id": "term:semesters:spring-2014",
+					"slug": "spring-2014",
+					"label": "Spring 2014"
+				},
+				{
+					"id": "term:semesters:spring-2015",
+					"slug": "spring-2015",
+					"label": "Spring 2015"
+				},
+				{
+					"id": "term:semesters:spring-2017",
+					"slug": "spring-2017",
+					"label": "Spring 2017"
+				},
+				{
+					"id": "term:semesters:spring-2018",
+					"slug": "spring-2018",
+					"label": "Spring 2018"
+				},
+				{
+					"id": "term:semesters:spring-2019",
+					"slug": "spring-2019",
+					"label": "Spring 2019"
+				},
+				{
+					"id": "term:semesters:spring-2021",
+					"slug": "spring-2021",
+					"label": "Spring 2021"
+				},
+				{
+					"id": "term:semesters:spring2018",
+					"slug": "spring2018",
+					"label": "Spring2018"
+				},
+				{
+					"id": "term:semesters:spring-2023",
+					"slug": "spring-2023",
+					"label": "spring 2023"
+				}
+			]
+		},
+		{
+			"id": "tax:tag",
+			"name": "tag",
+			"label": "Tags",
+			"labelSingular": "Tag",
+			"hierarchical": false,
+			"collections": ["posts"]
+		},
+		{
+			"id": "tax:topic",
+			"name": "topic",
+			"label": "Topics",
+			"labelSingular": "Topic",
+			"hierarchical": false,
+			"collections": ["projects"],
+			"terms": [
+				{
+					"id": "term:topic:crafts",
+					"slug": "crafts",
+					"label": "Crafts"
+				},
+				{
+					"id": "term:topic:lgbtq",
+					"slug": "lgbtq",
+					"label": "LGBTQ"
+				},
+				{
+					"id": "term:topic:military",
+					"slug": "military",
+					"label": "Military"
+				},
+				{
+					"id": "term:topic:organize-an-activity",
+					"slug": "organize-an-activity",
+					"label": "Organize An Activity"
+				},
+				{
+					"id": "term:topic:animal-rights",
+					"slug": "animal-rights",
+					"label": "animal rights"
+				},
+				{
+					"id": "term:topic:animals",
+					"slug": "animals",
+					"label": "animals"
+				},
+				{
+					"id": "term:topic:anxiety",
+					"slug": "anxiety",
+					"label": "anxiety"
+				},
+				{
+					"id": "term:topic:art",
+					"slug": "art",
+					"label": "art"
+				},
+				{
+					"id": "term:topic:assisted-living",
+					"slug": "assisted-living",
+					"label": "assisted living"
+				},
+				{
+					"id": "term:topic:blood-donation",
+					"slug": "blood-donation",
+					"label": "blood donation"
+				},
+				{
+					"id": "term:topic:business",
+					"slug": "business",
+					"label": "business"
+				},
+				{
+					"id": "term:topic:clubs",
+					"slug": "clubs",
+					"label": "clubs"
+				},
+				{
+					"id": "term:topic:community-building",
+					"slug": "community-building",
+					"label": "community-building"
+				},
+				{
+					"id": "term:topic:cultural",
+					"slug": "cultural",
+					"label": "cultural"
+				},
+				{
+					"id": "term:topic:culture",
+					"slug": "culture",
+					"label": "culture"
+				},
+				{
+					"id": "term:topic:donation-drive",
+					"slug": "donation-drive",
+					"label": "donation drive"
+				},
+				{
+					"id": "term:topic:eating-disorders",
+					"slug": "eating-disorders",
+					"label": "eating disorders"
+				},
+				{
+					"id": "term:topic:education",
+					"slug": "education",
+					"label": "education"
+				},
+				{
+					"id": "term:topic:elderly",
+					"slug": "elderly",
+					"label": "elderly"
+				},
+				{
+					"id": "term:topic:environmental",
+					"slug": "environmental",
+					"label": "environmental"
+				},
+				{
+					"id": "term:topic:feminine-hygiene",
+					"slug": "feminine-hygiene",
+					"label": "feminine hygiene"
+				},
+				{
+					"id": "term:topic:forum",
+					"slug": "forum",
+					"label": "forum"
+				},
+				{
+					"id": "term:topic:fundraiser",
+					"slug": "fundraiser",
+					"label": "fundraiser"
+				},
+				{
+					"id": "term:topic:glassblowing",
+					"slug": "glassblowing",
+					"label": "glassblowing"
+				},
+				{
+					"id": "term:topic:gratitude",
+					"slug": "gratitude",
+					"label": "gratitude"
+				},
+				{
+					"id": "term:topic:group-home",
+					"slug": "group-home",
+					"label": "group home"
+				},
+				{
+					"id": "term:topic:hands-on",
+					"slug": "hands-on",
+					"label": "hands-on"
+				},
+				{
+					"id": "term:topic:health",
+					"slug": "health",
+					"label": "health"
+				},
+				{
+					"id": "term:topic:high-school",
+					"slug": "high-school",
+					"label": "high-school"
+				},
+				{
+					"id": "term:topic:homeless",
+					"slug": "homeless",
+					"label": "homeless"
+				},
+				{
+					"id": "term:topic:international",
+					"slug": "international",
+					"label": "international"
+				},
+				{
+					"id": "term:topic:kids",
+					"slug": "kids",
+					"label": "kids"
+				},
+				{
+					"id": "term:topic:local",
+					"slug": "local",
+					"label": "local"
+				},
+				{
+					"id": "term:topic:meals",
+					"slug": "meals",
+					"label": "meals"
+				},
+				{
+					"id": "term:topic:meditation",
+					"slug": "meditation",
+					"label": "meditation"
+				},
+				{
+					"id": "term:topic:mental-health",
+					"slug": "mental-health",
+					"label": "mental health"
+				},
+				{
+					"id": "term:topic:music",
+					"slug": "music",
+					"label": "music"
+				},
+				{
+					"id": "term:topic:party",
+					"slug": "party",
+					"label": "party"
+				},
+				{
+					"id": "term:topic:politics",
+					"slug": "politics",
+					"label": "politics"
+				},
+				{
+					"id": "term:topic:poverty",
+					"slug": "poverty",
+					"label": "poverty"
+				},
+				{
+					"id": "term:topic:providing-food",
+					"slug": "providing-food",
+					"label": "providing food"
+				},
+				{
+					"id": "term:topic:religion",
+					"slug": "religion",
+					"label": "religion"
+				},
+				{
+					"id": "term:topic:school",
+					"slug": "school",
+					"label": "school"
+				},
+				{
+					"id": "term:topic:sports",
+					"slug": "sports",
+					"label": "sports"
+				},
+				{
+					"id": "term:topic:students",
+					"slug": "students",
+					"label": "students"
+				},
+				{
+					"id": "term:topic:teaching",
+					"slug": "teaching",
+					"label": "teaching"
+				},
+				{
+					"id": "term:topic:tie-blankets",
+					"slug": "tie-blankets",
+					"label": "tie-blankets"
+				},
+				{
+					"id": "term:topic:vegan",
+					"slug": "vegan",
+					"label": "vegan"
+				},
+				{
+					"id": "term:topic:veterans",
+					"slug": "veterans",
+					"label": "veterans"
+				},
+				{
+					"id": "term:topic:video",
+					"slug": "video",
+					"label": "video"
+				},
+				{
+					"id": "term:topic:walk-for-awareness",
+					"slug": "walk-for-awareness",
+					"label": "walk for awareness"
+				},
+				{
+					"id": "term:topic:writing",
+					"slug": "writing",
+					"label": "writing"
+				},
+				{
+					"id": "term:topic:youth",
+					"slug": "youth",
+					"label": "youth"
+				}
+			]
+		}
+	],
+	"menus": [
+		{
+			"id": "menu:primary",
+			"name": "primary",
+			"label": "Primary Navigation",
+			"items": [
+				{
+					"type": "custom",
+					"label": "Home",
+					"url": "/"
+				},
+				{
+					"type": "custom",
+					"label": "About",
+					"url": "/about/"
+				},
+				{
+					"type": "custom",
+					"label": "Projects",
+					"url": "/project/"
+				},
+				{
+					"type": "custom",
+					"label": "Resources",
+					"url": "/about-ce-projects/",
+					"children": [
+						{
+							"type": "custom",
+							"label": "Sample Syllabi and Assignments",
+							"url": "/sample-syllabi-and-assignments/"
+						},
+						{
+							"type": "custom",
+							"label": "Publications",
+							"url": "/publications/"
+						},
+						{
+							"type": "custom",
+							"label": "Organizations",
+							"url": "/about-ce-projects/organizations/"
+						},
+						{
+							"type": "custom",
+							"label": "People",
+							"url": "/about-ce-projects/people/"
+						},
+						{
+							"type": "custom",
+							"label": "Testimonials",
+							"url": "/about-ce-projects/testimonials/"
+						},
+						{
+							"type": "custom",
+							"label": "Skills Gained",
+							"url": "/about-ce-projects/skills-gained/"
+						},
+						{
+							"type": "custom",
+							"label": "About E-Portfolios",
+							"url": "/about-ce-projects/about-e-portfolios/"
+						}
+					]
+				},
+				{
+					"type": "custom",
+					"label": "FAQ",
+					"url": "/faq/"
+				},
+				{
+					"type": "custom",
+					"label": "Interviews",
+					"url": "/interviews/"
+				}
+			]
+		}
+	],
+	"widgetAreas": []
+}

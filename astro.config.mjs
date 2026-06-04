@@ -21,12 +21,16 @@ const legacyImagePluginAdminEntrypoint = fileURLToPath(
 const cloudflareAccessAuthEntrypoint = fileURLToPath(
 	new URL("./src/lib/cloudflare-access-auth.ts", import.meta.url),
 );
+const testAuthEntrypoint = fileURLToPath(
+	new URL("./src/lib/test-auth.ts", import.meta.url),
+);
 const anonymousCloudflareCacheEntrypoint = fileURLToPath(
 	new URL("./src/lib/anonymous-cloudflare-cache.ts", import.meta.url),
 );
 const cloudflareAccessInviteRouteEntrypoint = fileURLToPath(
 	new URL("./src/emdash-routes/cloudflare-access-invite.ts", import.meta.url),
 );
+const useTestAuth = process.env.EMDASH_TEST_AUTH === "1";
 
 function suppressKnownBuildWarnings(warning, warn) {
 	if (
@@ -120,15 +124,24 @@ export default defineConfig({
 				binding: "MEDIA",
 				publicUrl: "https://media.engagedphilosophy.com",
 			}),
-			auth: {
-				type: "cloudflare-access",
-				entrypoint: cloudflareAccessAuthEntrypoint,
-				config: {
-					teamDomain: "engaged-philosophy.cloudflareaccess.com",
-					audienceEnvVar: "CF_ACCESS_AUDIENCE",
-					autoProvision: false,
-				},
-			},
+			auth: useTestAuth
+				? {
+						type: "test",
+						entrypoint: testAuthEntrypoint,
+						config: {
+							autoProvision: useTestAuth,
+							defaultRole: 50,
+						},
+					}
+				: {
+						type: "cloudflare-access",
+						entrypoint: cloudflareAccessAuthEntrypoint,
+						config: {
+							teamDomain: "engaged-philosophy.cloudflareaccess.com",
+							audienceEnvVar: "CF_ACCESS_AUDIENCE",
+							autoProvision: false,
+						},
+					},
 			plugins: [
 				{
 					id: "audit-log",
