@@ -1,4 +1,6 @@
 ---
+import EntrySummary from "./content/EntrySummary.astro";
+import Pagination from "./content/Pagination.astro";
 import ThemeSidebar from "./ThemeSidebar.astro";
 import {
 	getEntryContent,
@@ -44,37 +46,24 @@ function pageHref(pageNumber: number) {
 		{
 			hasResults ? (
 				pageItems.map((project) => (
-					<article
-						class={`mb-5 pb-4 border-bottom ${project.data.featured_image?.src ? "has-post-thumbnail " : ""}project type-project status-publish`}
-					>
-						<header class="page-header mb-3">
-							<h2 class="entry-title h4 mb-0">{project.data.title}</h2>
-						</header>
-
-						<div class="entry-content text-muted lh-base">
-							{project.data.featured_image?.src && (
-								<img
-									class="img-thumbnail float-end ms-3"
-									src={rewriteWordPressUploadUrl(
+					<EntrySummary
+						articleClass={`mb-5 pb-4 border-bottom ${project.data.featured_image?.src ? "has-post-thumbnail " : ""}project type-project status-publish`}
+						title={project.data.title ?? ""}
+						continueHref={`/${project.data.path}/`}
+						excerpt={getExcerptText(
+							getEntryExcerpt(project.data),
+							getEntryContent(project.data),
+						)}
+						image={{
+							src: project.data.featured_image?.src
+								? rewriteWordPressUploadUrl(
 										project.data.featured_image.src,
 										mediaUrlPrefix,
-									)}
-									alt={project.data.featured_image.alt || project.data.title}
-									width="150"
-									height="150"
-								/>
-							)}
-							<p>
-								{getExcerptText(
-									getEntryExcerpt(project.data),
-									getEntryContent(project.data),
-								)}{" "}
-								<a href={`/${project.data.path}/`}>
-									Continue reading <span class="meta-nav">&rarr;</span>
-								</a>
-							</p>
-						</div>
-					</article>
+									)
+								: undefined,
+							alt: project.data.featured_image?.alt || project.data.title,
+						}}
+					/>
 				))
 			) : (
 				<article class="post no-results not-found">
@@ -115,55 +104,11 @@ function pageHref(pageNumber: number) {
 			)
 		}
 
-		{
-			totalPages > 1 && (
-				<nav aria-label="Page navigation">
-					<ul class="pagination justify-content-center">
-						<li class:list={["page-item", currentPage === 1 && "disabled"]}>
-							{currentPage === 1 ? (
-								<span class="page-link">&laquo; Previous</span>
-							) : (
-								<a class="page-link" href={pageHref(currentPage - 1)}>
-									&laquo; Previous
-								</a>
-							)}
-						</li>
-						{Array.from({ length: totalPages }, (_, index) => index + 1).map(
-							(pageNumber) => (
-								<li
-									class:list={[
-										"page-item",
-										pageNumber === currentPage && "active",
-									]}
-								>
-									{pageNumber === currentPage ? (
-										<span class="page-link">{pageNumber}</span>
-									) : (
-										<a class="page-link" href={pageHref(pageNumber)}>
-											{pageNumber}
-										</a>
-									)}
-								</li>
-							),
-						)}
-						<li
-							class:list={[
-								"page-item",
-								currentPage === totalPages && "disabled",
-							]}
-						>
-							{currentPage === totalPages ? (
-								<span class="page-link">Next &raquo;</span>
-							) : (
-								<a class="page-link" href={pageHref(currentPage + 1)}>
-									Next &raquo;
-								</a>
-							)}
-						</li>
-					</ul>
-				</nav>
-			)
-		}
+		<Pagination
+			currentPage={currentPage}
+			totalPages={totalPages}
+			pageHref={pageHref}
+		/>
 	</div>
 </section>
 

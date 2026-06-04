@@ -1,4 +1,6 @@
 ---
+import EntrySummary from "./content/EntrySummary.astro";
+import Pagination from "./content/Pagination.astro";
 import ThemeSidebar from "./ThemeSidebar.astro";
 import { searchSite } from "../lib/search";
 import { getMediaUrlPrefix } from "../lib/media";
@@ -38,94 +40,22 @@ function pageHref(pageNumber: number) {
 							</header>
 
 							{results.map((result) => (
-								<article
-									class:list={[
-										"mb-5",
-										"pb-4",
-										"border-bottom",
-										result.kind,
-										`type-${result.kind}`,
-									]}
-								>
-									<header class="page-header mb-3">
-										<h2 class="entry-title h4 mb-0">{result.title}</h2>
-									</header>
-
-									<div class="entry-content text-muted lh-base">
-										{result.imageSrc && (
-											<img
-												src={result.imageSrc}
-												class="img-thumbnail float-end ms-3"
-												alt={result.title}
-												width="150"
-												height="150"
-											/>
-										)}
-										{result.excerpt && (
-											<p>
-												{result.excerpt}{" "}
-												<a href={`/${result.path}/`}>
-													Continue reading <span class="meta-nav">&rarr;</span>
-												</a>
-											</p>
-										)}
-									</div>
-								</article>
+								<EntrySummary
+									articleClass={`mb-5 pb-4 border-bottom ${result.kind} type-${result.kind}`}
+									title={result.title}
+									continueHref={`/${result.path}/`}
+									excerpt={result.excerpt}
+									image={{ src: result.imageSrc, alt: result.title }}
+									showContinueWithoutExcerpt={false}
+								/>
 							))}
 
-							{totalPages > 1 && (
-								<nav aria-label="Page navigation">
-									<ul class="pagination justify-content-center">
-										<li
-											class:list={[
-												"page-item",
-												currentPage === 1 && "disabled",
-											]}
-										>
-											{currentPage === 1 ? (
-												<span class="page-link">Previous &laquo;</span>
-											) : (
-												<a class="page-link" href={pageHref(currentPage - 1)}>
-													Previous &laquo;
-												</a>
-											)}
-										</li>
-										{Array.from(
-											{ length: totalPages },
-											(_, index) => index + 1,
-										).map((pageNumber) => (
-											<li
-												class:list={[
-													"page-item",
-													pageNumber === currentPage && "active",
-												]}
-											>
-												{pageNumber === currentPage ? (
-													<span class="page-link">{pageNumber}</span>
-												) : (
-													<a class="page-link" href={pageHref(pageNumber)}>
-														{pageNumber}
-													</a>
-												)}
-											</li>
-										))}
-										<li
-											class:list={[
-												"page-item",
-												currentPage === totalPages && "disabled",
-											]}
-										>
-											{currentPage === totalPages ? (
-												<span class="page-link">Next &raquo;</span>
-											) : (
-												<a class="page-link" href={pageHref(currentPage + 1)}>
-													Next &raquo;
-												</a>
-											)}
-										</li>
-									</ul>
-								</nav>
-							)}
+							<Pagination
+								currentPage={currentPage}
+								totalPages={totalPages}
+								pageHref={pageHref}
+								previousIconAfter
+							/>
 						</>
 					) : (
 						<article class="post no-results not-found">
