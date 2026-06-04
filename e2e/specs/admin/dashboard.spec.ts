@@ -27,6 +27,26 @@ test.describe("admin worker integration", () => {
 		for (const slug of ["pages", "posts", "projects"]) {
 			expect(manifest?.data?.collections ?? {}).toHaveProperty(slug);
 		}
+		const plugins = manifest?.data?.plugins ?? {};
+		const legacyBlocks =
+			plugins["legacy-image-blocks"]?.portableTextBlocks ?? [];
+		expect(legacyBlocks.map((block: { type: string }) => block.type)).toEqual(
+			expect.arrayContaining([
+				"legacyImage",
+				"legacyVideo",
+				"legacyEmbed",
+				"legacyPageList",
+			]),
+		);
+		const embedBlocks = plugins.embeds?.portableTextBlocks ?? [];
+		expect(embedBlocks.map((block: { type: string }) => block.type)).toEqual(
+			expect.arrayContaining(["youtube", "vimeo"]),
+		);
+		expect(plugins["audit-log"]?.adminPages ?? []).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({ path: "/history", label: "Audit History" }),
+			]),
+		);
 
 		await expectOkJson(authedRequest, "/_emdash/api/dashboard");
 

@@ -17,6 +17,7 @@ const browserPath = resolveBrowserPath();
 
 export default defineConfig({
 	testDir: "./e2e/specs",
+	globalSetup: "./e2e/global-setup.ts",
 	fullyParallel: false,
 	workers: 1,
 	timeout: 30_000,
@@ -33,7 +34,7 @@ export default defineConfig({
 		navigationTimeout: 15_000,
 		trace: "retain-on-failure",
 		screenshot: "only-on-failure",
-		video: "retain-on-failure",
+		video: process.env.PLAYWRIGHT_VIDEO === "1" ? "retain-on-failure" : "off",
 	},
 	projects: [
 		{

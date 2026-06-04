@@ -64,7 +64,7 @@ async function waitForWorker(
 	child: ChildProcess,
 	getOutput: () => string,
 ) {
-	const url = `http://127.0.0.1:${port}/`;
+	const url = `http://127.0.0.1:${port}/_emdash/api/manifest`;
 	const startedAt = Date.now();
 
 	while (Date.now() - startedAt < STARTUP_TIMEOUT_MS) {
@@ -73,8 +73,20 @@ async function waitForWorker(
 		}
 
 		try {
-			await fetchWithTimeout(url);
-			return;
+			const response = await fetchWithTimeout(url, {
+				headers: {
+					[TEST_AUTH_HEADER]: "1",
+					"X-EmDash-Request": "1",
+				},
+			});
+			const text = await response.text();
+			if (
+				response.status >= 200 &&
+				response.status < 500 &&
+				text.trim().startsWith("{")
+			) {
+				return;
+			}
 		} catch {
 			await sleep(250);
 		}
@@ -106,7 +118,7 @@ async function stopProcess(child: ChildProcess) {
 	]);
 }
 
-function runBuildWithTestAuth() {
+export function buildWorkerForE2E() {
 	const result = spawnSync("npm", ["run", "build"], {
 		cwd: ROOT,
 		encoding: "utf8",
@@ -126,6 +138,19 @@ function runBuildWithTestAuth() {
 		throw new Error(
 			"Expected test-auth build to create dist/server/wrangler.json.",
 		);
+	}
+
+	process.env.EMDASH_E2E_BUILD_READY = "1";
+}
+
+function ensureWorkerBuild() {
+	if (process.env.EMDASH_E2E_BUILD_READY !== "1") {
+		buildWorkerForE2E();
+		return;
+	}
+
+	if (!existsSync(DIST_WRANGLER_CONFIG)) {
+		buildWorkerForE2E();
 	}
 }
 
@@ -151,7 +176,15 @@ export async function jsonRequest(
 	}
 
 	const text = await response.text();
-	const body = text ? JSON.parse(text) : null;
+	let body: unknown = null;
+	try {
+		body = text ? JSON.parse(text) : null;
+	} catch (error) {
+		throw new Error(
+			`Expected ${pathName} to return JSON, got ${response.status}\n${text}`,
+			{ cause: error },
+		);
+	}
 
 	assert.ok(
 		response.status >= 200 && response.status < 300,
@@ -174,13 +207,19 @@ export async function completeSetup(baseURL: string) {
 		}),
 	});
 
-	assert.equal(body?.data?.setupComplete, true);
+	const data =
+		body && typeof body === "object" && "data" in body ? body.data : undefined;
+	const setupComplete =
+		data && typeof data === "object" && "setupComplete" in data
+			? data.setupComplete
+			: undefined;
+	assert.equal(setupComplete, true);
 }
 
 export async function startWorkerServer(
 	workerIndex: number,
 ): Promise<WorkerServer> {
-	runBuildWithTestAuth();
+	ensureWorkerBuild();
 
 	const persistDir = path.join(
 		ROOT,

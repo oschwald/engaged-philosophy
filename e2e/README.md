@@ -2,6 +2,9 @@
 
 End-to-end tests live under `e2e/` and use the standard Playwright runner.
 These tests cover browser-visible behavior and Cloudflare Worker integration.
+Prefer user-facing page tests for admin and public workflows. Use API helpers
+for setup or focused assertions when browser setup would obscure the behavior
+being covered.
 
 ## Layout
 
@@ -19,7 +22,10 @@ tests unless they need a real browser or Worker runtime.
 - `npm run test:e2e` runs the Playwright suite headlessly.
 - `npm run test:e2e:headed` runs the suite with a visible browser.
 - `npm run test:e2e:ui` opens the Playwright UI runner.
+- `PLAYWRIGHT_VIDEO=1 npm run test:e2e` records failure videos when traces and
+  screenshots are not enough.
 
-The Worker fixture builds with `EMDASH_TEST_AUTH=1`, starts `wrangler dev`
-against the built Worker, applies `.emdash/seed.json` without content, and
-uses the `X-EmDash-Test-Auth` header for authenticated admin requests.
+Playwright global setup builds once with `EMDASH_TEST_AUTH=1`. The Worker
+fixture starts `wrangler dev` against that build, applies `.emdash/seed.json`
+without content, and uses the `X-EmDash-Test-Auth` header for authenticated
+admin requests.

@@ -20,12 +20,17 @@ export async function expectOkJson(
 	return text ? JSON.parse(text) : null;
 }
 
-export function collectPageErrors(page: Page) {
+export function collectPageErrors(
+	page: Page,
+	options: { ignore?: RegExp[] } = {},
+) {
 	const errors: string[] = [];
 
 	page.on("console", (message) => {
 		if (message.type() === "error") {
-			errors.push(message.text());
+			const text = message.text();
+			if (options.ignore?.some((pattern) => pattern.test(text))) return;
+			errors.push(text);
 		}
 	});
 	page.on("pageerror", (error) => {

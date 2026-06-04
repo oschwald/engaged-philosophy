@@ -1,4 +1,9 @@
-import { test as base, expect, type APIRequestContext } from "@playwright/test";
+import {
+	test as base,
+	expect,
+	type APIRequestContext,
+	type Page,
+} from "@playwright/test";
 
 import {
 	completeSetup,
@@ -9,6 +14,7 @@ import {
 
 interface TestFixtures {
 	authedRequest: APIRequestContext;
+	publicPage: Page;
 }
 
 interface WorkerFixtures {
@@ -40,6 +46,19 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 			[TEST_AUTH_HEADER]: "1",
 		});
 		await use(page);
+	},
+
+	publicPage: async ({ browser, workerServer }, use) => {
+		const context = await browser.newContext({
+			baseURL: workerServer.baseURL,
+		});
+		const page = await context.newPage();
+
+		try {
+			await use(page);
+		} finally {
+			await context.close();
+		}
 	},
 
 	authedRequest: async ({ playwright, workerServer }, use) => {
