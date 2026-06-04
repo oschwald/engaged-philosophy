@@ -20,6 +20,12 @@ const BASE_URL = normalizeBaseUrl(
 	process.env.LIVE_BASE_URL ?? DEFAULT_BASE_URL,
 );
 const ADMIN_COOKIE = process.env.LIVE_SMOKE_ADMIN_COOKIE;
+const CHECK_SITEMAP = process.env.LIVE_SMOKE_SITEMAP === "1";
+const REQUIRE_SITEMAP = process.env.LIVE_SMOKE_REQUIRE_SITEMAP === "1";
+const SITEMAP_LIMIT = Number.parseInt(
+	process.env.LIVE_SMOKE_SITEMAP_LIMIT ?? "0",
+	10,
+);
 
 function parseList(value, fallback) {
 	if (!value) return fallback;
@@ -40,6 +46,17 @@ function absoluteUrl(pathOrUrl) {
 
 function statusLabel(response) {
 	return `${response.status} ${response.statusText}`.trim();
+}
+
+function parseSitemapLocations(xml) {
+	return [...xml.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/g)].map((match) =>
+		(match[1] ?? "").trim(),
+	);
+}
+
+function toBaseUrl(url) {
+	const parsed = new URL(url, BASE_URL);
+	return new URL(`${parsed.pathname}${parsed.search}`, BASE_URL).toString();
 }
 
 async function fetchWithTimeout(url, init = {}) {
@@ -100,6 +117,56 @@ async function checkPublicPage(path) {
 	);
 
 	console.log(`ok public ${path}`);
+}
+
+async function getSitemapPageUrls() {
+	const sitemapUrl = absoluteUrl("/sitemap.xml");
+	const response = await expectOk(sitemapUrl, "Sitemap");
+	const xml = await response.text();
+	const locations = parseSitemapLocations(xml);
+	const sitemapLocations = locations.filter((location) =>
+		location.endsWith(".xml"),
+	);
+	const pageLocations = locations
+		.filter((location) => !location.endsWith(".xml"))
+		.map(toBaseUrl);
+
+	for (const location of sitemapLocations.map(toBaseUrl)) {
+		const childResponse = await expectOk(location, `Sitemap ${location}`);
+		const childXml = await childResponse.text();
+		pageLocations.push(
+			...parseSitemapLocations(childXml)
+				.filter((childLocation) => !childLocation.endsWith(".xml"))
+				.map(toBaseUrl),
+		);
+	}
+
+	const sameOriginPages = [...new Set(pageLocations)];
+	return SITEMAP_LIMIT > 0
+		? sameOriginPages.slice(0, SITEMAP_LIMIT)
+		: sameOriginPages;
+}
+
+async function checkSitemapPages() {
+	if (!CHECK_SITEMAP) return;
+
+	const urls = await getSitemapPageUrls();
+	if (urls.length === 0) {
+		assert.equal(
+			REQUIRE_SITEMAP,
+			false,
+			"Expected sitemap to include public page URLs",
+		);
+		console.log("skip sitemap pages (no URLs found)");
+		return;
+	}
+
+	for (const url of urls) {
+		const path = new URL(url).pathname;
+		await checkPublicPage(path);
+	}
+
+	console.log(`ok sitemap pages ${urls.length}`);
 }
 
 async function checkStaticAsset(path) {
@@ -212,5 +279,6 @@ for (const url of MEDIA_URLS) {
 
 await checkAdminAccessRedirect();
 await checkSignedInAdminIfConfigured();
+await checkSitemapPages();
 
 console.log("Live smoke checks passed.");
