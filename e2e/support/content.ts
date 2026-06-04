@@ -177,6 +177,26 @@ export async function publishContentViaApi(
 	return body?.data?.item as ContentItem;
 }
 
+export async function updateContentViaApi(
+	request: APIRequestContext,
+	collection: CollectionSlug,
+	id: string,
+	options: {
+		slug?: string | null;
+		data?: Record<string, unknown>;
+		publishedAt?: string | null;
+	},
+) {
+	const response = await request.put(
+		`/_emdash/api/content/${collection}/${id}`,
+		{
+			data: options,
+		},
+	);
+	const body = await expectJsonResponse(response, `update ${collection}`);
+	return body?.data?.item as ContentItem;
+}
+
 export async function createAndPublishContentViaApi(
 	request: APIRequestContext,
 	collection: CollectionSlug,

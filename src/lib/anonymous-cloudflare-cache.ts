@@ -3,11 +3,13 @@ import type { CacheProviderFactory, MiddlewareNext } from "astro";
 const STORED_AT_HEADER = "X-EP-Cache-Stored-At";
 const MAX_AGE_HEADER = "X-EP-Cache-Max-Age";
 const SWR_HEADER = "X-EP-Cache-SWR";
+const CACHE_TAG_HEADER = "Cache-Tag";
 const INTERNAL_HEADERS = [STORED_AT_HEADER, MAX_AGE_HEADER, SWR_HEADER];
 const MAX_AGE_REGEX = /max-age=(\d+)/;
 const SWR_REGEX = /stale-while-revalidate=(\d+)/;
 const HTML_CONTENT_TYPE_REGEX = /(?:^|;)\s*text\/html(?:;|$)/i;
 const CACHE_KEY_ORIGIN = "https://engaged-philosophy-cache.local";
+const TAG_INDEX_PATH_PREFIX = "/__ep-cache-tags/";
 
 const TRACKING_PARAMS = [
 	"utm_source",
@@ -150,6 +152,14 @@ function parseCdnCacheControl(header: string | null): {
 	};
 }
 
+function parseCacheTags(header: string | null): string[] {
+	if (!header) return [];
+	return header
+		.split(",")
+		.map((tag) => tag.trim())
+		.filter(Boolean);
+}
+
 function stripInternalHeaders(response: Response) {
 	for (const header of INTERNAL_HEADERS) {
 		response.headers.delete(header);
@@ -184,6 +194,55 @@ function mark(response: Response, status: "HIT" | "MISS" | "STALE") {
 	return response;
 }
 
+function tagIndexKey(tag: string) {
+	const url = new URL(
+		`${TAG_INDEX_PATH_PREFIX}${encodeURIComponent(tag)}`,
+		CACHE_KEY_ORIGIN,
+	);
+	return url.toString();
+}
+
+async function readTagIndex(cache: Cache, tag: string): Promise<Set<string>> {
+	const response = await cache.match(tagIndexKey(tag));
+	if (!response) return new Set();
+
+	try {
+		const keys = (await response.json()) as unknown;
+		return new Set(
+			Array.isArray(keys)
+				? keys.filter((key): key is string => typeof key === "string")
+				: [],
+		);
+	} catch {
+		return new Set();
+	}
+}
+
+async function writeTagIndex(cache: Cache, tag: string, keys: Set<string>) {
+	const indexKey = tagIndexKey(tag);
+	if (keys.size === 0) {
+		await cache.delete(indexKey);
+		return;
+	}
+
+	await cache.put(
+		indexKey,
+		Response.json([...keys], {
+			headers: {
+				"Cache-Control": "no-store",
+			},
+		}),
+	);
+}
+
+async function indexCacheTags(cache: Cache, cacheKey: string, tags: string[]) {
+	for (const tag of tags) {
+		const keys = await readTagIndex(cache, tag);
+		keys.add(cacheKey);
+		await writeTagIndex(cache, tag, keys);
+	}
+}
+
 async function renderAndStore(
 	cache: Cache,
 	cacheKey: string,
@@ -193,6 +252,7 @@ async function renderAndStore(
 	const { maxAge, swr } = parseCdnCacheControl(
 		response.headers.get("CDN-Cache-Control"),
 	);
+	const tags = parseCacheTags(response.headers.get(CACHE_TAG_HEADER));
 
 	if (maxAge <= 0) return response;
 
@@ -200,6 +260,7 @@ async function renderAndStore(
 	if (!toStore) return response;
 
 	await cache.put(cacheKey, toStore);
+	await indexCacheTags(cache, cacheKey, tags);
 	return mark(new Response(response.body, response), "MISS");
 }
 
@@ -273,9 +334,19 @@ const factory: CacheProviderFactory<AnonymousCloudflareCacheConfig> = (
 					await cache.delete(cacheKey);
 				}
 			}
-			// Tag invalidation for Workers Cache API requires a zone-level purge
-			// token. Without one, keep publishes working and let short max-age
-			// plus stale-while-revalidate refresh anonymous pages naturally.
+			if (options.tags) {
+				const cache = await getCache();
+				const tags = Array.isArray(options.tags)
+					? options.tags
+					: [options.tags];
+				for (const tag of tags) {
+					const cacheKeys = await readTagIndex(cache, tag);
+					for (const cacheKey of cacheKeys) {
+						await cache.delete(cacheKey);
+					}
+					await cache.delete(tagIndexKey(tag));
+				}
+			}
 		},
 	};
 };
