@@ -38,7 +38,8 @@ Cloudflare constraints.
 ## Removal Candidates
 
 - After launch and final WordPress import, delete `scripts/migration/**` and the
-  migration-only dev dependencies.
+  migration-only dev dependencies. See `docs/launch-checklist.md` for the final
+  import and cleanup sequence.
 - Revisit the audit-log native adapter if Cloudflare sandbox support becomes
   available or the upstream plugin ships a native/free-plan mode.
 - Revisit the custom invite route if site email is configured and the default
