@@ -26,7 +26,7 @@ function runAudit(seedPath: string) {
 	});
 }
 
-const validSeed = {
+const validSeed: Record<string, any> = {
 	media: {
 		1: {
 			url: "https://www.engagedphilosophy.com/wp-content/uploads/2024/05/photo.jpg",

@@ -49,6 +49,7 @@ function createStorage() {
 				warn() {},
 				error() {},
 			},
+			kv: {},
 			site: {
 				name: "Engaged Philosophy",
 				url: "https://example.test",
@@ -75,7 +76,7 @@ describe("audit log plugin", () => {
 			"content:write",
 			"media:read",
 		]);
-		expect(() => createHookPipeline([plugin])).not.toThrow();
+		expect(() => createHookPipeline([plugin as any])).not.toThrow();
 		expect(plugin.hooks["content:beforeSave"].dependencies).toEqual([]);
 		expect(plugin.hooks["content:beforeSave"].pluginId).toBe("audit-log");
 
@@ -133,7 +134,7 @@ describe("audit log plugin", () => {
 		expect(entry.changes.before.data.body).toBe("Before");
 		expect(entry.changes.after.body).toBe("After");
 
-		const history = await adminRoute!.handler({
+		const history = (await adminRoute!.handler({
 			...context,
 			input: { type: "page_load", page: "/history" },
 			request: new Request(
@@ -143,7 +144,7 @@ describe("audit log plugin", () => {
 				},
 			),
 			requestMeta: {},
-		});
+		} as any)) as { blocks: Array<{ type: string; rows: unknown[] }> };
 
 		const table = history.blocks.find((block: { type: string }) => {
 			return block.type === "table";
@@ -152,6 +153,7 @@ describe("audit log plugin", () => {
 			table,
 			"Expected audit history admin route to return a table",
 		).toBeDefined();
+		if (!table) throw new Error("Expected audit history table");
 		expect(table.rows).toHaveLength(1);
 		expect(table.rows[0]).toMatchObject({
 			action: "update",

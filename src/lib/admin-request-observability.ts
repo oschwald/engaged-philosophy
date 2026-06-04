@@ -43,7 +43,7 @@ function getQueryKeys(url: URL): string[] {
 
 export function getObservedRequestInfo(
 	request: Request,
-	requestId = crypto.randomUUID(),
+	requestId: string = crypto.randomUUID(),
 ): ObservedRequestInfo | null {
 	const url = new URL(request.url);
 	const cookieNames = new Set(getCookieNames(request.headers.get("Cookie")));

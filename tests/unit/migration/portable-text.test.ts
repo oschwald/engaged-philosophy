@@ -175,7 +175,9 @@ describe("WordPress HTML to Portable Text migration", () => {
 		);
 		expect(plainStandaloneYoutube._type).toBe("block");
 		expect(
-			plainStandaloneYoutube.children.map((child) => child.text).join(""),
+			plainStandaloneYoutube.children
+				.map((child: { text?: string }) => child.text)
+				.join(""),
 		).toBe("https://youtu.be/VwZO9oBPbtg");
 
 		const [malformedYoutubeEmbed] = htmlToPortableText(

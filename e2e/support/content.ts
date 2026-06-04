@@ -1,4 +1,4 @@
-import type { APIRequestContext, APIResponse, Page } from "@playwright/test";
+import type { APIRequestContext, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 export type CollectionSlug = "pages" | "posts" | "projects";
@@ -42,7 +42,12 @@ function dateParts(value?: string | null) {
 	];
 }
 
-async function expectJsonResponse(response: APIResponse, label: string) {
+interface JsonResponseLike {
+	status: () => number;
+	text: () => Promise<string>;
+}
+
+async function expectJsonResponse(response: JsonResponseLike, label: string) {
 	const text = await response.text();
 	expect(
 		response.status(),

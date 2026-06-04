@@ -9,7 +9,7 @@ function resolveBrowserPath() {
 		"/usr/bin/google-chrome",
 		"/usr/bin/chromium",
 		"/usr/bin/chromium-browser",
-	].filter(Boolean);
+	].filter((candidate): candidate is string => Boolean(candidate));
 
 	return candidates.find((candidate) => existsSync(candidate));
 }
