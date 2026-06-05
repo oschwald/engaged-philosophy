@@ -12,8 +12,10 @@
 node_modules/
 src/node_modules/
 npm-debug.log*
+pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+package-lock.json
 
 # Build and runtime output
 build/

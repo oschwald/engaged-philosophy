@@ -6,14 +6,14 @@ theme surface.
 
 Common commands:
 
-- `npm run generate:seed`
-- `npm run audit:migration`
-- `npm run audit:legacy-blocks`
-- `npm run audit:launch-data`
-- `npm run audit:wordpress-transforms`
-- `npm run parity:audit`
-- `npm run sync:seed-d1 -- --local`
-- `ALLOW_REMOTE_SEED_SYNC=1 npm run sync:seed-d1 -- --remote --confirm remote`
+- `pnpm run generate:seed`
+- `pnpm run audit:migration`
+- `pnpm run audit:legacy-blocks`
+- `pnpm run audit:launch-data`
+- `pnpm run audit:wordpress-transforms`
+- `pnpm run parity:audit`
+- `pnpm run sync:seed-d1 -- --local`
+- `ALLOW_REMOTE_SEED_SYNC=1 pnpm run sync:seed-d1 -- --remote --confirm remote`
 
 Keep new runtime or theme-maintenance scripts in `scripts/` unless they depend on
 the WordPress export, migration seed, or migration-only Portable Text importer.

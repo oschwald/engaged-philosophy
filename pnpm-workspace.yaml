@@ -1,0 +1,10 @@
+onlyBuiltDependencies:
+  - "@parcel/watcher"
+  - better-sqlite3
+  - esbuild
+  - sharp
+  - workerd
+
+overrides:
+  "@astro-community/astro-embed-integration>astro-auto-import": ^0.5.1
+  yaml-language-server>yaml: ^2.8.3

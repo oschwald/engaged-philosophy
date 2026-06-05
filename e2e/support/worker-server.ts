@@ -131,7 +131,7 @@ async function stopProcess(child: ChildProcess) {
 }
 
 export function buildWorkerForE2E() {
-	const result = spawnSync("npm", ["run", "build"], {
+	const result = spawnSync("pnpm", ["run", "build"], {
 		cwd: ROOT,
 		encoding: "utf8",
 		env: childProcessEnv({
@@ -245,8 +245,9 @@ export async function startWorkerServer(
 	let output = "";
 
 	const child = spawn(
-		"npx",
+		"pnpm",
 		[
+			"exec",
 			"wrangler",
 			"dev",
 			"--config",

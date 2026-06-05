@@ -55,12 +55,12 @@ async function findChunk(prefix) {
 }
 
 if (!existsSync(DIST_WRANGLER_CONFIG)) {
-	throw new Error("Run npm run build before npm run test:worker-bundle.");
+	throw new Error("Run pnpm run build before pnpm run test:worker-bundle.");
 }
 
 await rm(OUT_DIR, { recursive: true, force: true });
 
-run("npx", ["wrangler", "deploy", "--dry-run", "--outdir", OUT_DIR]);
+run("pnpm", ["exec", "wrangler", "deploy", "--dry-run", "--outdir", OUT_DIR]);
 
 registerHooks({
 	resolve(specifier, context, nextResolve) {

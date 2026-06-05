@@ -18,6 +18,6 @@ runners.
 
 ## Commands
 
-- `npm run test:unit` runs the Vitest suite once.
-- `npm run test:seed` runs only the checked-in EmDash seed guard.
-- `npm run test:unit:watch` runs Vitest in watch mode.
+- `pnpm run test:unit` runs the Vitest suite once.
+- `pnpm run test:seed` runs only the checked-in EmDash seed guard.
+- `pnpm run test:unit:watch` runs Vitest in watch mode.

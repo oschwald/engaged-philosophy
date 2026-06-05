@@ -102,7 +102,7 @@ async function stopProcess(child) {
 }
 
 if (!existsSync(DIST_WRANGLER_CONFIG)) {
-	throw new Error("Run npm run build before npm run test:worker-runtime.");
+	throw new Error("Run pnpm run build before pnpm run test:worker-runtime.");
 }
 
 await rm(PERSIST_DIR, { recursive: true, force: true });
@@ -111,8 +111,9 @@ const port = await getFreePort();
 let output = "";
 
 const child = spawn(
-	"npx",
+	"pnpm",
 	[
+		"exec",
 		"wrangler",
 		"dev",
 		"--config",

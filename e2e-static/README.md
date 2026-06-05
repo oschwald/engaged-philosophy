@@ -15,6 +15,6 @@ Astro rendering, EmDash APIs, Cloudflare bindings, or real admin navigation.
 
 ## Commands
 
-- `npm run test:static` runs the static Playwright suite headlessly.
-- `npm run test:static:headed` runs it with a visible browser.
-- `npm run test:static:ui` opens the Playwright UI runner.
+- `pnpm run test:static` runs the static Playwright suite headlessly.
+- `pnpm run test:static:headed` runs it with a visible browser.
+- `pnpm run test:static:ui` opens the Playwright UI runner.

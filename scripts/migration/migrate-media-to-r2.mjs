@@ -20,7 +20,7 @@ const UPLOAD_URL_RE =
 const DOWNLOAD_RETRIES = 3;
 
 function printUsage() {
-	console.log(`Usage: npm run migrate:media -- [options]
+	console.log(`Usage: pnpm run migrate:media -- [options]
 
 Options:
   --bucket <name>         R2 bucket name. Defaults to the first bucket in wrangler.jsonc.
