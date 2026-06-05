@@ -2,6 +2,9 @@ import { existsSync } from "node:fs";
 
 import { defineConfig, devices } from "@playwright/test";
 
+delete process.env.FORCE_COLOR;
+delete process.env.NO_COLOR;
+
 function resolveBrowserPath() {
 	const candidates = [
 		process.env.PLAYWRIGHT_BROWSER_PATH,

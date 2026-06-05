@@ -25,6 +25,18 @@ function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function childProcessEnv(extra: NodeJS.ProcessEnv = {}) {
+	const env = {
+		...process.env,
+		...extra,
+	};
+
+	delete env.FORCE_COLOR;
+	delete env.NO_COLOR;
+
+	return env;
+}
+
 function getFreePort() {
 	return new Promise<number>((resolve, reject) => {
 		const server = net.createServer();
@@ -122,10 +134,9 @@ export function buildWorkerForE2E() {
 	const result = spawnSync("npm", ["run", "build"], {
 		cwd: ROOT,
 		encoding: "utf8",
-		env: {
-			...process.env,
+		env: childProcessEnv({
 			EMDASH_TEST_AUTH: "1",
-		},
+		}),
 		stdio: ["ignore", "pipe", "pipe"],
 	});
 
@@ -230,6 +241,7 @@ export async function startWorkerServer(
 	await rm(persistDir, { recursive: true, force: true });
 
 	const port = await getFreePort();
+	const inspectorPort = await getFreePort();
 	let output = "";
 
 	const child = spawn(
@@ -243,6 +255,8 @@ export async function startWorkerServer(
 			"127.0.0.1",
 			"--port",
 			String(port),
+			"--inspector-port",
+			String(inspectorPort),
 			"--local",
 			"--persist-to",
 			persistDir,
@@ -253,6 +267,7 @@ export async function startWorkerServer(
 		{
 			cwd: ROOT,
 			detached: true,
+			env: childProcessEnv(),
 			stdio: ["ignore", "pipe", "pipe"],
 		},
 	);

@@ -2,6 +2,9 @@ import { existsSync } from "node:fs";
 
 import { defineConfig, devices } from "@playwright/test";
 
+delete process.env.FORCE_COLOR;
+delete process.env.NO_COLOR;
+
 function resolveBrowserPath() {
 	const candidates = [
 		process.env.RENDERED_SMOKE_BROWSER_PATH,
@@ -14,12 +17,13 @@ function resolveBrowserPath() {
 }
 
 const browserPath = resolveBrowserPath();
+const workers = Number.parseInt(process.env.E2E_WORKERS ?? "2", 10);
 
 export default defineConfig({
 	testDir: "./e2e/specs",
 	globalSetup: "./e2e/global-setup.ts",
 	fullyParallel: false,
-	workers: 1,
+	workers: Number.isFinite(workers) && workers > 0 ? workers : 2,
 	timeout: 30_000,
 	expect: {
 		timeout: 5000,

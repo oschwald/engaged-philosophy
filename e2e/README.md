@@ -20,6 +20,8 @@ browser fixtures that do not need the Worker in `e2e-static/`.
 ## Commands
 
 - `npm run test:e2e` runs the Playwright suite headlessly.
+- `E2E_WORKERS=1 npm run test:e2e` runs with a single Worker instance when
+  debugging local runtime state.
 - `npm run test:e2e:headed` runs the suite with a visible browser.
 - `npm run test:e2e:ui` opens the Playwright UI runner.
 - `PLAYWRIGHT_VIDEO=1 npm run test:e2e` records failure videos when traces and
