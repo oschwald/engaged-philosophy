@@ -13,6 +13,14 @@ export interface ContentItem {
 	publishedAt: string | null;
 }
 
+export interface MediaItem {
+	id: string;
+	filename: string;
+	mimeType: string;
+	storageKey?: string | null;
+	url?: string;
+}
+
 const SINGULAR_LABEL: Record<CollectionSlug, string> = {
 	pages: "Page",
 	posts: "Post",
@@ -159,6 +167,31 @@ export async function createContentViaApi(
 	});
 	const body = await expectJsonResponse(response, `create ${collection}`);
 	return body?.data?.item as ContentItem;
+}
+
+export async function uploadMediaViaApi(
+	request: APIRequestContext,
+	options: {
+		filename: string;
+		mimeType: string;
+		buffer: Buffer;
+		width?: number;
+		height?: number;
+	},
+) {
+	const response = await request.post("/_emdash/api/media", {
+		multipart: {
+			file: {
+				name: options.filename,
+				mimeType: options.mimeType,
+				buffer: options.buffer,
+			},
+			...(options.width ? { width: String(options.width) } : {}),
+			...(options.height ? { height: String(options.height) } : {}),
+		},
+	});
+	const body = await expectJsonResponse(response, "upload media");
+	return body?.data?.item as MediaItem;
 }
 
 export async function publishContentViaApi(
