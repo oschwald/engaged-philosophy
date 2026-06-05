@@ -27,5 +27,9 @@ browser timing in `e2e-static/`, and admin/public workflows in `e2e/`.
 - `npm run smoke:live:sitemap` runs the deployed smoke checks plus every same
   origin URL listed in the sitemap. Empty sitemaps are skipped; set
   `LIVE_SMOKE_REQUIRE_SITEMAP=1` for a strict launch check.
+- `npm run smoke:live:wordpress` checks every published page/post/project path
+  from the local WordPress export against `LIVE_BASE_URL`. Use
+  `LIVE_SMOKE_WORDPRESS_LIMIT` for a smaller sample, or `LIVE_SMOKE_PATH_FILE`
+  with `npm run smoke:live` to check one URL/path per line from a custom list.
 - `npm run ci` runs linting, fast tests, typecheck, build, Worker checks, and
   Worker-backed Playwright.

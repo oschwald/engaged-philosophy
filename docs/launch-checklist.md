@@ -32,8 +32,11 @@ be removed.
    - `npm run deploy`
 3. Run deployed smoke checks:
    - `LIVE_BASE_URL=https://engaged-philosophy.ramona75.workers.dev npm run smoke:live`
-4. If the canonical hostname has already moved, run the smoke check there too:
+4. Run the full migrated public-path smoke check against staging:
+   - `LIVE_BASE_URL=https://engaged-philosophy.ramona75.workers.dev npm run smoke:live:wordpress`
+5. If the canonical hostname has already moved, run the smoke checks there too:
    - `LIVE_BASE_URL=https://www.engagedphilosophy.com npm run smoke:live`
+   - `LIVE_BASE_URL=https://www.engagedphilosophy.com npm run smoke:live:wordpress`
 
 ## Post-Launch Cleanup
 
