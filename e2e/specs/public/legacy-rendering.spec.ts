@@ -69,32 +69,71 @@ test.describe("public legacy rendering", () => {
 							height: 120,
 						},
 						{
+							_type: "legacyImage",
+							_key: "unsafe-legacy-image",
+							url: "javascript:alert(1)",
+							alt: "Unsafe legacy image",
+							align: "left",
+							width: 120,
+							height: 120,
+						},
+						{
+							_type: "legacyImage",
+							_key: "unsafe-legacy-image-link",
+							url: LEGACY_IMAGE_PATH,
+							href: "javascript:alert(1)",
+							alt: "Legacy image with unsafe link",
+							align: "right",
+							width: 120,
+							height: 120,
+						},
+						{
 							_type: "gallery",
 							_key: "legacy-gallery",
 							layout: "shortcode",
 							columns: 2,
-							images: LEGACY_GALLERY_PATHS.map((url, index) => ({
-								_type: "image",
-								_key: `legacy-gallery-${index + 1}`,
-								asset: {
-									url,
+							images: [
+								...LEGACY_GALLERY_PATHS.map((url, index) => ({
+									_type: "image",
+									_key: `legacy-gallery-${index + 1}`,
+									asset: {
+										url,
+									},
+									alt: `Legacy gallery image ${index + 1}`,
+								})),
+								{
+									_type: "image",
+									_key: "legacy-gallery-unsafe",
+									asset: {
+										url: "javascript:alert(1)",
+									},
+									alt: "Unsafe legacy gallery image",
 								},
-								alt: `Legacy gallery image ${index + 1}`,
-							})),
+							],
 						},
 						{
 							_type: "gallery",
 							_key: "legacy-block-gallery",
 							layout: "figure",
 							columns: 2,
-							images: LEGACY_BLOCK_GALLERY_PATHS.map((url, index) => ({
-								_type: "image",
-								_key: `legacy-block-gallery-${index + 1}`,
-								asset: {
-									url,
+							images: [
+								...LEGACY_BLOCK_GALLERY_PATHS.map((url, index) => ({
+									_type: "image",
+									_key: `legacy-block-gallery-${index + 1}`,
+									asset: {
+										url,
+									},
+									alt: `Legacy block gallery image ${index + 1}`,
+								})),
+								{
+									_type: "image",
+									_key: "legacy-block-gallery-unsafe",
+									asset: {
+										url: "javascript:alert(1)",
+									},
+									alt: "Unsafe legacy block gallery image",
 								},
-								alt: `Legacy block gallery image ${index + 1}`,
-							})),
+							],
 						},
 						{
 							_type: "legacyEmbed",
@@ -139,11 +178,32 @@ test.describe("public legacy rendering", () => {
 			borderTopLeftRadius: "9999px",
 			floatValue: "left",
 		});
+		await expect(publicPage.getByAltText("Unsafe legacy image")).toHaveCount(0);
+
+		const unsafeLinkedImage = publicPage.getByAltText(
+			"Legacy image with unsafe link",
+		);
+		await expect(unsafeLinkedImage).toHaveAttribute(
+			"src",
+			`${MEDIA_BASE}${LEGACY_IMAGE_PATH}`,
+		);
+		await expect(
+			publicPage.locator('a:has(img[alt="Legacy image with unsafe link"])'),
+		).toHaveCount(0);
+		await expect(publicPage.locator('.entry-content img[src=""]')).toHaveCount(
+			0,
+		);
+		await expect(publicPage.locator('.entry-content a[href=""]')).toHaveCount(
+			0,
+		);
 
 		const gallery = publicPage.locator(
 			".legacy-gallery.legacy-gallery-shortcode.legacy-gallery-columns-2",
 		);
 		await expect(gallery.locator("img")).toHaveCount(2);
+		await expect(
+			publicPage.getByAltText("Unsafe legacy gallery image"),
+		).toHaveCount(0);
 		await expect(gallery.locator("img").first()).toHaveAttribute(
 			"src",
 			`${MEDIA_BASE}${LEGACY_GALLERY_PATHS[0]}`,
@@ -156,6 +216,9 @@ test.describe("public legacy rendering", () => {
 			".legacy-gallery.blocks-gallery-grid.columns-2",
 		);
 		await expect(blockGallery.locator("img")).toHaveCount(2);
+		await expect(
+			publicPage.getByAltText("Unsafe legacy block gallery image"),
+		).toHaveCount(0);
 		await expect(
 			blockGallery.evaluate((element) => {
 				const style = getComputedStyle(element);

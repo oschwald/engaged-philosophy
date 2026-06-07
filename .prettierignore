@@ -9,6 +9,8 @@ playwright-report-static/
 test-results/
 seed/seed.json
 engagedphilosophy.WordPress*.xml
+pnpm-lock.yaml
+mise.lock
 debug-crawl-parity.js
 *.zip
 emdash.md

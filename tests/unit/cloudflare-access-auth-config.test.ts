@@ -13,4 +13,10 @@ describe("Cloudflare Access auth config", () => {
 		expect(config).toMatch(/autoProvision:\s*false/);
 		expect(config).not.toMatch(/autoProvision:\s*true/);
 	});
+
+	test("guards the test auth provider behind an e2e-only opt-in", () => {
+		expect(config).toMatch(/EMDASH_TEST_AUTH/);
+		expect(config).toMatch(/EMDASH_ALLOW_TEST_AUTH/);
+		expect(config).toMatch(/useTestAuth && !allowTestAuth/);
+	});
 });

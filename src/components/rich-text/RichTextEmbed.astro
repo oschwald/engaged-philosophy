@@ -1,5 +1,6 @@
 ---
 import type { RichTextEmbedNode } from "../../lib/rich-text-types";
+import { safeUrlForHref, safeUrlForIframeSrc } from "../../lib/url-safety";
 
 interface Props {
 	node: RichTextEmbedNode;
@@ -7,10 +8,12 @@ interface Props {
 
 const { node } = Astro.props;
 const title = node.title || "Embedded media";
+const embedUrl = safeUrlForIframeSrc(node.embedUrl);
+const linkUrl = safeUrlForHref(node.url);
 ---
 
 {
-	node.embedUrl ? (
+	embedUrl ? (
 		<figure
 			class:list={[
 				"legacy-embed",
@@ -19,7 +22,7 @@ const title = node.title || "Embedded media";
 		>
 			<div class="legacy-embed__frame">
 				<iframe
-					src={node.embedUrl}
+					src={embedUrl}
 					title={title}
 					loading="lazy"
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -29,9 +32,9 @@ const title = node.title || "Embedded media";
 			</div>
 		</figure>
 	) : (
-		node.url && (
+		linkUrl && (
 			<p>
-				<a href={node.url}>{title}</a>
+				<a href={linkUrl}>{title}</a>
 			</p>
 		)
 	)

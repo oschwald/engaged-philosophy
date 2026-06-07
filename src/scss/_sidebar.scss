@@ -10,18 +10,16 @@
 	margin-bottom: 1.5rem;
 	background-color: #f8f9fa;
 	border: 1px solid #dee2e6;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+	box-shadow: 0 2px 8px rgb(0 0 0 / 8%);
 	display: flex;
 	flex-direction: column;
 	max-width: 100%;
-	word-wrap: break-word;
 	overflow-wrap: break-word;
 	box-sizing: border-box;
 }
 
 .lead-home p {
 	margin-bottom: 0.8rem;
-	word-wrap: break-word;
 	overflow-wrap: break-word;
 	hyphens: auto;
 }
@@ -47,20 +45,20 @@
 }
 
 .widget {
-	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
 
 .widget.card {
 	border: 1px solid #dee2e6;
 	background-color: #f8f9fa;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
 	margin-bottom: 1.5rem;
 }
 
 .widget .card-header {
 	background-color: #e9ecef;
 	border-bottom: 1px solid #dee2e6;
-	padding: 1.5rem 1.5rem;
+	padding: 1.5rem;
 	margin-bottom: 0;
 }
 
@@ -77,7 +75,7 @@
 	font-size: 1rem;
 	font-weight: 600;
 	margin-bottom: 0;
-	padding: 1.5rem 1.5rem;
+	padding: 1.5rem;
 	background-color: #e9ecef;
 	border-bottom: 1px solid #dee2e6;
 }
@@ -87,7 +85,7 @@
 	font-size: 1rem !important;
 	font-weight: 600 !important;
 	margin-bottom: 0 !important;
-	padding: 1.5rem 1.5rem !important;
+	padding: 1.5rem !important;
 	background-color: #e9ecef !important;
 	border-bottom: 1px solid #dee2e6 !important;
 }

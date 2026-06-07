@@ -34,6 +34,7 @@ const hasLegacyFeatures = Boolean(
 	isLegacyNode ||
 	isWordPressUploadUrl(node.asset?.url ?? imageUrl),
 );
+const canRenderLegacyImage = Boolean(hasLegacyFeatures && src);
 
 const alignmentClass =
 	node.align === "left"
@@ -68,10 +69,11 @@ const standardImageNode: StandardImageNode | null =
 				...(node.shape ? { shape: node.shape } : {}),
 			}
 		: null;
+const standardImageNodeToRender = !hasLegacyFeatures ? standardImageNode : null;
 ---
 
 {
-	hasLegacyFeatures ? (
+	canRenderLegacyImage ? (
 		node?.caption ? (
 			<figure class:list={["emdash-image", alignmentClass, shapeClass]}>
 				{href ? (
@@ -125,6 +127,8 @@ const standardImageNode: StandardImageNode | null =
 			/>
 		)
 	) : (
-		standardImageNode && <EmDashPortableTextImage node={standardImageNode} />
+		standardImageNodeToRender && (
+			<EmDashPortableTextImage node={standardImageNodeToRender} />
+		)
 	)
 }
