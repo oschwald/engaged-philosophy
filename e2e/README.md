@@ -27,7 +27,8 @@ browser fixtures that do not need the Worker in `e2e-static/`.
 - `PLAYWRIGHT_VIDEO=1 pnpm run test:e2e` records failure videos when traces and
   screenshots are not enough.
 
-Playwright global setup builds once with `EMDASH_TEST_AUTH=1`. The Worker
+Playwright global setup builds once with `EMDASH_TEST_AUTH=1` and the
+e2e-only `EMDASH_ALLOW_TEST_AUTH=1` guard. The Worker
 fixture starts `wrangler dev` against that build, applies `.emdash/seed.json`
 without content, and uses the `X-EmDash-Test-Auth` header for authenticated
 admin requests.

@@ -135,6 +135,7 @@ export function buildWorkerForE2E() {
 		cwd: ROOT,
 		encoding: "utf8",
 		env: childProcessEnv({
+			EMDASH_ALLOW_TEST_AUTH: "1",
 			EMDASH_TEST_AUTH: "1",
 		}),
 		stdio: ["ignore", "pipe", "pipe"],

@@ -37,6 +37,13 @@ const cloudflareAccessInviteRouteEntrypoint = fileURLToPath(
 	new URL("./src/emdash-routes/cloudflare-access-invite.ts", import.meta.url),
 );
 const useTestAuth = process.env.EMDASH_TEST_AUTH === "1";
+const allowTestAuth = process.env.EMDASH_ALLOW_TEST_AUTH === "1";
+
+if (useTestAuth && !allowTestAuth) {
+	throw new Error(
+		"EMDASH_TEST_AUTH requires EMDASH_ALLOW_TEST_AUTH=1 and must only be used by local e2e builds.",
+	);
+}
 
 function suppressKnownBuildWarnings(warning, warn) {
 	if (
