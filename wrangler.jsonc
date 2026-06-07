@@ -2,6 +2,16 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "engaged-philosophy",
 	"main": "./src/worker.ts",
+	"routes": [
+		{
+			"pattern": "engagedphilosophy.com",
+			"custom_domain": true,
+		},
+		{
+			"pattern": "www.engagedphilosophy.com",
+			"custom_domain": true,
+		},
+	],
 	"compatibility_date": "2026-05-25",
 	"compatibility_flags": ["nodejs_compat"],
 	"observability": {
