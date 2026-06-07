@@ -22,7 +22,7 @@ body > .container {
 #page {
 	background-color: #fff;
 	padding: 0;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 0 10px rgb(0 0 0 / 10%);
 }
 
 // Content areas
@@ -66,8 +66,12 @@ body > .container {
 // Assistive text
 .assistive-text,
 .visually-hidden {
-	clip: rect(1px, 1px, 1px, 1px);
 	position: absolute !important;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
 }
 
 .block {
@@ -83,7 +87,6 @@ body > .container {
 // Spacing utilities and text wrapping
 .entry-content,
 .page-header {
-	word-wrap: break-word;
 	overflow-wrap: break-word;
 	hyphens: auto;
 }
