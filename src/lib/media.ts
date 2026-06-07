@@ -1,6 +1,7 @@
 import { env as cloudflareEnv } from "cloudflare:workers";
 
 import { PUBLIC_MEDIA_URL, WORDPRESS_SITE_URL } from "./site-config";
+import { safeUrlForMediaSrc } from "./url-safety";
 
 export { PUBLIC_MEDIA_URL, WORDPRESS_SITE_URL };
 
@@ -32,9 +33,13 @@ function getInternalMediaKey(value?: string | null) {
 	const normalized = value ?? "";
 	if (!normalized.startsWith(EMDASH_MEDIA_FILE_PREFIX)) return "";
 
-	return decodeURIComponent(
-		normalized.replace(EMDASH_MEDIA_FILE_PREFIX, "").split(/[?#]/)[0] ?? "",
-	);
+	const encodedKey =
+		normalized.replace(EMDASH_MEDIA_FILE_PREFIX, "").split(/[?#]/)[0] ?? "";
+	try {
+		return decodeURIComponent(encodedKey);
+	} catch {
+		return encodedKey;
+	}
 }
 
 function getStorageKeyFromMeta(meta?: Record<string, unknown> | null) {
@@ -57,7 +62,7 @@ function resolvePublicMediaUrl(
 	}
 
 	if (resolvedUrl && !resolvedUrl.startsWith(EMDASH_MEDIA_FILE_PREFIX)) {
-		return resolvedUrl;
+		return safeUrlForMediaSrc(resolvedUrl);
 	}
 
 	return getPublicMediaStorageUrl(key);
@@ -99,7 +104,7 @@ export function getAssetSrc(
 		return rewriteWordPressUploadUrl(url, getMediaUrlPrefix());
 	}
 
-	return url;
+	return safeUrlForMediaSrc(url);
 }
 
 export function getMediaUrlPrefix(
