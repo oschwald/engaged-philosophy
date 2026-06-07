@@ -32,7 +32,12 @@
 
 // Carousel caption
 .carousel-caption {
-	background: linear-gradient(to top, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
+	background: linear-gradient(
+		to top,
+		rgba(0, 0, 0, 0.9),
+		rgba(0, 0, 0, 0.6),
+		rgba(0, 0, 0, 0.3)
+	);
 	position: absolute;
 	bottom: 0;
 	left: 0;
@@ -71,7 +76,6 @@
 
 // Mobile carousel responsive styling
 @media (max-width: 767px) {
-
 	.carousel .carousel-item > img {
 		width: 100%;
 	}

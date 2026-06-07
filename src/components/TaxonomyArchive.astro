@@ -1,0 +1,115 @@
+---
+import EntrySummary from "./content/EntrySummary.astro";
+import Pagination from "./content/Pagination.astro";
+import ThemeSidebar from "./ThemeSidebar.astro";
+import {
+	getEntryContent,
+	getEntryExcerpt,
+	getExcerptText,
+} from "../lib/rich-text";
+import { getMediaUrlPrefix, rewriteWordPressUploadUrl } from "../lib/media";
+import type { ContentEntry, ProjectData } from "../lib/types";
+
+interface Props {
+	taxonomy: string;
+	label: string;
+	projects: ContentEntry<ProjectData>[];
+	page: number;
+	perPage?: number;
+}
+
+const { taxonomy, label, projects, page, perPage = 10 } = Astro.props;
+
+const totalPages = Math.max(1, Math.ceil(projects.length / perPage));
+const currentPage = Math.min(Math.max(page, 1), totalPages);
+const start = (currentPage - 1) * perPage;
+const pageItems = projects.slice(start, start + perPage);
+const hasResults = pageItems.length > 0;
+const showSidebar = taxonomy !== "topic";
+const titlePrefix = taxonomy === "topic" ? "Project Topic: " : "";
+const basePath = `/${taxonomy}/${Astro.params.slug}/`;
+const mediaUrlPrefix = getMediaUrlPrefix();
+
+function pageHref(pageNumber: number) {
+	return pageNumber === 1 ? basePath : `${basePath}page/${pageNumber}/`;
+}
+---
+
+<section id="primary" class="col-lg-8 px-4">
+	<div id="content" role="main">
+		<header class="page-header">
+			<h1 class="page-title">
+				{titlePrefix}<span>{label}</span>
+			</h1>
+		</header>
+
+		{
+			hasResults ? (
+				pageItems.map((project) => (
+					<EntrySummary
+						articleClass={`mb-5 pb-4 border-bottom ${project.data.featured_image?.src ? "has-post-thumbnail " : ""}project type-project status-publish`}
+						title={project.data.title ?? ""}
+						continueHref={`/${project.data.path}/`}
+						excerpt={getExcerptText(
+							getEntryExcerpt(project.data),
+							getEntryContent(project.data),
+						)}
+						image={{
+							src: project.data.featured_image?.src
+								? rewriteWordPressUploadUrl(
+										project.data.featured_image.src,
+										mediaUrlPrefix,
+									)
+								: undefined,
+							alt: project.data.featured_image?.alt || project.data.title,
+						}}
+					/>
+				))
+			) : (
+				<article class="post no-results not-found">
+					<header class="page-header">
+						<h1 class="entry-title">Nothing Found</h1>
+					</header>
+					<div class="entry-content">
+						<p>
+							Apologies, but no results were found for the requested archive.
+							Perhaps searching will help find a related post.
+						</p>
+						<form method="get" id="searchform" class="d-flex" action="/">
+							<label
+								for={`archive-search-${taxonomy}-${label}`}
+								class="visually-hidden"
+							>
+								Search
+							</label>
+							<div class="input-group">
+								<input
+									id={`archive-search-${taxonomy}-${label}`}
+									class="form-control"
+									type="search"
+									name="s"
+									placeholder="Search"
+								/>
+								<button
+									class="btn btn-primary"
+									type="submit"
+									aria-label="Submit search"
+								>
+									<i class="bi bi-search" />
+								</button>
+							</div>
+						</form>
+					</div>
+				</article>
+			)
+		}
+
+		<Pagination
+			currentPage={currentPage}
+			totalPages={totalPages}
+			pageHref={pageHref}
+		/>
+	</div>
+</section>
+
+{showSidebar && <ThemeSidebar />}

@@ -1,0 +1,65 @@
+---
+interface SummaryImage {
+	src?: string;
+	alt?: string;
+}
+
+interface Props {
+	articleClass: string;
+	title: string;
+	titleHref?: string;
+	meta?: string;
+	excerpt?: string;
+	continueHref: string;
+	image?: SummaryImage | null;
+	imageClass?: string;
+	showContinueWithoutExcerpt?: boolean;
+}
+
+const {
+	articleClass,
+	title,
+	titleHref,
+	meta = "",
+	excerpt = "",
+	continueHref,
+	image,
+	imageClass = "img-thumbnail float-end ms-3",
+	showContinueWithoutExcerpt = true,
+} = Astro.props;
+const shouldShowSummary = Boolean(excerpt || showContinueWithoutExcerpt);
+---
+
+<article class={articleClass}>
+	<header class="page-header mb-3">
+		<h2 class="entry-title h4 mb-0">
+			{titleHref ? <a href={titleHref}>{title}</a> : title}
+		</h2>
+		{meta && <div class="entry-meta">{meta}</div>}
+	</header>
+
+	<div class="entry-content text-muted lh-base">
+		{
+			image?.src && (
+				<img
+					src={image.src}
+					class={imageClass}
+					alt={image.alt || title}
+					width="150"
+					height="150"
+				/>
+			)
+		}
+		{
+			shouldShowSummary && (
+				<p>
+					{excerpt}
+					{excerpt && " "}
+					<a href={continueHref}>
+						Continue reading <span class="meta-nav">&rarr;</span>
+					</a>
+				</p>
+			)
+		}
+	</div>
+</article>

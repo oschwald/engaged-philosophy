@@ -1,0 +1,108 @@
+---
+interface Props {
+	currentPage: number;
+	totalPages: number;
+	pageHref: (pageNumber: number) => string;
+	windowed?: boolean;
+	previousIconAfter?: boolean;
+	nextLinkClass?: string;
+}
+
+const {
+	currentPage,
+	totalPages,
+	pageHref,
+	windowed = false,
+	previousIconAfter = false,
+	nextLinkClass = "",
+} = Astro.props;
+
+function getPaginationItems(): Array<number | "ellipsis"> {
+	if (totalPages <= 1) return [];
+	if (!windowed) {
+		return Array.from({ length: totalPages }, (_, index) => index + 1);
+	}
+
+	const items = [1];
+	for (
+		let pageNumber = Math.max(2, currentPage - 2);
+		pageNumber <= Math.min(totalPages - 1, currentPage + 2);
+		pageNumber += 1
+	) {
+		items.push(pageNumber);
+	}
+	if (totalPages > 1) items.push(totalPages);
+
+	const unique = [...new Set(items)].sort((left, right) => left - right);
+	return unique.flatMap((pageNumber, index) => {
+		const previous = unique[index - 1];
+		if (index > 0 && previous !== undefined && pageNumber - previous > 1) {
+			return ["ellipsis", pageNumber];
+		}
+		return [pageNumber];
+	});
+}
+
+const paginationItems = getPaginationItems();
+---
+
+{
+	totalPages > 1 && (
+		<nav aria-label="Page navigation">
+			<ul class="pagination justify-content-center">
+				<li class:list={["page-item", currentPage === 1 && "disabled"]}>
+					{currentPage === 1 ? (
+						<span class="page-link">
+							{previousIconAfter ? (
+								<>Previous &laquo;</>
+							) : (
+								<>&laquo; Previous</>
+							)}
+						</span>
+					) : (
+						<a class="page-link" href={pageHref(currentPage - 1)}>
+							{previousIconAfter ? (
+								<>Previous &laquo;</>
+							) : (
+								<>&laquo; Previous</>
+							)}
+						</a>
+					)}
+				</li>
+				{paginationItems.map((item) =>
+					item === "ellipsis" ? (
+						<li class="page-item disabled">
+							<span class="page-link">&hellip;</span>
+						</li>
+					) : (
+						<li class:list={["page-item", item === currentPage && "active"]}>
+							{item === currentPage ? (
+								<span aria-current="page" class="page-link">
+									{item}
+								</span>
+							) : (
+								<a class="page-link" href={pageHref(item)}>
+									{item}
+								</a>
+							)}
+						</li>
+					),
+				)}
+				<li
+					class:list={["page-item", currentPage === totalPages && "disabled"]}
+				>
+					{currentPage === totalPages ? (
+						<span class="page-link">Next &raquo;</span>
+					) : (
+						<a
+							class:list={["page-link", nextLinkClass]}
+							href={pageHref(currentPage + 1)}
+						>
+							Next &raquo;
+						</a>
+					)}
+				</li>
+			</ul>
+		</nav>
+	)
+}

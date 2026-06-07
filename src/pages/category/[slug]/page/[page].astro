@@ -1,0 +1,35 @@
+---
+import CategoryArchive from "../../../../components/CategoryArchive.astro";
+import Base from "../../../../layouts/Base.astro";
+import { getPostsByCategory, getTaxonomyTerm } from "../../../../lib/content";
+
+const { slug = "", page = "1" } = Astro.params;
+const term = await getTaxonomyTerm("category", slug);
+
+if (!term) {
+	return Astro.redirect("/404");
+}
+
+const pageNumber = Number.parseInt(page, 10);
+if (!Number.isFinite(pageNumber) || pageNumber < 2) {
+	return Astro.redirect(`/category/${slug}/`);
+}
+
+const posts = await getPostsByCategory(slug);
+const totalPages = Math.max(1, Math.ceil(posts.length / 10));
+
+if (pageNumber > totalPages) {
+	return Astro.redirect("/404");
+}
+---
+
+<Base
+	title={`Category: ${term.label} – Page ${pageNumber}`}
+	bodyClass={`archive category category-${slug} paged paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
+>
+	<div class="container-fluid">
+		<div class="row">
+			<CategoryArchive slug={slug} label={term.label} page={pageNumber} />
+		</div>
+	</div>
+</Base>

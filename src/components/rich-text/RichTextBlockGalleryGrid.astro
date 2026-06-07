@@ -1,0 +1,59 @@
+---
+import { getAssetSrc } from "../../lib/media";
+import type { RichTextGalleryImageNode } from "../../lib/rich-text-types";
+
+interface Props {
+	images: RichTextGalleryImageNode[];
+	columns?: number;
+	alignmentClass?: string;
+	includeLegacyClass?: boolean;
+}
+
+const {
+	images,
+	columns,
+	alignmentClass = "",
+	includeLegacyClass = false,
+} = Astro.props;
+const getPublicMediaUrl = Astro.locals.emdash?.getPublicMediaUrl;
+const getImageShapeClass = (shape?: string) =>
+	shape === "rounded" ? "legacy-image--rounded" : "";
+---
+
+<ul
+	class:list={[
+		includeLegacyClass && "legacy-gallery",
+		"blocks-gallery-grid",
+		columns ? `columns-${columns}` : undefined,
+		alignmentClass,
+	]}
+>
+	{
+		images.map((image) => {
+			const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
+			const shapeClass = getImageShapeClass(image.shape);
+			return (
+				<li class="blocks-gallery-item">
+					<figure>
+						<a href={src}>
+							<img
+								class={shapeClass || undefined}
+								src={src}
+								alt={image.alt || image.caption || ""}
+								width={image.width}
+								height={image.height}
+								loading="lazy"
+								decoding="async"
+							/>
+						</a>
+						{image.caption && (
+							<figcaption class="blocks-gallery-item__caption">
+								{image.caption}
+							</figcaption>
+						)}
+					</figure>
+				</li>
+			);
+		})
+	}
+</ul>

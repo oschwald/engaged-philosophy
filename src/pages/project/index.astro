@@ -1,0 +1,77 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getTaxonomyTerms } from "../../lib/content";
+
+const allTopics = await getTaxonomyTerms("topic");
+const topicsWithCounts = allTopics.filter((term) => (term.count ?? 0) > 0);
+const dateSeed = Number(
+	new Date().toISOString().slice(0, 10).replace(/-/g, ""),
+);
+const shuffled = [...topicsWithCounts];
+
+if (shuffled.length > 0) {
+	const slots = new Array(shuffled.length);
+	for (let i = 0; i < shuffled.length; i += 1) {
+		let pseudoRandom = (dateSeed + i * 31) % shuffled.length;
+		while (slots[pseudoRandom] !== undefined) {
+			pseudoRandom = (pseudoRandom + 1) % shuffled.length;
+		}
+		slots[pseudoRandom] = shuffled[i];
+	}
+	shuffled.splice(0, shuffled.length, ...slots);
+}
+
+const visibleTopics = shuffled.slice(0, 40);
+const counts = visibleTopics.map((term) => term.count ?? 0);
+const minCount = counts.length ? Math.min(...counts) : 0;
+const maxCount = counts.length ? Math.max(...counts) : 0;
+---
+
+<Base
+	title="Civic Engagement Projects"
+	bodyClass="post-type-archive post-type-archive-project"
+>
+	<div class="container-fluid">
+		<section id="primary" class="p-4">
+			<main id="content">
+				<header class="page-header mb-4 pb-3 border-bottom">
+					<h1 class="page-title h2 mb-0">Civic Engagement Projects</h1>
+				</header>
+
+				<p>
+					This page provides a list of examples of completed student projects
+					organized by broad themes such as "animals" and "art." Click on one of
+					the themes below to find a list of projects that fit under that theme.
+					The bigger the the word is below, the more examples you will see.
+				</p>
+
+				<div class="row">
+					<div class="col-12">
+						<div class="tag-cloud-projects">
+							{
+								visibleTopics.map((topic) => {
+									const count = topic.count ?? 0;
+									const scale =
+										maxCount > minCount
+											? (count - minCount) / (maxCount - minCount)
+											: 0;
+									const fontSize = 13 + scale * (32 - 13);
+
+									return (
+										<a
+											href={`/topic/${topic.slug}/`}
+											style={`font-size: ${fontSize}px; margin-right: 8px;`}
+											class="tag-link"
+										>
+											{topic.label}
+										</a>
+									);
+								})
+							}
+						</div>
+					</div>
+				</div>
+			</main>
+		</section>
+	</div>
+</Base>

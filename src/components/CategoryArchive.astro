@@ -1,0 +1,79 @@
+---
+import EntrySummary from "./content/EntrySummary.astro";
+import Pagination from "./content/Pagination.astro";
+import ThemeSidebar from "./ThemeSidebar.astro";
+import { getPostsByCategory } from "../lib/content";
+import { formatPathDate, sortByPublishedOn } from "../lib/path-utils";
+import {
+	getEntryContent,
+	getEntryExcerpt,
+	getExcerptText,
+} from "../lib/rich-text";
+
+interface Props {
+	slug: string;
+	label: string;
+	page: number;
+	perPage?: number;
+}
+
+const { slug, label, page, perPage = 10 } = Astro.props;
+const posts = sortByPublishedOn(await getPostsByCategory(slug));
+const totalPages = Math.max(1, Math.ceil(posts.length / perPage));
+const currentPage = Math.min(Math.max(page, 1), totalPages);
+const start = (currentPage - 1) * perPage;
+const pageItems = posts.slice(start, start + perPage);
+
+function pageHref(pageNumber: number) {
+	return pageNumber === 1
+		? `/category/${slug}/`
+		: `/category/${slug}/page/${pageNumber}/`;
+}
+---
+
+<section id="primary" class="col-lg-8 p-4">
+	<div id="content" role="main">
+		<header class="page-header mb-4 pb-3 border-bottom">
+			<h1 class="page-title h2 mb-0">
+				Category Archives: <span>{label}</span>
+			</h1>
+		</header>
+
+		{
+			pageItems.length > 0 ? (
+				pageItems.map((post) => (
+					<EntrySummary
+						articleClass="mb-5 pb-4 border-bottom post"
+						title={post.data.title ?? ""}
+						titleHref={`/${post.data.path}/`}
+						meta={formatPathDate(post.data.path)}
+						continueHref={`/${post.data.path}/`}
+						excerpt={getExcerptText(
+							getEntryExcerpt(post.data),
+							getEntryContent(post.data),
+						)}
+					/>
+				))
+			) : (
+				<article class="post no-results not-found">
+					<header class="page-header">
+						<h1 class="entry-title">Nothing Found</h1>
+					</header>
+					<div class="entry-content">
+						<p>No posts were found for this category.</p>
+					</div>
+				</article>
+			)
+		}
+
+		<Pagination
+			currentPage={currentPage}
+			totalPages={totalPages}
+			pageHref={pageHref}
+			windowed
+			nextLinkClass="next"
+		/>
+	</div>
+</section>
+
+<ThemeSidebar />

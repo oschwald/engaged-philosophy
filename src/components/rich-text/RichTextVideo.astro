@@ -1,0 +1,51 @@
+---
+import { getAssetSrc } from "../../lib/media";
+import type { RichTextVideoNode } from "../../lib/rich-text-types";
+
+interface Props {
+	node: RichTextVideoNode;
+}
+
+const { node } = Astro.props;
+const getPublicMediaUrl = Astro.locals.emdash?.getPublicMediaUrl;
+const src = getAssetSrc(null, node.url, getPublicMediaUrl);
+---
+
+{
+	src && (
+		<figure class="legacy-video">
+			<video
+				controls
+				preload="metadata"
+				playsinline
+				width={node.width}
+				height={node.height}
+				aria-label={node.title || undefined}
+			>
+				<source src={src} type={node.mimeType || undefined} />
+				<a href={src}>{node.title || src}</a>
+			</video>
+			{node.title && <figcaption>{node.title}</figcaption>}
+		</figure>
+	)
+}
+
+<style>
+	.legacy-video {
+		margin: 1.5rem 0;
+	}
+
+	.legacy-video video {
+		display: block;
+		width: 100%;
+		max-width: 100%;
+		height: auto;
+		background: #000;
+	}
+
+	.legacy-video figcaption {
+		margin-top: 0.5rem;
+		font-size: 0.9rem;
+		color: #666;
+	}
+</style>

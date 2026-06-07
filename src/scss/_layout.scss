@@ -75,8 +75,7 @@ body > .container {
 }
 
 // Sidebar layout
-.sidebar-content #primary,
-.sidebar-content #attachment-comment {
+.sidebar-content #primary {
 	float: right;
 	margin: 0 20px 0 0;
 }
@@ -93,10 +92,6 @@ body > .container {
 #header-image,
 .entry-content {
 	margin-bottom: 18px;
-}
-
-.entry-attachment {
-	margin-bottom: 36px;
 }
 
 article.post,

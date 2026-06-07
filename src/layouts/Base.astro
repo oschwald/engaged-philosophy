@@ -1,0 +1,77 @@
+---
+import PrimaryNav from "../components/layout/PrimaryNav.astro";
+import SiteFooter from "../components/layout/SiteFooter.astro";
+import SiteHead from "../components/layout/SiteHead.astro";
+import SiteHeader from "../components/layout/SiteHeader.astro";
+import { getPrimaryMenu, getRuntimeSiteSettings } from "../lib/content";
+import { getMediaUrlPrefix, rewriteInternalMediaFileUrl } from "../lib/media";
+import { SITE_TAGLINE_FALLBACK, SITE_TITLE_FALLBACK } from "../lib/site-config";
+import "../scss/style.scss";
+
+interface Props {
+	title?: string;
+	description?: string;
+	bodyClass?: string;
+}
+
+const { title, description, bodyClass = "" } = Astro.props;
+Astro.cache.set({
+	maxAge: 300,
+	swr: 86400,
+	tags: ["pages", "posts", "projects"],
+});
+const settings = await getRuntimeSiteSettings();
+const siteTitle = settings?.title || SITE_TITLE_FALLBACK;
+const siteDescription = settings?.tagline || SITE_TAGLINE_FALLBACK;
+const pageTitle =
+	title && title !== "Home"
+		? `${title} – ${siteTitle}`
+		: `${siteTitle} – ${siteDescription}`;
+const favicon = settings?.favicon;
+const faviconHref = favicon?.url
+	? rewriteInternalMediaFileUrl(favicon.url)
+	: "/favicon.svg";
+const faviconType =
+	favicon?.contentType || (favicon?.url ? undefined : "image/svg+xml");
+const menuItems = await getPrimaryMenu();
+const currentPath = Astro.url.pathname;
+const mediaUrlPrefix = getMediaUrlPrefix();
+const logo = settings?.logo;
+const logoSrc = logo?.url
+	? rewriteInternalMediaFileUrl(logo.url, mediaUrlPrefix)
+	: `${mediaUrlPrefix}/img/logo.png`;
+const logoAlt = logo?.alt || `${siteTitle} Logo`;
+---
+
+<!doctype html>
+<html class="no-js" lang="en-US">
+	<SiteHead
+		pageTitle={pageTitle}
+		description={description || siteDescription}
+		faviconHref={faviconHref}
+		faviconType={faviconType}
+		hasCustomFavicon={Boolean(favicon?.url)}
+	/>
+	<body class={bodyClass}>
+		<div id="fb-root"></div>
+		<div class="container">
+			<SiteHeader
+				siteTitle={siteTitle}
+				logoSrc={logoSrc}
+				logoAlt={logoAlt}
+				logoWidth={logo?.width}
+				logoHeight={logo?.height}
+			/>
+
+			<PrimaryNav menuItems={menuItems} currentPath={currentPath} />
+
+			<div id="page" class="hfeed row">
+				<slot />
+				<SiteFooter siteTitle={siteTitle} />
+			</div>
+		</div>
+		<script>
+			import "../js/index.js";
+		</script>
+	</body>
+</html>

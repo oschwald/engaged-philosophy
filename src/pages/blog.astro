@@ -1,0 +1,39 @@
+---
+import Base from "../layouts/Base.astro";
+import RichContent from "../components/RichContent.astro";
+import { getPageByPath, getPageBySlug } from "../lib/content";
+import { getEmDashEditEntryAttrs } from "../lib/editing";
+import { getEntryContent } from "../lib/rich-text";
+
+const page = (await getPageBySlug("blog")) ?? (await getPageByPath("blog"));
+---
+
+<Base
+	title={page?.data.title || "Blog"}
+	bodyClass="page page-template page-template-default"
+>
+	<div class="container-fluid">
+		<section id="primary" class="p-4">
+			<div id="content" role="main">
+				<article {...page ? getEmDashEditEntryAttrs("pages", page) : {}}>
+					<header class="page-header">
+						<h1
+							class="entry-title"
+							{...page ? getEmDashEditEntryAttrs("pages", page, "title") : {}}
+						>
+							{page?.data.title || "Blog"}
+						</h1>
+					</header>
+					<div
+						class="entry-content"
+						{...page ? getEmDashEditEntryAttrs("pages", page, "content") : {}}
+					>
+						<RichContent
+							value={page ? getEntryContent(page.data) : undefined}
+						/>
+					</div>
+				</article>
+			</div>
+		</section>
+	</div>
+</Base>

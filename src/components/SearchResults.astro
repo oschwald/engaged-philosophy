@@ -1,0 +1,104 @@
+---
+import EntrySummary from "./content/EntrySummary.astro";
+import Pagination from "./content/Pagination.astro";
+import ThemeSidebar from "./ThemeSidebar.astro";
+import { searchSite } from "../lib/search";
+import { getMediaUrlPrefix } from "../lib/media";
+
+interface Props {
+	query: string;
+	page?: number;
+}
+
+const { query, page = 1 } = Astro.props;
+const mediaUrlPrefix = getMediaUrlPrefix();
+const { results, totalPages, currentPage } = await searchSite(
+	query,
+	page,
+	mediaUrlPrefix,
+);
+
+function pageHref(pageNumber: number) {
+	const params = new URLSearchParams({ s: query });
+	return pageNumber === 1
+		? `/?${params.toString()}`
+		: `/page/${pageNumber}/?${params.toString()}`;
+}
+---
+
+<div class="container-fluid">
+	<div class="row">
+		<section id="primary" class="col-lg-8 p-4">
+			<div id="content" role="main">
+				{
+					results.length > 0 ? (
+						<>
+							<header class="page-header mb-4 pb-3 border-bottom">
+								<h1 class="page-title h2 mb-0">
+									Search Results for: <span>{query}</span>
+								</h1>
+							</header>
+
+							{results.map((result) => (
+								<EntrySummary
+									articleClass={`mb-5 pb-4 border-bottom ${result.kind} type-${result.kind}`}
+									title={result.title}
+									continueHref={`/${result.path}/`}
+									excerpt={result.excerpt}
+									image={{ src: result.imageSrc, alt: result.title }}
+									showContinueWithoutExcerpt={false}
+								/>
+							))}
+
+							<Pagination
+								currentPage={currentPage}
+								totalPages={totalPages}
+								pageHref={pageHref}
+								previousIconAfter
+							/>
+						</>
+					) : (
+						<article class="post no-results not-found">
+							<header class="page-header">
+								<h1 class="entry-title">Nothing Found</h1>
+							</header>
+
+							<div class="entry-content">
+								<p>
+									Sorry, but nothing matched your search criteria. Please try
+									again with some different keywords.
+								</p>
+								<form method="get" id="searchform" class="d-flex" action="/">
+									<label for="search-results-query" class="visually-hidden">
+										Search
+									</label>
+									<div class="input-group">
+										<input
+											id="search-results-query"
+											class="form-control"
+											type="search"
+											name="s"
+											value={query}
+											placeholder="Search"
+										/>
+										<button
+											class="btn btn-primary"
+											name="submit"
+											id="searchsubmit"
+											type="submit"
+											aria-label="Submit search"
+										>
+											<i class="bi bi-search" />
+										</button>
+									</div>
+								</form>
+							</div>
+						</article>
+					)
+				}
+			</div>
+		</section>
+
+		<ThemeSidebar />
+	</div>
+</div>

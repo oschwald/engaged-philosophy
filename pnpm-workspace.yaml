@@ -1,0 +1,21 @@
+allowBuilds:
+  "@parcel/watcher": true
+  better-sqlite3: true
+  esbuild: true
+  sharp: true
+  workerd: true
+
+minimumReleaseAgeExclude:
+  - "@types/node@24.13.1"
+  - "@emdash-cms/admin@0.17.2"
+  - "@emdash-cms/auth@0.17.2"
+  - "@emdash-cms/blocks@0.17.2"
+  - "@emdash-cms/cloudflare@0.17.2"
+  - "@emdash-cms/gutenberg-to-portable-text@0.17.2"
+  - "@emdash-cms/plugin-embeds@0.1.21"
+  - emdash@0.17.2
+  - "@cloudflare/workers-types@4.20260606.1"
+
+overrides:
+  "@astro-community/astro-embed-integration>astro-auto-import": ^0.5.1
+  yaml-language-server>yaml: ^2.8.3

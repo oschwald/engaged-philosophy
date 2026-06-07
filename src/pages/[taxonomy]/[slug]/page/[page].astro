@@ -1,0 +1,48 @@
+---
+import Base from "../../../../layouts/Base.astro";
+import TaxonomyArchive from "../../../../components/TaxonomyArchive.astro";
+import {
+	getProjectsByTaxonomy,
+	getTaxonomyTerm,
+} from "../../../../lib/content";
+import { sortByPublishedOn } from "../../../../lib/path-utils";
+import { isProjectTaxonomy } from "../../../../lib/taxonomy-utils";
+import type { ContentEntry, ProjectData } from "../../../../lib/types";
+
+const { taxonomy = "", slug = "", page = "1" } = Astro.params;
+
+if (!isProjectTaxonomy(taxonomy)) {
+	return Astro.redirect("/404");
+}
+
+const term = await getTaxonomyTerm(taxonomy, slug);
+if (!term) {
+	return Astro.redirect("/404");
+}
+
+const pageNumber = Number.parseInt(page, 10);
+if (!Number.isFinite(pageNumber) || pageNumber < 2) {
+	return Astro.redirect(`/${taxonomy}/${slug}/`);
+}
+
+const projects = sortByPublishedOn(
+	(await getProjectsByTaxonomy(taxonomy, slug)) as ContentEntry<ProjectData>[],
+);
+const totalPages = Math.max(1, Math.ceil(projects.length / 10));
+
+if (pageNumber > totalPages) {
+	return Astro.redirect("/404");
+}
+---
+
+<Base
+	title={`${term.label} – Page ${pageNumber}`}
+	bodyClass={`archive paged tax-${taxonomy} term-${slug} paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
+>
+	<TaxonomyArchive
+		taxonomy={taxonomy}
+		label={term.label}
+		projects={projects}
+		page={pageNumber}
+	/>
+</Base>

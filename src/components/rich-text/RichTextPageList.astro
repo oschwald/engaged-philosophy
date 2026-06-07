@@ -1,0 +1,24 @@
+---
+import { getPublishedPages } from "../../lib/content";
+
+const pages = (await getPublishedPages())
+	.flatMap((page) => {
+		const { path, title } = page.data;
+		return path && title ? [{ path, title }] : [];
+	})
+	.sort((left, right) =>
+		left.title.localeCompare(right.title, undefined, {
+			sensitivity: "base",
+		}),
+	);
+---
+
+<ul class="legacy-page-list">
+	{
+		pages.map((page) => (
+			<li>
+				<a href={`/${page.path}/`}>{page.title}</a>
+			</li>
+		))
+	}
+</ul>

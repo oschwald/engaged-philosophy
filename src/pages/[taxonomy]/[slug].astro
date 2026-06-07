@@ -1,0 +1,80 @@
+---
+import Base from "../../layouts/Base.astro";
+import TaxonomyArchive from "../../components/TaxonomyArchive.astro";
+import {
+	getPageByPath,
+	getProjectsByTaxonomy,
+	getTaxonomyTerm,
+} from "../../lib/content";
+import { getEmDashEditEntryAttrs } from "../../lib/editing";
+import { sortByPublishedOn } from "../../lib/path-utils";
+import { getEntryContent } from "../../lib/rich-text";
+import { isProjectTaxonomy } from "../../lib/taxonomy-utils";
+import type { ContentEntry, ProjectData } from "../../lib/types";
+import RichContent from "../../components/RichContent.astro";
+
+const { taxonomy = "", slug = "" } = Astro.params;
+const pagePath = `${taxonomy}/${slug}`;
+const isProjectArchive = isProjectTaxonomy(taxonomy);
+const page = isProjectArchive ? null : await getPageByPath(pagePath);
+
+if (!isProjectArchive) {
+	if (!page) {
+		return Astro.redirect("/404");
+	}
+}
+
+const term = isProjectArchive ? await getTaxonomyTerm(taxonomy, slug) : null;
+
+if (isProjectArchive && !term) {
+	return Astro.redirect("/404");
+}
+
+const projects = isProjectArchive
+	? sortByPublishedOn(
+			(await getProjectsByTaxonomy(
+				taxonomy,
+				slug,
+			)) as ContentEntry<ProjectData>[],
+		)
+	: [];
+---
+
+{
+	page ? (
+		<Base title={page.data.title}>
+			<section id="primary" class="col-12 px-4">
+				<main id="content">
+					<article {...getEmDashEditEntryAttrs("pages", page)}>
+						<header class="page-header">
+							<h1
+								class="entry-title"
+								{...getEmDashEditEntryAttrs("pages", page, "title")}
+							>
+								{page.data.title}
+							</h1>
+						</header>
+						<div
+							class="entry-content"
+							{...getEmDashEditEntryAttrs("pages", page, "content")}
+						>
+							<RichContent value={getEntryContent(page.data)} />
+						</div>
+					</article>
+				</main>
+			</section>
+		</Base>
+	) : (
+		<Base
+			title={term?.label}
+			bodyClass={`archive tax-${taxonomy} term-${slug} wp-theme-engaged-philosophy-20 content-sidebar`}
+		>
+			<TaxonomyArchive
+				taxonomy={taxonomy}
+				label={term?.label ?? ""}
+				projects={projects}
+				page={1}
+			/>
+		</Base>
+	)
+}

@@ -1,0 +1,17 @@
+---
+interface Props {
+	siteTitle: string;
+	logoSrc: string;
+	logoAlt: string;
+	logoWidth?: number;
+	logoHeight?: number;
+}
+
+const { siteTitle, logoSrc, logoAlt, logoWidth, logoHeight } = Astro.props;
+---
+
+<header id="branding" class="text-center py-3">
+	<a id="header-image" href="/" title={siteTitle} rel="home">
+		<img src={logoSrc} alt={logoAlt} width={logoWidth} height={logoHeight} />
+	</a>
+</header>

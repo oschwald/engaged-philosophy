@@ -1,0 +1,153 @@
+---
+import RichContent from "../components/RichContent.astro";
+import SearchResults from "../components/SearchResults.astro";
+import Base from "../layouts/Base.astro";
+import { getPageBySlug, getPublishedProjects } from "../lib/content";
+import { searchSite } from "../lib/search";
+import { getEmDashEditEntryAttrs } from "../lib/editing";
+import { getMediaUrlPrefix, rewriteWordPressUploadUrl } from "../lib/media";
+import { sortByPublishedOn } from "../lib/path-utils";
+import {
+	getEntryContent,
+	getEntryExcerpt,
+	getExcerptText,
+} from "../lib/rich-text";
+import type { ContentEntry, ProjectData } from "../lib/types";
+
+const home = await getPageBySlug("home");
+const projects = (await getPublishedProjects()) as ContentEntry<ProjectData>[];
+const highlightedProjects = sortByPublishedOn(
+	projects.filter((project) => project.data.highlight),
+).slice(0, 6);
+const query = Astro.url.searchParams.get("s")?.trim() ?? "";
+const mediaUrlPrefix = getMediaUrlPrefix();
+const search = query ? await searchSite(query, 1, mediaUrlPrefix) : null;
+const homeEntryAttrs = home ? getEmDashEditEntryAttrs("pages", home) : {};
+const homeBoxes = home
+	? [
+			{
+				title: home.data.box_left_title,
+				html: home.data.box_left_html,
+				titleField: "box_left_title",
+				htmlField: "box_left_html",
+			},
+			{
+				title: home.data.box_middle_title,
+				html: home.data.box_middle_html,
+				titleField: "box_middle_title",
+				htmlField: "box_middle_html",
+			},
+			{
+				title: home.data.box_right_title,
+				html: home.data.box_right_html,
+				titleField: "box_right_title",
+				htmlField: "box_right_html",
+			},
+		]
+	: [];
+---
+
+<Base
+	title={query ? `Search Results for: ${query}` : home?.data.title}
+	bodyClass={query
+		? "search search-results wp-theme-engaged-philosophy-20 content-sidebar"
+		: "home page-template page-template-templates page-template-home"}
+>
+	{
+		query ? (
+			<SearchResults query={query} page={search?.currentPage} />
+		) : (
+			<section id="primary" class="col-12">
+				<main id="content" {...homeEntryAttrs}>
+					<div class="row">
+						<div
+							id="projects_carousel"
+							class="carousel slide col-lg-9 ps-3 pe-0"
+							data-bs-ride="carousel"
+						>
+							<div class="carousel-inner">
+								{highlightedProjects.map((project, index) => (
+									<div class:list={["carousel-item", index === 0 && "active"]}>
+										{project.data.featured_image?.src && (
+											<img
+												src={rewriteWordPressUploadUrl(
+													project.data.featured_image.src,
+													mediaUrlPrefix,
+												)}
+												alt={`${project.data.title} project image`}
+												width="700"
+												height="460"
+											/>
+										)}
+										<div class="carousel-caption">
+											<h4>{project.data.title}</h4>
+											<p>
+												{getExcerptText(
+													getEntryExcerpt(project.data),
+													getEntryContent(project.data),
+												)}{" "}
+												<a href={`/${project.data.path}/`}>
+													Continue reading <span class="meta-nav">&rarr;</span>
+												</a>
+											</p>
+										</div>
+									</div>
+								))}
+							</div>
+							<button
+								class="carousel-control-prev"
+								type="button"
+								data-bs-target="#projects_carousel"
+								data-bs-slide="prev"
+							>
+								<span class="carousel-control-prev-icon" aria-hidden="true" />
+								<span class="visually-hidden">Previous</span>
+							</button>
+							<button
+								class="carousel-control-next"
+								type="button"
+								data-bs-target="#projects_carousel"
+								data-bs-slide="next"
+							>
+								<span class="carousel-control-next-icon" aria-hidden="true" />
+								<span class="visually-hidden">Next</span>
+							</button>
+						</div>
+						<div class="col-lg-3">
+							<div
+								class="lead-home"
+								{...(home
+									? getEmDashEditEntryAttrs("pages", home, "content")
+									: {})}
+							>
+								<RichContent
+									value={home ? getEntryContent(home.data) : undefined}
+								/>
+							</div>
+						</div>
+					</div>
+					<div class="row mt-4">
+						{homeBoxes.map((box) => (
+							<div class="col-lg-4 mb-4">
+								{box.title && home && (
+									<h2
+										{...getEmDashEditEntryAttrs("pages", home, box.titleField)}
+									>
+										{box.title}
+									</h2>
+								)}
+								<div
+									{...(home
+										? getEmDashEditEntryAttrs("pages", home, box.htmlField)
+										: {})}
+								>
+									<RichContent value={box.html} />
+								</div>
+							</div>
+						))}
+					</div>
+				</main>
+			</section>
+		)
+	}
+</Base>

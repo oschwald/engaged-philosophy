@@ -1,0 +1,33 @@
+---
+import { CONTACT_EMAIL, FACEBOOK_PAGE_URL } from "../../lib/site-config";
+
+interface Props {
+	siteTitle: string;
+}
+
+const { siteTitle } = Astro.props;
+---
+
+<footer id="colophon" class="col-12">
+	<div
+		id="page-footer"
+		class="footer-custom d-flex align-items-center justify-content-between px-3 py-3"
+	>
+		<span class="credits alignleft"
+			>&copy; 2026 <a href="/">{siteTitle}</a>, all rights reserved.</span
+		>
+		<div class="d-flex align-items-center gap-2">
+			<div
+				class="fb-like"
+				data-href={FACEBOOK_PAGE_URL}
+				data-width="200"
+				data-layout="button_count"
+				data-action="like"
+				data-show-faces="false"
+				data-share="false"
+			>
+			</div>
+			<a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+		</div>
+	</div>
+</footer>

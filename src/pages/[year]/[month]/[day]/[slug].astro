@@ -1,0 +1,75 @@
+---
+import RichContent from "../../../../components/RichContent.astro";
+import ThemeSidebar from "../../../../components/ThemeSidebar.astro";
+import Base from "../../../../layouts/Base.astro";
+import {
+	getEntryTermSlugs,
+	getPostByPath,
+	getTermsBySlugs,
+} from "../../../../lib/content";
+import { getEmDashEditEntryAttrs } from "../../../../lib/editing";
+import { joinPath } from "../../../../lib/path-utils";
+import { getEntryContent } from "../../../../lib/rich-text";
+
+const { year = "", month = "", day = "", slug = "" } = Astro.params;
+const path = joinPath([year, month, day, slug]);
+const post = await getPostByPath(path);
+
+if (!post) {
+	return Astro.redirect("/404");
+}
+
+const categories = await getTermsBySlugs(
+	"category",
+	getEntryTermSlugs(post, "category"),
+);
+---
+
+<Base
+	title={post.data.title}
+	bodyClass={`wp-singular post-template-default single single-post${post.data.id ? ` postid-${post.data.id}` : ""} single-format-standard wp-theme-engaged-philosophy-20 content-sidebar`}
+>
+	<section id="primary" class="col-lg-8 px-4">
+		<div id="content" role="main">
+			<article class="post" {...getEmDashEditEntryAttrs("posts", post)}>
+				<header class="page-header">
+					<h1
+						class="entry-title"
+						{...getEmDashEditEntryAttrs("posts", post, "title")}
+					>
+						{post.data.title}
+					</h1>
+					<div class="entry-meta">
+						{
+							post.data.published_on
+								? new Date(post.data.published_on).toLocaleDateString()
+								: ""
+						}
+					</div>
+				</header>
+				<div
+					class="entry-content"
+					{...getEmDashEditEntryAttrs("posts", post, "content")}
+				>
+					<RichContent value={getEntryContent(post.data)} />
+				</div>
+				{
+					categories.length > 0 && (
+						<footer class="entry-footer">
+							<span class="cat-links block">
+								Posted in{" "}
+								{categories
+									.map((term) => (
+										<a href={`/category/${term.slug}/`}>{term.label}</a>
+									))
+									.reduce((prev, curr) => [prev, ", ", curr])}
+								.
+							</span>
+						</footer>
+					)
+				}
+			</article>
+		</div>
+	</section>
+	<ThemeSidebar />
+</Base>

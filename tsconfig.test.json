@@ -1,0 +1,16 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
+		"types": ["node", "@cloudflare/workers-types", "vitest"]
+	},
+	"include": [
+		"e2e/**/*.ts",
+		"e2e-static/**/*.ts",
+		"playwright.config.ts",
+		"playwright.static.config.ts",
+		"tests/**/*.ts",
+		"vitest.config.ts"
+	]
+}

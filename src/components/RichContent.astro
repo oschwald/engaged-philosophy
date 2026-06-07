@@ -1,0 +1,89 @@
+---
+import { getEditMeta } from "emdash";
+import { PortableText } from "emdash/ui";
+
+import RichTextNumberedHeading from "./rich-text/RichTextNumberedHeading.astro";
+import RichTextEmbed from "./rich-text/RichTextEmbed.astro";
+import RichTextImage from "./rich-text/RichTextImage.astro";
+import RichTextGallery from "./rich-text/RichTextGallery.astro";
+import RichTextPageList from "./rich-text/RichTextPageList.astro";
+import RichTextVideo from "./rich-text/RichTextVideo.astro";
+import { isPortableTextValue } from "../lib/rich-text";
+import type {
+	RichTextBlock,
+	RichTextNumberedHeadingNode,
+	RichTextValue,
+} from "../lib/rich-text-types";
+
+interface Props {
+	value?: RichTextValue | null;
+	class?: string;
+}
+
+const { value, class: className = "" } = Astro.props;
+const editMeta = getEditMeta(value);
+
+type NumberedPortableBlock = RichTextBlock & {
+	_type?: string;
+	_key?: string;
+	style?: string;
+	listItem?: string;
+	level?: unknown;
+};
+
+function normalizeLegacyPortableText(blocks: RichTextValue) {
+	let numberedHeadingIndex = 0;
+
+	return blocks.map((block) => {
+		const portableBlock = block as NumberedPortableBlock;
+		if (
+			portableBlock?._type === "block" &&
+			typeof portableBlock.style === "string" &&
+			/^h[1-6]$/.test(portableBlock.style) &&
+			portableBlock.listItem === "number"
+		) {
+			numberedHeadingIndex += 1;
+			const numberedHeading: RichTextNumberedHeadingNode = {
+				_type: "numberedHeading",
+				_key: portableBlock._key ?? `numbered-heading-${numberedHeadingIndex}`,
+				level: Number(portableBlock.style.slice(1)),
+				index: numberedHeadingIndex,
+				block: {
+					...portableBlock,
+					listItem: undefined,
+					level: undefined,
+				},
+			};
+			return numberedHeading;
+		}
+
+		return block;
+	});
+}
+
+const normalizedValue =
+	isPortableTextValue(value) && !editMeta
+		? normalizeLegacyPortableText(value)
+		: value;
+---
+
+{
+	isPortableTextValue(normalizedValue) && (
+		<div class:list={["legacy-content", className]}>
+			<PortableText
+				value={normalizedValue}
+				components={{
+					type: {
+						numberedHeading: RichTextNumberedHeading,
+						legacyEmbed: RichTextEmbed,
+						image: RichTextImage,
+						legacyImage: RichTextImage,
+						gallery: RichTextGallery,
+						legacyPageList: RichTextPageList,
+						legacyVideo: RichTextVideo,
+					},
+				}}
+			/>
+		</div>
+	)
+}

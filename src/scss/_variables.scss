@@ -2,8 +2,8 @@
 // --------------------------------------------------
 
 // Import Bootstrap variables first
-@import "~bootstrap/scss/functions";
-@import "~bootstrap/scss/variables";
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
 
 // Custom theme variables
 // --------------------------------------------------
@@ -56,7 +56,7 @@ $grid-breakpoints: (
 	md: 768px,
 	lg: 992px,
 	xl: 1200px,
-	xxl: 1400px
+	xxl: 1400px,
 );
 
 // Container max widths
@@ -65,7 +65,7 @@ $container-max-widths: (
 	md: 720px,
 	lg: 960px,
 	xl: 1140px,
-	xxl: 1320px
+	xxl: 1320px,
 );
 
 // Navbar

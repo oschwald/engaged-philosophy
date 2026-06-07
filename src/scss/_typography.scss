@@ -48,7 +48,8 @@ h4 small {
 // Page header
 .page-header {
 	padding-bottom: calc(#{$line-height-base} * 0.5rem - 1px);
-	margin: calc(#{$line-height-base} * 1rem) 0 calc(#{$line-height-base} * 1.5rem);
+	margin: calc(#{$line-height-base} * 1rem) 0
+		calc(#{$line-height-base} * 1.5rem);
 	border-bottom: 1px solid $gray-300;
 }
 

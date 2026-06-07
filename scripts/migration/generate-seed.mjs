@@ -1,0 +1,1066 @@
+import fs from "node:fs";
+import path from "node:path";
+
+import { DEFAULT_MIGRATION_SEED_PATH } from "./lib/migration-seed-path.mjs";
+import { htmlToPortableText } from "./lib/portable-text.mjs";
+import {
+	guessMimeTypeFromPath,
+	mediaValueForWordPressAttachment,
+} from "./lib/wordpress-media.mjs";
+
+const ROOT = process.cwd();
+const WXR_PATH = path.join(ROOT, "engagedphilosophy.WordPress.2026-05-25.xml");
+const SEED_PATH = DEFAULT_MIGRATION_SEED_PATH;
+
+const CONTROL_CHARS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g;
+const ITEM_RE = /<item>([\s\S]*?)<\/item>/g;
+const TERM_RE =
+	/<wp:term>\s*<wp:term_id>(.*?)<\/wp:term_id>\s*<wp:term_taxonomy>(?:<!\[CDATA\[(.*?)\]\]>|(.*?))<\/wp:term_taxonomy>\s*<wp:term_slug><!\[CDATA\[(.*?)\]\]><\/wp:term_slug>\s*<wp:term_parent><!\[CDATA\[(.*?)\]\]><\/wp:term_parent>\s*<wp:term_name><!\[CDATA\[(.*?)\]\]><\/wp:term_name>\s*<\/wp:term>/gs;
+const WP_CATEGORY_RE =
+	/<wp:category>\s*<wp:term_id>(.*?)<\/wp:term_id>\s*<wp:category_nicename><!\[CDATA\[(.*?)\]\]><\/wp:category_nicename>\s*<wp:category_parent><!\[CDATA\[(.*?)\]\]><\/wp:category_parent>\s*<wp:cat_name><!\[CDATA\[(.*?)\]\]><\/wp:cat_name>\s*<\/wp:category>/gs;
+const AUTHOR_RE =
+	/<wp:author>[\s\S]*?<wp:author_login><!\[CDATA\[(.*?)\]\]><\/wp:author_login>[\s\S]*?<wp:author_display_name><!\[CDATA\[(.*?)\]\]><\/wp:author_display_name>[\s\S]*?<\/wp:author>/gs;
+const META_RE =
+	/<wp:postmeta>\s*<wp:meta_key><!\[CDATA\[(.*?)\]\]><\/wp:meta_key>\s*<wp:meta_value><!\[CDATA\[(.*?)\]\]><\/wp:meta_value>\s*<\/wp:postmeta>/gs;
+const ITEM_CATEGORY_RE =
+	/<category domain="([^"]+)" nicename="([^"]+)"><!\[CDATA\[(.*?)\]\]><\/category>/gs;
+const INTERNAL_UPLOAD_URL_RE =
+	/(https?:\/\/(?:www\.|media\.)?engagedphilosophy\.com\/wp-content\/uploads\/[^"'()\s<>]+|\/wp-content\/uploads\/[^"'()\s<>]+)/gi;
+const LEGACY_SITE_URL_RE =
+	/\bhttps?:\/\/(?:www\.)?engagedphilosophy\.com(?=\/|[?#]|$)([^"'()\s<>]*)/gi;
+const NON_DURABLE_MEDIA_ATTR_RE =
+	/\b(?:src|href)=["'](?:blob:|data:image\/|https?:\/\/attachments\.office\.net\/)/i;
+const WP_IMAGE_BLOCK_RE = /<!--\s*wp:image\b[\s\S]*?<!--\s*\/wp:image\s*-->/gi;
+const NON_DURABLE_LINKED_IMAGE_RE =
+	/<a\b[^>]*>\s*<img\b[^>]*(?:src|href)=["'](?:blob:|data:image\/|https?:\/\/attachments\.office\.net\/)[\s\S]*?>\s*<\/a>/gi;
+const NON_DURABLE_IMAGE_RE =
+	/<img\b[^>]*(?:src|href)=["'](?:blob:|data:image\/|https?:\/\/attachments\.office\.net\/)[\s\S]*?>/gi;
+const EMPTY_ANCHOR_RE = /<a\b[^>]*>\s*(?:&nbsp;|\u00a0|\s)*<\/a>/gi;
+const DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/;
+
+function readFile(filePath) {
+	return fs.readFileSync(filePath, "utf8").replace(CONTROL_CHARS, "");
+}
+
+function extractTag(source, tag) {
+	const cdataMatch = source.match(
+		new RegExp(`<${tag}><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`, "s"),
+	);
+	if (cdataMatch) return cdataMatch[1].trim();
+
+	const plainMatch = source.match(
+		new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "s"),
+	);
+	return plainMatch ? plainMatch[1].trim() : "";
+}
+
+function decodeEntities(value) {
+	const namedEntities = {
+		amp: "&",
+		apos: "'",
+		quot: '"',
+		nbsp: " ",
+		hellip: "…",
+		ndash: "–",
+		mdash: "—",
+		lsquo: "‘",
+		rsquo: "’",
+		ldquo: "“",
+		rdquo: "”",
+	};
+
+	return (value || "").replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (entity, token) => {
+		const lowerToken = token.toLowerCase();
+		if (lowerToken.startsWith("#x")) {
+			const codePoint = Number.parseInt(lowerToken.slice(2), 16);
+			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
+		}
+		if (lowerToken.startsWith("#")) {
+			const codePoint = Number.parseInt(lowerToken.slice(1), 10);
+			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
+		}
+		return namedEntities[lowerToken] ?? entity;
+	});
+}
+
+function slugify(value, fallback) {
+	const base = decodeEntities(value)
+		.normalize("NFKD")
+		.replace(/[^\w\s-]/g, "")
+		.trim()
+		.toLowerCase()
+		.replace(/[\s_-]+/g, "-")
+		.replace(/^-+|-+$/g, "");
+
+	return base || fallback;
+}
+
+function normalizeStatus(status) {
+	return status === "draft" ? "draft" : "published";
+}
+
+function toIsoDate(value) {
+	if (!value) return "";
+	return `${value.replace(" ", "T")}Z`;
+}
+
+function pathFromUrl(url, siteUrl) {
+	if (!url) return "";
+
+	try {
+		const parsed = new URL(decodeEntities(url), siteUrl);
+		return parsed.pathname.replace(/^\/+|\/+$/g, "");
+	} catch {
+		return "";
+	}
+}
+
+function ensureUnique(value, seen, fallbackPrefix, explicitSet) {
+	let candidate = value;
+	let i = 2;
+	while (
+		!candidate ||
+		seen.has(candidate) ||
+		(explicitSet && candidate !== value && explicitSet.has(candidate))
+	) {
+		candidate = value ? `${value}-${i}` : `${fallbackPrefix}-${i}`;
+		i += 1;
+	}
+	seen.add(candidate);
+	return candidate;
+}
+
+function toMediaRef(id, attachment) {
+	return mediaValueForWordPressAttachment(id, attachment);
+}
+
+function extractSerializedInt(source, key) {
+	const match = source.match(
+		new RegExp(`s:${key.length}:"${key}";i:([0-9]+);`),
+	);
+	return match ? Number.parseInt(match[1], 10) : undefined;
+}
+
+function extractSerializedString(source, key) {
+	const match = source.match(
+		new RegExp(`s:${key.length}:"${key}";s:[0-9]+:"([^"]*)";`),
+	);
+	return match ? match[1] : "";
+}
+
+function parseAttachmentMetadata(value) {
+	const source = value || "";
+	const width = extractSerializedInt(source, "width");
+	const height = extractSerializedInt(source, "height");
+	const mimeType = extractSerializedString(source, "mime_type");
+
+	return {
+		...(Number.isInteger(width) ? { width } : {}),
+		...(Number.isInteger(height) ? { height } : {}),
+		...(mimeType ? { mimeType } : {}),
+	};
+}
+
+function normalizeBool(value) {
+	if (!value) return false;
+	const normalized = value.toLowerCase();
+	return (
+		normalized.includes("highlight") ||
+		normalized === "1" ||
+		normalized === "true"
+	);
+}
+
+function normalizeHtml(value) {
+	return decodeEntities(value || "")
+		.replace(CONTROL_CHARS, "")
+		.trim();
+}
+
+function normalizeUploadFilename(value) {
+	return (value || "")
+		.replace(/-e\d+(?=\.[^.]+$)/i, "")
+		.replace(/-\d+x\d+(?=\.[^.]+$)/i, "");
+}
+
+function registerUnique(map, key, value) {
+	if (!key || !value) return;
+	const existing = map.get(key);
+	if (!existing) {
+		map.set(key, value);
+		return;
+	}
+	if (existing !== value) {
+		map.set(key, null);
+	}
+}
+
+function repairInternalUploadLinks(
+	value,
+	exactReplacements,
+	filenameReplacements,
+	siteUrl,
+) {
+	return (value || "").replace(INTERNAL_UPLOAD_URL_RE, (match) => {
+		const trimmed = match.trim();
+		const absoluteUrl = trimmed.startsWith("/wp-content/uploads/")
+			? new URL(trimmed, siteUrl).toString()
+			: trimmed;
+		const directReplacement =
+			exactReplacements.get(absoluteUrl) ?? exactReplacements.get(trimmed);
+		if (directReplacement) return directReplacement;
+
+		try {
+			const { pathname } = new URL(absoluteUrl);
+			const filename = pathname.split("/").pop() || "";
+			const normalizedFilename = normalizeUploadFilename(filename);
+			const filenameReplacement = filenameReplacements.get(normalizedFilename);
+			return filenameReplacement || match;
+		} catch {
+			return match;
+		}
+	});
+}
+
+function repairMalformedInternalLinks(value, postsBySlug) {
+	return (value || "").replace(
+		/((?:https?:\/\/(?:www\.)?engagedphilosophy\.com)?\/(?:(?:…|\.\.\.|%E2%80%A6)\/){2,}\d{2}\/([a-z0-9-]+)\/?)/gi,
+		(match, _path, slug) => {
+			const canonicalPath = postsBySlug.get(slug.toLowerCase());
+			return canonicalPath ? `/${canonicalPath}/` : match;
+		},
+	);
+}
+
+function normalizeInternalSiteLinks(value) {
+	return (value || "").replace(LEGACY_SITE_URL_RE, (_match, suffix = "") => {
+		const path = suffix || "/";
+		return path.startsWith("/") ? path : `/${path}`;
+	});
+}
+
+function stripNonDurableMedia(value) {
+	return (value || "")
+		.replace(WP_IMAGE_BLOCK_RE, (block) =>
+			NON_DURABLE_MEDIA_ATTR_RE.test(block) ? "" : block,
+		)
+		.replace(NON_DURABLE_LINKED_IMAGE_RE, "")
+		.replace(NON_DURABLE_IMAGE_RE, "")
+		.replace(EMPTY_ANCHOR_RE, "");
+}
+
+function prepareRichTextHtml(
+	value,
+	postsBySlug,
+	exactReplacements,
+	filenameReplacements,
+	siteUrl,
+) {
+	let html = stripNonDurableMedia(value);
+	html = repairMalformedInternalLinks(html, postsBySlug);
+	html = normalizeInternalSiteLinks(html);
+	html = repairInternalUploadLinks(
+		html,
+		exactReplacements,
+		filenameReplacements,
+		siteUrl,
+	);
+	return html;
+}
+
+function normalizeRedirectPath(value) {
+	const normalized = (value || "").replace(/^\/+|\/+$/g, "");
+	return normalized ? `/${normalized}` : "/";
+}
+
+function trailingSlashPath(value) {
+	const normalized = normalizeRedirectPath(value);
+	return normalized === "/" || normalized.endsWith("/")
+		? normalized
+		: `${normalized}/`;
+}
+
+function addLegacyRedirect(redirects, sourcePath, destinationPath) {
+	const destination = trailingSlashPath(destinationPath);
+	const source = trailingSlashPath(sourcePath);
+	if (source === destination) return;
+
+	const variants = source === "/" ? [source] : [source, source.slice(0, -1)];
+	for (const variant of variants) {
+		if (variant && variant !== destination && !redirects.has(variant)) {
+			redirects.set(variant, {
+				source: variant,
+				destination,
+				type: 301,
+				enabled: true,
+				groupName: "wordpress-migration",
+			});
+		}
+	}
+}
+
+function addOldSlugRedirect(redirects, postType, oldSlug, contentPath) {
+	const slug = slugify(oldSlug, "");
+	if (!slug || !contentPath) return;
+
+	const segments = contentPath.split("/").filter(Boolean);
+	segments.pop();
+	const source =
+		postType === "project" ? `project/${slug}` : [...segments, slug].join("/");
+	addLegacyRedirect(redirects, source, contentPath);
+}
+
+function addOldDateRedirect(redirects, postType, oldDate, contentPath) {
+	if (postType !== "post" || !contentPath) return;
+	const match = DATE_RE.exec(oldDate || "");
+	if (!match) return;
+
+	const slug = contentPath.split("/").filter(Boolean).at(-1);
+	if (!slug) return;
+	addLegacyRedirect(
+		redirects,
+		`${match[1]}/${match[2]}/${match[3]}/${slug}`,
+		contentPath,
+	);
+}
+
+function buildMenuTree(itemsById, parentId = "0") {
+	return Object.values(itemsById)
+		.filter((item) => item.parentId === parentId)
+		.sort((a, b) => a.menuOrder - b.menuOrder)
+		.map((item) => {
+			const result = {
+				type: "custom",
+				label: item.label,
+				url: item.url,
+			};
+			const children = buildMenuTree(itemsById, item.id);
+			if (children.length > 0) result.children = children;
+			return result;
+		});
+}
+
+function hiddenField(slug, label, type) {
+	return {
+		slug,
+		label,
+		type,
+		widget: "legacy-image-blocks:hidden",
+	};
+}
+
+const rawXml = readFile(WXR_PATH);
+const siteTitle =
+	rawXml.match(/<channel>\s*<title>([\s\S]*?)<\/title>/)?.[1]?.trim() ||
+	"Engaged Philosophy";
+const siteDescription =
+	rawXml
+		.match(/<channel>[\s\S]*?<description>([\s\S]*?)<\/description>/)?.[1]
+		?.trim() || "Civic Engagement in Philosophy Classes";
+const siteUrl =
+	extractTag(rawXml, "wp:base_site_url") || "https://www.engagedphilosophy.com";
+
+const authors = new Map();
+for (const match of rawXml.matchAll(AUTHOR_RE)) {
+	const [, login, displayName] = match;
+	authors.set(login, displayName || login);
+}
+
+const taxonomies = new Map();
+taxonomies.set("category", {
+	name: "category",
+	label: "Categories",
+	labelSingular: "Category",
+	hierarchical: true,
+	collections: ["posts"],
+	terms: [],
+});
+
+for (const match of rawXml.matchAll(TERM_RE)) {
+	const [, , taxonomyCdata, taxonomyPlain, slug, parent, label] = match;
+	const taxonomyName = (taxonomyCdata || taxonomyPlain || "").trim();
+	if (
+		!["topic", "schools", "professors", "courses", "semesters"].includes(
+			taxonomyName,
+		)
+	)
+		continue;
+
+	if (!taxonomies.has(taxonomyName)) {
+		taxonomies.set(taxonomyName, {
+			name: taxonomyName,
+			label:
+				taxonomyName === "topic"
+					? "Topics"
+					: taxonomyName[0].toUpperCase() + taxonomyName.slice(1),
+			labelSingular:
+				taxonomyName === "topic"
+					? "Topic"
+					: taxonomyName === "schools"
+						? "School"
+						: taxonomyName === "courses"
+							? "Course"
+							: taxonomyName === "professors"
+								? "Professor"
+								: "Semester",
+			hierarchical: taxonomyName !== "topic",
+			collections: ["projects"],
+			terms: [],
+		});
+	}
+
+	taxonomies.get(taxonomyName).terms.push({
+		slug,
+		label,
+		...(parent ? { parent } : {}),
+	});
+}
+
+for (const match of rawXml.matchAll(WP_CATEGORY_RE)) {
+	const [, , slug, parent, label] = match;
+	taxonomies.get("category").terms.push({
+		slug,
+		label,
+		...(parent ? { parent } : {}),
+	});
+}
+
+const items = [...rawXml.matchAll(ITEM_RE)].map((match) => match[1]);
+items.sort((left, right) => {
+	const leftType = extractTag(left, "wp:post_type");
+	const rightType = extractTag(right, "wp:post_type");
+	if (leftType === "nav_menu_item" || rightType === "nav_menu_item") return 0;
+
+	const leftStatus = extractTag(left, "wp:status");
+	const rightStatus = extractTag(right, "wp:status");
+	const leftSlug = extractTag(left, "wp:post_name");
+	const rightSlug = extractTag(right, "wp:post_name");
+	const leftLink = decodeEntities(extractTag(left, "link"));
+	const rightLink = decodeEntities(extractTag(right, "link"));
+	const leftPath = pathFromUrl(leftLink, siteUrl);
+	const rightPath = pathFromUrl(rightLink, siteUrl);
+	const leftContentLength = extractTag(left, "content:encoded").length;
+	const rightContentLength = extractTag(right, "content:encoded").length;
+
+	return (
+		Number(rightStatus === "publish") - Number(leftStatus === "publish") ||
+		Number(Boolean(rightSlug)) - Number(Boolean(leftSlug)) ||
+		Number(Boolean(rightPath)) - Number(Boolean(leftPath)) ||
+		rightContentLength - leftContentLength
+	);
+});
+const attachments = new Map();
+const attachmentReplacements = new Map();
+const attachmentReplacementsByFilename = new Map();
+
+for (const item of items) {
+	const postType = extractTag(item, "wp:post_type");
+	if (postType !== "attachment") continue;
+
+	const postId = extractTag(item, "wp:post_id");
+	const attachmentUrl = extractTag(item, "wp:attachment_url");
+	const guidUrl = decodeEntities(extractTag(item, "guid"));
+	const meta = Object.fromEntries(
+		[...item.matchAll(META_RE)].map((m) => [m[1], m[2]]),
+	);
+	const filename = attachmentUrl ? attachmentUrl.split("/").pop() : "";
+	const metadata = parseAttachmentMetadata(meta._wp_attachment_metadata);
+	const createdAt = toIsoDate(
+		extractTag(item, "wp:post_date_gmt") || extractTag(item, "wp:post_date"),
+	);
+
+	if (attachmentUrl) {
+		registerUnique(attachmentReplacements, attachmentUrl, attachmentUrl);
+		if (guidUrl) {
+			registerUnique(attachmentReplacements, guidUrl, attachmentUrl);
+		}
+		registerUnique(
+			attachmentReplacementsByFilename,
+			normalizeUploadFilename(filename),
+			attachmentUrl,
+		);
+	}
+
+	attachments.set(postId, {
+		url: attachmentUrl,
+		alt: meta._wp_attachment_image_alt || "",
+		filename,
+		title: extractTag(item, "title"),
+		caption: normalizeHtml(extractTag(item, "excerpt:encoded")),
+		...(createdAt ? { createdAt } : {}),
+		...metadata,
+	});
+}
+
+const pages = [];
+const posts = [];
+const projects = [];
+const pageMap = new Map();
+const legacyRedirects = new Map();
+const rawMenuItems = [];
+const usedPaths = new Set();
+const usedSlugs = {
+	pages: new Set(),
+	posts: new Set(),
+	projects: new Set(),
+};
+
+const explicitSlugs = {
+	pages: new Set(),
+	posts: new Set(),
+	projects: new Set(),
+};
+const explicitPaths = new Set();
+
+for (const item of items) {
+	const postType = extractTag(item, "wp:post_type");
+	if (!["page", "post", "project"].includes(postType)) continue;
+
+	const status = extractTag(item, "wp:status");
+	if (!["publish", "draft"].includes(status)) continue;
+
+	const link = decodeEntities(extractTag(item, "link"));
+	const rawPath = pathFromUrl(link, siteUrl);
+	if (rawPath) {
+		explicitPaths.add(rawPath.replace(/^\/+|\/+$/g, ""));
+	}
+
+	const rawSlug = extractTag(item, "wp:post_name");
+	if (rawSlug) {
+		const postId = extractTag(item, "wp:post_id");
+		const generatedSlug = slugify(rawSlug, `${postType}-${postId}`);
+		if (generatedSlug) {
+			const typeKey = `${postType}s`;
+			explicitSlugs[
+				typeKey === "projects"
+					? "projects"
+					: typeKey === "posts"
+						? "posts"
+						: "pages"
+			].add(generatedSlug);
+		}
+	}
+}
+
+for (const item of items) {
+	const postType = extractTag(item, "wp:post_type");
+	if (!["page", "post", "project", "nav_menu_item"].includes(postType))
+		continue;
+
+	const postId = extractTag(item, "wp:post_id");
+	const status = extractTag(item, "wp:status");
+	const rawTitle = extractTag(item, "title") || "";
+	const title = decodeEntities(rawTitle) || `${postType} ${postId}`;
+	const link = decodeEntities(extractTag(item, "link"));
+	const creator = extractTag(item, "dc:creator");
+	const authorName = authors.get(creator) || creator || "";
+	const rawSlug = extractTag(item, "wp:post_name");
+	const menuOrder = Number(extractTag(item, "wp:menu_order") || "0");
+	const metas = Object.fromEntries(
+		[...item.matchAll(META_RE)].map((m) => [m[1], m[2]]),
+	);
+	const categories = [...item.matchAll(ITEM_CATEGORY_RE)].map((m) => ({
+		domain: m[1],
+		slug: m[2],
+		label: m[3],
+	}));
+
+	if (postType === "nav_menu_item") {
+		const menuTerms = categories.filter(
+			(category) => category.domain === "nav_menu",
+		);
+		if (!menuTerms.some((term) => term.slug === "main-menu")) continue;
+		rawMenuItems.push({
+			id: postId,
+			parentId: metas._menu_item_menu_item_parent || "0",
+			menuOrder: Number(extractTag(item, "wp:menu_order") || "0"),
+			type: metas._menu_item_type || "custom",
+			object: metas._menu_item_object || "",
+			objectId: metas._menu_item_object_id || "",
+			title: rawTitle,
+			url: decodeEntities(metas._menu_item_url || ""),
+		});
+		continue;
+	}
+
+	if (!["publish", "draft"].includes(status)) continue;
+
+	const statusValue = normalizeStatus(status);
+	const rawPath = pathFromUrl(link, siteUrl);
+	const generatedSlug = slugify(rawSlug || title, `${postType}-${postId}`);
+	const slug = ensureUnique(
+		generatedSlug,
+		usedSlugs[`${postType}s`] || usedSlugs.pages,
+		`${postType}-${postId}`,
+		explicitSlugs[`${postType}s`] || explicitSlugs.pages,
+	);
+
+	let contentPath = rawPath;
+	if (!contentPath) {
+		if (postType === "page") {
+			contentPath = slug === "home" ? "" : slug;
+		} else if (postType === "project") {
+			contentPath = `project/${slug}`;
+		} else if (postType === "post") {
+			const date = extractTag(item, "wp:post_date").slice(0, 10).split("-");
+			contentPath = `${date[0]}/${date[1]}/${date[2]}/${slug}`;
+		}
+	}
+
+	contentPath = contentPath.replace(/^\/+|\/+$/g, "");
+	if (postType !== "page" || contentPath !== "") {
+		contentPath = ensureUnique(
+			contentPath,
+			usedPaths,
+			`${postType}-${postId}`,
+			explicitPaths,
+		);
+	}
+
+	const thumbnail = toMediaRef(
+		metas._thumbnail_id,
+		attachments.get(metas._thumbnail_id),
+	);
+	const baseData = {
+		title,
+		path: contentPath,
+		content: normalizeHtml(extractTag(item, "content:encoded")),
+		author_name: authorName,
+		legacy_wp_id: Number(postId),
+		...(thumbnail ? { featured_image: thumbnail } : {}),
+	};
+
+	addOldSlugRedirect(
+		legacyRedirects,
+		postType,
+		metas._wp_old_slug,
+		contentPath,
+	);
+	addOldDateRedirect(
+		legacyRedirects,
+		postType,
+		metas._wp_old_date,
+		contentPath,
+	);
+
+	if (postType === "page") {
+		const entry = {
+			id: `page-${postId}`,
+			slug,
+			status: statusValue,
+			data: {
+				...baseData,
+				template: metas._wp_page_template || "default",
+				about_html: normalizeHtml(metas.about || ""),
+				box_left_title: metas["box-left-title"] || "",
+				box_left_html: normalizeHtml(metas["box-left"] || ""),
+				box_middle_title: metas["box-middle-title"] || "",
+				box_middle_html: normalizeHtml(metas["box-middle"] || ""),
+				box_right_title: metas["box-right-title"] || "",
+				box_right_html: normalizeHtml(metas["box-right"] || ""),
+			},
+		};
+		pages.push(entry);
+		pageMap.set(postId, {
+			title,
+			url: contentPath ? `/${contentPath}/` : "/",
+		});
+		continue;
+	}
+
+	if (postType === "post") {
+		const entry = {
+			id: `post-${postId}`,
+			slug,
+			status: statusValue,
+			data: {
+				...baseData,
+				excerpt: normalizeHtml(extractTag(item, "excerpt:encoded")),
+				published_on: toIsoDate(
+					extractTag(item, "wp:post_date_gmt") ||
+						extractTag(item, "wp:post_date"),
+				),
+			},
+			taxonomies: {
+				category: categories
+					.filter((category) => category.domain === "category")
+					.map((category) => category.slug),
+			},
+		};
+		posts.push(entry);
+		continue;
+	}
+
+	if (postType === "project") {
+		const taxonomyAssignments = {};
+		for (const taxonomyName of [
+			"topic",
+			"schools",
+			"professors",
+			"courses",
+			"semesters",
+		]) {
+			const assigned = categories
+				.filter((category) => category.domain === taxonomyName)
+				.map((category) => category.slug);
+			if (assigned.length > 0) taxonomyAssignments[taxonomyName] = assigned;
+		}
+
+		projects.push({
+			id: `project-${postId}`,
+			slug,
+			status: statusValue,
+			data: {
+				...baseData,
+				excerpt: normalizeHtml(extractTag(item, "excerpt:encoded")),
+				highlight: normalizeBool(metas.highlight || ""),
+				menu_order: menuOrder,
+				published_on: toIsoDate(
+					extractTag(item, "wp:post_date_gmt") ||
+						extractTag(item, "wp:post_date"),
+				),
+			},
+			taxonomies: taxonomyAssignments,
+		});
+	}
+}
+
+const pageItemsById = {};
+const postPathsBySlug = new Map(
+	posts.map((entry) => [entry.slug.toLowerCase(), entry.data.path]),
+);
+const seedMedia = Object.fromEntries(
+	Array.from(attachments.entries()).map(([id, attachment]) => [
+		id,
+		{
+			url: attachment.url,
+			alt: attachment.alt || "",
+			filename: attachment.filename || "",
+			title: attachment.title || "",
+			...(attachment.createdAt ? { createdAt: attachment.createdAt } : {}),
+			...(attachment.caption ? { caption: attachment.caption } : {}),
+			mimeType:
+				attachment.mimeType ||
+				guessMimeTypeFromPath(attachment.filename || attachment.url),
+			...(typeof attachment.width === "number"
+				? { width: attachment.width }
+				: {}),
+			...(typeof attachment.height === "number"
+				? { height: attachment.height }
+				: {}),
+		},
+	]),
+);
+const portableTextMedia = Object.fromEntries(
+	Array.from(attachments.entries()).map(([id, attachment]) => [
+		id,
+		{
+			url: attachment.url,
+			alt: attachment.alt || "",
+			filename: attachment.filename || "",
+			title: attachment.title || "",
+			mimeType:
+				attachment.mimeType ||
+				guessMimeTypeFromPath(attachment.filename || attachment.url),
+			...(typeof attachment.width === "number"
+				? { width: attachment.width }
+				: {}),
+			...(typeof attachment.height === "number"
+				? { height: attachment.height }
+				: {}),
+		},
+	]),
+);
+
+for (const entry of pages) {
+	entry.data.content = prepareRichTextHtml(
+		entry.data.content,
+		postPathsBySlug,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
+	entry.data.about_html = prepareRichTextHtml(
+		entry.data.about_html,
+		postPathsBySlug,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
+	entry.data.box_left_html = prepareRichTextHtml(
+		entry.data.box_left_html,
+		postPathsBySlug,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
+	entry.data.box_middle_html = prepareRichTextHtml(
+		entry.data.box_middle_html,
+		postPathsBySlug,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
+	entry.data.box_right_html = prepareRichTextHtml(
+		entry.data.box_right_html,
+		postPathsBySlug,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
+	entry.data.content = htmlToPortableText(
+		entry.data.content,
+		portableTextMedia,
+	);
+	entry.data.about_html = htmlToPortableText(
+		entry.data.about_html,
+		portableTextMedia,
+	);
+	entry.data.box_left_html = htmlToPortableText(
+		entry.data.box_left_html,
+		portableTextMedia,
+	);
+	entry.data.box_middle_html = htmlToPortableText(
+		entry.data.box_middle_html,
+		portableTextMedia,
+	);
+	entry.data.box_right_html = htmlToPortableText(
+		entry.data.box_right_html,
+		portableTextMedia,
+	);
+}
+
+for (const entry of posts) {
+	entry.data.content = prepareRichTextHtml(
+		entry.data.content,
+		postPathsBySlug,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
+	entry.data.excerpt = prepareRichTextHtml(
+		entry.data.excerpt,
+		postPathsBySlug,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
+	entry.data.content = htmlToPortableText(
+		entry.data.content,
+		portableTextMedia,
+	);
+	entry.data.excerpt = htmlToPortableText(
+		entry.data.excerpt,
+		portableTextMedia,
+		{ autoEmbedStandaloneUrls: false },
+	);
+}
+
+for (const entry of projects) {
+	entry.data.content = prepareRichTextHtml(
+		entry.data.content,
+		postPathsBySlug,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
+	entry.data.excerpt = prepareRichTextHtml(
+		entry.data.excerpt,
+		postPathsBySlug,
+		attachmentReplacements,
+		attachmentReplacementsByFilename,
+		siteUrl,
+	);
+	entry.data.content = htmlToPortableText(
+		entry.data.content,
+		portableTextMedia,
+	);
+	entry.data.excerpt = htmlToPortableText(
+		entry.data.excerpt,
+		portableTextMedia,
+		{ autoEmbedStandaloneUrls: false },
+	);
+}
+
+for (const item of rawMenuItems) {
+	let label = item.title;
+	let url = item.url;
+
+	if (
+		item.type === "post_type" &&
+		item.object === "page" &&
+		pageMap.has(item.objectId)
+	) {
+		const page = pageMap.get(item.objectId);
+		label = page.title;
+		url = page.url;
+	}
+
+	if (!url) continue;
+	if (url.startsWith(siteUrl)) {
+		url = `/${pathFromUrl(url, siteUrl)}`.replace(/\/+$/, "/");
+		if (url === "/") url = "/";
+	}
+	if (!url.startsWith("/")) url = `/${url.replace(/^\/+/, "")}`;
+	if (url !== "/" && !url.endsWith("/")) url = `${url}/`;
+
+	pageItemsById[item.id] = {
+		id: item.id,
+		parentId: item.parentId,
+		menuOrder: item.menuOrder,
+		label: label || "Untitled",
+		url,
+	};
+}
+
+const seed = {
+	$schema: "https://emdashcms.com/seed.schema.json",
+	version: "1",
+	meta: {
+		name: "Engaged Philosophy",
+		description: "Migrated from the Engaged Philosophy WordPress export",
+		author: "GitHub Copilot",
+	},
+	settings: {
+		title: decodeEntities(siteTitle),
+		tagline: decodeEntities(siteDescription),
+	},
+	collections: [
+		{
+			slug: "pages",
+			label: "Pages",
+			labelSingular: "Page",
+			supports: ["drafts", "revisions", "search"],
+			fields: [
+				{ slug: "title", label: "Title", type: "string", required: true },
+				{
+					slug: "path",
+					label: "Path",
+					type: "string",
+					unique: true,
+					widget: "legacy-image-blocks:hidden",
+				},
+				{ slug: "content", label: "Content", type: "portableText" },
+				{ slug: "featured_image", label: "Featured Image", type: "image" },
+				{ slug: "template", label: "Template", type: "string" },
+				{ slug: "about_html", label: "Home About", type: "portableText" },
+				{
+					slug: "box_left_title",
+					label: "Home Left Box Title",
+					type: "string",
+				},
+				{
+					slug: "box_left_html",
+					label: "Home Left Box",
+					type: "portableText",
+				},
+				{
+					slug: "box_middle_title",
+					label: "Home Middle Box Title",
+					type: "string",
+				},
+				{
+					slug: "box_middle_html",
+					label: "Home Middle Box",
+					type: "portableText",
+				},
+				{
+					slug: "box_right_title",
+					label: "Home Right Box Title",
+					type: "string",
+				},
+				{
+					slug: "box_right_html",
+					label: "Home Right Box",
+					type: "portableText",
+				},
+				hiddenField("author_name", "Author Name", "string"),
+				hiddenField("legacy_wp_id", "Legacy WordPress ID", "integer"),
+			],
+		},
+		{
+			slug: "posts",
+			label: "Posts",
+			labelSingular: "Post",
+			supports: ["drafts", "revisions", "search"],
+			fields: [
+				{ slug: "title", label: "Title", type: "string", required: true },
+				{
+					slug: "path",
+					label: "Path",
+					type: "string",
+					unique: true,
+					widget: "legacy-image-blocks:hidden",
+				},
+				{ slug: "excerpt", label: "Excerpt", type: "portableText" },
+				{ slug: "content", label: "Content", type: "portableText" },
+				{ slug: "featured_image", label: "Featured Image", type: "image" },
+				{ slug: "published_on", label: "Published On", type: "datetime" },
+				hiddenField("author_name", "Author Name", "string"),
+				hiddenField("legacy_wp_id", "Legacy WordPress ID", "integer"),
+			],
+		},
+		{
+			slug: "projects",
+			label: "Projects",
+			labelSingular: "Project",
+			supports: ["drafts", "revisions", "search"],
+			fields: [
+				{ slug: "title", label: "Title", type: "string", required: true },
+				{
+					slug: "path",
+					label: "Path",
+					type: "string",
+					unique: true,
+					widget: "legacy-image-blocks:hidden",
+				},
+				{ slug: "excerpt", label: "Excerpt", type: "portableText" },
+				{ slug: "content", label: "Content", type: "portableText" },
+				{ slug: "featured_image", label: "Featured Image", type: "image" },
+				{
+					slug: "highlight",
+					label: "Highlight",
+					type: "boolean",
+					defaultValue: false,
+				},
+				{
+					slug: "menu_order",
+					label: "Menu Order",
+					type: "integer",
+					defaultValue: 0,
+				},
+				{ slug: "published_on", label: "Published On", type: "datetime" },
+				hiddenField("author_name", "Author Name", "string"),
+				hiddenField("legacy_wp_id", "Legacy WordPress ID", "integer"),
+			],
+		},
+	],
+	taxonomies: Array.from(taxonomies.values()).map((taxonomy) => ({
+		...taxonomy,
+		terms: taxonomy.terms.sort((a, b) => a.label.localeCompare(b.label)),
+	})),
+	menus: [
+		{
+			name: "primary",
+			label: "Primary Navigation",
+			items: buildMenuTree(pageItemsById),
+		},
+	],
+	redirects: Array.from(legacyRedirects.values()).sort((a, b) =>
+		a.source.localeCompare(b.source),
+	),
+	media: seedMedia,
+	content: {
+		pages: pages.sort((a, b) => a.data.path.localeCompare(b.data.path)),
+		posts: posts.sort((a, b) => a.data.path.localeCompare(b.data.path)),
+		projects: projects.sort((a, b) => a.data.path.localeCompare(b.data.path)),
+	},
+};
+
+fs.mkdirSync(path.dirname(SEED_PATH), { recursive: true });
+fs.writeFileSync(SEED_PATH, `${JSON.stringify(seed, null, 2)}\n`);
+
+console.log(`Wrote ${SEED_PATH}`);
+console.log(`Pages: ${pages.length}`);
+console.log(`Posts: ${posts.length}`);
+console.log(`Projects: ${projects.length}`);

@@ -1,0 +1,66 @@
+---
+import ProjectTermsList from "../../components/content/ProjectTermsList.astro";
+import RichContent from "../../components/RichContent.astro";
+import Base from "../../layouts/Base.astro";
+import { getEntryTerms, getProjectBySlug } from "../../lib/content";
+import { getEmDashEditEntryAttrs } from "../../lib/editing";
+import { getEntryContent } from "../../lib/rich-text";
+
+const { slug } = Astro.params;
+const project = await getProjectBySlug(slug ?? "");
+
+if (!project) {
+	return Astro.redirect("/404");
+}
+
+const schools = getEntryTerms(project, "schools");
+const professors = getEntryTerms(project, "professors");
+const courses = getEntryTerms(project, "courses");
+const semesters = getEntryTerms(project, "semesters");
+const topics = getEntryTerms(project, "topic");
+const termGroups = [
+	{ label: "College", pathPrefix: "schools", terms: schools },
+	{ label: "Professor", pathPrefix: "professors", terms: professors },
+	{ label: "Course", pathPrefix: "courses", terms: courses },
+	{ label: "Semester", pathPrefix: "semesters", terms: semesters },
+	{ label: "Topics", pathPrefix: "topic", terms: topics },
+];
+---
+
+<Base
+	title={project.data.title}
+	bodyClass={`wp-singular project-template-default single single-project${project.data.id ? ` postid-${project.data.id}` : ""} wp-theme-engaged-philosophy-20 content-sidebar`}
+>
+	<section id="primary" class="col-12 px-4">
+		<main id="content">
+			<article
+				class="project type-project status-publish"
+				{...getEmDashEditEntryAttrs("projects", project)}
+			>
+				<header class="page-header">
+					<h1
+						class="entry-title"
+						{...getEmDashEditEntryAttrs("projects", project, "title")}
+					>
+						{project.data.title}
+					</h1>
+				</header>
+
+				<div
+					class="entry-content"
+					{...getEmDashEditEntryAttrs("projects", project, "content")}
+				>
+					<div class="row">
+						<div class="col-lg-9">
+							<RichContent value={getEntryContent(project.data)} />
+						</div>
+
+						<div class="col-lg-3">
+							<ProjectTermsList groups={termGroups} />
+						</div>
+					</div>
+				</div>
+			</article>
+		</main>
+	</section>
+</Base>

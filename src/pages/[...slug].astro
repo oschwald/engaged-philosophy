@@ -1,0 +1,97 @@
+---
+import RichContent from "../components/RichContent.astro";
+import Base from "../layouts/Base.astro";
+import { getPageByPath, getPageBySlug, getProjectBySlug } from "../lib/content";
+import { getEmDashEditEntryAttrs } from "../lib/editing";
+import { joinPath } from "../lib/path-utils";
+import { getEntryContent } from "../lib/rich-text";
+
+const slugParts = Astro.params.slug?.split("/").filter(Boolean) ?? [];
+const path = joinPath(slugParts);
+
+const page =
+	slugParts.length === 1
+		? await getPageBySlug(path)
+		: await getPageByPath(path);
+
+if (!page) {
+	const project = slugParts.length === 1 ? await getProjectBySlug(path) : null;
+	if (project?.data.path) {
+		return Astro.redirect(`/${project.data.path}/`);
+	}
+	return Astro.redirect("/404");
+}
+
+if (page.data.path !== path) {
+	return Astro.redirect(page.data.path ? `/${page.data.path}/` : "/");
+}
+
+const useFullWidthTemplate =
+	page.data.template === "templates/_full_width.php" &&
+	page.data.path !== "faq";
+const bodyClass = [
+	"wp-singular",
+	...(useFullWidthTemplate
+		? [
+				"page-template",
+				"page-template-templates_full_width",
+				"page-template-templates_full_width-php",
+			]
+		: ["page-template-default", "content-sidebar"]),
+	"page",
+	page.data.id ? `page-id-${page.data.id}` : null,
+	"wp-theme-engaged-philosophy-20",
+]
+	.filter(Boolean)
+	.join(" ");
+---
+
+<Base title={page.data.title} bodyClass={bodyClass}>
+	{
+		useFullWidthTemplate ? (
+			<section id="primary" class="col-12 px-4">
+				<main id="content">
+					<article {...getEmDashEditEntryAttrs("pages", page)}>
+						<header class="page-header">
+							<h1
+								class="entry-title"
+								{...getEmDashEditEntryAttrs("pages", page, "title")}
+							>
+								{page.data.title}
+							</h1>
+						</header>
+						<div
+							class="entry-content"
+							{...getEmDashEditEntryAttrs("pages", page, "content")}
+						>
+							<RichContent value={getEntryContent(page.data)} />
+						</div>
+					</article>
+				</main>
+			</section>
+		) : (
+			<div class="container-fluid">
+				<section id="primary" class="p-4">
+					<div id="content" role="main">
+						<article {...getEmDashEditEntryAttrs("pages", page)}>
+							<header class="page-header">
+								<h1
+									class="entry-title"
+									{...getEmDashEditEntryAttrs("pages", page, "title")}
+								>
+									{page.data.title}
+								</h1>
+							</header>
+							<div
+								class="entry-content"
+								{...getEmDashEditEntryAttrs("pages", page, "content")}
+							>
+								<RichContent value={getEntryContent(page.data)} />
+							</div>
+						</article>
+					</div>
+				</section>
+			</div>
+		)
+	}
+</Base>

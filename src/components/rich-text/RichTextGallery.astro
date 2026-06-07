@@ -1,0 +1,87 @@
+---
+import { Gallery as EmDashGallery } from "emdash/ui";
+
+import { getAssetSrc } from "../../lib/media";
+import type { RichTextGalleryNode } from "../../lib/rich-text-types";
+import RichTextBlockGalleryGrid from "./RichTextBlockGalleryGrid.astro";
+
+interface Props {
+	node: RichTextGalleryNode;
+}
+
+const { node } = Astro.props;
+const images = node.images;
+const getPublicMediaUrl = Astro.locals.emdash?.getPublicMediaUrl;
+const isLegacyGallery = node.layout === "shortcode" || node.layout === "figure";
+const usesLeadLayout =
+	node.layout === "shortcode" && node.columns === 3 && images.length === 4;
+const alignmentClass =
+	node.align === "left"
+		? "alignleft"
+		: node.align === "right"
+			? "alignright"
+			: node.align === "center"
+				? "aligncenter"
+				: "";
+const getImageShapeClass = (shape?: string) =>
+	shape === "rounded" ? "legacy-image--rounded" : "";
+---
+
+{
+	isLegacyGallery ? (
+		node.layout === "shortcode" ? (
+			<div
+				class:list={[
+					"legacy-gallery",
+					"legacy-gallery-shortcode",
+					node.columns ? `legacy-gallery-columns-${node.columns}` : undefined,
+					usesLeadLayout && "legacy-gallery-shortcode--lead",
+					alignmentClass,
+				]}
+			>
+				{images.map((image, index) => {
+					const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
+					const shapeClass = getImageShapeClass(image.shape);
+					const size = usesLeadLayout
+						? index === 0
+							? { width: 936, height: 936 }
+							: { width: 309, height: 309 }
+						: undefined;
+					return (
+						<a
+							class:list={[
+								"gallery-item",
+								usesLeadLayout && index === 0 && "gallery-item--lead",
+							]}
+							href={src}
+						>
+							<img
+								class={shapeClass || undefined}
+								src={src}
+								alt={image.alt || image.caption || ""}
+								width={size?.width}
+								height={size?.height}
+								loading="lazy"
+								decoding="async"
+							/>
+						</a>
+					);
+				})}
+			</div>
+		) : node.caption ? (
+			<figure class:list={["legacy-gallery", alignmentClass]}>
+				<RichTextBlockGalleryGrid images={images} columns={node.columns} />
+				<figcaption class="blocks-gallery-caption">{node.caption}</figcaption>
+			</figure>
+		) : (
+			<RichTextBlockGalleryGrid
+				images={images}
+				columns={node.columns}
+				alignmentClass={alignmentClass}
+				includeLegacyClass
+			/>
+		)
+	) : (
+		<EmDashGallery node={node} />
+	)
+}
