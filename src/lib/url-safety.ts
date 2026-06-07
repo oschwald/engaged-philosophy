@@ -35,6 +35,15 @@ function safeAbsoluteHttpUrl(value: string) {
 	}
 }
 
+function safeAbsoluteHttpsUrl(value: string) {
+	try {
+		const url = new URL(value);
+		return url.protocol === "https:" ? url.href : "";
+	} catch {
+		return "";
+	}
+}
+
 export function safeUrlForHref(value?: string | null) {
 	const normalized = normalizeUrlValue(value);
 	if (!normalized) return "";
@@ -48,7 +57,7 @@ export function safeUrlForMediaSrc(value?: string | null) {
 	if (normalized.startsWith("//")) return "";
 	if (normalized.startsWith("/")) return normalized;
 
-	return safeAbsoluteHttpUrl(normalized);
+	return safeAbsoluteHttpsUrl(normalized);
 }
 
 export function safeUrlForIframeSrc(value?: string | null) {

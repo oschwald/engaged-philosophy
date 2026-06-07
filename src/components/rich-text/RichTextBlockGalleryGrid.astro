@@ -16,6 +16,12 @@ const {
 	includeLegacyClass = false,
 } = Astro.props;
 const getPublicMediaUrl = Astro.locals.emdash?.getPublicMediaUrl;
+const renderableImages = images
+	.map((image) => ({
+		image,
+		src: getAssetSrc(image.asset, undefined, getPublicMediaUrl),
+	}))
+	.filter(({ src }) => src);
 const getImageShapeClass = (shape?: string) =>
 	shape === "rounded" ? "legacy-image--rounded" : "";
 ---
@@ -29,8 +35,7 @@ const getImageShapeClass = (shape?: string) =>
 	]}
 >
 	{
-		images.map((image) => {
-			const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
+		renderableImages.map(({ image, src }) => {
 			const shapeClass = getImageShapeClass(image.shape);
 			return (
 				<li class="blocks-gallery-item">

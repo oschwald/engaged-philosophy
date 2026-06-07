@@ -62,7 +62,8 @@ function resolvePublicMediaUrl(
 	}
 
 	if (resolvedUrl && !resolvedUrl.startsWith(EMDASH_MEDIA_FILE_PREFIX)) {
-		return safeUrlForMediaSrc(resolvedUrl);
+		const safeResolvedUrl = safeUrlForMediaSrc(resolvedUrl);
+		if (safeResolvedUrl) return safeResolvedUrl;
 	}
 
 	return getPublicMediaStorageUrl(key);

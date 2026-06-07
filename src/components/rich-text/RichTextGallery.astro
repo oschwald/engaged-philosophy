@@ -12,9 +12,17 @@ interface Props {
 const { node } = Astro.props;
 const images = node.images;
 const getPublicMediaUrl = Astro.locals.emdash?.getPublicMediaUrl;
+const renderableImages = images
+	.map((image) => ({
+		image,
+		src: getAssetSrc(image.asset, undefined, getPublicMediaUrl),
+	}))
+	.filter(({ src }) => src);
 const isLegacyGallery = node.layout === "shortcode" || node.layout === "figure";
 const usesLeadLayout =
-	node.layout === "shortcode" && node.columns === 3 && images.length === 4;
+	node.layout === "shortcode" &&
+	node.columns === 3 &&
+	renderableImages.length === 4;
 const alignmentClass =
 	node.align === "left"
 		? "alignleft"
@@ -39,8 +47,7 @@ const getImageShapeClass = (shape?: string) =>
 					alignmentClass,
 				]}
 			>
-				{images.map((image, index) => {
-					const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
+				{renderableImages.map(({ image, src }, index) => {
 					const shapeClass = getImageShapeClass(image.shape);
 					const size = usesLeadLayout
 						? index === 0

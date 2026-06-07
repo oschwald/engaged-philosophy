@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import {
 	getAssetSrc,
+	getPublicMediaStorageUrl,
 	rewriteInternalMediaFileUrl,
 	rewriteWordPressUploadUrl,
 } from "../../src/lib/media";
@@ -18,6 +19,7 @@ describe("media URL helpers", () => {
 		expect(getAssetSrc(null, "https://media.example/photo.jpg")).toBe(
 			"https://media.example/photo.jpg",
 		);
+		expect(getAssetSrc(null, "http://media.example/photo.jpg")).toBe("");
 	});
 
 	test("rewrites WordPress upload URLs to the public media host", () => {
@@ -59,5 +61,17 @@ describe("media URL helpers", () => {
 				"https://media.example",
 			),
 		).toBe("https://media.example/wp-content/uploads/%25ZZ/photo.jpg");
+	});
+
+	test("falls back to public storage URL when resolver output is unsafe", () => {
+		const key = "wp-content/uploads/2024/05/photo.jpg";
+
+		expect(
+			getAssetSrc(
+				{ meta: { storageKey: key } },
+				null,
+				() => "javascript:alert(1)",
+			),
+		).toBe(getPublicMediaStorageUrl(key));
 	});
 });

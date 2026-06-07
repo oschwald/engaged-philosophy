@@ -24,13 +24,14 @@ describe("URL safety helpers", () => {
 		expect(safeUrlForHref("https://example.com/\u0000path")).toBe("");
 	});
 
-	test("allows only same-origin paths and http URLs for media sources", () => {
+	test("allows only same-origin paths and https URLs for media sources", () => {
 		expect(safeUrlForMediaSrc("/wp-content/uploads/photo.jpg")).toBe(
 			"/wp-content/uploads/photo.jpg",
 		);
 		expect(safeUrlForMediaSrc("https://media.example/photo.jpg")).toBe(
 			"https://media.example/photo.jpg",
 		);
+		expect(safeUrlForMediaSrc("http://media.example/photo.jpg")).toBe("");
 		expect(safeUrlForMediaSrc("#photo")).toBe("");
 		expect(safeUrlForMediaSrc("?photo=1")).toBe("");
 		expect(safeUrlForMediaSrc("javascript:alert(1)")).toBe("");
