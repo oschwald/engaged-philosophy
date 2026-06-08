@@ -45,6 +45,8 @@ jobs:
           PLAYWRIGHT_VIDEO: "1"
         run: |
           set -o pipefail
+          cp -a test-results/e2e-static test-results/e2e-static-initial || true
+          cp -a playwright-report-static playwright-report-static-initial || true
           pnpm run test:static -- --last-failed 2>&1 | tee playwright-debug-static.log
 
       - name: Typecheck app
@@ -76,18 +78,24 @@ jobs:
           PLAYWRIGHT_VIDEO: "1"
         run: |
           set -o pipefail
+          cp -a test-results/e2e test-results/e2e-initial || true
+          cp -a playwright-report playwright-report-initial || true
           pnpm run test:e2e -- --last-failed 2>&1 | tee playwright-debug-e2e.log
 
       - name: Upload Playwright failure artifacts
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: playwright-failure-artifacts
           path: |
             test-results/e2e
+            test-results/e2e-initial
             test-results/e2e-static
+            test-results/e2e-static-initial
             playwright-report
+            playwright-report-initial
             playwright-report-static
+            playwright-report-static-initial
             playwright-debug-*.log
           if-no-files-found: ignore
           retention-days: 14
