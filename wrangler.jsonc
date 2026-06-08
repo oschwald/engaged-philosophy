@@ -2,6 +2,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "engaged-philosophy",
 	"main": "./src/worker.ts",
+	"preview_urls": true,
 	"routes": [
 		{
 			"pattern": "engagedphilosophy.com",
