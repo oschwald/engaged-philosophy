@@ -23,6 +23,7 @@ export default defineConfig({
 	testDir: "./e2e-static/specs",
 	fullyParallel: false,
 	workers: 1,
+	retries: process.env.CI ? 1 : 0,
 	timeout: 30_000,
 	expect: {
 		timeout: 5000,

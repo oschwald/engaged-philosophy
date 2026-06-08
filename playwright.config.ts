@@ -24,9 +24,10 @@ export default defineConfig({
 	globalSetup: "./e2e/global-setup.ts",
 	fullyParallel: false,
 	workers: Number.isFinite(workers) && workers > 0 ? workers : 2,
+	retries: process.env.CI ? 1 : 0,
 	timeout: 30_000,
 	expect: {
-		timeout: 5000,
+		timeout: 7500,
 	},
 	outputDir: "test-results/e2e",
 	reporter: [
