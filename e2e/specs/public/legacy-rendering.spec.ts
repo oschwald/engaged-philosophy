@@ -246,6 +246,24 @@ test.describe("public legacy rendering", () => {
 		await expectPageTextNotToContain(publicPage, "[gallery");
 		await expectPageTextNotToContain(publicPage, "[youtube");
 		await expectPageTextNotToContain(publicPage, "[playlist");
+
+		await publicPage.context().addCookies([
+			{
+				name: "astro-session",
+				value: "e2e-session-probe",
+				url: publicPage.url(),
+			},
+		]);
+		const signedInResponse = await publicPage.goto(publicPath, {
+			waitUntil: "domcontentloaded",
+			timeout: 10_000,
+		});
+		expect(signedInResponse?.status()).toBe(200);
+		await expect(publicPage.getByText(bodyText)).toBeVisible();
+		await expect(legacyImage).toHaveAttribute(
+			"src",
+			`${MEDIA_BASE}${LEGACY_IMAGE_PATH}`,
+		);
 	});
 
 	test("preserves centered legacy images, page lists, and mobile nav", async ({

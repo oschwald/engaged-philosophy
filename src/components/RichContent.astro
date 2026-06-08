@@ -22,6 +22,15 @@ interface Props {
 
 const { value, class: className = "" } = Astro.props;
 const editMeta = getEditMeta(value);
+const legacyBlockTypes = new Set([
+	"break",
+	"gallery",
+	"legacyEmbed",
+	"legacyImage",
+	"legacyPageList",
+	"legacyVideo",
+	"numberedHeading",
+]);
 
 type NumberedPortableBlock = RichTextBlock & {
 	_type?: string;
@@ -61,8 +70,27 @@ function normalizeLegacyPortableText(blocks: RichTextValue) {
 	});
 }
 
+function hasLegacyPortableTextBlocks(blocks: RichTextValue) {
+	return blocks.some((block) => {
+		const portableBlock = block as NumberedPortableBlock;
+		return (
+			(typeof portableBlock?._type === "string" &&
+				legacyBlockTypes.has(portableBlock._type)) ||
+			(portableBlock?._type === "block" &&
+				typeof portableBlock.style === "string" &&
+				/^h[1-6]$/.test(portableBlock.style) &&
+				portableBlock.listItem === "number")
+		);
+	});
+}
+
+const hasLegacyBlocks = isPortableTextValue(value)
+	? hasLegacyPortableTextBlocks(value)
+	: false;
+// Imported legacy blocks render statically; the normalized copy also drops
+// EmDash edit metadata so the inline editor does not try to own them.
 const normalizedValue =
-	isPortableTextValue(value) && !editMeta
+	isPortableTextValue(value) && (!editMeta || hasLegacyBlocks)
 		? normalizeLegacyPortableText(value)
 		: value;
 ---
