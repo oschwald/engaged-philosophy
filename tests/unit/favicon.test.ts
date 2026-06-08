@@ -2,11 +2,10 @@ import { describe, expect, test } from "vitest";
 
 import {
 	createFaviconResponse,
+	FAVICON_CACHE_CONTROL,
+	FAVICON_NOT_FOUND_CACHE_CONTROL,
 	getConfiguredFaviconHref,
 } from "../../src/lib/favicon";
-
-const FAVICON_CACHE_CONTROL =
-	"public, max-age=300, s-maxage=3600, stale-while-revalidate=86400";
 
 describe("favicon helpers", () => {
 	test("rewrites configured EmDash media file URLs", () => {
@@ -47,7 +46,9 @@ describe("favicon helpers", () => {
 
 		expect(response.status).toBe(404);
 		expect(response.headers.has("location")).toBe(false);
-		expect(response.headers.get("cache-control")).toBe(FAVICON_CACHE_CONTROL);
+		expect(response.headers.get("cache-control")).toBe(
+			FAVICON_NOT_FOUND_CACHE_CONTROL,
+		);
 	});
 
 	test("redirects absolute configured media favicon URLs unchanged", () => {
@@ -66,7 +67,7 @@ describe("favicon helpers", () => {
 		);
 	});
 
-	test("allows root-relative non-compatibility favicon URLs", () => {
+	test("rejects root-relative non-compatibility favicon URLs", () => {
 		expect(
 			getConfiguredFaviconHref(
 				{
@@ -76,7 +77,7 @@ describe("favicon helpers", () => {
 				},
 				"https://media.example",
 			),
-		).toBe("/assets/favicon.png");
+		).toBe("");
 	});
 
 	test("does not redirect to compatibility favicon paths", () => {
@@ -94,6 +95,9 @@ describe("favicon helpers", () => {
 
 		expect(response.status).toBe(404);
 		expect(response.headers.has("location")).toBe(false);
+		expect(response.headers.get("cache-control")).toBe(
+			FAVICON_NOT_FOUND_CACHE_CONTROL,
+		);
 	});
 
 	test("does not redirect to the same request target", () => {

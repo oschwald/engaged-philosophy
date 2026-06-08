@@ -1,7 +1,7 @@
 import { getMediaUrlPrefix, rewriteInternalMediaFileUrl } from "./media";
 import { safeUrlForMediaSrc } from "./url-safety";
 
-type SiteFaviconSettings = {
+export type SiteFaviconSettings = {
 	favicon?: {
 		url?: string | null;
 	} | null;
@@ -12,8 +12,9 @@ type CreateFaviconResponseOptions = {
 	requestUrl?: string | URL;
 };
 
-const FAVICON_CACHE_CONTROL =
+export const FAVICON_CACHE_CONTROL =
 	"public, max-age=300, s-maxage=3600, stale-while-revalidate=86400";
+export const FAVICON_NOT_FOUND_CACHE_CONTROL = "public, max-age=0, s-maxage=60";
 const COMPATIBILITY_FAVICON_PATHS = new Set([
 	"/favicon.ico",
 	"/favicon.svg",
@@ -68,7 +69,6 @@ export function getConfiguredFaviconHref(
 	);
 	if (!faviconHref) return "";
 	if (isRootRelativeCompatibilityFaviconPath(faviconHref)) return "";
-	if (faviconHref.startsWith("/")) return faviconHref;
 
 	return isAllowedMediaUrl(faviconHref, resolvedMediaUrlPrefix)
 		? faviconHref
@@ -90,7 +90,9 @@ export function createFaviconResponse(
 	return new Response(null, {
 		status: location ? 302 : 404,
 		headers: {
-			"Cache-Control": FAVICON_CACHE_CONTROL,
+			"Cache-Control": location
+				? FAVICON_CACHE_CONTROL
+				: FAVICON_NOT_FOUND_CACHE_CONTROL,
 			...(location ? { Location: location } : {}),
 		},
 	});
