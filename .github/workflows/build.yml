@@ -32,6 +32,8 @@ jobs:
         run: pnpm run test:unit
 
       - name: Static browser tests
+        env:
+          PLAYWRIGHT_VIDEO: "1"
         run: pnpm run test:static
 
       - name: Typecheck app
@@ -50,6 +52,8 @@ jobs:
         run: pnpm run test:worker-runtime
 
       - name: Worker browser tests
+        env:
+          PLAYWRIGHT_VIDEO: "1"
         run: pnpm run test:e2e
 
       - name: Upload Playwright failure artifacts
