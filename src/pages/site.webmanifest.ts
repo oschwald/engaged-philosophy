@@ -6,20 +6,18 @@ export async function GET() {
 	const settings = await getRuntimeSiteSettings();
 	const siteTitle = settings?.title || SITE_TITLE_FALLBACK;
 	const favicon = settings?.favicon;
-	const faviconIcon = favicon?.url
-		? {
-				src: rewriteInternalMediaFileUrl(favicon.url),
-				sizes:
-					favicon.width && favicon.height
-						? `${favicon.width}x${favicon.height}`
-						: "any",
-				...(favicon.contentType ? { type: favicon.contentType } : {}),
-			}
-		: {
-				src: "/favicon.svg",
-				sizes: "any",
-				type: "image/svg+xml",
-			};
+	const icons = favicon?.url
+		? [
+				{
+					src: rewriteInternalMediaFileUrl(favicon.url),
+					sizes:
+						favicon.width && favicon.height
+							? `${favicon.width}x${favicon.height}`
+							: "any",
+					...(favicon.contentType ? { type: favicon.contentType } : {}),
+				},
+			]
+		: [];
 
 	return new Response(
 		JSON.stringify(
@@ -28,7 +26,7 @@ export async function GET() {
 				short_name:
 					siteTitle === SITE_TITLE_FALLBACK ? "EngagedPhil" : siteTitle,
 				description: settings?.tagline || SITE_TAGLINE_FALLBACK,
-				icons: [faviconIcon],
+				icons,
 				theme_color: "#fd7e14",
 				background_color: "#ffffff",
 				display: "standalone",
