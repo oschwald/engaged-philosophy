@@ -13,7 +13,7 @@ const PUBLIC_PATHS = parseList(process.env.LIVE_SMOKE_PATHS, [
 	"/project/",
 ]);
 const STATIC_PATHS = parseList(process.env.LIVE_SMOKE_STATIC_PATHS, [
-	"/favicon.svg",
+	"/favicon.ico",
 	"/site.webmanifest",
 ]);
 const MEDIA_URLS = parseList(process.env.LIVE_SMOKE_MEDIA_URLS, []);
@@ -178,6 +178,11 @@ async function checkPublicPage(path) {
 		text.includes("[gallery") || text.includes("[embed]"),
 		false,
 		`Public page ${path} appears to contain unrendered legacy shortcode text`,
+	);
+	assert.equal(
+		/href=["']\/favicon(?:-simple)?\.svg["']/i.test(text),
+		false,
+		`Public page ${path} should not advertise the removed SVG favicon`,
 	);
 
 	console.log(`ok public ${path}`);

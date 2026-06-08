@@ -2,18 +2,11 @@
 interface Props {
 	pageTitle: string;
 	description: string;
-	faviconHref: string;
+	faviconHref?: string;
 	faviconType?: string;
-	hasCustomFavicon?: boolean;
 }
 
-const {
-	pageTitle,
-	description,
-	faviconHref,
-	faviconType,
-	hasCustomFavicon = false,
-} = Astro.props;
+const { pageTitle, description, faviconHref, faviconType } = Astro.props;
 ---
 
 <head>
@@ -22,16 +15,7 @@ const {
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>{pageTitle}</title>
 	<meta name="description" content={description} />
-	<link rel="icon" type={faviconType} href={faviconHref} />
-	{
-		!hasCustomFavicon && (
-			<link
-				rel="alternate icon"
-				type="image/svg+xml"
-				href="/favicon-simple.svg"
-			/>
-		)
-	}
+	{faviconHref && <link rel="icon" type={faviconType} href={faviconHref} />}
 	<link rel="manifest" href="/site.webmanifest" />
 	<meta name="theme-color" content="#fd7e14" />
 	<meta name="msapplication-TileColor" content="#fd7e14" />
