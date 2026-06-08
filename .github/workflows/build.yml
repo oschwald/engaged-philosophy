@@ -32,9 +32,20 @@ jobs:
         run: pnpm run test:unit
 
       - name: Static browser tests
+        id: static-browser-tests
         env:
           PLAYWRIGHT_VIDEO: "1"
         run: pnpm run test:static
+
+      - name: Static browser tests debug rerun
+        if: failure() && steps.static-browser-tests.outcome == 'failure'
+        continue-on-error: true
+        env:
+          DEBUG: pw:api
+          PLAYWRIGHT_VIDEO: "1"
+        run: |
+          set -o pipefail
+          pnpm run test:static -- --last-failed 2>&1 | tee playwright-debug-static.log
 
       - name: Typecheck app
         run: pnpm run typecheck
@@ -52,9 +63,20 @@ jobs:
         run: pnpm run test:worker-runtime
 
       - name: Worker browser tests
+        id: worker-browser-tests
         env:
           PLAYWRIGHT_VIDEO: "1"
         run: pnpm run test:e2e
+
+      - name: Worker browser tests debug rerun
+        if: failure() && steps.worker-browser-tests.outcome == 'failure'
+        continue-on-error: true
+        env:
+          DEBUG: pw:api
+          PLAYWRIGHT_VIDEO: "1"
+        run: |
+          set -o pipefail
+          pnpm run test:e2e -- --last-failed 2>&1 | tee playwright-debug-e2e.log
 
       - name: Upload Playwright failure artifacts
         if: failure()
@@ -66,5 +88,6 @@ jobs:
             test-results/e2e-static
             playwright-report
             playwright-report-static
+            playwright-debug-*.log
           if-no-files-found: ignore
           retention-days: 14
