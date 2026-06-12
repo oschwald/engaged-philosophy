@@ -291,7 +291,7 @@ export async function createAndPublishContentViaAdmin(
 	const created = createdBody?.data?.item as ContentItem;
 
 	await expect(page).toHaveURL(
-		new RegExp(`/_emdash/admin/content/${collection}/${created.id}$`),
+		new RegExp(`/_emdash/admin/content/${collection}/${created.id}(?:\\?.*)?$`),
 	);
 	await expect(page.getByText("Saved").first()).toBeVisible();
 
@@ -312,9 +312,10 @@ export async function createAndPublishContentViaAdmin(
 	);
 	const published = publishedBody?.data?.item as ContentItem;
 
+	expect(published.status).toBe("published");
+	expect(published.publishedAt).not.toBeNull();
 	await expect(page.getByText("Content is now live")).toBeVisible();
 	await expect(page.getByText("Published").first()).toBeVisible();
-	await expect(page.getByRole("link", { name: "Live View" })).toBeVisible();
 
 	return {
 		created,

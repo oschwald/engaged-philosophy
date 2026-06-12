@@ -36,6 +36,9 @@ const anonymousCloudflareCacheEntrypoint = fileURLToPath(
 const cloudflareAccessInviteRouteEntrypoint = fileURLToPath(
 	new URL("./src/emdash-routes/cloudflare-access-invite.ts", import.meta.url),
 );
+const emdashContentAuthorsShimEntrypoint = fileURLToPath(
+	new URL("./src/middleware/emdash-content-authors.ts", import.meta.url),
+);
 const useTestAuth = process.env.EMDASH_TEST_AUTH === "1";
 const allowTestAuth = process.env.EMDASH_ALLOW_TEST_AUTH === "1";
 
@@ -70,14 +73,28 @@ viteLogger.warn = (message, options) => {
 	viteWarn(message, options);
 };
 
-function cloudflareAccessInviteRoute() {
+function localEmDashRoutes() {
 	return {
-		name: "engaged-philosophy-cloudflare-access-invite-route",
+		name: "engaged-philosophy-local-emdash-routes",
 		hooks: {
 			"astro:config:setup": ({ injectRoute }) => {
 				injectRoute({
 					pattern: "/_emdash/api/auth/invite",
 					entrypoint: cloudflareAccessInviteRouteEntrypoint,
+				});
+			},
+		},
+	};
+}
+
+function emdashContentAuthorsShim() {
+	return {
+		name: "engaged-philosophy-emdash-content-authors-shim",
+		hooks: {
+			"astro:config:setup": ({ addMiddleware }) => {
+				addMiddleware({
+					entrypoint: emdashContentAuthorsShimEntrypoint,
+					order: "pre",
 				});
 			},
 		},
@@ -130,7 +147,7 @@ export default defineConfig({
 	},
 	integrations: [
 		react(),
-		cloudflareAccessInviteRoute(),
+		localEmDashRoutes(),
 		emdash({
 			database: d1({ binding: "DB", session: "disabled" }),
 			storage: r2({
@@ -176,6 +193,7 @@ export default defineConfig({
 				},
 			],
 		}),
+		emdashContentAuthorsShim(),
 	],
 	devToolbar: { enabled: false },
 });

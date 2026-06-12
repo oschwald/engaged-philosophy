@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { readdir, rm } from "node:fs/promises";
+import { readFile, readdir, rm } from "node:fs/promises";
 import { registerHooks } from "node:module";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -58,6 +58,11 @@ if (!existsSync(DIST_WRANGLER_CONFIG)) {
 	throw new Error("Run pnpm run build before pnpm run test:worker-bundle.");
 }
 
+const distWranglerConfig = JSON.parse(
+	await readFile(DIST_WRANGLER_CONFIG, "utf8"),
+);
+assert.deepEqual(distWranglerConfig.triggers?.crons, ["* * * * *"]);
+
 await rm(OUT_DIR, { recursive: true, force: true });
 
 run("pnpm", ["exec", "wrangler", "deploy", "--dry-run", "--outdir", OUT_DIR]);
@@ -76,6 +81,8 @@ const entryModule = await import(
 	pathToFileURL(path.join(OUT_DIR, "entry.mjs")).href
 );
 assert.equal(typeof entryModule.default?.fetch, "function");
+assert.equal(typeof entryModule.default?.scheduled, "function");
+assert.equal(typeof entryModule.PluginBridge, "function");
 
 await import(pathToFileURL(await findChunk("wait-until_")).href);
 await import(

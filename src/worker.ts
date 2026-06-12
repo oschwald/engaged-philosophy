@@ -1,4 +1,8 @@
 import handler from "@astrojs/cloudflare/entrypoints/server";
+import {
+	createScheduledHandler,
+	PluginBridge,
+} from "@emdash-cms/cloudflare/worker";
 
 import {
 	getObservedRequestInfo,
@@ -68,6 +72,8 @@ function errorLog(
 }
 
 const observedHandler: ExportedHandler<Env> = {
+	scheduled: createScheduledHandler(),
+
 	async fetch(request, env, ctx) {
 		const info = getObservedRequestInfo(request);
 		if (!info) {
@@ -106,4 +112,5 @@ const observedHandler: ExportedHandler<Env> = {
 	},
 };
 
+export { PluginBridge };
 export default observedHandler;

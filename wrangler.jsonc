@@ -3,6 +3,9 @@
 	"name": "engaged-philosophy",
 	"main": "./src/worker.ts",
 	"preview_urls": true,
+	"triggers": {
+		"crons": ["* * * * *"],
+	},
 	"routes": [
 		{
 			"pattern": "engagedphilosophy.com",

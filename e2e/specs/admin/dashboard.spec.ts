@@ -52,6 +52,11 @@ test.describe("admin worker integration", () => {
 
 		for (const slug of ["pages", "posts", "projects"]) {
 			await expectOkJson(authedRequest, `/_emdash/api/content/${slug}?limit=1`);
+			const authors = await expectOkJson(
+				authedRequest,
+				`/_emdash/api/content/${slug}/authors`,
+			);
+			expect(Array.isArray(authors?.data?.items)).toBe(true);
 		}
 
 		await expectOkJson(authedRequest, "/_emdash/api/media?limit=1");

@@ -58,4 +58,7 @@ changes.
 Do not commit secrets, Cloudflare tokens, generated migration data, or local
 exports. Keep `seed/seed.json`, `.migration/`, `.wrangler/`, `dist/`, and
 Playwright reports out of commits. Add runtime tools to `mise.toml` so CI and
-local environments stay aligned; update `mise.lock` with tool changes.
+local environments stay aligned; update `mise.lock` with tool changes. The live
+site runs on Cloudflare Workers Free, so keep new Worker features within Free
+request/CPU limits and avoid paid-only features unless the account plan is
+explicitly changed.
