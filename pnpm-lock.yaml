@@ -14,31 +14,31 @@ importers:
     dependencies:
       '@astrojs/cloudflare':
         specifier: ^13.7.0
-        version: 13.7.0(@types/node@25.9.3)(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))(lightningcss@1.32.0)(sass@1.100.0)(workerd@1.20260609.1)(wrangler@4.99.0(@cloudflare/workers-types@4.20260610.1))(yaml@2.9.0)
+        version: 13.7.0(@types/node@25.9.3)(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))(lightningcss@1.32.0)(sass@1.101.0)(workerd@1.20260611.1)(wrangler@4.100.0(@cloudflare/workers-types@4.20260612.1))(yaml@2.9.0)
       '@astrojs/react':
         specifier: ^5.0.7
-        version: 5.0.7(@types/node@25.9.3)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.100.0)(yaml@2.9.0)
+        version: 5.0.7(@types/node@25.9.3)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)(yaml@2.9.0)
       '@emdash-cms/auth':
-        specifier: ^0.18.0
-        version: 0.18.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))(kysely@0.29.2)
+        specifier: ^0.19.0
+        version: 0.19.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))(kysely@0.29.2)
       '@emdash-cms/cloudflare':
-        specifier: ^0.18.0
-        version: 0.18.0(1f03659a231023a180728a32607d07ba)
+        specifier: ^0.19.0
+        version: 0.19.0(9e75fe977eb4fcfb3b2a6fe03a938709)
       '@emdash-cms/plugin-audit-log':
         specifier: ^0.2.0
-        version: 0.2.0(emdash@0.18.0(7b95155d3da8dee54388115f02ed6b3b))
+        version: 0.2.0(emdash@0.19.0(14ff3106d1aa0fef8c5429d7a4cec64d))
       '@emdash-cms/plugin-embeds':
-        specifier: ^0.1.22
-        version: 0.1.22(@date-fns/tz@1.5.0)(@types/react@19.2.16)(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))(date-fns@4.4.0)(emdash@0.18.0(7b95155d3da8dee54388115f02ed6b3b))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)
+        specifier: ^0.1.23
+        version: 0.1.23(@date-fns/tz@1.5.0)(@types/react@19.2.16)(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))(date-fns@4.4.0)(emdash@0.19.0(14ff3106d1aa0fef8c5429d7a4cec64d))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)
       astro:
         specifier: ^6.4.6
-        version: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)
+        version: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)
       bootstrap:
         specifier: ^5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
       emdash:
-        specifier: ^0.18.0
-        version: 0.18.0(7b95155d3da8dee54388115f02ed6b3b)
+        specifier: ^0.19.0
+        version: 0.19.0(14ff3106d1aa0fef8c5429d7a4cec64d)
       jose:
         specifier: ^6.2.3
         version: 6.2.3
@@ -52,15 +52,15 @@ importers:
         specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
       sass:
-        specifier: ^1.100.0
-        version: 1.100.0
+        specifier: ^1.101.0
+        version: 1.101.0
     devDependencies:
       '@astrojs/check':
         specifier: ^0.9.9
         version: 0.9.9(prettier-plugin-astro@0.14.1)(prettier@3.8.4)(typescript@6.0.3)
       '@cloudflare/workers-types':
-        specifier: ^4.20260610.1
-        version: 4.20260610.1
+        specifier: ^4.20260612.1
+        version: 4.20260612.1
       '@playwright/test':
         specifier: ^1.60.0
         version: 1.60.0
@@ -117,13 +117,13 @@ importers:
         version: 6.0.3
       vite:
         specifier: ^8.0.16
-        version: 8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.100.0)(yaml@2.9.0)
+        version: 8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.101.0)(yaml@2.9.0)
       vitest:
         specifier: ^4.1.8
-        version: 4.1.8(@types/node@25.9.3)(vite@8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.100.0)(yaml@2.9.0))
+        version: 4.1.8(@types/node@25.9.3)(vite@8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.101.0)(yaml@2.9.0))
       wrangler:
-        specifier: ^4.99.0
-        version: 4.99.0(@cloudflare/workers-types@4.20260610.1)
+        specifier: ^4.100.0
+        version: 4.100.0(@cloudflare/workers-types@4.20260612.1)
 
 packages:
 
@@ -461,8 +461,20 @@ packages:
     cpu: [x64]
     os: [darwin]
 
+  '@cloudflare/workerd-darwin-64@1.20260611.1':
+    resolution: {integrity: sha512-iJICldmi4sBGgi7IrQles8cStOGXM/Tmv95C4OODVs6VIbMsJPqThUM5h3uYVQNULuJ8I/aVvnJ3Eh/wZCKwuA==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [darwin]
+
   '@cloudflare/workerd-darwin-arm64@1.20260609.1':
     resolution: {integrity: sha512-4kKXfr7ZHU6xQ/R9ShdSuj1A1bEouoRcHzUWdjnuMPBlRsAAVanlxAVYISotFUulLEinayOpRFbhpsfwzrpSSw==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [darwin]
+
+  '@cloudflare/workerd-darwin-arm64@1.20260611.1':
+    resolution: {integrity: sha512-yBbVXvbZyltR3I7NJdC4C4ItkItjZSiabcA/3HzEWOUQjLVKFqRh4so6ToHr70VCYh8VGeR8EDZL23igLhXqFQ==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [darwin]
@@ -473,8 +485,20 @@ packages:
     cpu: [x64]
     os: [linux]
 
+  '@cloudflare/workerd-linux-64@1.20260611.1':
+    resolution: {integrity: sha512-PfNjpxOlaIgZFYuhD7+neEEewCN2Ud993wEEN0fmbtSOax1AK53LGqmXUDvFhnbkHxJLFAxYCSNISW8QbzaAIg==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [linux]
+
   '@cloudflare/workerd-linux-arm64@1.20260609.1':
     resolution: {integrity: sha512-INfcYoSsKqEIvPL69/3RkqYoP8WUR0VEN6loWN/3tekXLoJrVOj3E5NjIetsdS8MJN6zc3st/ae4bMuWRRzoDg==}
+    engines: {node: '>=16'}
+    cpu: [arm64]
+    os: [linux]
+
+  '@cloudflare/workerd-linux-arm64@1.20260611.1':
+    resolution: {integrity: sha512-GEp4XbuIKjlF8pakqXcUDJfKiJosD/Q7S83J0d+r+z9XIlYGfF3ntm08e2aiF5TFTwp3fnG4yMoPUAKNhNJpvQ==}
     engines: {node: '>=16'}
     cpu: [arm64]
     os: [linux]
@@ -485,8 +509,14 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@cloudflare/workers-types@4.20260610.1':
-    resolution: {integrity: sha512-Mk/f3lUygeIHzQ4HnJjU/JvGg/kllgp9gISty9nylHE/2M2MFeKO+hgAKSgiPpmwUbuhewdYGgqFGgT/ADK0/g==}
+  '@cloudflare/workerd-windows-64@1.20260611.1':
+    resolution: {integrity: sha512-S6JkS0kEbcCKs19RGqEPhjCRbP8GBkQwqYLp2fhBJtD/KTlwqLzOJ9E6PQ7gQKgWHtxy1NBG3oXarlNFRNU/dw==}
+    engines: {node: '>=16'}
+    cpu: [x64]
+    os: [win32]
+
+  '@cloudflare/workers-types@4.20260612.1':
+    resolution: {integrity: sha512-PMQI7XP/wrMhxyjseUHoHj6XFqkHaf4utWQ/hhefVY8oMK2LJ730oeQ7H/nZSVMexZe39DzsdOx7sf1PqMr7+Q==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -561,14 +591,14 @@ packages:
     peerDependencies:
       react: '>=16.8.0'
 
-  '@emdash-cms/admin@0.18.0':
-    resolution: {integrity: sha512-d7DmgpOuhfyA2n1s5BaAlzNwDXZMtidwWlXAKSEj8Gr0X2R2c8iwxFf8W9ZcF2LdwalfzzjMBYHvGUOGjLG6Ww==}
+  '@emdash-cms/admin@0.19.0':
+    resolution: {integrity: sha512-Wzte7YYw3oHdQgm6pkPhjcm5k10oexIZ4DQy/DIOedylS4agw5gQHUTl5c/ScikAUqoT3W7juTB+WHklA/3FUw==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
-  '@emdash-cms/auth@0.18.0':
-    resolution: {integrity: sha512-nLM8yvBl2NcfCQn2X+H2mcv+a2O9fsvVFG55Vhm804r2wOI+H31KZOxfRaOWLLtX6B3GhXGALrVB1wPLgjfUOg==}
+  '@emdash-cms/auth@0.19.0':
+    resolution: {integrity: sha512-M6w87MksXmmJG9/thkE4KmcHHhTPJRSAUVWlSWMZFK5aCWuFyS6tF7uZxRc1SdtAu7ch0P9vW/AM1HokNVc5Kg==}
     peerDependencies:
       astro: '>=6.0.0-beta.0'
       kysely: ^0.29.0
@@ -576,29 +606,30 @@ packages:
       kysely:
         optional: true
 
-  '@emdash-cms/blocks@0.18.0':
-    resolution: {integrity: sha512-G2/cJDAPI06/RBdPkoG64vHc4ebaJmH8EdcoesfIs5tkSAbUu+Dmu3Sa52VpkBhJJgFSoKV4uHGbeAVTTQzVWQ==}
+  '@emdash-cms/blocks@0.19.0':
+    resolution: {integrity: sha512-wZuSPtnTtAYYfcZJJCiW6dvHG0t1LDfQhBe9vV4ZQEmSnraoTiEgassLmk19hdb98fgmkWiBWUxTP/YoJN2ghg==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
       react-dom: ^18.0.0 || ^19.0.0
 
-  '@emdash-cms/cloudflare@0.18.0':
-    resolution: {integrity: sha512-TFgo92i1QA9Uyyw1i23jPcN/8ot4r8YPKikkqtxOERkuRy3/+ZxMOVrneQNXFn7B0Hsr1KMh5SBPAvi2VWsrPw==}
+  '@emdash-cms/cloudflare@0.19.0':
+    resolution: {integrity: sha512-uBvjhhl3LDcx+ioBMG7gkfZIPCMFb5GNjZD74YTssV1F+6R5Ahj4DQeEnnrTS/FTVcbMssVQhgM5JsA+RWel6w==}
     peerDependencies:
+      '@astrojs/cloudflare': '>=12.0.0'
       '@cloudflare/workers-types': '>=4.0.0'
       astro: '>=6.0.0-beta.0'
       kysely: '>=0.28.17'
 
-  '@emdash-cms/gutenberg-to-portable-text@0.18.0':
-    resolution: {integrity: sha512-2IIyWlgJdPDf2V7XutCsyGlUVYWmlj4Bl00mQ/6ffb+Rb/5vXC2dovbsyr62NmVpzAP4ki9BccF4FG5Vta8RRw==}
+  '@emdash-cms/gutenberg-to-portable-text@0.19.0':
+    resolution: {integrity: sha512-Fd+c08gFTHDQ7UfdbJ+rr/VPzV8YAGQ4CePnJjDngcnThus7szxpg67g6+0/Pkb9PQU23NM6B6F3bruNnMAuDw==}
 
   '@emdash-cms/plugin-audit-log@0.2.0':
     resolution: {integrity: sha512-HuefzmjFDeJOiJLBn+V5FAgfgp2vi9fj3KCHxj+lcKRCTzUPy2P3sVzlCJCHEkHnElmdmxezi+hn09TrPeaekA==}
     peerDependencies:
       emdash: '>=0.13.0'
 
-  '@emdash-cms/plugin-embeds@0.1.22':
-    resolution: {integrity: sha512-f+mi59mgx/TVnohJX6YPWKxveUHG/60lHhRm+ri1p33w0xMjdxjXa27yFhiFL5+bvgD3PPjBnT8wBiDN/HTcVA==}
+  '@emdash-cms/plugin-embeds@0.1.23':
+    resolution: {integrity: sha512-tGjCukuf3Q0Kf9SlUEnxhitVEb5fyZWze69uwf9NjZg4o499FhxTVHtD0GUsx3wJ1TcPQnPB/Pt7Foia+r5g+w==}
     peerDependencies:
       astro: '>=6.0.0-beta.0'
       emdash: '>=0.15.0'
@@ -2747,8 +2778,8 @@ packages:
   electron-to-chromium@1.5.371:
     resolution: {integrity: sha512-e9htk9mAYL6AzmkEhSvVVw7IWGSBJ/Bqdn2eRyRLrj1g6sncN4WbFt5qnILYoCktktr45pyjIrOiRvBThQ808w==}
 
-  emdash@0.18.0:
-    resolution: {integrity: sha512-fyCrroImGgz2Lv3vzx30wg/bHwg2PlajxGfQ8jfcvqqFL5EdtmBkiMK02dCe3iTWhZI/MAsLxlBnMWq90gqEfQ==}
+  emdash@0.19.0:
+    resolution: {integrity: sha512-WuzCKKDDOJpviiXMy9cuZsxwXaeu3ZPSbLYb3H/jDvAS1x15fcWPG4ssYPJiHEo7xSHz0SYIycYFlhUo83NVLw==}
     hasBin: true
     peerDependencies:
       '@astrojs/react': '>=5.0.0-beta.0'
@@ -3739,6 +3770,11 @@ packages:
     engines: {node: '>=22.0.0'}
     hasBin: true
 
+  miniflare@4.20260611.0:
+    resolution: {integrity: sha512-i+JwEo8vN96naz1WL3ntFgFyRluBDYL408zwhHKvR2jefJ464KsZ/gCmJAQ5k+oaWeb5Ug+s7yne5AyiAEswjg==}
+    engines: {node: '>=22.0.0'}
+    hasBin: true
+
   minimatch@10.2.5:
     resolution: {integrity: sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==}
     engines: {node: 18 || 20 || >=22}
@@ -4327,8 +4363,8 @@ packages:
   sass-formatter@0.7.9:
     resolution: {integrity: sha512-CWZ8XiSim+fJVG0cFLStwDvft1VI7uvXdCNJYXhDvowiv+DsbD1nXLiQ4zrE5UBvj5DWZJ93cwN0NX5PMsr1Pw==}
 
-  sass@1.100.0:
-    resolution: {integrity: sha512-B5j0rYMlinhhOo9tjQebMVVn0TfyXAF+wB3b2ggZUuJ/is/Y+7+JGjirAMxHZ9Z3hIP98NPfamlAkBHa1lAaXQ==}
+  sass@1.101.0:
+    resolution: {integrity: sha512-OL3GoQyoUdDt843DpVmDO6y2k1sc5IhUDSpu8XucEI+35neq5QivZ1iuegnpraEVTJXlQGK1gl27zKcTLEPbQw==}
     engines: {node: '>=20.19.0'}
     hasBin: true
 
@@ -5106,12 +5142,17 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  wrangler@4.99.0:
-    resolution: {integrity: sha512-i7GA2mZETTyq3ljWdEzM908FjLaMWZ1AaAHKaOJ8pFA/tonf2VqIWDyBGzKleIVBbNQxOTIY2wnbv0iaK3rC6g==}
+  workerd@1.20260611.1:
+    resolution: {integrity: sha512-CS/640T7pIJ2HYX6x2DwKFGbcSckAWN3tgcdq+ptB6SaqjWUhlzIgA/YhPuwIU+/NnMnGpqOFX/hC18Oyge63w==}
+    engines: {node: '>=16'}
+    hasBin: true
+
+  wrangler@4.100.0:
+    resolution: {integrity: sha512-dSQO7DO+mD6XDzkVWIWBoGLO3yw+lacWSc/KhFvd7pgfpth+kX98qb5SGRHZN8ACCDhhfwzDLXwB6qHsIHhfBg==}
     engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
-      '@cloudflare/workers-types': ^4.20260609.1
+      '@cloudflare/workers-types': ^4.20260611.1
     peerDependenciesMeta:
       '@cloudflare/workers-types':
         optional: true
@@ -5241,7 +5282,7 @@ snapshots:
     dependencies:
       '@astro-community/astro-embed-utils': 0.2.0
 
-  '@astro-community/astro-embed-integration@0.11.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))':
+  '@astro-community/astro-embed-integration@0.11.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))':
     dependencies:
       '@astro-community/astro-embed-bluesky': 0.1.6
       '@astro-community/astro-embed-gist': 0.1.0
@@ -5251,8 +5292,8 @@ snapshots:
       '@astro-community/astro-embed-vimeo': 0.3.12
       '@astro-community/astro-embed-youtube': 0.5.10
       '@types/unist': 3.0.3
-      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)
-      astro-auto-import: 0.5.1(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))
+      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)
+      astro-auto-import: 0.5.1(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))
       unist-util-select: 5.1.0
 
   '@astro-community/astro-embed-link-preview@0.3.1':
@@ -5290,16 +5331,16 @@ snapshots:
       - prettier
       - prettier-plugin-astro
 
-  '@astrojs/cloudflare@13.7.0(@types/node@25.9.3)(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))(lightningcss@1.32.0)(sass@1.100.0)(workerd@1.20260609.1)(wrangler@4.99.0(@cloudflare/workers-types@4.20260610.1))(yaml@2.9.0)':
+  '@astrojs/cloudflare@13.7.0(@types/node@25.9.3)(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))(lightningcss@1.32.0)(sass@1.101.0)(workerd@1.20260611.1)(wrangler@4.100.0(@cloudflare/workers-types@4.20260612.1))(yaml@2.9.0)':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
       '@astrojs/underscore-redirects': 1.0.3
-      '@cloudflare/vite-plugin': 1.40.1(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0))(workerd@1.20260609.1)(wrangler@4.99.0(@cloudflare/workers-types@4.20260610.1))
-      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)
+      '@cloudflare/vite-plugin': 1.40.1(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0))(workerd@1.20260611.1)(wrangler@4.100.0(@cloudflare/workers-types@4.20260612.1))
+      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)
       piccolore: 0.1.3
       tinyglobby: 0.2.17
-      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0)
-      wrangler: 4.99.0(@cloudflare/workers-types@4.20260610.1)
+      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0)
+      wrangler: 4.100.0(@cloudflare/workers-types@4.20260612.1)
     transitivePeerDependencies:
       - '@types/node'
       - bufferutil
@@ -5385,17 +5426,17 @@ snapshots:
     dependencies:
       prismjs: 1.30.0
 
-  '@astrojs/react@5.0.7(@types/node@25.9.3)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.100.0)(yaml@2.9.0)':
+  '@astrojs/react@5.0.7(@types/node@25.9.3)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)(yaml@2.9.0)':
     dependencies:
       '@astrojs/internal-helpers': 0.10.0
       '@types/react': 19.2.16
       '@types/react-dom': 19.2.3(@types/react@19.2.16)
-      '@vitejs/plugin-react': 5.2.0(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0))
+      '@vitejs/plugin-react': 5.2.0(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0))
       devalue: 5.8.1
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
       ultrahtml: 1.6.0
-      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -5716,19 +5757,19 @@ snapshots:
 
   '@cloudflare/kv-asset-handler@0.5.0': {}
 
-  '@cloudflare/unenv-preset@2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260609.1)':
+  '@cloudflare/unenv-preset@2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260611.1)':
     dependencies:
       unenv: 2.0.0-rc.24
     optionalDependencies:
-      workerd: 1.20260609.1
+      workerd: 1.20260611.1
 
-  '@cloudflare/vite-plugin@1.40.1(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0))(workerd@1.20260609.1)(wrangler@4.99.0(@cloudflare/workers-types@4.20260610.1))':
+  '@cloudflare/vite-plugin@1.40.1(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0))(workerd@1.20260611.1)(wrangler@4.100.0(@cloudflare/workers-types@4.20260612.1))':
     dependencies:
-      '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260609.1)
+      '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260611.1)
       miniflare: 4.20260609.0
       unenv: 2.0.0-rc.24
-      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0)
-      wrangler: 4.99.0(@cloudflare/workers-types@4.20260610.1)
+      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0)
+      wrangler: 4.100.0(@cloudflare/workers-types@4.20260612.1)
       ws: 8.20.1
     transitivePeerDependencies:
       - bufferutil
@@ -5738,19 +5779,34 @@ snapshots:
   '@cloudflare/workerd-darwin-64@1.20260609.1':
     optional: true
 
+  '@cloudflare/workerd-darwin-64@1.20260611.1':
+    optional: true
+
   '@cloudflare/workerd-darwin-arm64@1.20260609.1':
+    optional: true
+
+  '@cloudflare/workerd-darwin-arm64@1.20260611.1':
     optional: true
 
   '@cloudflare/workerd-linux-64@1.20260609.1':
     optional: true
 
+  '@cloudflare/workerd-linux-64@1.20260611.1':
+    optional: true
+
   '@cloudflare/workerd-linux-arm64@1.20260609.1':
+    optional: true
+
+  '@cloudflare/workerd-linux-arm64@1.20260611.1':
     optional: true
 
   '@cloudflare/workerd-windows-64@1.20260609.1':
     optional: true
 
-  '@cloudflare/workers-types@4.20260610.1': {}
+  '@cloudflare/workerd-windows-64@1.20260611.1':
+    optional: true
+
+  '@cloudflare/workers-types@4.20260612.1': {}
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -5811,7 +5867,7 @@ snapshots:
       react: 19.2.7
       tslib: 2.8.1
 
-  '@emdash-cms/admin@0.18.0(@atcute/identity@1.1.5(@atcute/lexicons@1.3.1))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.7.6)(@tiptap/extension-collaboration@3.26.0(@tiptap/core@3.26.0(@tiptap/pm@3.26.0))(@tiptap/pm@3.26.0)(@tiptap/y-tiptap@3.0.4(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(yjs@13.6.31))(@tiptap/extensions@3.26.0(@tiptap/core@3.26.0(@tiptap/pm@3.26.0))(@tiptap/pm@3.26.0))(@tiptap/y-tiptap@3.0.4(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(date-fns@4.4.0)(echarts@6.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)(zod@4.4.3)':
+  '@emdash-cms/admin@0.19.0(@atcute/identity@1.1.5(@atcute/lexicons@1.3.1))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.7.6)(@tiptap/extension-collaboration@3.26.0(@tiptap/core@3.26.0(@tiptap/pm@3.26.0))(@tiptap/pm@3.26.0)(@tiptap/y-tiptap@3.0.4(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(yjs@13.6.31))(@tiptap/extensions@3.26.0(@tiptap/core@3.26.0(@tiptap/pm@3.26.0))(@tiptap/pm@3.26.0))(@tiptap/y-tiptap@3.0.4(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(date-fns@4.4.0)(echarts@6.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)(zod@4.4.3)':
     dependencies:
       '@atcute/identity-resolver': 2.0.0(@atcute/identity@1.1.5(@atcute/lexicons@1.3.1))(@atcute/lexicons@1.3.1)(typescript@6.0.3)
       '@atcute/lexicons': 1.3.1
@@ -5819,7 +5875,7 @@ snapshots:
       '@dnd-kit/core': 6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@dnd-kit/sortable': 10.0.0(@dnd-kit/core@6.3.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
       '@dnd-kit/utilities': 3.2.2(react@19.2.7)
-      '@emdash-cms/blocks': 0.18.0(@date-fns/tz@1.5.0)(@types/react@19.2.16)(date-fns@4.4.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)
+      '@emdash-cms/blocks': 0.19.0(@date-fns/tz@1.5.0)(@types/react@19.2.16)(date-fns@4.4.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)
       '@emdash-cms/registry-client': 0.3.1
       '@emdash-cms/registry-lexicons': 0.1.0
       '@floating-ui/react': 0.27.19(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -5873,18 +5929,18 @@ snapshots:
       - typescript
       - zod
 
-  '@emdash-cms/auth@0.18.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))(kysely@0.29.2)':
+  '@emdash-cms/auth@0.19.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))(kysely@0.29.2)':
     dependencies:
       '@oslojs/crypto': 1.0.1
       '@oslojs/encoding': 1.1.0
       '@oslojs/webauthn': 1.0.0
-      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)
+      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)
       ulidx: 2.4.1
       zod: 4.4.3
     optionalDependencies:
       kysely: 0.29.2
 
-  '@emdash-cms/blocks@0.18.0(@date-fns/tz@1.5.0)(@types/react@19.2.16)(date-fns@4.4.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)':
+  '@emdash-cms/blocks@0.19.0(@date-fns/tz@1.5.0)(@types/react@19.2.16)(date-fns@4.4.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)':
     dependencies:
       '@cloudflare/kumo': 2.5.2(@date-fns/tz@1.5.0)(@phosphor-icons/react@2.1.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(@types/react@19.2.16)(date-fns@4.4.0)(echarts@6.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)
       '@phosphor-icons/react': 2.1.10(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -5900,11 +5956,12 @@ snapshots:
       - date-fns
       - zod
 
-  '@emdash-cms/cloudflare@0.18.0(1f03659a231023a180728a32607d07ba)':
+  '@emdash-cms/cloudflare@0.19.0(9e75fe977eb4fcfb3b2a6fe03a938709)':
     dependencies:
-      '@cloudflare/workers-types': 4.20260610.1
-      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)
-      emdash: 0.18.0(7b95155d3da8dee54388115f02ed6b3b)
+      '@astrojs/cloudflare': 13.7.0(@types/node@25.9.3)(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))(lightningcss@1.32.0)(sass@1.101.0)(workerd@1.20260611.1)(wrangler@4.100.0(@cloudflare/workers-types@4.20260612.1))(yaml@2.9.0)
+      '@cloudflare/workers-types': 4.20260612.1
+      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)
+      emdash: 0.19.0(14ff3106d1aa0fef8c5429d7a4cec64d)
       jose: 6.2.3
       kysely: 0.29.2
       kysely-d1: 0.4.0(kysely@0.29.2)
@@ -5935,21 +5992,21 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@emdash-cms/gutenberg-to-portable-text@0.18.0':
+  '@emdash-cms/gutenberg-to-portable-text@0.19.0':
     dependencies:
       '@wordpress/block-serialization-default-parser': 5.48.0
       parse5: 7.3.0
 
-  '@emdash-cms/plugin-audit-log@0.2.0(emdash@0.18.0(7b95155d3da8dee54388115f02ed6b3b))':
+  '@emdash-cms/plugin-audit-log@0.2.0(emdash@0.19.0(14ff3106d1aa0fef8c5429d7a4cec64d))':
     dependencies:
-      emdash: 0.18.0(7b95155d3da8dee54388115f02ed6b3b)
+      emdash: 0.19.0(14ff3106d1aa0fef8c5429d7a4cec64d)
 
-  '@emdash-cms/plugin-embeds@0.1.22(@date-fns/tz@1.5.0)(@types/react@19.2.16)(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))(date-fns@4.4.0)(emdash@0.18.0(7b95155d3da8dee54388115f02ed6b3b))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)':
+  '@emdash-cms/plugin-embeds@0.1.23(@date-fns/tz@1.5.0)(@types/react@19.2.16)(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))(date-fns@4.4.0)(emdash@0.19.0(14ff3106d1aa0fef8c5429d7a4cec64d))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)':
     dependencies:
-      '@emdash-cms/blocks': 0.18.0(@date-fns/tz@1.5.0)(@types/react@19.2.16)(date-fns@4.4.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)
-      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)
-      astro-embed: 0.12.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))
-      emdash: 0.18.0(7b95155d3da8dee54388115f02ed6b3b)
+      '@emdash-cms/blocks': 0.19.0(@date-fns/tz@1.5.0)(@types/react@19.2.16)(date-fns@4.4.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(zod@4.4.3)
+      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)
+      astro-embed: 0.12.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))
+      emdash: 0.19.0(14ff3106d1aa0fef8c5429d7a4cec64d)
     transitivePeerDependencies:
       - '@date-fns/tz'
       - '@emotion/is-prop-valid'
@@ -7313,7 +7370,7 @@ snapshots:
     dependencies:
       blurhash: 2.0.5
 
-  '@vitejs/plugin-react@5.2.0(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0))':
+  '@vitejs/plugin-react@5.2.0(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0))':
     dependencies:
       '@babel/core': 7.29.7
       '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.7)
@@ -7321,7 +7378,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-rc.3
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -7334,13 +7391,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.8(vite@8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.100.0)(yaml@2.9.0))':
+  '@vitest/mocker@4.1.8(vite@8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.101.0)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.1.8
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.100.0)(yaml@2.9.0)
+      vite: 8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.101.0)(yaml@2.9.0)
 
   '@vitest/pretty-format@4.1.8':
     dependencies:
@@ -7480,23 +7537,23 @@ snapshots:
 
   astral-regex@2.0.0: {}
 
-  astro-auto-import@0.5.1(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)):
+  astro-auto-import@0.5.1(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)):
     dependencies:
       acorn: 8.16.0
-      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)
+      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)
 
-  astro-embed@0.12.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)):
+  astro-embed@0.12.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)):
     dependencies:
       '@astro-community/astro-embed-baseline-status': 0.2.2
       '@astro-community/astro-embed-bluesky': 0.1.6
       '@astro-community/astro-embed-gist': 0.1.0
-      '@astro-community/astro-embed-integration': 0.11.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))
+      '@astro-community/astro-embed-integration': 0.11.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))
       '@astro-community/astro-embed-link-preview': 0.3.1
       '@astro-community/astro-embed-mastodon': 0.1.1
       '@astro-community/astro-embed-twitter': 0.5.11
       '@astro-community/astro-embed-vimeo': 0.3.12
       '@astro-community/astro-embed-youtube': 0.5.10
-      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)
+      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)
 
   astro-eslint-parser@1.4.0:
     dependencies:
@@ -7515,13 +7572,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  astro-portabletext@0.11.4(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)):
+  astro-portabletext@0.11.4(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)):
     dependencies:
       '@portabletext/toolkit': 3.0.3
       '@portabletext/types': 2.0.15
-      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)
+      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)
 
-  astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0):
+  astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0):
     dependencies:
       '@astrojs/compiler': 4.0.0
       '@astrojs/internal-helpers': 0.10.0
@@ -7573,8 +7630,8 @@ snapshots:
       unist-util-visit: 5.1.0
       unstorage: 1.17.5
       vfile: 6.0.3
-      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0)
-      vitefu: 1.1.3(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0))
+      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0)
+      vitefu: 1.1.3(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0))
       xxhash-wasm: 1.1.0
       yargs-parser: 22.0.0
       zod: 4.4.3
@@ -7955,15 +8012,15 @@ snapshots:
 
   electron-to-chromium@1.5.371: {}
 
-  emdash@0.18.0(7b95155d3da8dee54388115f02ed6b3b):
+  emdash@0.19.0(14ff3106d1aa0fef8c5429d7a4cec64d):
     dependencies:
-      '@astrojs/react': 5.0.7(@types/node@25.9.3)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.100.0)(yaml@2.9.0)
+      '@astrojs/react': 5.0.7(@types/node@25.9.3)(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(lightningcss@1.32.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.101.0)(yaml@2.9.0)
       '@atcute/client': 4.2.2(@atcute/lexicons@1.3.1)
       '@atcute/lexicons': 1.3.1
       '@atcute/multibase': 1.2.0
-      '@emdash-cms/admin': 0.18.0(@atcute/identity@1.1.5(@atcute/lexicons@1.3.1))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.7.6)(@tiptap/extension-collaboration@3.26.0(@tiptap/core@3.26.0(@tiptap/pm@3.26.0))(@tiptap/pm@3.26.0)(@tiptap/y-tiptap@3.0.4(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(yjs@13.6.31))(@tiptap/extensions@3.26.0(@tiptap/core@3.26.0(@tiptap/pm@3.26.0))(@tiptap/pm@3.26.0))(@tiptap/y-tiptap@3.0.4(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(date-fns@4.4.0)(echarts@6.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)(zod@4.4.3)
-      '@emdash-cms/auth': 0.18.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))(kysely@0.29.2)
-      '@emdash-cms/gutenberg-to-portable-text': 0.18.0
+      '@emdash-cms/admin': 0.19.0(@atcute/identity@1.1.5(@atcute/lexicons@1.3.1))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.7.6)(@tiptap/extension-collaboration@3.26.0(@tiptap/core@3.26.0(@tiptap/pm@3.26.0))(@tiptap/pm@3.26.0)(@tiptap/y-tiptap@3.0.4(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(yjs@13.6.31))(@tiptap/extensions@3.26.0(@tiptap/core@3.26.0(@tiptap/pm@3.26.0))(@tiptap/pm@3.26.0))(@tiptap/y-tiptap@3.0.4(prosemirror-model@1.25.8)(prosemirror-state@1.4.4)(prosemirror-view@1.41.9)(y-protocols@1.0.7(yjs@13.6.31))(yjs@13.6.31))(@types/react-dom@19.2.3(@types/react@19.2.16))(@types/react@19.2.16)(date-fns@4.4.0)(echarts@6.1.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3)(zod@4.4.3)
+      '@emdash-cms/auth': 0.19.0(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))(kysely@0.29.2)
+      '@emdash-cms/gutenberg-to-portable-text': 0.19.0
       '@emdash-cms/plugin-types': 0.0.1
       '@emdash-cms/registry-client': 0.3.1
       '@floating-ui/react': 0.27.19(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
@@ -7985,8 +8042,8 @@ snapshots:
       '@tiptap/suggestion': 3.26.0(@tiptap/core@3.26.0(@tiptap/pm@3.26.0))(@tiptap/pm@3.26.0)
       '@unpic/placeholder': 0.1.2
       arctic: 3.7.0
-      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0)
-      astro-portabletext: 0.11.4(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.100.0)(yaml@2.9.0))
+      astro: 6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0)
+      astro-portabletext: 0.11.4(astro@6.4.6(@types/node@25.9.3)(lightningcss@1.32.0)(rollup@4.61.1)(sass@1.101.0)(yaml@2.9.0))
       better-sqlite3: 12.10.0
       blurhash: 2.0.5
       citty: 0.1.6
@@ -9227,6 +9284,18 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
+  miniflare@4.20260611.0:
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
+      sharp: 0.34.5
+      undici: 7.24.8
+      workerd: 1.20260611.1
+      ws: 8.20.1
+      youch: 4.1.0-beta.10
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   minimatch@10.2.5:
     dependencies:
       brace-expansion: 5.0.6
@@ -9909,7 +9978,7 @@ snapshots:
     dependencies:
       suf-log: 2.5.3
 
-  sass@1.100.0:
+  sass@1.101.0:
     dependencies:
       chokidar: 5.0.0
       immutable: 5.1.6
@@ -10452,7 +10521,7 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0):
+  vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0):
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
@@ -10464,10 +10533,10 @@ snapshots:
       '@types/node': 25.9.3
       fsevents: 2.3.3
       lightningcss: 1.32.0
-      sass: 1.100.0
+      sass: 1.101.0
       yaml: 2.9.0
 
-  vite@8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.100.0)(yaml@2.9.0):
+  vite@8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.101.0)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.32.0
       picomatch: 4.0.4
@@ -10478,17 +10547,17 @@ snapshots:
       '@types/node': 25.9.3
       esbuild: 0.27.7
       fsevents: 2.3.3
-      sass: 1.100.0
+      sass: 1.101.0
       yaml: 2.9.0
 
-  vitefu@1.1.3(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0)):
+  vitefu@1.1.3(vite@7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0)):
     optionalDependencies:
-      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.100.0)(yaml@2.9.0)
+      vite: 7.3.5(@types/node@25.9.3)(lightningcss@1.32.0)(sass@1.101.0)(yaml@2.9.0)
 
-  vitest@4.1.8(@types/node@25.9.3)(vite@8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.100.0)(yaml@2.9.0)):
+  vitest@4.1.8(@types/node@25.9.3)(vite@8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.101.0)(yaml@2.9.0)):
     dependencies:
       '@vitest/expect': 4.1.8
-      '@vitest/mocker': 4.1.8(vite@8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.100.0)(yaml@2.9.0))
+      '@vitest/mocker': 4.1.8(vite@8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.101.0)(yaml@2.9.0))
       '@vitest/pretty-format': 4.1.8
       '@vitest/runner': 4.1.8
       '@vitest/snapshot': 4.1.8
@@ -10505,7 +10574,7 @@ snapshots:
       tinyexec: 1.2.4
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.0
-      vite: 8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.100.0)(yaml@2.9.0)
+      vite: 8.0.16(@types/node@25.9.3)(esbuild@0.27.7)(sass@1.101.0)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 25.9.3
@@ -10656,18 +10725,26 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20260609.1
       '@cloudflare/workerd-windows-64': 1.20260609.1
 
-  wrangler@4.99.0(@cloudflare/workers-types@4.20260610.1):
+  workerd@1.20260611.1:
+    optionalDependencies:
+      '@cloudflare/workerd-darwin-64': 1.20260611.1
+      '@cloudflare/workerd-darwin-arm64': 1.20260611.1
+      '@cloudflare/workerd-linux-64': 1.20260611.1
+      '@cloudflare/workerd-linux-arm64': 1.20260611.1
+      '@cloudflare/workerd-windows-64': 1.20260611.1
+
+  wrangler@4.100.0(@cloudflare/workers-types@4.20260612.1):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.0
-      '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260609.1)
+      '@cloudflare/unenv-preset': 2.16.1(unenv@2.0.0-rc.24)(workerd@1.20260611.1)
       blake3-wasm: 2.1.5
       esbuild: 0.27.3
-      miniflare: 4.20260609.0
+      miniflare: 4.20260611.0
       path-to-regexp: 6.3.0
       unenv: 2.0.0-rc.24
-      workerd: 1.20260609.1
+      workerd: 1.20260611.1
     optionalDependencies:
-      '@cloudflare/workers-types': 4.20260610.1
+      '@cloudflare/workers-types': 4.20260612.1
       fsevents: 2.3.3
     transitivePeerDependencies:
       - bufferutil

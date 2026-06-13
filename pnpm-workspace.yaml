@@ -6,14 +6,16 @@ allowBuilds:
   workerd: true
 
 minimumReleaseAgeExclude:
-  - "@emdash-cms/admin@0.18.0"
-  - "@emdash-cms/auth@0.18.0"
-  - "@emdash-cms/blocks@0.18.0"
-  - "@emdash-cms/cloudflare@0.18.0"
-  - "@emdash-cms/gutenberg-to-portable-text@0.18.0"
-  - "@emdash-cms/plugin-embeds@0.1.22"
-  - emdash@0.18.0
-  - "@cloudflare/workers-types@4.20260610.1"
+  - "@emdash-cms/admin@0.19.0"
+  - "@emdash-cms/auth@0.19.0"
+  - "@emdash-cms/blocks@0.19.0"
+  - "@emdash-cms/cloudflare@0.19.0"
+  - "@emdash-cms/gutenberg-to-portable-text@0.19.0"
+  - "@emdash-cms/plugin-embeds@0.1.23"
+  - emdash@0.19.0
+  - "@cloudflare/workers-types@4.20260612.1"
+  - sass@1.101.0
+  - wrangler@4.100.0
 
 overrides:
   "@astro-community/astro-embed-integration>astro-auto-import": ^0.5.1
