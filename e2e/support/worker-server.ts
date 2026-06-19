@@ -27,6 +27,31 @@ function sleep(ms: number) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function hasWorkerRestartMidRequestError(
+	error: unknown,
+	seen = new Set<unknown>(),
+): boolean {
+	if (typeof error === "string") {
+		return WORKER_RESTART_MID_REQUEST_PATTERN.test(error);
+	}
+
+	if (!error || typeof error !== "object" || seen.has(error)) {
+		return false;
+	}
+
+	seen.add(error);
+
+	if (
+		error instanceof Error &&
+		WORKER_RESTART_MID_REQUEST_PATTERN.test(error.message)
+	) {
+		return true;
+	}
+
+	const cause = "cause" in error ? (error as { cause?: unknown }).cause : null;
+	return hasWorkerRestartMidRequestError(cause, seen);
+}
+
 function childProcessEnv(extra: NodeJS.ProcessEnv = {}) {
 	const env = {
 		...process.env,
@@ -227,8 +252,7 @@ export async function completeSetup(baseURL: string) {
 		} catch (error) {
 			if (
 				attempt === SETUP_RETRY_COUNT ||
-				!(error instanceof Error) ||
-				!WORKER_RESTART_MID_REQUEST_PATTERN.test(error.message)
+				!hasWorkerRestartMidRequestError(error)
 			) {
 				throw error;
 			}
