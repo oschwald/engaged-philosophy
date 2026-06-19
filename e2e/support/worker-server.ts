@@ -11,6 +11,8 @@ const ROOT = path.resolve(new URL("../..", import.meta.url).pathname);
 const DIST_WRANGLER_CONFIG = path.join(ROOT, "dist", "server", "wrangler.json");
 const STARTUP_TIMEOUT_MS = 30_000;
 const REQUEST_TIMEOUT_MS = 15_000;
+const SETUP_RETRY_COUNT = 3;
+const WORKER_RESTART_MID_REQUEST_PATTERN = /Your worker restarted mid-request/;
 const WORKER_ERROR_PATTERN =
 	/EmDash middleware error|Cannot read properties of undefined \(reading 'every'\)|ReferenceError|Cannot access .* before initialization|Unhandled|\[ERROR\]|✘ \[ERROR\]/;
 
@@ -207,17 +209,33 @@ export async function jsonRequest(
 }
 
 export async function completeSetup(baseURL: string) {
-	const body = await jsonRequest(baseURL, "/_emdash/api/setup", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			title: "Engaged Philosophy",
-			tagline: "Civic Engagement in Philosophy Classes",
-			includeContent: false,
-		}),
-	});
+	let body: unknown;
+	for (let attempt = 1; attempt <= SETUP_RETRY_COUNT; attempt += 1) {
+		try {
+			body = await jsonRequest(baseURL, "/_emdash/api/setup", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					title: "Engaged Philosophy",
+					tagline: "Civic Engagement in Philosophy Classes",
+					includeContent: false,
+				}),
+			});
+			break;
+		} catch (error) {
+			if (
+				attempt === SETUP_RETRY_COUNT ||
+				!(error instanceof Error) ||
+				!WORKER_RESTART_MID_REQUEST_PATTERN.test(error.message)
+			) {
+				throw error;
+			}
+
+			await sleep(250 * attempt);
+		}
+	}
 
 	const data =
 		body && typeof body === "object" && "data" in body ? body.data : undefined;
