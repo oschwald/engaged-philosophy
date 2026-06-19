@@ -1,11 +1,11 @@
-import { defineMiddleware } from "astro:middleware";
+import type { APIRoute } from "astro";
 
 import {
 	getPublishedPages,
 	getPublishedPosts,
 	getPublishedProjects,
-} from "./lib/content";
-import { renderSitemapXml, type SitemapInputEntry } from "./lib/sitemap";
+} from "../lib/content";
+import { renderSitemapXml, type SitemapInputEntry } from "../lib/sitemap";
 
 interface SitemapSourceEntry {
 	id: string;
@@ -36,13 +36,15 @@ function toSitemapEntry(entry: SitemapSourceEntry): SitemapInputEntry {
 	};
 }
 
-async function renderSitemapResponse(origin: string) {
+export const prerender = false;
+
+export const GET: APIRoute = async ({ url }) => {
 	const [pages, posts, projects] = await Promise.all([
 		getPublishedPages(),
 		getPublishedPosts(),
 		getPublishedProjects(),
 	]);
-	const body = renderSitemapXml(origin, [
+	const body = renderSitemapXml(url.origin, [
 		...pages.map(toSitemapEntry),
 		...posts.map(toSitemapEntry),
 		...projects.map(toSitemapEntry),
@@ -54,12 +56,4 @@ async function renderSitemapResponse(origin: string) {
 			"Cache-Control": "public, max-age=3600",
 		},
 	});
-}
-
-export const onRequest = defineMiddleware((context, next) => {
-	if (context.url.pathname === "/sitemap.xml") {
-		return renderSitemapResponse(context.url.origin);
-	}
-
-	return next();
-});
+};

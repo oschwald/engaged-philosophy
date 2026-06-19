@@ -1,5 +1,8 @@
 import { test, expect } from "../../fixtures/worker";
-import { collectPageErrors } from "../../support/assertions";
+import {
+	collectPageErrors,
+	LOCAL_MEDIA_THUMBNAIL_OPTIMIZER_403,
+} from "../../support/assertions";
 import { dismissWelcome } from "../../support/content";
 
 function svgBuffer(label: string) {
@@ -13,7 +16,10 @@ test.describe("admin media library", () => {
 		page,
 	}, testInfo) => {
 		const pageErrors = collectPageErrors(page, {
-			ignore: [/status of 501 \(Not Implemented\)/],
+			ignore: [
+				/status of 501 \(Not Implemented\)/,
+				LOCAL_MEDIA_THUMBNAIL_OPTIMIZER_403,
+			],
 		});
 		const filename = `e2e-upload-${testInfo.workerIndex}-${Date.now()}.svg`;
 
