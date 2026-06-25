@@ -4,8 +4,8 @@ import { handleContentAuthors } from "emdash";
 export const onRequest = defineMiddleware(async (context, next) => {
 	const emdash = context.locals.emdash;
 
-	// Temporary compatibility shim for EmDash 0.19.0: the route exists, but
-	// the runtime middleware does not attach this handler to Astro locals.
+	// The EmDash authors API route expects this handler on Astro locals, but
+	// Worker-backed admin tests still see it missing in the route context.
 	if (emdash?.db && typeof emdash.handleContentAuthors !== "function") {
 		emdash.handleContentAuthors = (collection) =>
 			handleContentAuthors(emdash.db, collection);
