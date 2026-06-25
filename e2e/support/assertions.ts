@@ -1,9 +1,6 @@
 import type { APIRequestContext, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
-export const LOCAL_MEDIA_THUMBNAIL_OPTIMIZER_403 =
-	/status of 403 \(Forbidden\).*\/_image\?href=.*%2F_emdash%2Fapi%2Fmedia%2Ffile%2F/;
-
 export async function expectOkJson(
 	request: APIRequestContext,
 	pathName: string,
