@@ -7,6 +7,13 @@ export interface RichTextAssetRef {
 	meta?: Record<string, unknown>;
 }
 
+export type RichTextImageAlignment =
+	| "left"
+	| "right"
+	| "center"
+	| "wide"
+	| "full";
+
 export interface RichTextRequiredAssetRef extends RichTextAssetRef {
 	_ref: string;
 }
@@ -21,6 +28,7 @@ export interface RichTextImageNode {
 	caption?: string;
 	href?: string;
 	align?: "left" | "right" | "center";
+	alignment?: RichTextImageAlignment;
 	width?: number;
 	height?: number;
 	displayWidth?: number;
