@@ -37,6 +37,22 @@ class MemoryCache implements Pick<Cache, "delete" | "match" | "put"> {
 	}
 }
 
+function installMockCaches(cache: MemoryCache) {
+	const hadCaches = "caches" in globalThis;
+	const previousCaches = globalThis.caches;
+	globalThis.caches = {
+		open: async () => cache as unknown as Cache,
+	} as unknown as CacheStorage;
+
+	return () => {
+		if (hadCaches) {
+			globalThis.caches = previousCaches;
+		} else {
+			Reflect.deleteProperty(globalThis, "caches");
+		}
+	};
+}
+
 describe("anonymous Cloudflare page cache", () => {
 	test("accepts anonymous page GET requests", () => {
 		expect(isAnonymousPageCacheCandidate(request("/about/"))).toBe(true);
@@ -112,10 +128,7 @@ describe("anonymous Cloudflare page cache", () => {
 
 	test("invalidates cached pages by Astro cache tags", async () => {
 		const cache = new MemoryCache();
-		const previousCaches = globalThis.caches;
-		globalThis.caches = {
-			open: async () => cache as unknown as Cache,
-		} as unknown as CacheStorage;
+		const restoreCaches = installMockCaches(cache);
 
 		try {
 			const provider = createCacheProvider({ cacheName: "test-pages" });
@@ -156,7 +169,53 @@ describe("anonymous Cloudflare page cache", () => {
 					.then((response) => response.text()),
 			).resolves.toBe("render 2");
 		} finally {
-			globalThis.caches = previousCaches;
+			restoreCaches();
+		}
+	});
+
+	test("does not store responses that upstream marks private", async () => {
+		for (const cacheControl of [
+			"private, no-store",
+			'private="Set-Cookie", max-age=300',
+		]) {
+			const cache = new MemoryCache();
+			const restoreCaches = installMockCaches(cache);
+
+			try {
+				const provider = createCacheProvider({ cacheName: "test-pages" });
+				let renderCount = 0;
+
+				async function render() {
+					renderCount += 1;
+					return new Response(`render ${renderCount}`, {
+						headers: {
+							"Content-Type": "text/html",
+							"Cache-Control": cacheControl,
+							"CDN-Cache-Control": "max-age=300, stale-while-revalidate=86400",
+						},
+					});
+				}
+
+				const context = {
+					request: request("/about/"),
+					url: new URL(
+						"https://engaged-philosophy.ramona75.workers.dev/about/",
+					),
+				};
+
+				await expect(
+					provider
+						.onRequest?.(context, render)
+						.then((response) => response.text()),
+				).resolves.toBe("render 1");
+				await expect(
+					provider
+						.onRequest?.(context, render)
+						.then((response) => response.text()),
+				).resolves.toBe("render 2");
+			} finally {
+				restoreCaches();
+			}
 		}
 	});
 });

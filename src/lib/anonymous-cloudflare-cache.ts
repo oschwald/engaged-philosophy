@@ -7,6 +7,7 @@ const CACHE_TAG_HEADER = "Cache-Tag";
 const INTERNAL_HEADERS = [STORED_AT_HEADER, MAX_AGE_HEADER, SWR_HEADER];
 const MAX_AGE_REGEX = /max-age=(\d+)/;
 const SWR_REGEX = /stale-while-revalidate=(\d+)/;
+const CACHE_CONTROL_SPLIT_REGEX = /\s*,\s*/;
 const HTML_CONTENT_TYPE_REGEX = /(?:^|;)\s*text\/html(?:;|$)/i;
 const CACHE_KEY_ORIGIN = "https://engaged-philosophy-cache.local";
 const TAG_INDEX_PATH_PREFIX = "/__ep-cache-tags/";
@@ -175,12 +176,31 @@ function isCacheableHtmlResponse(response: Response): boolean {
 	return response.status === 200 && HTML_CONTENT_TYPE_REGEX.test(contentType);
 }
 
+function responseDisallowsSharedCache(response: Response): boolean {
+	for (const header of ["Cache-Control", "CDN-Cache-Control"]) {
+		const directives = response.headers
+			.get(header)
+			?.split(CACHE_CONTROL_SPLIT_REGEX)
+			.map((directive) => directive.split("=", 1)[0]?.trim().toLowerCase());
+		if (directives?.includes("no-store") || directives?.includes("private")) {
+			return true;
+		}
+	}
+	return false;
+}
+
 function prepareForCache(
 	response: Response,
 	maxAge: number,
 	swr: number,
 ): Response | null {
-	if (!isCacheableHtmlResponse(response) || hasSetCookie(response)) return null;
+	if (
+		!isCacheableHtmlResponse(response) ||
+		hasSetCookie(response) ||
+		responseDisallowsSharedCache(response)
+	) {
+		return null;
+	}
 	const prepared = new Response(response.body, response);
 	prepared.headers.set(STORED_AT_HEADER, String(Date.now()));
 	prepared.headers.set(MAX_AGE_HEADER, String(maxAge));
