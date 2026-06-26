@@ -1,17 +1,12 @@
 import { test, expect } from "../../fixtures/worker";
-import {
-	collectPageErrors,
-	LOCAL_MEDIA_THUMBNAIL_OPTIMIZER_403,
-} from "../../support/assertions";
+import { collectPageErrors } from "../../support/assertions";
 import { dismissWelcome } from "../../support/content";
 
 test.describe("admin navigation", () => {
 	test("opens the primary admin sections from the sidebar", async ({
 		page,
 	}) => {
-		const pageErrors = collectPageErrors(page, {
-			ignore: [LOCAL_MEDIA_THUMBNAIL_OPTIMIZER_403],
-		});
+		const pageErrors = collectPageErrors(page);
 		await page.goto("/_emdash/admin", { waitUntil: "domcontentloaded" });
 		await dismissWelcome(page);
 		await expect(
