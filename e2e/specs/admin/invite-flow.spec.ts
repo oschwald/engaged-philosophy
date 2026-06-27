@@ -3,7 +3,7 @@ import { collectPageErrors } from "../../support/assertions";
 import { dismissWelcome } from "../../support/content";
 
 test.describe("admin user invites", () => {
-	test("creates a Cloudflare Access user and shows a manual invite link", async ({
+	test("creates an EmDash user and shows the admin sign-in link", async ({
 		page,
 	}, testInfo) => {
 		const pageErrors = collectPageErrors(page);

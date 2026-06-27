@@ -4,7 +4,16 @@ const VALID_ROLE_LEVELS = new Set<number>(Object.values(Role));
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const CLOUDFLARE_ACCESS_INVITE_MESSAGE =
-	"User added. Share the admin URL with them and make sure Cloudflare Access allows their email.";
+	"User added to EmDash and Cloudflare Access. Share the admin URL with them.";
+
+export const CLOUDFLARE_ACCESS_INVITE_EXISTING_USER_MESSAGE =
+	"User already existed in EmDash and now has Cloudflare Access. Share the admin URL with them.";
+
+export const CLOUDFLARE_ACCESS_INVITE_MANUAL_MESSAGE =
+	"User added to EmDash. Add their email to the Cloudflare Access EMAIL list before sharing the admin URL.";
+
+export const CLOUDFLARE_ACCESS_INVITE_EXISTING_USER_MANUAL_MESSAGE =
+	"User already exists in EmDash. Add their email to the Cloudflare Access EMAIL list before sharing the admin URL.";
 
 export interface NormalizedCloudflareAccessInvite {
 	email: string;
