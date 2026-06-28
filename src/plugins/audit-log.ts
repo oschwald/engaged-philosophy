@@ -78,10 +78,23 @@ function routeConfig(route: RouteEntry) {
 	return typeof route === "function" ? { handler: route } : route;
 }
 
-function serializeHeaders(headers: Headers) {
+const SANDBOX_STRIPPED_HEADERS = new Set([
+	"cookie",
+	"set-cookie",
+	"authorization",
+	"proxy-authorization",
+	"cf-access-jwt-assertion",
+	"cf-access-client-id",
+	"cf-access-client-secret",
+	"x-emdash-request",
+]);
+
+export function serializeHeadersForSandbox(headers: Headers) {
 	const result: Record<string, string> = {};
 	headers.forEach((value, name) => {
-		result[name] = value;
+		if (!SANDBOX_STRIPPED_HEADERS.has(name)) {
+			result[name] = value;
+		}
 	});
 	return result;
 }
@@ -92,7 +105,7 @@ function sandboxRouteContext(ctx: NativeRouteContext): SandboxedRouteContext {
 		request: {
 			url: ctx.request.url,
 			method: ctx.request.method,
-			headers: serializeHeaders(ctx.request.headers),
+			headers: serializeHeadersForSandbox(ctx.request.headers),
 		},
 		requestMeta: ctx.requestMeta,
 	};
