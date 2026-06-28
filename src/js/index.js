@@ -7,5 +7,4 @@ window.bootstrap = bootstrap;
 
 // Import custom JavaScript modules
 import "./carousel.js";
-import "./facebook-sdk.js";
 import "./emdash-save-gate.js";

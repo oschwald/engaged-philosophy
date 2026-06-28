@@ -56,13 +56,6 @@ test.describe("visual editing", () => {
 			},
 		);
 
-		await page.route("https://connect.facebook.net/**", (route) =>
-			route.fulfill({
-				contentType: "application/javascript",
-				body: "",
-			}),
-		);
-
 		await page.goto("/_emdash/admin", { waitUntil: "domcontentloaded" });
 		await dismissWelcome(page);
 		await expect(
@@ -156,13 +149,6 @@ test.describe("visual editing", () => {
 					],
 				},
 			},
-		);
-
-		await page.route("https://connect.facebook.net/**", (route) =>
-			route.fulfill({
-				contentType: "application/javascript",
-				body: "",
-			}),
 		);
 
 		await page.goto("/_emdash/admin", { waitUntil: "domcontentloaded" });
