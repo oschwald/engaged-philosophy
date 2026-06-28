@@ -54,7 +54,7 @@ describe("Worker security headers", () => {
 		expect(response.headers.get("referrer-policy")).toBe("same-origin");
 	});
 
-	test("does not set a public CSP for signed-in public editing responses", () => {
+	test("sets an editing-compatible CSP for signed-in public editing responses", () => {
 		const response = applySecurityHeaders(
 			new Request("https://www.engagedphilosophy.com/about/", {
 				headers: { cookie: "CF_Authorization=abc; emdash-edit-mode=true" },
@@ -62,7 +62,12 @@ describe("Worker security headers", () => {
 			htmlResponse(),
 		);
 
-		expect(response.headers.has("content-security-policy")).toBe(false);
+		expect(response.headers.get("content-security-policy")).toContain(
+			"script-src 'self' 'unsafe-inline' https://www.youtube.com",
+		);
+		expect(response.headers.get("content-security-policy")).toContain(
+			"style-src 'self' 'unsafe-inline'",
+		);
 		expect(response.headers.get("x-content-type-options")).toBe("nosniff");
 	});
 

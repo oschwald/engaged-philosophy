@@ -16,6 +16,22 @@ const PUBLIC_CONTENT_SECURITY_POLICY = [
 	"frame-ancestors 'self'",
 ].join("; ");
 
+const AUTHENTICATED_PUBLIC_CONTENT_SECURITY_POLICY = [
+	"default-src 'self'",
+	"script-src 'self' 'unsafe-inline' https://www.youtube.com",
+	"style-src 'self' 'unsafe-inline'",
+	"img-src 'self' https: data: blob:",
+	"font-src 'self' data:",
+	"connect-src 'self'",
+	"frame-src 'self' https://animoto.com https://player.vimeo.com https://www.youtube.com https://www.youtube-nocookie.com",
+	"media-src 'self' https:",
+	"manifest-src 'self'",
+	"object-src 'none'",
+	"base-uri 'self'",
+	"form-action 'self'",
+	"frame-ancestors 'self'",
+].join("; ");
+
 const STRICT_TRANSPORT_SECURITY = "max-age=31536000; includeSubDomains";
 const BASELINE_SECURITY_HEADERS = {
 	"permissions-policy": "camera=(), microphone=(), geolocation=(), payment=()",
@@ -75,13 +91,14 @@ export function applySecurityHeaders(request: Request, response: Response) {
 	const { pathname } = new URL(request.url);
 	if (
 		!isAdminPath(pathname) &&
-		!isStatefulRequest(request) &&
 		isHtmlResponse(securedResponse) &&
 		!securedResponse.headers.has("content-security-policy")
 	) {
 		securedResponse.headers.set(
 			"content-security-policy",
-			PUBLIC_CONTENT_SECURITY_POLICY,
+			isStatefulRequest(request)
+				? AUTHENTICATED_PUBLIC_CONTENT_SECURITY_POLICY
+				: PUBLIC_CONTENT_SECURITY_POLICY,
 		);
 	}
 
