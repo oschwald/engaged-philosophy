@@ -8,6 +8,7 @@ import {
 	getObservedRequestInfo,
 	OBSERVED_REQUEST_SLOW_MS,
 } from "./lib/admin-request-observability";
+import { applySecurityHeaders } from "./lib/security-headers";
 
 type Env = Record<string, unknown>;
 type AstroHandler = Required<Pick<ExportedHandler<Env>, "fetch">>;
@@ -77,7 +78,8 @@ const observedHandler: ExportedHandler<Env> = {
 	async fetch(request, env, ctx) {
 		const info = getObservedRequestInfo(request);
 		if (!info) {
-			return astroHandler.fetch(request, env, ctx);
+			const response = await astroHandler.fetch(request, env, ctx);
+			return applySecurityHeaders(request, response);
 		}
 
 		const startedAt = performance.now();
@@ -101,7 +103,7 @@ const observedHandler: ExportedHandler<Env> = {
 			completed = true;
 			console.log(responseLog(info, startedAt, response));
 
-			const observedResponse = new Response(response.body, response);
+			const observedResponse = applySecurityHeaders(request, response);
 			observedResponse.headers.set("X-EP-Request-ID", info.requestId);
 			return observedResponse;
 		} catch (error) {
