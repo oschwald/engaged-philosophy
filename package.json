@@ -63,6 +63,7 @@
 		"@emdash-cms/plugin-embeds": "^0.1.27",
 		"astro": "^6.4.8",
 		"bootstrap": "^5.3.8",
+		"bootstrap-icons": "1.11.0",
 		"emdash": "^0.23.0",
 		"jose": "^6.2.3",
 		"kysely": "^0.29.2",

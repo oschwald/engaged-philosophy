@@ -1,6 +1,7 @@
 // Main JavaScript entry point
 // Import Bootstrap JavaScript and expose globally
 import * as bootstrap from "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 // Make Bootstrap available globally for WordPress customizer and other scripts
 window.bootstrap = bootstrap;
