@@ -88,7 +88,6 @@ const standardImageNodeToRender = !hasLegacyFeatures ? standardImageNode : null;
 							height={node?.displayHeight || node?.height}
 							loading="lazy"
 							decoding="async"
-							style="max-width: 100%; height: auto;"
 						/>
 					</a>
 				) : (
@@ -99,7 +98,6 @@ const standardImageNodeToRender = !hasLegacyFeatures ? standardImageNode : null;
 						height={node?.displayHeight || node?.height}
 						loading="lazy"
 						decoding="async"
-						style="max-width: 100%; height: auto;"
 					/>
 				)}
 				<figcaption>{node.caption}</figcaption>
@@ -114,7 +112,6 @@ const standardImageNodeToRender = !hasLegacyFeatures ? standardImageNode : null;
 					height={node?.displayHeight || node?.height}
 					loading="lazy"
 					decoding="async"
-					style="max-width: 100%; height: auto;"
 				/>
 			</a>
 		) : (
@@ -126,7 +123,6 @@ const standardImageNodeToRender = !hasLegacyFeatures ? standardImageNode : null;
 				height={node?.displayHeight || node?.height}
 				loading="lazy"
 				decoding="async"
-				style="max-width: 100%; height: auto;"
 			/>
 		)
 	) : (
