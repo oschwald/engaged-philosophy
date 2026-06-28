@@ -37,13 +37,21 @@ async function toggleEditMode(page: Page, enabled: boolean) {
 	await expectEditMode(page, enabled);
 }
 
+function collectEditingPageErrors(page: Page) {
+	return collectPageErrors(page, {
+		ignore: [
+			/Failed to load resource: the server responded with a status of 404 \(Not Found\) \(http:\/\/127\.0\.0\.1:\d+\/favicon\.ico\)/,
+		],
+	});
+}
+
 test.describe("visual editing", () => {
 	test("saves portable text before leaving edit mode and publishing", async ({
 		authedRequest,
 		page,
 		publicPage,
 	}, testInfo) => {
-		const pageErrors = collectPageErrors(page);
+		const pageErrors = collectEditingPageErrors(page);
 		const title = uniqueTitle("E2E Visual Editing", testInfo.testId);
 		const initialBody = `${title} original body.`;
 		const editedText = `saved before leaving edit mode ${Date.now()}`;
@@ -130,7 +138,7 @@ test.describe("visual editing", () => {
 		page,
 		publicPage,
 	}, testInfo) => {
-		const pageErrors = collectPageErrors(page);
+		const pageErrors = collectEditingPageErrors(page);
 		const title = uniqueTitle("E2E Legacy Visual Editing", testInfo.testId);
 		const initialBody = `${title} body before legacy edit.`;
 		const editedText = `edited around legacy blocks ${Date.now()}`;
