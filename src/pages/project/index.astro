@@ -56,12 +56,12 @@ const maxCount = counts.length ? Math.max(...counts) : 0;
 											? (count - minCount) / (maxCount - minCount)
 											: 0;
 									const fontSize = 13 + scale * (32 - 13);
+									const fontSizeClass = `tag-link-size-${Math.round(fontSize)}`;
 
 									return (
 										<a
 											href={`/topic/${topic.slug}/`}
-											style={`font-size: ${fontSize}px; margin-right: 8px;`}
-											class="tag-link"
+											class={`tag-link ${fontSizeClass}`}
 										>
 											{topic.label}
 										</a>

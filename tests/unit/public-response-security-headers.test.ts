@@ -19,7 +19,10 @@ describe("Worker security headers", () => {
 		);
 
 		expect(response.headers.get("content-security-policy")).toContain(
-			"script-src 'self' 'unsafe-inline' https://www.youtube.com",
+			"script-src 'self' https://www.youtube.com",
+		);
+		expect(response.headers.get("content-security-policy")).toContain(
+			"style-src 'self'",
 		);
 		expect(response.headers.get("content-security-policy")).toContain(
 			"frame-src 'self' https://animoto.com https://player.vimeo.com",
@@ -49,6 +52,18 @@ describe("Worker security headers", () => {
 			"default-src 'none'",
 		);
 		expect(response.headers.get("referrer-policy")).toBe("same-origin");
+	});
+
+	test("does not set a public CSP for signed-in public editing responses", () => {
+		const response = applySecurityHeaders(
+			new Request("https://www.engagedphilosophy.com/about/", {
+				headers: { cookie: "CF_Authorization=abc; emdash-edit-mode=true" },
+			}),
+			htmlResponse(),
+		);
+
+		expect(response.headers.has("content-security-policy")).toBe(false);
+		expect(response.headers.get("x-content-type-options")).toBe("nosniff");
 	});
 
 	test("leaves EmDash admin CSP ownership to EmDash", () => {

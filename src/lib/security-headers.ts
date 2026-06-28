@@ -1,7 +1,9 @@
+import { hasStatefulCookie } from "./anonymous-cloudflare-cache";
+
 const PUBLIC_CONTENT_SECURITY_POLICY = [
 	"default-src 'self'",
-	"script-src 'self' 'unsafe-inline' https://www.youtube.com",
-	"style-src 'self' 'unsafe-inline'",
+	"script-src 'self' https://www.youtube.com",
+	"style-src 'self'",
 	"img-src 'self' https: data: blob:",
 	"font-src 'self' data:",
 	"connect-src 'self'",
@@ -44,6 +46,13 @@ function isHtmlResponse(response: Response) {
 		.includes("text/html");
 }
 
+function isStatefulRequest(request: Request) {
+	return (
+		hasStatefulCookie(request.headers.get("cookie")) ||
+		request.headers.has("cf-access-jwt-assertion")
+	);
+}
+
 export function applySecurityHeaders(request: Request, response: Response) {
 	const securedResponse = new Response(response.body, response);
 
@@ -66,6 +75,7 @@ export function applySecurityHeaders(request: Request, response: Response) {
 	const { pathname } = new URL(request.url);
 	if (
 		!isAdminPath(pathname) &&
+		!isStatefulRequest(request) &&
 		isHtmlResponse(securedResponse) &&
 		!securedResponse.headers.has("content-security-policy")
 	) {
