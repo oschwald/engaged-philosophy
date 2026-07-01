@@ -33,8 +33,7 @@ interface InviteValidationSuccess {
 }
 
 export type InviteValidationResult =
-	| InviteValidationError
-	| InviteValidationSuccess;
+	InviteValidationError | InviteValidationSuccess;
 
 export function getCloudflareAccessInviteUrl(requestUrl: string | URL): string {
 	const url = new URL(requestUrl);

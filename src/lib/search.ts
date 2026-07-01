@@ -47,9 +47,7 @@ function countTermMatches(haystack: string, terms: string[], weight: number) {
 function rankEntry(
 	kind: SearchResult["kind"],
 	entry:
-		| ContentEntry<PageData>
-		| ContentEntry<PostData>
-		| ContentEntry<ProjectData>,
+		ContentEntry<PageData> | ContentEntry<PostData> | ContentEntry<ProjectData>,
 	query: string,
 	terms: string[],
 	mediaUrlPrefix: string,
