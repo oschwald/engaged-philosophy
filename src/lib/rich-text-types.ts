@@ -8,11 +8,7 @@ export interface RichTextAssetRef {
 }
 
 export type RichTextImageAlignment =
-	| "left"
-	| "right"
-	| "center"
-	| "wide"
-	| "full";
+	"left" | "right" | "center" | "wide" | "full";
 
 export interface RichTextRequiredAssetRef extends RichTextAssetRef {
 	_ref: string;
@@ -44,8 +40,7 @@ export interface RichTextLegacyImageNode extends Omit<
 }
 
 export type RichTextRenderableImageNode =
-	| RichTextImageNode
-	| RichTextLegacyImageNode;
+	RichTextImageNode | RichTextLegacyImageNode;
 
 export interface RichTextGalleryImageNode extends Omit<
 	RichTextImageNode,

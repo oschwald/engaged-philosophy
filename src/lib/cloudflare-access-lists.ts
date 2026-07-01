@@ -33,9 +33,7 @@ export interface CloudflareAccessEmailListConfig {
 }
 
 export type CloudflareAccessEmailListSyncStatus =
-	| "added"
-	| "already_present"
-	| "not_configured";
+	"added" | "already_present" | "not_configured";
 
 export interface CloudflareAccessEmailListSyncResult {
 	status: CloudflareAccessEmailListSyncStatus;
