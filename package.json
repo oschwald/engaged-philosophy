@@ -42,7 +42,7 @@
 		"typecheck:tests": "tsc --noEmit -p tsconfig.test.json"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "^13.7.0",
+		"@astrojs/cloudflare": "^14.0.1",
 		"@astrojs/react": "^6.0.0",
 		"@emdash-cms/auth": "^0.27.0",
 		"@emdash-cms/cloudflare": "^0.27.0",
