@@ -125,10 +125,10 @@ export function canonicalAliasForItem(
 	return `/${collection}/${slug}/`;
 }
 
-export async function dismissWelcome(page: Page) {
+export async function dismissWelcome(page: Page, timeoutMs = 2000) {
 	const dialog = page.getByRole("dialog", { name: /Welcome to EmDash/ });
 	try {
-		await dialog.waitFor({ state: "visible", timeout: 2000 });
+		await dialog.waitFor({ state: "visible", timeout: timeoutMs });
 	} catch {
 		return;
 	}
@@ -259,7 +259,7 @@ export async function createAndPublishContentViaAdmin(
 	await page.goto(`/_emdash/admin/content/${collection}/new`, {
 		waitUntil: "domcontentloaded",
 	});
-	await dismissWelcome(page);
+	await dismissWelcome(page, 5000);
 
 	await expect(
 		page.getByRole("heading", { name: `New ${SINGULAR_LABEL[collection]}` }),
