@@ -28,22 +28,10 @@ const SITEMAP_LIMIT = Number.parseInt(
 	10,
 );
 const PATH_FILE = process.env.LIVE_SMOKE_PATH_FILE;
-const WORDPRESS_EXPORT = process.env.LIVE_SMOKE_WORDPRESS_EXPORT;
-const WORDPRESS_LIMIT = Number.parseInt(
-	process.env.LIVE_SMOKE_WORDPRESS_LIMIT ?? "0",
-	10,
-);
 const CHECK_CONCURRENCY = Math.max(
 	1,
 	Number.parseInt(process.env.LIVE_SMOKE_CONCURRENCY ?? "6", 10),
 );
-
-const ITEM_RE = /<item>([\s\S]*?)<\/item>/g;
-const EXCLUDED_WORDPRESS_PATHS = new Set([
-	"/1477/",
-	"/project-guidelines-critical-thinking-3/",
-	"/project/photos-for-our-furry-friends-2/",
-]);
 
 function parseList(value, fallback) {
 	if (!value) return fallback;
@@ -85,42 +73,6 @@ function toPath(pathOrUrl) {
 function normalizeSmokePath(pathOrUrl) {
 	const path = toPath(pathOrUrl).replace(/\/{2,}/g, "/");
 	return path || "/";
-}
-
-function extractTag(source, tag) {
-	const cdataMatch = source.match(
-		new RegExp(`<${tag}><!\\[CDATA\\[([\\s\\S]*?)\\]\\]><\\/${tag}>`, "s"),
-	);
-	if (cdataMatch) return cdataMatch[1].trim();
-
-	const plainMatch = source.match(
-		new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "s"),
-	);
-	return plainMatch ? plainMatch[1].trim() : "";
-}
-
-function decodeEntities(value) {
-	const namedEntities = {
-		amp: "&",
-		apos: "'",
-		quot: '"',
-		nbsp: " ",
-		lt: "<",
-		gt: ">",
-	};
-
-	return (value || "").replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (entity, token) => {
-		const lowerToken = token.toLowerCase();
-		if (lowerToken.startsWith("#x")) {
-			const codePoint = Number.parseInt(lowerToken.slice(2), 16);
-			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
-		}
-		if (lowerToken.startsWith("#")) {
-			const codePoint = Number.parseInt(lowerToken.slice(1), 10);
-			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
-		}
-		return namedEntities[lowerToken] ?? entity;
-	});
 }
 
 async function fetchWithTimeout(url, init = {}) {
@@ -267,52 +219,12 @@ function getPathFilePages() {
 		.map(normalizeSmokePath);
 }
 
-function getWordPressExportPages() {
-	if (!WORDPRESS_EXPORT) return [];
-	if (!fs.existsSync(WORDPRESS_EXPORT)) {
-		throw new Error(
-			`LIVE_SMOKE_WORDPRESS_EXPORT does not exist: ${WORDPRESS_EXPORT}`,
-		);
-	}
-
-	const xml = fs.readFileSync(WORDPRESS_EXPORT, "utf8");
-	const paths = [];
-
-	for (const match of xml.matchAll(ITEM_RE)) {
-		const item = match[1] ?? "";
-		const postType = extractTag(item, "wp:post_type");
-		const status = extractTag(item, "wp:status");
-		if (!["page", "post", "project"].includes(postType)) continue;
-		if (status !== "publish") continue;
-
-		const link = decodeEntities(extractTag(item, "link"));
-		if (!link) continue;
-
-		const path = normalizeSmokePath(link);
-		if (EXCLUDED_WORDPRESS_PATHS.has(path)) continue;
-		paths.push(path);
-	}
-
-	const uniquePaths = [...new Set(paths)].sort();
-	return WORDPRESS_LIMIT > 0
-		? uniquePaths.slice(0, WORDPRESS_LIMIT)
-		: uniquePaths;
-}
-
 async function checkPathFilePages() {
 	const paths = getPathFilePages();
 	if (paths.length === 0) return;
 
 	await checkPublicPages(paths);
 	console.log(`ok path file pages ${paths.length}`);
-}
-
-async function checkWordPressExportPages() {
-	const paths = getWordPressExportPages();
-	if (paths.length === 0) return;
-
-	await checkPublicPages(paths);
-	console.log(`ok wordpress export pages ${paths.length}`);
 }
 
 async function checkStaticAsset(path) {
@@ -425,6 +337,5 @@ await checkAdminAccessRedirect();
 await checkSignedInAdminIfConfigured();
 await checkSitemapPages();
 await checkPathFilePages();
-await checkWordPressExportPages();
 
 console.log("Live smoke checks passed.");

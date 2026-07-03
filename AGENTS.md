@@ -6,10 +6,9 @@ This is an Astro + EmDash site deployed to Cloudflare Workers. Runtime source
 lives in `src/`, with pages in `src/pages/`, shared components in
 `src/components/`, Sass in `src/scss/`, and custom browser scripts in `src/js/`.
 Custom EmDash plugins live under `src/plugins/`. Public static assets are in
-`public/`. Migration-only WordPress tooling is isolated in `scripts/migration/`
-and should not be expanded for normal runtime work. Documentation lives in
-`docs/`. Tests are split between `tests/` for Vitest, `e2e-static/` for browser
-fixtures without a Worker, and `e2e/` for Worker-backed Playwright workflows.
+`public/`. Documentation lives in `docs/`. Tests are split between `tests/` for
+Vitest, `e2e-static/` for browser fixtures without a Worker, and `e2e/` for
+Worker-backed Playwright workflows.
 
 ## Build, Test, and Development Commands
 
@@ -29,7 +28,7 @@ example `mise exec -- pnpm run ci`.
 `pnpm run dev` starts Astro locally. `pnpm run build` runs the seed guard and
 builds the Worker output. `pnpm run ci` runs linting, unit/static tests,
 typechecks, build, Worker smoke checks, and Worker-backed e2e tests. Use
-`pnpm run smoke:live` or `pnpm run smoke:live:wordpress` for deployed checks.
+`pnpm run smoke:live` or `pnpm run smoke:live:sitemap` for deployed checks.
 
 ## Coding Style & Naming Conventions
 
