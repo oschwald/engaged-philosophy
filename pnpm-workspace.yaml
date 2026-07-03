@@ -14,13 +14,13 @@ minimumReleaseAgeExclude:
   - playwright@1.61.1
   - sass@1.101.0
   - vitest@4.1.9
-  - "@emdash-cms/admin@0.25.1"
-  - "@emdash-cms/auth@0.25.1"
-  - "@emdash-cms/blocks@0.25.1"
-  - "@emdash-cms/cloudflare@0.25.1"
-  - "@emdash-cms/gutenberg-to-portable-text@0.25.1"
-  - "@emdash-cms/plugin-embeds@0.1.31"
-  - emdash@0.25.1
+  - "@emdash-cms/admin@0.27.0"
+  - "@emdash-cms/auth@0.27.0"
+  - "@emdash-cms/blocks@0.27.0"
+  - "@emdash-cms/cloudflare@0.27.0"
+  - "@emdash-cms/gutenberg-to-portable-text@0.27.0"
+  - "@emdash-cms/plugin-embeds@0.1.33"
+  - emdash@0.27.0
 
 overrides:
   "@astro-community/astro-embed-integration>astro-auto-import": ^0.5.1
