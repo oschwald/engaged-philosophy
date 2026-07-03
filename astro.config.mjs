@@ -104,13 +104,11 @@ function emdashContentAuthorsShim() {
 export default defineConfig({
 	output: "server",
 	adapter: cloudflare(),
-	experimental: {
-		cache: {
-			provider: {
-				entrypoint: anonymousCloudflareCacheEntrypoint,
-				config: {
-					cacheName: ANONYMOUS_PAGE_CACHE_NAME,
-				},
+	cache: {
+		provider: {
+			entrypoint: anonymousCloudflareCacheEntrypoint,
+			config: {
+				cacheName: ANONYMOUS_PAGE_CACHE_NAME,
 			},
 		},
 	},
