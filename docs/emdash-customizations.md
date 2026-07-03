@@ -67,4 +67,6 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 - Revisit the audit-log native adapter if Cloudflare sandbox support becomes
   available or the upstream plugin ships a native/free-plan mode.
 - Revisit the custom invite route if site email is configured and the default
-  EmDash invite flow works with the chosen auth provider.
+  EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a
+  Cloudflare Email Sending plugin, but that only handles email delivery; this
+  site still needs invitees appended to the Cloudflare Access EMAIL list.

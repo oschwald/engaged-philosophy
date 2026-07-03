@@ -57,14 +57,14 @@
 	"dependencies": {
 		"@astrojs/cloudflare": "^13.7.0",
 		"@astrojs/react": "^5.0.7",
-		"@emdash-cms/auth": "^0.25.1",
-		"@emdash-cms/cloudflare": "^0.25.1",
+		"@emdash-cms/auth": "^0.27.0",
+		"@emdash-cms/cloudflare": "^0.27.0",
 		"@emdash-cms/plugin-audit-log": "^0.2.0",
-		"@emdash-cms/plugin-embeds": "^0.1.31",
+		"@emdash-cms/plugin-embeds": "^0.1.33",
 		"astro": "^6.4.8",
 		"bootstrap": "^5.3.8",
 		"bootstrap-icons": "1.13.1",
-		"emdash": "^0.25.1",
+		"emdash": "^0.27.0",
 		"jose": "^6.2.3",
 		"kysely": "^0.29.2",
 		"react": "^19.2.7",
@@ -73,7 +73,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.9",
-		"@cloudflare/workers-types": "^4.20260630.1",
+		"@cloudflare/workers-types": "^4.20260702.1",
 		"@playwright/test": "^1.61.1",
 		"@types/node": "^25.9.4",
 		"@typescript-eslint/eslint-plugin": "^8.62.1",
@@ -92,8 +92,8 @@
 		"turndown": "^7.2.4",
 		"turndown-plugin-gfm": "^1.0.2",
 		"typescript": "^6.0.3",
-		"vite": "^8.1.1",
+		"vite": "^8.1.2",
 		"vitest": "^4.1.9",
-		"wrangler": "^4.105.0"
+		"wrangler": "^4.106.0"
 	}
 }
