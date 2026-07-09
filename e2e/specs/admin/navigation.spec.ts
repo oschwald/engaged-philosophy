@@ -1,5 +1,8 @@
 import { test, expect } from "../../fixtures/worker";
-import { collectPageErrors } from "../../support/assertions";
+import {
+	collectPageErrors,
+	expectExactHeading,
+} from "../../support/assertions";
 import { dismissWelcome } from "../../support/content";
 
 test.describe("admin navigation", () => {
@@ -9,9 +12,7 @@ test.describe("admin navigation", () => {
 		const pageErrors = collectPageErrors(page);
 		await page.goto("/_emdash/admin", { waitUntil: "domcontentloaded" });
 		await dismissWelcome(page);
-		await expect(
-			page.getByRole("heading", { name: "Dashboard" }),
-		).toBeVisible();
+		await expectExactHeading(page, "Dashboard");
 
 		const destinations = [
 			{
@@ -54,9 +55,7 @@ test.describe("admin navigation", () => {
 				.first()
 				.click();
 			await expect(page).toHaveURL(new RegExp(`${destination.path}$`));
-			await expect(
-				page.getByRole("heading", { name: destination.heading }),
-			).toBeVisible();
+			await expectExactHeading(page, destination.heading);
 			await expect(page.getByText("Authentication required")).toHaveCount(0);
 		}
 
