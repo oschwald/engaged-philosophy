@@ -1,7 +1,10 @@
 import type { Page, Response } from "@playwright/test";
 
 import { test, expect } from "../../fixtures/worker";
-import { collectPageErrors } from "../../support/assertions";
+import {
+	collectPageErrors,
+	expectExactHeading,
+} from "../../support/assertions";
 import {
 	createAndPublishContentViaApi,
 	dismissWelcome,
@@ -66,9 +69,7 @@ test.describe("visual editing", () => {
 
 		await page.goto("/_emdash/admin", { waitUntil: "domcontentloaded" });
 		await dismissWelcome(page);
-		await expect(
-			page.getByRole("heading", { name: "Dashboard" }),
-		).toBeVisible();
+		await expectExactHeading(page, "Dashboard");
 
 		await page.goto(publicPath, { waitUntil: "domcontentloaded" });
 		await expect(page.locator("#emdash-toolbar")).toBeVisible();

@@ -1,5 +1,8 @@
 import { test, expect } from "../../fixtures/worker";
-import { collectPageErrors } from "../../support/assertions";
+import {
+	collectPageErrors,
+	expectExactHeading,
+} from "../../support/assertions";
 import { dismissWelcome } from "../../support/content";
 
 function svgBuffer(label: string) {
@@ -19,9 +22,7 @@ test.describe("admin media library", () => {
 
 		await page.goto("/_emdash/admin/media", { waitUntil: "domcontentloaded" });
 		await dismissWelcome(page);
-		await expect(
-			page.getByRole("heading", { name: "Media Library" }),
-		).toBeVisible();
+		await expectExactHeading(page, "Media Library");
 		await expect(
 			page.getByRole("button", { name: "Upload to Library" }),
 		).toBeVisible();
@@ -53,9 +54,7 @@ test.describe("admin media library", () => {
 		expect(uploadBody.data?.item?.filename).toBe(filename);
 
 		await page.reload({ waitUntil: "domcontentloaded" });
-		await expect(
-			page.getByRole("heading", { name: "Media Library" }),
-		).toBeVisible();
+		await expectExactHeading(page, "Media Library");
 		await page.getByLabel("Search media").fill(filename);
 		await expect(page.getByText(filename)).toBeVisible({ timeout: 10_000 });
 

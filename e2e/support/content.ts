@@ -1,6 +1,8 @@
 import type { APIRequestContext, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
+import { expectExactHeading } from "./assertions";
+
 export type CollectionSlug = "pages" | "posts" | "projects";
 
 export interface ContentItem {
@@ -261,9 +263,7 @@ export async function createAndPublishContentViaAdmin(
 	});
 	await dismissWelcome(page, 5000);
 
-	await expect(
-		page.getByRole("heading", { name: `New ${SINGULAR_LABEL[collection]}` }),
-	).toBeVisible();
+	await expectExactHeading(page, `New ${SINGULAR_LABEL[collection]}`);
 	await page.getByLabel("Title", { exact: true }).fill(options.title);
 	if (options.slug) {
 		await page.getByLabel("Slug", { exact: true }).fill(options.slug);
@@ -337,9 +337,7 @@ export async function expectPublicContent(
 		`Expected ${pathName} to load`,
 	).toBeGreaterThanOrEqual(200);
 	expect(response?.status(), `Expected ${pathName} to load`).toBeLessThan(300);
-	await expect(
-		page.getByRole("heading", { level: 1, name: title }),
-	).toBeVisible();
+	await expectExactHeading(page, title, { level: 1 });
 	await expect(page.getByText(bodyText)).toBeVisible();
 	await expect(page.getByText("Authentication required")).toHaveCount(0);
 }

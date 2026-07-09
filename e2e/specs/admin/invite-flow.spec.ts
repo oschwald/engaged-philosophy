@@ -1,5 +1,8 @@
 import { test, expect } from "../../fixtures/worker";
-import { collectPageErrors } from "../../support/assertions";
+import {
+	collectPageErrors,
+	expectExactHeading,
+} from "../../support/assertions";
 import { dismissWelcome } from "../../support/content";
 
 test.describe("admin user invites", () => {
@@ -11,7 +14,7 @@ test.describe("admin user invites", () => {
 
 		await page.goto("/_emdash/admin/users", { waitUntil: "domcontentloaded" });
 		await dismissWelcome(page);
-		await expect(page.getByRole("heading", { name: "Users" })).toBeVisible();
+		await expectExactHeading(page, "Users");
 
 		await page.getByRole("button", { name: "Invite User" }).click();
 		const dialog = page.getByRole("dialog", { name: "Invite User" });

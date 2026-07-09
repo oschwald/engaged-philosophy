@@ -1,6 +1,21 @@
 import type { APIRequestContext, Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
+export async function expectExactHeading(
+	page: Page,
+	name: string,
+	options: { level?: number; timeout?: number } = {},
+) {
+	const { level, timeout = 15_000 } = options;
+	await expect(
+		page.getByRole("heading", {
+			name,
+			exact: true,
+			...(level === undefined ? {} : { level }),
+		}),
+	).toBeVisible({ timeout });
+}
+
 export async function expectOkJson(
 	request: APIRequestContext,
 	pathName: string,
