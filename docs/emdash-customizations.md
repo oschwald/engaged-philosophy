@@ -53,9 +53,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Build Compatibility
 
-- `astro.config.mjs` suppresses known upstream build warnings and aliases
-  `@astrojs/internal-helpers/create-filter` for current dependency
-  compatibility.
+- `astro.config.mjs` keeps the Vite chunk-size warning limit aligned with the
+  admin bundle size while leaving upstream build warnings visible.
 - `wrangler.jsonc` enables Cloudflare logs/traces and includes both current and
   legacy binding names for D1/R2 compatibility.
 
