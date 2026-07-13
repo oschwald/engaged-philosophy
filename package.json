@@ -62,7 +62,7 @@
 		"@astrojs/check": "^0.9.9",
 		"@cloudflare/workers-types": "^5.20260708.1",
 		"@playwright/test": "^1.61.1",
-		"@types/node": "^26.1.0",
+		"@types/node": "^26.1.1",
 		"@typescript-eslint/eslint-plugin": "^8.63.0",
 		"@typescript-eslint/parser": "^8.63.0",
 		"astro-eslint-parser": "^2.1.0",
