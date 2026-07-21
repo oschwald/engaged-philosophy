@@ -293,7 +293,9 @@ export async function createAndPublishContentViaAdmin(
 	await expect(page).toHaveURL(
 		new RegExp(`/_emdash/admin/content/${collection}/${created.id}(?:\\?.*)?$`),
 	);
-	await expect(page.getByText("Saved").first()).toBeVisible();
+	await expect(
+		page.getByRole("button", { name: "Saved", exact: true }).first(),
+	).toBeVisible();
 
 	const publishResponsePromise = page.waitForResponse(
 		(response) =>
@@ -303,7 +305,10 @@ export async function createAndPublishContentViaAdmin(
 				.includes(`/_emdash/api/content/${collection}/${created.id}/publish`),
 	);
 	await page
-		.getByRole("button", { name: "Publish", exact: true })
+		.getByRole("button", {
+			name: `Publish ${SINGULAR_LABEL[collection]}`,
+			exact: true,
+		})
 		.first()
 		.click();
 	const publishedBody = await expectJsonResponse(
