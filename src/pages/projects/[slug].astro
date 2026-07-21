@@ -26,7 +26,11 @@ const title =
 const content = getEntryContent(liveEntry.data);
 ---
 
-<Base title={title} bodyClass="single single-project">
+<Base
+	title={title}
+	bodyClass="single single-project"
+	content={{ collection: "projects", entry: liveEntry }}
+>
 	<section id="primary" class="col-12 px-4">
 		<main id="content">
 			<article class="project type-project status-publish">

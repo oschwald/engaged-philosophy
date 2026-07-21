@@ -10,6 +10,7 @@ const page = (await getPageBySlug("blog")) ?? (await getPageByPath("blog"));
 <Base
 	title={page?.data.title || "Blog"}
 	bodyClass="page page-template page-template-default"
+	content={page ? { collection: "pages", entry: page } : undefined}
 >
 	<div class="container-fluid">
 		<section id="primary" class="p-4">

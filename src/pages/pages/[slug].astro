@@ -26,7 +26,7 @@ const title =
 const content = getEntryContent(liveEntry.data);
 ---
 
-<Base title={title}>
+<Base title={title} content={{ collection: "pages", entry: liveEntry }}>
 	<div class="container-fluid">
 		<section id="primary" class="p-4">
 			<div id="content" role="main">

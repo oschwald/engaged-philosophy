@@ -45,7 +45,11 @@ const bodyClass = [
 	.join(" ");
 ---
 
-<Base title={page.data.title} bodyClass={bodyClass}>
+<Base
+	title={page.data.title}
+	bodyClass={bodyClass}
+	content={{ collection: "pages", entry: page }}
+>
 	{
 		useFullWidthTemplate ? (
 			<section id="primary" class="col-12 px-4">

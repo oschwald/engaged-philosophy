@@ -45,6 +45,7 @@ const homeBoxes = home
 
 <Base
 	title={query ? `Search Results for: ${query}` : home?.data.title}
+	content={!query && home ? { collection: "pages", entry: home } : undefined}
 	bodyClass={query
 		? "search search-results wp-theme-engaged-philosophy-20 content-sidebar"
 		: "home page-template page-template-templates page-template-home"}

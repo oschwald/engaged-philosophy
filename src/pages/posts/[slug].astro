@@ -31,7 +31,11 @@ const publishedOn =
 		: "";
 ---
 
-<Base title={title} bodyClass="single single-post content-sidebar">
+<Base
+	title={title}
+	bodyClass="single single-post content-sidebar"
+	content={{ collection: "posts", entry: liveEntry }}
+>
 	<section id="primary" class="col-lg-8 px-4">
 		<div id="content" role="main">
 			<article class="post">

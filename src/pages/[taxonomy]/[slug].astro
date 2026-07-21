@@ -34,7 +34,10 @@ const projectPage = isProjectArchive
 
 {
 	page ? (
-		<Base title={page.data.title}>
+		<Base
+			title={page.data.title}
+			content={{ collection: "pages", entry: page }}
+		>
 			<section id="primary" class="col-12 px-4">
 				<main id="content">
 					<article {...page.edit}>

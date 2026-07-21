@@ -4,18 +4,23 @@ import SiteFooter from "../components/layout/SiteFooter.astro";
 import SiteHead from "../components/layout/SiteHead.astro";
 import SiteHeader from "../components/layout/SiteHeader.astro";
 import { getPrimaryMenu, getRuntimeSiteSettings } from "../lib/content";
-import { getConfiguredFaviconHref } from "../lib/favicon";
 import { getMediaUrlPrefix, rewriteInternalMediaFileUrl } from "../lib/media";
+import {
+	createSitePageContext,
+	type SiteContentContext,
+} from "../lib/page-context";
 import { SITE_TAGLINE_FALLBACK, SITE_TITLE_FALLBACK } from "../lib/site-config";
+import { EmDashBodyEnd, EmDashBodyStart } from "emdash/ui";
 import "../scss/style.scss";
 
 interface Props {
 	title?: string;
 	description?: string;
 	bodyClass?: string;
+	content?: SiteContentContext;
 }
 
-const { title, description, bodyClass = "" } = Astro.props;
+const { title, description, bodyClass = "", content } = Astro.props;
 Astro.cache.set({
 	maxAge: 300,
 	swr: 86400,
@@ -24,13 +29,6 @@ Astro.cache.set({
 const settings = await getRuntimeSiteSettings();
 const siteTitle = settings?.title || SITE_TITLE_FALLBACK;
 const siteDescription = settings?.tagline || SITE_TAGLINE_FALLBACK;
-const pageTitle =
-	title && title !== "Home"
-		? `${title} – ${siteTitle}`
-		: `${siteTitle} – ${siteDescription}`;
-const favicon = settings?.favicon;
-const faviconHref = getConfiguredFaviconHref(settings);
-const faviconType = favicon?.contentType;
 const menuItems = await getPrimaryMenu();
 const currentPath = Astro.url.pathname;
 const mediaUrlPrefix = getMediaUrlPrefix();
@@ -39,17 +37,22 @@ const logoSrc = logo?.url
 	? rewriteInternalMediaFileUrl(logo.url, mediaUrlPrefix)
 	: `${mediaUrlPrefix}/img/logo.png`;
 const logoAlt = logo?.alt || `${siteTitle} Logo`;
+const page = createSitePageContext({
+	url: Astro.url,
+	siteTitle,
+	siteDescription,
+	siteUrl: settings?.url,
+	title,
+	description,
+	content,
+});
 ---
 
 <!doctype html>
 <html class="no-js" lang="en-US">
-	<SiteHead
-		pageTitle={pageTitle}
-		description={description || siteDescription}
-		faviconHref={faviconHref}
-		faviconType={faviconType}
-	/>
+	<SiteHead page={page} />
 	<body class={bodyClass}>
+		<EmDashBodyStart page={page} />
 		<div class="container">
 			<SiteHeader
 				siteTitle={siteTitle}
@@ -69,5 +72,6 @@ const logoAlt = logo?.alt || `${siteTitle} Logo`;
 		<script>
 			import "../js/index.js";
 		</script>
+		<EmDashBodyEnd page={page} />
 	</body>
 </html>
