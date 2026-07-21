@@ -20,7 +20,9 @@ const highlightedProjects = sortByPublishedOn(
 ).slice(0, 6);
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
 const mediaUrlPrefix = getMediaUrlPrefix();
-const search = query ? await searchSite(query, 1, mediaUrlPrefix) : null;
+const search = query
+	? await searchSite(query, undefined, mediaUrlPrefix)
+	: null;
 const homeEntryAttrs = home?.edit ?? {};
 const homeBoxes = home
 	? [
@@ -53,8 +55,8 @@ const homeBoxes = home
 		: "home page-template page-template-templates page-template-home"}
 >
 	{
-		query ? (
-			<SearchResults query={query} page={search?.currentPage} />
+		query && search ? (
+			<SearchResults query={query} search={search} />
 		) : (
 			<section id="primary" class="col-12">
 				<main id="content" {...homeEntryAttrs}>

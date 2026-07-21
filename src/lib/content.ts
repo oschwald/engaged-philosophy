@@ -155,6 +155,23 @@ async function getPublishedCollectionByTerm<
 		.filter(isPublicEntry);
 }
 
+export async function getPublishedEntriesByIds<
+	T extends { path?: string; featured_image?: RawMediaField | null },
+>(collection: "pages" | "posts" | "projects", ids: string[]) {
+	if (ids.length === 0) return [];
+
+	const { entries } = await getEmDashCollection(collection, {
+		status: "published",
+		limit: ids.length,
+		where: { id: ids },
+	});
+	return entries
+		.map((entry) =>
+			normalizeEntry(entry as unknown as EmDashContentEntry<T>, collection),
+		)
+		.filter(isPublicEntry);
+}
+
 export async function getRuntimeSiteSettings() {
 	return getEmDashSiteSettings();
 }
