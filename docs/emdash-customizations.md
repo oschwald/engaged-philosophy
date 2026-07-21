@@ -17,8 +17,19 @@ Cloudflare constraints.
 - `src/lib/anonymous-cloudflare-cache.ts` caches anonymous HTML page responses in
   the Workers Cache API while bypassing signed-in, preview, admin, API, and
   static-asset requests.
+- `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
+  controls wait for pending inline saves. EmDash 0.30 flushes edits when the
+  browser navigates away, but its toolbar can still publish before a Portable
+  Text blur save finishes. The gate also ignores redundant keepalive saves when
+  EmDash reports no unsaved changes, while retaining the unload protection for
+  real edits.
 - `src/worker.ts` logs selected admin/signed-in request metadata and slow
   observed requests without serializing cookie values.
+
+EmDash 0.30's backup page works with the existing R2 storage adapter and
+scheduled Worker handler. Administrators can enable daily archives under
+Settings -> Backups; archives contain content and media metadata, not media
+binaries, user accounts, or secrets.
 
 ### Cloudflare Access Invites
 
@@ -62,6 +73,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 - Revisit the audit-log native adapter if Cloudflare sandbox support becomes
   available or the upstream plugin ships a native/free-plan mode.
+- Revisit the visual-editing save gate when the upstream toolbar explicitly
+  waits for Portable Text saves before publishing or leaving edit mode.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a
   Cloudflare Email Sending plugin, but that only handles email delivery; this
