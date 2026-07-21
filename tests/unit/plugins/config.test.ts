@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
+import { embedsPlugin } from "@emdash-cms/plugin-embeds";
 
 import { createPlugin as createAuditLogPlugin } from "../../../src/plugins/audit-log";
-import { createPlugin as createEmbedsPlugin } from "../../../src/plugins/embeds";
 import { createPlugin as createLegacyImagePlugin } from "../../../src/plugins/legacy-image-blocks";
 
 describe("plugin configuration", () => {
@@ -33,15 +33,12 @@ describe("plugin configuration", () => {
 	});
 
 	test("registers configured embed blocks", () => {
-		const plugin = createEmbedsPlugin({ types: ["youtube", "vimeo"] });
-		const blocks = plugin.admin?.portableTextBlocks ?? [];
-
-		expect(blocks.find((item) => item.type === "youtube")?.label).toBe(
-			"YouTube Video",
-		);
-		expect(blocks.find((item) => item.type === "vimeo")?.label).toBe(
-			"Vimeo Video",
-		);
+		expect(embedsPlugin({ types: ["youtube", "vimeo"] })).toMatchObject({
+			id: "embeds",
+			entrypoint: "@emdash-cms/plugin-embeds",
+			componentsEntry: "@emdash-cms/plugin-embeds/astro",
+			options: { types: ["youtube", "vimeo"] },
+		});
 	});
 
 	test("registers audit log native hooks and admin UI", () => {

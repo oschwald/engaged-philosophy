@@ -56,8 +56,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 - `src/plugins/audit-log.ts` adapts the audit-log plugin's sandbox definition to
   native hooks/routes so it can run on the current Cloudflare plan.
-- `src/plugins/embeds.ts` registers YouTube and Vimeo editor blocks while using
-  the upstream embed renderer.
+- The upstream embeds plugin registers and renders the enabled YouTube and Vimeo
+  blocks directly.
 - `src/plugins/legacy-image-blocks.ts` preserves edit controls for imported
   WordPress-only Portable Text blocks such as floated images, playlist videos,
   legacy embeds, and page lists.

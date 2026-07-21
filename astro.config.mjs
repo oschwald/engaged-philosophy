@@ -1,6 +1,7 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { d1, r2 } from "@emdash-cms/cloudflare";
+import { embedsPlugin } from "@emdash-cms/plugin-embeds";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
@@ -11,9 +12,6 @@ import {
 	PUBLIC_MEDIA_URL,
 } from "./src/lib/site-config.ts";
 
-const embedsPluginEntrypoint = fileURLToPath(
-	new URL("./src/plugins/embeds.ts", import.meta.url),
-);
 const auditLogPluginEntrypoint = fileURLToPath(
 	new URL("./src/plugins/audit-log.ts", import.meta.url),
 );
@@ -119,13 +117,7 @@ export default defineConfig({
 					version: "0.2.0",
 					entrypoint: auditLogPluginEntrypoint,
 				},
-				{
-					id: "embeds",
-					version: "0.0.1",
-					entrypoint: embedsPluginEntrypoint,
-					componentsEntry: "@emdash-cms/plugin-embeds/astro",
-					options: { types: ["youtube", "vimeo"] },
-				},
+				embedsPlugin({ types: ["youtube", "vimeo"] }),
 				{
 					id: "legacy-image-blocks",
 					version: "0.1.0",
