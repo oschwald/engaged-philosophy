@@ -14,17 +14,13 @@ interface Props {
 	taxonomy: string;
 	label: string;
 	projects: ContentEntry<ProjectData>[];
+	hasMore: boolean;
 	page: number;
-	perPage?: number;
 }
 
-const { taxonomy, label, projects, page, perPage = 10 } = Astro.props;
+const { taxonomy, label, projects, hasMore, page } = Astro.props;
 
-const totalPages = Math.max(1, Math.ceil(projects.length / perPage));
-const currentPage = Math.min(Math.max(page, 1), totalPages);
-const start = (currentPage - 1) * perPage;
-const pageItems = projects.slice(start, start + perPage);
-const hasResults = pageItems.length > 0;
+const hasResults = projects.length > 0;
 const showSidebar = taxonomy !== "topic";
 const titlePrefix = taxonomy === "topic" ? "Project Topic: " : "";
 const basePath = `/${taxonomy}/${Astro.params.slug}/`;
@@ -45,7 +41,7 @@ function pageHref(pageNumber: number) {
 
 		{
 			hasResults ? (
-				pageItems.map((project) => (
+				projects.map((project) => (
 					<EntrySummary
 						articleClass={`mb-5 pb-4 border-bottom ${project.data.featured_image?.src ? "has-post-thumbnail " : ""}project type-project status-publish`}
 						title={project.data.title ?? ""}
@@ -104,11 +100,7 @@ function pageHref(pageNumber: number) {
 			)
 		}
 
-		<Pagination
-			currentPage={currentPage}
-			totalPages={totalPages}
-			pageHref={pageHref}
-		/>
+		<Pagination currentPage={page} hasMore={hasMore} pageHref={pageHref} />
 	</div>
 </section>
 

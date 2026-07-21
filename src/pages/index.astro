@@ -2,22 +2,17 @@
 import RichContent from "../components/RichContent.astro";
 import SearchResults from "../components/SearchResults.astro";
 import Base from "../layouts/Base.astro";
-import { getPageBySlug, getPublishedProjects } from "../lib/content";
+import { getHighlightedProjects, getPageBySlug } from "../lib/content";
 import { searchSite } from "../lib/search";
 import { getMediaUrlPrefix, rewriteWordPressUploadUrl } from "../lib/media";
-import { sortByPublishedOn } from "../lib/path-utils";
 import {
 	getEntryContent,
 	getEntryExcerpt,
 	getExcerptText,
 } from "../lib/rich-text";
-import type { ContentEntry, ProjectData } from "../lib/types";
 
 const home = await getPageBySlug("home");
-const projects = (await getPublishedProjects()) as ContentEntry<ProjectData>[];
-const highlightedProjects = sortByPublishedOn(
-	projects.filter((project) => project.data.highlight),
-).slice(0, 6);
+const { entries: highlightedProjects } = await getHighlightedProjects();
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
 const mediaUrlPrefix = getMediaUrlPrefix();
 const search = query

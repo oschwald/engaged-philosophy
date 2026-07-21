@@ -3,13 +3,11 @@ import Base from "../../layouts/Base.astro";
 import TaxonomyArchive from "../../components/TaxonomyArchive.astro";
 import {
 	getPageByPath,
-	getProjectsByTaxonomy,
+	getProjectsPageByTaxonomy,
 	getTaxonomyTerm,
 } from "../../lib/content";
-import { sortByPublishedOn } from "../../lib/path-utils";
 import { getEntryContent } from "../../lib/rich-text";
 import { isProjectTaxonomy } from "../../lib/taxonomy-utils";
-import type { ContentEntry, ProjectData } from "../../lib/types";
 import RichContent from "../../components/RichContent.astro";
 
 const { taxonomy = "", slug = "" } = Astro.params;
@@ -29,14 +27,9 @@ if (isProjectArchive && !term) {
 	return Astro.redirect("/404");
 }
 
-const projects = isProjectArchive
-	? sortByPublishedOn(
-			(await getProjectsByTaxonomy(
-				taxonomy,
-				slug,
-			)) as ContentEntry<ProjectData>[],
-		)
-	: [];
+const projectPage = isProjectArchive
+	? await getProjectsPageByTaxonomy(taxonomy, slug, 1)
+	: { entries: [], hasMore: false };
 ---
 
 {
@@ -65,7 +58,8 @@ const projects = isProjectArchive
 			<TaxonomyArchive
 				taxonomy={taxonomy}
 				label={term?.label ?? ""}
-				projects={projects}
+				projects={projectPage.entries}
+				hasMore={projectPage.hasMore}
 				page={1}
 			/>
 		</Base>

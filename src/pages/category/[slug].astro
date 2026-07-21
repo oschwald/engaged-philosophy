@@ -1,7 +1,7 @@
 ---
 import CategoryArchive from "../../components/CategoryArchive.astro";
 import Base from "../../layouts/Base.astro";
-import { getTaxonomyTerm } from "../../lib/content";
+import { getPostsPageByCategory, getTaxonomyTerm } from "../../lib/content";
 
 const { slug = "" } = Astro.params;
 const term = await getTaxonomyTerm("category", slug);
@@ -9,6 +9,7 @@ const term = await getTaxonomyTerm("category", slug);
 if (!term) {
 	return Astro.redirect("/404");
 }
+const { entries: posts, hasMore } = await getPostsPageByCategory(slug, 1);
 ---
 
 <Base
@@ -17,7 +18,13 @@ if (!term) {
 >
 	<div class="container-fluid">
 		<div class="row">
-			<CategoryArchive slug={slug} label={term.label} page={1} />
+			<CategoryArchive
+				slug={slug}
+				label={term.label}
+				posts={posts}
+				hasMore={hasMore}
+				page={1}
+			/>
 		</div>
 	</div>
 </Base>
