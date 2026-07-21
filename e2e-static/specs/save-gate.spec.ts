@@ -68,6 +68,42 @@ test.describe("custom EmDash save gate", () => {
 		expect(eventTypes(events)).not.toContain("save-start");
 	});
 
+	test("suppresses only redundant unload saves", async ({
+		page,
+		staticServer,
+	}) => {
+		staticServer.resetEvents();
+		await page.goto("/emdash-save-gate/", { waitUntil: "domcontentloaded" });
+
+		const unchangedStatus = await page.evaluate(async () => {
+			const response = await fetch("/_emdash/api/content/pages/about", {
+				method: "PUT",
+				keepalive: true,
+			});
+			return response.status;
+		});
+
+		expect(unchangedStatus).toBe(204);
+		expect(eventTypes(staticServer.getEvents())).not.toContain("save-start");
+
+		const changedStatus = await page.evaluate(async () => {
+			document.dispatchEvent(
+				new CustomEvent("emdash:save", { detail: { state: "unsaved" } }),
+			);
+			const response = await fetch("/_emdash/api/content/pages/about", {
+				method: "PUT",
+				keepalive: true,
+			});
+			return response.status;
+		});
+
+		expect(changedStatus).toBe(200);
+		const events = await waitForFixtureEvent(staticServer, (nextEvents) =>
+			nextEvents.some((event) => event.type === "save-finish"),
+		);
+		expectEventOrder(events, ["save-start", "save-finish"]);
+	});
+
 	test("waits for an active inline save before publishing", async ({
 		page,
 		staticServer,
