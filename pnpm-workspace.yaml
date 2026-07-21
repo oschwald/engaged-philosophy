@@ -6,21 +6,35 @@ allowBuilds:
   workerd: true
 
 minimumReleaseAgeExclude:
-  - "@emdash-cms/plugin-types@0.1.0"
-  - "@emdash-cms/registry-client@0.3.2"
-  - astro@6.4.8
   - "@playwright/test@1.61.1"
   - miniflare@4.20260617.0
   - playwright@1.61.1
   - sass@1.101.0
   - vitest@4.1.10
-  - "@emdash-cms/admin@0.28.1"
-  - "@emdash-cms/auth@0.28.1"
-  - "@emdash-cms/blocks@0.28.1"
-  - "@emdash-cms/cloudflare@0.28.1"
-  - "@emdash-cms/gutenberg-to-portable-text@0.28.1"
-  - "@emdash-cms/plugin-embeds@0.1.35"
-  - emdash@0.28.1
+  - "@astrojs/cloudflare@14.1.4"
+  - "@emdash-cms/admin@0.30.0"
+  - "@emdash-cms/auth@0.30.0"
+  - "@emdash-cms/blocks@0.30.0"
+  - "@emdash-cms/cloudflare@0.30.0"
+  - "@emdash-cms/gutenberg-to-portable-text@0.30.0"
+  - "@emdash-cms/plugin-embeds@0.1.37"
+  - "@emdash-cms/plugin-types@0.3.0"
+  - "@emdash-cms/registry-client@0.3.4"
+  - "@emdash-cms/registry-lexicons@0.3.0"
+  - astro@7.1.3
+  - emdash@0.30.0
+  - "@cloudflare/workers-types@5.20260721.1"
+  - "@typescript-eslint/eslint-plugin@8.65.0"
+  - "@typescript-eslint/parser@8.65.0"
+  - "@typescript-eslint/project-service@8.65.0"
+  - "@typescript-eslint/scope-manager@8.65.0"
+  - "@typescript-eslint/tsconfig-utils@8.65.0"
+  - "@typescript-eslint/type-utils@8.65.0"
+  - "@typescript-eslint/types@8.65.0"
+  - "@typescript-eslint/typescript-estree@8.65.0"
+  - "@typescript-eslint/utils@8.65.0"
+  - "@typescript-eslint/visitor-keys@8.65.0"
+  - prettier@3.9.6
 
 overrides:
   "@astro-community/astro-embed-integration>astro-auto-import": ^0.5.1
