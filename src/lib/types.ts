@@ -1,3 +1,4 @@
+import type { ContentEntry as EmDashContentEntry } from "emdash";
 import type { RichTextValue } from "./rich-text-types";
 
 export type { RichTextValue } from "./rich-text-types";
@@ -38,7 +39,4 @@ export interface ProjectData extends PostData {
 	menu_order?: number;
 }
 
-export interface ContentEntry<T> {
-	id: string;
-	data: T;
-}
+export type ContentEntry<T> = EmDashContentEntry<T>;

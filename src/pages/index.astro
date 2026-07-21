@@ -4,7 +4,6 @@ import SearchResults from "../components/SearchResults.astro";
 import Base from "../layouts/Base.astro";
 import { getPageBySlug, getPublishedProjects } from "../lib/content";
 import { searchSite } from "../lib/search";
-import { getEmDashEditEntryAttrs } from "../lib/editing";
 import { getMediaUrlPrefix, rewriteWordPressUploadUrl } from "../lib/media";
 import { sortByPublishedOn } from "../lib/path-utils";
 import {
@@ -22,7 +21,7 @@ const highlightedProjects = sortByPublishedOn(
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
 const mediaUrlPrefix = getMediaUrlPrefix();
 const search = query ? await searchSite(query, 1, mediaUrlPrefix) : null;
-const homeEntryAttrs = home ? getEmDashEditEntryAttrs("pages", home) : {};
+const homeEntryAttrs = home?.edit ?? {};
 const homeBoxes = home
 	? [
 			{
@@ -114,12 +113,7 @@ const homeBoxes = home
 							</button>
 						</div>
 						<div class="col-lg-3">
-							<div
-								class="lead-home"
-								{...(home
-									? getEmDashEditEntryAttrs("pages", home, "content")
-									: {})}
-							>
+							<div class="lead-home" {...(home?.edit.content ?? {})}>
 								<RichContent
 									value={home ? getEntryContent(home.data) : undefined}
 								/>
@@ -130,17 +124,9 @@ const homeBoxes = home
 						{homeBoxes.map((box) => (
 							<div class="col-lg-4 mb-4">
 								{box.title && home && (
-									<h2
-										{...getEmDashEditEntryAttrs("pages", home, box.titleField)}
-									>
-										{box.title}
-									</h2>
+									<h2 {...(home.edit[box.titleField] ?? {})}>{box.title}</h2>
 								)}
-								<div
-									{...(home
-										? getEmDashEditEntryAttrs("pages", home, box.htmlField)
-										: {})}
-								>
+								<div {...(home?.edit[box.htmlField] ?? {})}>
 									<RichContent value={box.html} />
 								</div>
 							</div>

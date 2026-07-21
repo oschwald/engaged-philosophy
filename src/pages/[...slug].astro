@@ -2,7 +2,6 @@
 import RichContent from "../components/RichContent.astro";
 import Base from "../layouts/Base.astro";
 import { getPageByPath, getPageBySlug, getProjectBySlug } from "../lib/content";
-import { getEmDashEditEntryAttrs } from "../lib/editing";
 import { joinPath } from "../lib/path-utils";
 import { getEntryContent } from "../lib/rich-text";
 
@@ -51,19 +50,13 @@ const bodyClass = [
 		useFullWidthTemplate ? (
 			<section id="primary" class="col-12 px-4">
 				<main id="content">
-					<article {...getEmDashEditEntryAttrs("pages", page)}>
+					<article {...page.edit}>
 						<header class="page-header">
-							<h1
-								class="entry-title"
-								{...getEmDashEditEntryAttrs("pages", page, "title")}
-							>
+							<h1 class="entry-title" {...page.edit.title}>
 								{page.data.title}
 							</h1>
 						</header>
-						<div
-							class="entry-content"
-							{...getEmDashEditEntryAttrs("pages", page, "content")}
-						>
+						<div class="entry-content" {...page.edit.content}>
 							<RichContent value={getEntryContent(page.data)} />
 						</div>
 					</article>
@@ -73,19 +66,13 @@ const bodyClass = [
 			<div class="container-fluid">
 				<section id="primary" class="p-4">
 					<div id="content" role="main">
-						<article {...getEmDashEditEntryAttrs("pages", page)}>
+						<article {...page.edit}>
 							<header class="page-header">
-								<h1
-									class="entry-title"
-									{...getEmDashEditEntryAttrs("pages", page, "title")}
-								>
+								<h1 class="entry-title" {...page.edit.title}>
 									{page.data.title}
 								</h1>
 							</header>
-							<div
-								class="entry-content"
-								{...getEmDashEditEntryAttrs("pages", page, "content")}
-							>
+							<div class="entry-content" {...page.edit.content}>
 								<RichContent value={getEntryContent(page.data)} />
 							</div>
 						</article>

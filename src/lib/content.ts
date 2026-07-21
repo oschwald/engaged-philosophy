@@ -28,7 +28,6 @@ import type {
 type TaxonomyMap = Record<string, string[]>;
 type EmDashTermsMap = Record<string, Array<{ slug: string; label: string }>>;
 type RuntimeEntry<T> = ContentEntry<T> & {
-	edit?: unknown;
 	data: T & {
 		id?: string;
 		status?: string;

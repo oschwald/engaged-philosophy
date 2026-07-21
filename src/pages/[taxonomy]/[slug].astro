@@ -6,7 +6,6 @@ import {
 	getProjectsByTaxonomy,
 	getTaxonomyTerm,
 } from "../../lib/content";
-import { getEmDashEditEntryAttrs } from "../../lib/editing";
 import { sortByPublishedOn } from "../../lib/path-utils";
 import { getEntryContent } from "../../lib/rich-text";
 import { isProjectTaxonomy } from "../../lib/taxonomy-utils";
@@ -45,19 +44,13 @@ const projects = isProjectArchive
 		<Base title={page.data.title}>
 			<section id="primary" class="col-12 px-4">
 				<main id="content">
-					<article {...getEmDashEditEntryAttrs("pages", page)}>
+					<article {...page.edit}>
 						<header class="page-header">
-							<h1
-								class="entry-title"
-								{...getEmDashEditEntryAttrs("pages", page, "title")}
-							>
+							<h1 class="entry-title" {...page.edit.title}>
 								{page.data.title}
 							</h1>
 						</header>
-						<div
-							class="entry-content"
-							{...getEmDashEditEntryAttrs("pages", page, "content")}
-						>
+						<div class="entry-content" {...page.edit.content}>
 							<RichContent value={getEntryContent(page.data)} />
 						</div>
 					</article>
