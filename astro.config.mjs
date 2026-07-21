@@ -35,9 +35,6 @@ const anonymousCloudflareCacheEntrypoint = fileURLToPath(
 const cloudflareAccessInviteRouteEntrypoint = fileURLToPath(
 	new URL("./src/emdash-routes/cloudflare-access-invite.ts", import.meta.url),
 );
-const emdashContentAuthorsShimEntrypoint = fileURLToPath(
-	new URL("./src/middleware/emdash-content-authors.ts", import.meta.url),
-);
 const useTestAuth = process.env.EMDASH_TEST_AUTH === "1";
 const allowTestAuth = process.env.EMDASH_ALLOW_TEST_AUTH === "1";
 
@@ -55,20 +52,6 @@ function localEmDashRoutes() {
 				injectRoute({
 					pattern: "/_emdash/api/auth/invite",
 					entrypoint: cloudflareAccessInviteRouteEntrypoint,
-				});
-			},
-		},
-	};
-}
-
-function emdashContentAuthorsShim() {
-	return {
-		name: "engaged-philosophy-emdash-content-authors-shim",
-		hooks: {
-			"astro:config:setup": ({ addMiddleware }) => {
-				addMiddleware({
-					entrypoint: emdashContentAuthorsShimEntrypoint,
-					order: "pre",
 				});
 			},
 		},
@@ -151,7 +134,6 @@ export default defineConfig({
 				},
 			],
 		}),
-		emdashContentAuthorsShim(),
 	],
 	devToolbar: { enabled: false },
 });
