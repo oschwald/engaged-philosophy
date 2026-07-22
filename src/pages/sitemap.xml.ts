@@ -7,6 +7,11 @@ import {
 	getPublishedProjects,
 	getRuntimeSiteSettings,
 } from "../lib/content";
+import { SITE_SETTINGS_CACHE_TAG } from "../lib/cache-tags";
+import {
+	ANONYMOUS_PAGE_CACHE_MAX_AGE_SECONDS,
+	ANONYMOUS_PAGE_CACHE_SWR_SECONDS,
+} from "../lib/site-config";
 import {
 	renderSitemapXml,
 	sitemapOrigin,
@@ -49,7 +54,12 @@ function toSitemapEntry(
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ url }) => {
+export const GET: APIRoute = async ({ cache, url }) => {
+	cache.set({
+		maxAge: ANONYMOUS_PAGE_CACHE_MAX_AGE_SECONDS,
+		swr: ANONYMOUS_PAGE_CACHE_SWR_SECONDS,
+		tags: [SITE_SETTINGS_CACHE_TAG, "pages", "posts", "projects"],
+	});
 	const [settings, pages, posts, projects] = await Promise.all([
 		getRuntimeSiteSettings(),
 		getPublishedPages(),
@@ -66,7 +76,7 @@ export const GET: APIRoute = async ({ url }) => {
 	return new Response(body, {
 		headers: {
 			"Content-Type": "application/xml; charset=utf-8",
-			"Cache-Control": "public, max-age=3600",
+			"Cache-Control": "public, max-age=0, must-revalidate",
 		},
 	});
 };

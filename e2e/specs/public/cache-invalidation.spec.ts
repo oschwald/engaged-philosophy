@@ -9,6 +9,21 @@ import {
 } from "../../support/content";
 
 test.describe("public page cache", () => {
+	test("caches generated metadata with its data dependencies", async ({
+		publicPage,
+	}) => {
+		const manifestResponse = await publicPage.request.get("/site.webmanifest");
+		expect(manifestResponse.headers()["cache-tag"]).toContain("site-settings");
+		expect(
+			manifestResponse.headers()["cloudflare-cdn-cache-control"],
+		).toContain("max-age=300");
+
+		const faviconResponse = await publicPage.request.get("/favicon.ico", {
+			maxRedirects: 0,
+		});
+		expect(faviconResponse.headers()["cache-tag"]).toContain("site-settings");
+	});
+
 	test("keeps stateful and query-string HTML out of the shared cache", async ({
 		publicPage,
 	}) => {
