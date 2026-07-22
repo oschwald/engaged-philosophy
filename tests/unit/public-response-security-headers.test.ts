@@ -37,6 +37,30 @@ describe("Worker security headers", () => {
 		expect(response.headers.get("permissions-policy")).toBe(
 			"camera=(), microphone=(), geolocation=(), payment=()",
 		);
+		expect(response.headers.get("vary")).toBe("Cookie");
+	});
+
+	test("preserves existing variance for public HTML", () => {
+		const response = applySecurityHeaders(
+			new Request("https://www.engagedphilosophy.com/about/"),
+			htmlResponse({ vary: "Accept-Encoding" }),
+		);
+
+		expect(response.headers.get("vary")).toBe("Accept-Encoding, Cookie");
+	});
+
+	test("bypasses the edge cache for cookie and query variants", () => {
+		for (const request of [
+			new Request("https://www.engagedphilosophy.com/about/", {
+				headers: { cookie: "CF_Authorization=abc" },
+			}),
+			new Request("https://www.engagedphilosophy.com/about/?utm_source=test"),
+		]) {
+			const response = applySecurityHeaders(request, htmlResponse());
+			expect(response.headers.get("cloudflare-cdn-cache-control")).toBe(
+				"no-store",
+			);
+		}
 	});
 
 	test("does not replace existing security headers", () => {

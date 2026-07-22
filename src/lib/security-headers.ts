@@ -1,4 +1,4 @@
-import { hasStatefulCookie } from "./anonymous-cloudflare-cache";
+import { hasStatefulCookie } from "./request-state";
 
 const PUBLIC_CONTENT_SECURITY_POLICY = [
 	"default-src 'self'",
@@ -69,6 +69,20 @@ function isStatefulRequest(request: Request) {
 	);
 }
 
+function appendVary(headers: Headers, name: string) {
+	const values = (headers.get("vary") ?? "")
+		.split(",")
+		.map((value) => value.trim())
+		.filter(Boolean);
+	if (
+		values.includes("*") ||
+		values.some((value) => value.toLowerCase() === name.toLowerCase())
+	) {
+		return;
+	}
+	headers.set("vary", [...values, name].join(", "));
+}
+
 export function applySecurityHeaders(request: Request, response: Response) {
 	const securedResponse = new Response(response.body, response);
 
@@ -88,18 +102,21 @@ export function applySecurityHeaders(request: Request, response: Response) {
 		);
 	}
 
-	const { pathname } = new URL(request.url);
-	if (
-		!isAdminPath(pathname) &&
-		isHtmlResponse(securedResponse) &&
-		!securedResponse.headers.has("content-security-policy")
-	) {
-		securedResponse.headers.set(
-			"content-security-policy",
-			isStatefulRequest(request)
-				? AUTHENTICATED_PUBLIC_CONTENT_SECURITY_POLICY
-				: PUBLIC_CONTENT_SECURITY_POLICY,
-		);
+	const url = new URL(request.url);
+	if (!isAdminPath(url.pathname) && isHtmlResponse(securedResponse)) {
+		appendVary(securedResponse.headers, "Cookie");
+		if (request.headers.get("cookie")?.trim() || url.search) {
+			securedResponse.headers.set("cloudflare-cdn-cache-control", "no-store");
+		}
+
+		if (!securedResponse.headers.has("content-security-policy")) {
+			securedResponse.headers.set(
+				"content-security-policy",
+				isStatefulRequest(request)
+					? AUTHENTICATED_PUBLIC_CONTENT_SECURITY_POLICY
+					: PUBLIC_CONTENT_SECURITY_POLICY,
+			);
+		}
 	}
 
 	return securedResponse;

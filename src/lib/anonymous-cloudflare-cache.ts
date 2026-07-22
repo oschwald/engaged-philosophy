@@ -1,5 +1,7 @@
 import type { CacheProviderFactory, MiddlewareNext } from "astro";
 
+import { hasStatefulCookie } from "./request-state";
+
 const STORED_AT_HEADER = "X-EP-Cache-Stored-At";
 const MAX_AGE_HEADER = "X-EP-Cache-Max-Age";
 const SWR_HEADER = "X-EP-Cache-SWR";
@@ -29,18 +31,6 @@ const TRACKING_PARAMS = [
 	"_gl",
 ];
 
-const STATEFUL_COOKIE_NAMES = [
-	"astro-session",
-	"CF_Authorization",
-	"CF_AppSession",
-	"CF_Session",
-	"emdash-edit-mode",
-	"emdash_preview",
-	"emdash_preview_params",
-	"emdash_wp_auth",
-	"__em_d1_bookmark",
-];
-
 const BYPASS_PATH_PREFIXES = ["/_astro/", "/_emdash", "/cdn-cgi/"];
 
 const BYPASS_FILE_EXTENSIONS = new Set([
@@ -64,19 +54,6 @@ const BYPASS_FILE_EXTENSIONS = new Set([
 
 export interface AnonymousCloudflareCacheConfig {
 	cacheName?: string;
-}
-
-function getCookieNames(cookieHeader: string): string[] {
-	if (!cookieHeader) return [];
-	return cookieHeader
-		.split(";")
-		.map((cookie) => cookie.trim().split("=", 1)[0])
-		.filter(Boolean);
-}
-
-export function hasStatefulCookie(cookieHeader: string | null): boolean {
-	const names = getCookieNames(cookieHeader ?? "");
-	return names.some((name) => STATEFUL_COOKIE_NAMES.includes(name));
 }
 
 function hasNonTrackingSearchParam(url: URL): boolean {

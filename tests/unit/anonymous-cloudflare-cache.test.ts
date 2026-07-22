@@ -2,11 +2,11 @@ import { describe, expect, test } from "vitest";
 
 import {
 	default as createCacheProvider,
-	hasStatefulCookie,
 	isAnonymousPageCacheCandidate,
 	normalizePageCacheInvalidationKeys,
 	normalizePageCacheKey,
 } from "../../src/lib/anonymous-cloudflare-cache";
+import { hasStatefulCookie } from "../../src/lib/request-state";
 
 function request(path: string, init: RequestInit = {}) {
 	return new Request(
