@@ -66,6 +66,7 @@ describe("sitemap helpers", () => {
 			},
 			{
 				id: "project",
+				image: "https://media.example/project&image.jpg",
 				data: {
 					path: "project/a-b",
 					updated_at: "2026-06-07T00:00:00Z",
@@ -89,6 +90,9 @@ describe("sitemap helpers", () => {
 			].join("\n    "),
 		);
 		expect(xml).toContain("<lastmod>2026-06-07T00:00:00Z</lastmod>");
+		expect(xml).toContain(
+			"<image:loc>https://media.example/project&amp;image.jpg</image:loc>",
+		);
 	});
 
 	test("honors EmDash indexing and canonical settings", () => {

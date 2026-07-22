@@ -6,6 +6,7 @@ const APOS_RE = /'/g;
 
 export interface SitemapInputEntry {
 	id: string;
+	image?: string | null;
 	updated_at?: string | null;
 	updatedAt?: string | Date | null;
 	published_at?: string | null;
@@ -116,28 +117,34 @@ export function escapeSitemapXml(value: string) {
 }
 
 export function renderSitemapXml(origin: string, entries: SitemapInputEntry[]) {
-	const urls = new Map<string, string>();
+	const urls = new Map<string, { lastmod: string; image: string | null }>();
 	const lines = [
 		'<?xml version="1.0" encoding="UTF-8"?>',
-		'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+		'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">',
 	];
 
 	for (const entry of entries) {
 		if (entry.data.seo?.noIndex) continue;
 		const loc = sitemapEntryUrl(origin, entry);
 		if (!loc) continue;
-		urls.set(
-			loc,
-			newerLastmod(urls.get(loc) ?? "", sitemapEntryLastmod(entry)),
-		);
+		const current = urls.get(loc);
+		urls.set(loc, {
+			lastmod: newerLastmod(current?.lastmod ?? "", sitemapEntryLastmod(entry)),
+			image: entry.image || current?.image || null,
+		});
 	}
 
-	for (const [loc, lastmod] of urls) {
+	for (const [loc, { lastmod, image }] of urls) {
 		lines.push("  <url>");
 		lines.push(`    <loc>${escapeSitemapXml(loc)}</loc>`);
 
 		if (lastmod) {
 			lines.push(`    <lastmod>${escapeSitemapXml(lastmod)}</lastmod>`);
+		}
+		if (image) {
+			lines.push("    <image:image>");
+			lines.push(`      <image:loc>${escapeSitemapXml(image)}</image:loc>`);
+			lines.push("    </image:image>");
 		}
 
 		lines.push("  </url>");
