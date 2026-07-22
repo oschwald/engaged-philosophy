@@ -1,10 +1,11 @@
 import { describe, expect, test } from "vitest";
-import { embedsPlugin } from "@emdash-cms/plugin-embeds";
+
+import { emdashPlugins } from "../../../astro.config.mjs";
 
 import { createPlugin as createAuditLogPlugin } from "../../../src/plugins/audit-log";
 import { createPlugin as createLegacyImagePlugin } from "../../../src/plugins/legacy-image-blocks";
 
-describe("plugin configuration", () => {
+describe("EmDash plugin registration", () => {
 	test("registers legacy media portable text blocks", () => {
 		const plugin = createLegacyImagePlugin();
 		const blocks = plugin.admin?.portableTextBlocks ?? [];
@@ -33,7 +34,9 @@ describe("plugin configuration", () => {
 	});
 
 	test("registers configured embed blocks", () => {
-		expect(embedsPlugin({ types: ["youtube", "vimeo"] })).toMatchObject({
+		const embeds = emdashPlugins.find((plugin) => plugin.id === "embeds");
+
+		expect(embeds).toMatchObject({
 			id: "embeds",
 			entrypoint: "@emdash-cms/plugin-embeds",
 			componentsEntry: "@emdash-cms/plugin-embeds/astro",

@@ -56,6 +56,21 @@ function localEmDashRoutes() {
 	};
 }
 
+export const emdashPlugins = [
+	{
+		id: "audit-log",
+		version: "0.2.0",
+		entrypoint: auditLogPluginEntrypoint,
+	},
+	embedsPlugin({ types: ["youtube", "vimeo"] }),
+	{
+		id: "legacy-image-blocks",
+		version: "0.1.0",
+		entrypoint: legacyImagePluginEntrypoint,
+		adminEntry: legacyImagePluginAdminEntrypoint,
+	},
+];
+
 export default defineConfig({
 	output: "server",
 	adapter: cloudflare(),
@@ -111,20 +126,7 @@ export default defineConfig({
 							autoProvision: false,
 						},
 					},
-			plugins: [
-				{
-					id: "audit-log",
-					version: "0.2.0",
-					entrypoint: auditLogPluginEntrypoint,
-				},
-				embedsPlugin({ types: ["youtube", "vimeo"] }),
-				{
-					id: "legacy-image-blocks",
-					version: "0.1.0",
-					entrypoint: legacyImagePluginEntrypoint,
-					adminEntry: legacyImagePluginAdminEntrypoint,
-				},
-			],
+			plugins: emdashPlugins,
 		}),
 	],
 	devToolbar: { enabled: false },
