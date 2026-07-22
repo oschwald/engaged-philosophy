@@ -8,5 +8,5 @@ if (!project) {
 	return Astro.redirect("/404");
 }
 
-return Astro.redirect(`/${project.data.path}/`);
+return Astro.redirect(`/${project.data.path}/`, 301);
 ---

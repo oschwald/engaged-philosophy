@@ -8,5 +8,5 @@ if (!page) {
 	return Astro.redirect("/404");
 }
 
-return Astro.redirect(page.data.path ? `/${page.data.path}/` : "/");
+return Astro.redirect(page.data.path ? `/${page.data.path}/` : "/", 301);
 ---

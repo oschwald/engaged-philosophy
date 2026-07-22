@@ -17,7 +17,7 @@ test.describe("admin content workflows", () => {
 		const title = uniqueTitle("E2E Admin Page", testInfo.testId);
 		const bodyText = `${title} body created through the admin editor.`;
 
-		const { publicPath } = await createAndPublishContentViaAdmin(
+		const { published, publicPath } = await createAndPublishContentViaAdmin(
 			page,
 			"pages",
 			{
@@ -27,6 +27,12 @@ test.describe("admin content workflows", () => {
 		);
 
 		await expectPublicContent(publicPage, publicPath, title, bodyText);
+		const alias = canonicalAliasForItem("pages", published);
+		const aliasResponse = await publicPage.request.get(alias, {
+			maxRedirects: 0,
+		});
+		expect(aliasResponse.status()).toBe(301);
+		expect(aliasResponse.headers().location).toBe(publicPath);
 
 		await page.goto("/_emdash/admin/content/pages", {
 			waitUntil: "domcontentloaded",
@@ -56,6 +62,11 @@ test.describe("admin content workflows", () => {
 			await expectPublicContent(publicPage, publicPath, title, bodyText);
 
 			const alias = canonicalAliasForItem(collection, published);
+			const aliasResponse = await publicPage.request.get(alias, {
+				maxRedirects: 0,
+			});
+			expect(aliasResponse.status()).toBe(301);
+			expect(aliasResponse.headers().location).toBe(publicPath);
 			const response = await publicPage.goto(alias, {
 				waitUntil: "domcontentloaded",
 			});
