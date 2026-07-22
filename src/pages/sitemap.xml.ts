@@ -4,8 +4,13 @@ import {
 	getPublishedPages,
 	getPublishedPosts,
 	getPublishedProjects,
+	getRuntimeSiteSettings,
 } from "../lib/content";
-import { renderSitemapXml, type SitemapInputEntry } from "../lib/sitemap";
+import {
+	renderSitemapXml,
+	sitemapOrigin,
+	type SitemapInputEntry,
+} from "../lib/sitemap";
 
 interface SitemapSourceEntry {
 	id: string;
@@ -32,6 +37,7 @@ function toSitemapEntry(entry: SitemapSourceEntry): SitemapInputEntry {
 			published_at: entry.data.published_at,
 			publishedAt: entry.data.publishedAt,
 			published_on: entry.data.published_on,
+			seo: entry.data.seo,
 		},
 	};
 }
@@ -39,12 +45,14 @@ function toSitemapEntry(entry: SitemapSourceEntry): SitemapInputEntry {
 export const prerender = false;
 
 export const GET: APIRoute = async ({ url }) => {
-	const [pages, posts, projects] = await Promise.all([
+	const [settings, pages, posts, projects] = await Promise.all([
+		getRuntimeSiteSettings(),
 		getPublishedPages(),
 		getPublishedPosts(),
 		getPublishedProjects(),
 	]);
-	const body = renderSitemapXml(url.origin, [
+	const origin = sitemapOrigin(settings?.url, url.origin);
+	const body = renderSitemapXml(origin, [
 		...pages.map(toSitemapEntry),
 		...posts.map(toSitemapEntry),
 		...projects.map(toSitemapEntry),

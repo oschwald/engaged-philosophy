@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
 	renderSitemapXml,
 	sitemapEntryLastmod,
+	sitemapOrigin,
 	sitemapPathToUrl,
 } from "../../src/lib/sitemap";
 
@@ -20,6 +21,18 @@ describe("sitemap helpers", () => {
 		expect(
 			sitemapPathToUrl("https://www.engagedphilosophy.com", " about/ "),
 		).toBe("https://www.engagedphilosophy.com/about/");
+	});
+
+	test("prefers a valid configured site origin", () => {
+		expect(
+			sitemapOrigin(
+				"https://www.engagedphilosophy.com/site/",
+				"https://worker.example",
+			),
+		).toBe("https://www.engagedphilosophy.com");
+		expect(sitemapOrigin("not a URL", "https://worker.example/path")).toBe(
+			"https://worker.example",
+		);
 	});
 
 	test("uses the best available timestamp for lastmod", () => {
@@ -76,5 +89,36 @@ describe("sitemap helpers", () => {
 			].join("\n    "),
 		);
 		expect(xml).toContain("<lastmod>2026-06-07T00:00:00Z</lastmod>");
+	});
+
+	test("honors EmDash indexing and canonical settings", () => {
+		const xml = renderSitemapXml("https://www.example.com", [
+			{
+				id: "canonical",
+				data: {
+					path: "old-path",
+					seo: { canonical: "/preferred/" },
+				},
+			},
+			{
+				id: "noindex",
+				data: {
+					path: "private",
+					seo: { noIndex: true },
+				},
+			},
+			{
+				id: "external-canonical",
+				data: {
+					path: "duplicate",
+					seo: { canonical: "https://elsewhere.example/original/" },
+				},
+			},
+		]);
+
+		expect(xml).toContain("<loc>https://www.example.com/preferred/</loc>");
+		expect(xml).not.toContain("private");
+		expect(xml).not.toContain("duplicate");
+		expect(xml.match(/<url>/g)).toHaveLength(1);
 	});
 });

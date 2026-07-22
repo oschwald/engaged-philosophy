@@ -18,6 +18,10 @@ export interface SitemapInputEntry {
 		published_at?: string | null;
 		publishedAt?: string | Date | null;
 		published_on?: string | null;
+		seo?: {
+			canonical?: string | null;
+			noIndex?: boolean;
+		};
 	};
 }
 
@@ -29,6 +33,38 @@ export function sitemapPathToUrl(origin: string, path?: string | null) {
 	const normalizedPath = (path ?? "").trim().replace(/^\/+|\/+$/g, "");
 	const pathname = normalizedPath ? `/${normalizedPath}/` : "/";
 	return `${canonicalSitemapOrigin(origin)}${pathname}`;
+}
+
+export function sitemapOrigin(
+	configuredUrl: string | null | undefined,
+	requestOrigin: string,
+) {
+	if (configuredUrl) {
+		try {
+			const url = new URL(configuredUrl);
+			if (url.protocol === "http:" || url.protocol === "https:") {
+				return url.origin;
+			}
+		} catch {
+			// Fall back to the request origin when the saved setting is malformed.
+		}
+	}
+	return new URL(requestOrigin).origin;
+}
+
+function sitemapEntryUrl(origin: string, entry: SitemapInputEntry) {
+	const configuredCanonical = entry.data.seo?.canonical;
+	if (!configuredCanonical) return sitemapPathToUrl(origin, entry.data.path);
+
+	try {
+		const canonical = new URL(
+			configuredCanonical,
+			`${canonicalSitemapOrigin(origin)}/`,
+		);
+		return canonical.origin === new URL(origin).origin ? canonical.href : null;
+	} catch {
+		return sitemapPathToUrl(origin, entry.data.path);
+	}
 }
 
 function timestampValue(value?: string | Date | null) {
@@ -87,7 +123,9 @@ export function renderSitemapXml(origin: string, entries: SitemapInputEntry[]) {
 	];
 
 	for (const entry of entries) {
-		const loc = sitemapPathToUrl(origin, entry.data.path);
+		if (entry.data.seo?.noIndex) continue;
+		const loc = sitemapEntryUrl(origin, entry);
+		if (!loc) continue;
 		urls.set(
 			loc,
 			newerLastmod(urls.get(loc) ?? "", sitemapEntryLastmod(entry)),
