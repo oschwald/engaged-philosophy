@@ -57,7 +57,7 @@ test.describe("public sitemap", () => {
 		expect(response?.headers()["cache-tag"]).toContain("site-settings");
 		expect(response?.headers()["cache-tag"]).toContain("projects");
 		expect(response?.headers()["cloudflare-cdn-cache-control"]).toContain(
-			"max-age=300",
+			"max-age=86400",
 		);
 
 		const xml = await response!.text();

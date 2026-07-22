@@ -16,7 +16,7 @@ test.describe("public page cache", () => {
 		expect(manifestResponse.headers()["cache-tag"]).toContain("site-settings");
 		expect(
 			manifestResponse.headers()["cloudflare-cdn-cache-control"],
-		).toContain("max-age=300");
+		).toContain("max-age=86400");
 
 		const faviconResponse = await publicPage.request.get("/favicon.ico", {
 			maxRedirects: 0,
@@ -81,7 +81,7 @@ test.describe("public page cache", () => {
 		} else {
 			expect(
 				cachedResponse?.headers()["cloudflare-cdn-cache-control"],
-			).toContain("max-age=300");
+			).toContain("max-age=86400");
 		}
 
 		await updateContentViaApi(authedRequest, "pages", published.id, {

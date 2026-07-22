@@ -9,8 +9,8 @@ import {
 } from "../lib/content";
 import { SITE_SETTINGS_CACHE_TAG } from "../lib/cache-tags";
 import {
-	ANONYMOUS_PAGE_CACHE_MAX_AGE_SECONDS,
-	ANONYMOUS_PAGE_CACHE_SWR_SECONDS,
+	PUBLIC_EDGE_CACHE_MAX_AGE_SECONDS,
+	PUBLIC_EDGE_CACHE_SWR_SECONDS,
 } from "../lib/site-config";
 import {
 	renderSitemapXml,
@@ -56,8 +56,8 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ cache, url }) => {
 	cache.set({
-		maxAge: ANONYMOUS_PAGE_CACHE_MAX_AGE_SECONDS,
-		swr: ANONYMOUS_PAGE_CACHE_SWR_SECONDS,
+		maxAge: PUBLIC_EDGE_CACHE_MAX_AGE_SECONDS,
+		swr: PUBLIC_EDGE_CACHE_SWR_SECONDS,
 		tags: [SITE_SETTINGS_CACHE_TAG, "pages", "posts", "projects"],
 	});
 	const [settings, pages, posts, projects] = await Promise.all([
