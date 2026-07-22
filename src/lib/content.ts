@@ -354,8 +354,9 @@ export function getEntryTermSlugs(
 }
 
 export async function getTermsBySlugs(taxonomy: string, slugs: string[]) {
-	const wanted = new Set(slugs);
-	return (await getTaxonomyTerms(taxonomy)).filter((term) =>
-		wanted.has(term.slug),
+	const uniqueSlugs = [...new Set(slugs)];
+	const terms = await Promise.all(
+		uniqueSlugs.map((slug) => getTerm(taxonomy, slug)),
 	);
+	return terms.filter((term) => term !== null);
 }

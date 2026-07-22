@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const { getEmDashCollection, getEmDashEntry } = vi.hoisted(() => ({
+const { getEmDashCollection, getEmDashEntry, getTerm } = vi.hoisted(() => ({
 	getEmDashCollection: vi.fn(),
 	getEmDashEntry: vi.fn(),
+	getTerm: vi.fn(),
 }));
 
 vi.mock("emdash", () => ({
@@ -11,7 +12,7 @@ vi.mock("emdash", () => ({
 	getMenu: vi.fn(),
 	getSiteSettings: vi.fn(),
 	getTaxonomyTerms: vi.fn(),
-	getTerm: vi.fn(),
+	getTerm,
 }));
 
 import {
@@ -19,6 +20,7 @@ import {
 	getPostsPageByCategory,
 	getPublishedPages,
 	getRecentPosts,
+	getTermsBySlugs,
 } from "../../src/lib/content";
 
 function entry(id: string, data: Record<string, unknown>) {
@@ -115,5 +117,21 @@ describe("content queries", () => {
 			limit: 1,
 			where: { path: "parent/child" },
 		});
+	});
+
+	test("resolves only assigned taxonomy terms", async () => {
+		getTerm
+			.mockResolvedValueOnce({ slug: "ethics", label: "Ethics" })
+			.mockResolvedValueOnce({ slug: "teaching", label: "Teaching" });
+
+		await expect(
+			getTermsBySlugs("category", ["ethics", "ethics", "teaching"]),
+		).resolves.toEqual([
+			{ slug: "ethics", label: "Ethics" },
+			{ slug: "teaching", label: "Teaching" },
+		]);
+		expect(getTerm).toHaveBeenCalledTimes(2);
+		expect(getTerm).toHaveBeenNthCalledWith(1, "category", "ethics");
+		expect(getTerm).toHaveBeenNthCalledWith(2, "category", "teaching");
 	});
 });
