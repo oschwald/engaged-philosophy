@@ -43,7 +43,36 @@ EmDash KV object cache is also intentionally disabled on Workers Free: the
 is 5 million rows read per day. The existing anonymous HTML cache avoids most
 repeat D1 work without consuming the smaller KV write budget.
 
-### Cloudflare Access Invites
+## Public Rendering
+
+- Public entry annotations come directly from EmDash's `ContentEntry.edit`
+  proxy; there is no site-level editing adapter.
+- Search uses EmDash full-text search, then batch-hydrates only the entries on
+  the current result page. Archives use database limit/offset queries, and
+  exhaustive jobs such as the sitemap walk collection cursors.
+- The base layout uses `EmDashHead`, `EmDashBodyStart`, and `EmDashBodyEnd` so
+  EmDash SEO settings and plugin page contributions are rendered through the
+  standard pipeline.
+- The sitemap remains site-specific because imported WordPress posts use a
+  stored `path` such as `2022/05/31/post-slug`. EmDash collection URL patterns
+  can interpolate an entry slug or ID, but cannot interpolate this custom path.
+  The custom sitemap still honors EmDash noindex and canonical settings.
+- Current Portable Text image and gallery nodes use the EmDash renderers.
+  Legacy renderers remain only for imported WordPress alignment, link, gallery,
+  and media shapes that do not have direct EmDash equivalents.
+
+## Imported Field Names
+
+EmDash system properties use camelCase (`createdAt`, `updatedAt`, and
+`publishedAt`). Imported WordPress fields retain their persisted schema slugs,
+which use snake_case (`published_on`, `featured_image`, `author_name`, and
+`menu_order`). These names are database and admin-schema identifiers, not a
+style choice in new application code. New application-facing APIs should use
+camelCase and keep legacy names inside content adapters. Renaming a persisted
+field requires a backup-backed content/schema migration and should be handled
+separately from routine refactoring.
+
+## Cloudflare Access Invites
 
 To let EmDash user invites grant Zero Trust access, create a Zero Trust
 Reusable components EMAIL list for admin users and reference that list from the
