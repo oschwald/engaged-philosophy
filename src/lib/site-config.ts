@@ -4,7 +4,6 @@ export const WORDPRESS_SITE_URL = "https://www.engagedphilosophy.com";
 export const PUBLIC_MEDIA_URL = "https://media.engagedphilosophy.com";
 export const CLOUDFLARE_ACCESS_TEAM_DOMAIN =
 	"engaged-philosophy.cloudflareaccess.com";
-export const ANONYMOUS_PAGE_CACHE_NAME = "engaged-philosophy-pages-v2";
 export const ANONYMOUS_PAGE_CACHE_MAX_AGE_SECONDS = 300;
 export const ANONYMOUS_PAGE_CACHE_SWR_SECONDS = 300;
 export const CONTACT_EMAIL = "info@engagedphilosophy.com";

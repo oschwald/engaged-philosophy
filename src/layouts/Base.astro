@@ -35,6 +35,10 @@ const {
 	cacheTags = [],
 } = Astro.props;
 const routeCacheTags = getSitePageCacheTags(content, cacheTags);
+Astro.response.headers.set(
+	"Cache-Control",
+	"public, max-age=0, must-revalidate",
+);
 Astro.cache.set({
 	maxAge: ANONYMOUS_PAGE_CACHE_MAX_AGE_SECONDS,
 	swr: ANONYMOUS_PAGE_CACHE_SWR_SECONDS,

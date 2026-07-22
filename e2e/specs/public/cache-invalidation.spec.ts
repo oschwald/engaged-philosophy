@@ -9,6 +9,34 @@ import {
 } from "../../support/content";
 
 test.describe("public page cache", () => {
+	test("keeps stateful and query-string HTML out of the shared cache", async ({
+		publicPage,
+	}) => {
+		const anonymousResponse = await publicPage.request.get("/");
+		expect(anonymousResponse.headers()["vary"]).toContain("Cookie");
+		expect(anonymousResponse.headers()["cache-control"]).toBe(
+			"public, max-age=0, must-revalidate",
+		);
+
+		await publicPage.context().addCookies([
+			{
+				name: "analytics",
+				value: "enabled",
+				url: new URL(anonymousResponse.url()).origin,
+			},
+		]);
+		const cookieResponse = await publicPage.request.get("/");
+		expect(cookieResponse.headers()["cloudflare-cdn-cache-control"]).toBe(
+			"no-store",
+		);
+		await publicPage.context().clearCookies();
+
+		const queryResponse = await publicPage.request.get("/?preview=1");
+		expect(queryResponse.headers()["cloudflare-cdn-cache-control"]).toBe(
+			"no-store",
+		);
+	});
+
 	test("refreshes anonymous cached HTML after publishing an edit", async ({
 		authedRequest,
 		publicPage,
@@ -30,8 +58,14 @@ test.describe("public page cache", () => {
 		const cachedResponse = await publicPage.goto(publicPath, {
 			waitUntil: "domcontentloaded",
 		});
-		const primedCacheStatus = cachedResponse?.headers()["x-ep-cache"];
-		expect(primedCacheStatus).toMatch(/^(HIT|MISS|STALE)$/);
+		const primedCacheStatus = cachedResponse?.headers()["cf-cache-status"];
+		if (primedCacheStatus) {
+			expect(primedCacheStatus).toMatch(/^(HIT|MISS|STALE|UPDATING)$/);
+		} else {
+			expect(
+				cachedResponse?.headers()["cloudflare-cdn-cache-control"],
+			).toContain("max-age=300");
+		}
 
 		await updateContentViaApi(authedRequest, "pages", published.id, {
 			data: {
@@ -44,7 +78,7 @@ test.describe("public page cache", () => {
 			waitUntil: "domcontentloaded",
 		});
 		if (primedCacheStatus === "HIT") {
-			expect(refreshedResponse?.headers()["x-ep-cache"]).toBe("MISS");
+			expect(refreshedResponse?.headers()["cf-cache-status"]).not.toBe("HIT");
 		}
 		await expect(publicPage.getByText(updatedText)).toBeVisible();
 		await expect(publicPage.getByText(initialText)).toHaveCount(0);

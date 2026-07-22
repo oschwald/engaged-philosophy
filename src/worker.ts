@@ -51,8 +51,6 @@ function responseLog(
 		status: response.status,
 		elapsedMs: elapsedSince(startedAt),
 		serverTiming: response.headers.get("Server-Timing"),
-		epCache: response.headers.get("X-EP-Cache"),
-		cfCacheStatus: response.headers.get("CF-Cache-Status"),
 	};
 }
 
