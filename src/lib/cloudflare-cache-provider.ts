@@ -9,7 +9,7 @@ const factory: CacheProviderFactory = (config) => {
 		...provider,
 		async invalidate(options) {
 			const { cache } = await import("cloudflare:workers");
-			// Workers Cache is not emulated locally yet; keep mutations usable in dev.
+			// Wrangler's local Workers Cache lacks purge(); keep mutations usable in dev.
 			if (typeof cache.purge !== "function") return;
 
 			const tags = collectInvalidationTags(options);
