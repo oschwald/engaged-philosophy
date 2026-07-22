@@ -27,7 +27,7 @@ function entry(id: string, data: Record<string, unknown>) {
 	return { id, edit: {}, data };
 }
 
-describe("content queries", () => {
+describe("content retrieval and taxonomy", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
 	});
