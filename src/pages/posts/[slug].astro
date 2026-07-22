@@ -1,56 +1,12 @@
 ---
-import RichContent from "../../components/RichContent.astro";
-import ThemeSidebar from "../../components/ThemeSidebar.astro";
-import Base from "../../layouts/Base.astro";
-import { getEmDashEntry } from "emdash";
 import { getPostBySlug } from "../../lib/content";
-import { getEntryContent } from "../../lib/rich-text";
 
 const { slug = "" } = Astro.params;
 const post = await getPostBySlug(slug);
 
-const livePost = post
-	? null
-	: await getEmDashEntry("posts", slug).then((result) => result.entry);
-
-if (!post && !livePost) {
+if (!post) {
 	return Astro.redirect("/404");
 }
 
-if (post) {
-	return Astro.redirect(`/${post.data.path}/`);
-}
-
-const liveEntry = livePost!;
-const title =
-	typeof liveEntry.data.title === "string" ? liveEntry.data.title : "";
-const content = getEntryContent(liveEntry.data);
-const publishedOn =
-	typeof liveEntry.data.published_on === "string"
-		? liveEntry.data.published_on
-		: "";
+return Astro.redirect(`/${post.data.path}/`);
 ---
-
-<Base
-	title={title}
-	bodyClass="single single-post content-sidebar"
-	content={{ collection: "posts", entry: liveEntry }}
-	cacheTags={["posts"]}
->
-	<section id="primary" class="col-lg-8 px-4">
-		<div id="content" role="main">
-			<article class="post">
-				<header class="page-header">
-					<h1 class="entry-title">{title}</h1>
-					<div class="entry-meta">
-						{publishedOn ? new Date(publishedOn).toLocaleDateString() : ""}
-					</div>
-				</header>
-				<div class="entry-content">
-					<RichContent value={content} />
-				</div>
-			</article>
-		</div>
-	</section>
-	<ThemeSidebar />
-</Base>
