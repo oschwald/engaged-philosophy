@@ -2,27 +2,23 @@
 import EntrySummary from "./content/EntrySummary.astro";
 import Pagination from "./content/Pagination.astro";
 import ThemeSidebar from "./ThemeSidebar.astro";
-import { getPostsByCategory } from "../lib/content";
-import { formatPathDate, sortByPublishedOn } from "../lib/path-utils";
+import { formatPathDate } from "../lib/path-utils";
 import {
 	getEntryContent,
 	getEntryExcerpt,
 	getExcerptText,
 } from "../lib/rich-text";
+import type { ContentEntry, PostData } from "../lib/types";
 
 interface Props {
 	slug: string;
 	label: string;
+	posts: ContentEntry<PostData>[];
+	hasMore: boolean;
 	page: number;
-	perPage?: number;
 }
 
-const { slug, label, page, perPage = 10 } = Astro.props;
-const posts = sortByPublishedOn(await getPostsByCategory(slug));
-const totalPages = Math.max(1, Math.ceil(posts.length / perPage));
-const currentPage = Math.min(Math.max(page, 1), totalPages);
-const start = (currentPage - 1) * perPage;
-const pageItems = posts.slice(start, start + perPage);
+const { slug, label, posts, hasMore, page } = Astro.props;
 
 function pageHref(pageNumber: number) {
 	return pageNumber === 1
@@ -40,8 +36,8 @@ function pageHref(pageNumber: number) {
 		</header>
 
 		{
-			pageItems.length > 0 ? (
-				pageItems.map((post) => (
+			posts.length > 0 ? (
+				posts.map((post) => (
 					<EntrySummary
 						articleClass="mb-5 pb-4 border-bottom post"
 						title={post.data.title ?? ""}
@@ -67,8 +63,8 @@ function pageHref(pageNumber: number) {
 		}
 
 		<Pagination
-			currentPage={currentPage}
-			totalPages={totalPages}
+			currentPage={page}
+			hasMore={hasMore}
 			pageHref={pageHref}
 			windowed
 			nextLinkClass="next"

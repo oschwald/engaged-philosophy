@@ -1,21 +1,20 @@
 ---
+import { EmDashHead } from "emdash/ui";
+import type { PublicPageContext } from "emdash";
+
 interface Props {
-	pageTitle: string;
-	description: string;
-	faviconHref?: string;
-	faviconType?: string;
+	page: PublicPageContext;
 }
 
-const { pageTitle, description, faviconHref, faviconType } = Astro.props;
+const { page } = Astro.props;
 ---
 
 <head>
 	<link rel="profile" href="https://gmpg.org/xfn/11" />
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>{pageTitle}</title>
-	<meta name="description" content={description} />
-	{faviconHref && <link rel="icon" type={faviconType} href={faviconHref} />}
+	<title>{page.title}</title>
+	<EmDashHead page={page} />
 	<link rel="manifest" href="/site.webmanifest" />
 	<meta name="theme-color" content="#fd7e14" />
 	<meta name="msapplication-TileColor" content="#fd7e14" />

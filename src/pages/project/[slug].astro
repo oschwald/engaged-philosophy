@@ -3,7 +3,6 @@ import ProjectTermsList from "../../components/content/ProjectTermsList.astro";
 import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
 import { getEntryTerms, getProjectBySlug } from "../../lib/content";
-import { getEmDashEditEntryAttrs } from "../../lib/editing";
 import { getEntryContent } from "../../lib/rich-text";
 
 const { slug } = Astro.params;
@@ -30,26 +29,18 @@ const termGroups = [
 <Base
 	title={project.data.title}
 	bodyClass={`wp-singular project-template-default single single-project${project.data.id ? ` postid-${project.data.id}` : ""} wp-theme-engaged-philosophy-20 content-sidebar`}
+	content={{ collection: "projects", entry: project }}
 >
 	<section id="primary" class="col-12 px-4">
 		<main id="content">
-			<article
-				class="project type-project status-publish"
-				{...getEmDashEditEntryAttrs("projects", project)}
-			>
+			<article class="project type-project status-publish" {...project.edit}>
 				<header class="page-header">
-					<h1
-						class="entry-title"
-						{...getEmDashEditEntryAttrs("projects", project, "title")}
-					>
+					<h1 class="entry-title" {...project.edit.title}>
 						{project.data.title}
 					</h1>
 				</header>
 
-				<div
-					class="entry-content"
-					{...getEmDashEditEntryAttrs("projects", project, "content")}
-				>
+				<div class="entry-content" {...project.edit.content}>
 					<div class="row">
 						<div class="col-lg-9">
 							<RichContent value={getEntryContent(project.data)} />

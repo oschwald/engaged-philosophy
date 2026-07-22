@@ -28,7 +28,6 @@ import type {
 type TaxonomyMap = Record<string, string[]>;
 type EmDashTermsMap = Record<string, Array<{ slug: string; label: string }>>;
 type RuntimeEntry<T> = ContentEntry<T> & {
-	edit?: unknown;
 	data: T & {
 		id?: string;
 		status?: string;
@@ -47,7 +46,7 @@ type RawMediaField = MediaField & {
 	};
 };
 
-const COLLECTION_LIMIT = 1000;
+const COLLECTION_PAGE_SIZE = 1000;
 
 function normalizeLocalMediaField(
 	media: RawMediaField,
@@ -130,9 +129,62 @@ function flattenTerms<T extends { children?: T[] }>(terms: T[]): T[] {
 async function getPublishedCollection<
 	T extends { path?: string; featured_image?: RawMediaField | null },
 >(collection: "pages" | "posts" | "projects") {
+	const entries: Array<EmDashContentEntry<T>> = [];
+	let cursor: string | undefined;
+	do {
+		const result = await getEmDashCollection(collection, {
+			status: "published",
+			limit: COLLECTION_PAGE_SIZE,
+			cursor,
+		});
+		entries.push(
+			...result.entries.map(
+				(entry) => entry as unknown as EmDashContentEntry<T>,
+			),
+		);
+		cursor = result.nextCursor;
+	} while (cursor);
+
+	return entries
+		.map((entry) => normalizeEntry(entry, collection))
+		.filter(isPublicEntry);
+}
+
+async function getPublishedCollectionPage<
+	T extends { path?: string; featured_image?: RawMediaField | null },
+>(
+	collection: "posts" | "projects",
+	options: {
+		limit: number;
+		offset?: number;
+		where?: Record<string, string | string[]>;
+		orderBy: Record<string, "asc" | "desc">;
+	},
+) {
+	const result = await getEmDashCollection(collection, {
+		status: "published",
+		...options,
+	});
+	return {
+		entries: result.entries
+			.map((entry) =>
+				normalizeEntry(entry as unknown as EmDashContentEntry<T>, collection),
+			)
+			.filter(isPublicEntry),
+		hasMore: result.hasMore ?? false,
+		cacheHint: result.cacheHint,
+	};
+}
+
+export async function getPublishedEntriesByIds<
+	T extends { path?: string; featured_image?: RawMediaField | null },
+>(collection: "pages" | "posts" | "projects", ids: string[]) {
+	if (ids.length === 0) return [];
+
 	const { entries } = await getEmDashCollection(collection, {
 		status: "published",
-		limit: COLLECTION_LIMIT,
+		limit: ids.length,
+		where: { id: ids },
 	});
 	return entries
 		.map((entry) =>
@@ -141,19 +193,42 @@ async function getPublishedCollection<
 		.filter(isPublicEntry);
 }
 
-async function getPublishedCollectionByTerm<
-	T extends { path?: string; featured_image?: RawMediaField | null },
->(collection: "posts" | "projects", taxonomy: string, slug: string) {
-	const { entries } = await getEmDashCollection(collection, {
-		status: "published",
-		limit: COLLECTION_LIMIT,
-		where: { [taxonomy]: slug },
+export function getRecentPosts(limit = 25) {
+	return getPublishedCollectionPage<PostData>("posts", {
+		limit,
+		orderBy: { published_on: "desc", title: "asc" },
 	});
-	return entries
-		.map((entry) =>
-			normalizeEntry(entry as unknown as EmDashContentEntry<T>, collection),
-		)
-		.filter(isPublicEntry);
+}
+
+export function getHighlightedProjects(limit = 6) {
+	return getPublishedCollectionPage<ProjectData>("projects", {
+		limit,
+		where: { highlight: "1" },
+		orderBy: { menu_order: "asc", published_on: "desc", title: "asc" },
+	});
+}
+
+export function getPostsPageByCategory(slug: string, page: number, limit = 10) {
+	return getPublishedCollectionPage<PostData>("posts", {
+		limit,
+		offset: Math.max(0, page - 1) * limit,
+		where: { category: slug },
+		orderBy: { published_on: "desc", title: "asc" },
+	});
+}
+
+export function getProjectsPageByTaxonomy(
+	taxonomy: string,
+	slug: string,
+	page: number,
+	limit = 10,
+) {
+	return getPublishedCollectionPage<ProjectData>("projects", {
+		limit,
+		offset: Math.max(0, page - 1) * limit,
+		where: { [taxonomy]: slug },
+		orderBy: { menu_order: "asc", published_on: "desc", title: "asc" },
+	});
 }
 
 export async function getRuntimeSiteSettings() {
@@ -192,11 +267,18 @@ export async function getPageByPath(path: string) {
 	const page = slug ? await getPageBySlug(slug) : null;
 	if (page?.data.path === normalizedPath) return page;
 
-	return (
-		(await getPublishedPages()).find(
-			(entry) => entry.data.path === normalizedPath,
-		) ?? null
+	const { entries } = await getEmDashCollection("pages", {
+		status: "published",
+		limit: 1,
+		where: { path: normalizedPath },
+	});
+	const entry = entries[0];
+	if (!entry) return null;
+	const matched = normalizeEntry(
+		entry as unknown as EmDashContentEntry<PageData>,
+		"pages",
 	);
+	return isPublicEntry(matched) ? matched : null;
 }
 
 export async function getPostByPath(path: string) {
@@ -205,11 +287,18 @@ export async function getPostByPath(path: string) {
 	const post = slug ? await getPostBySlug(slug) : null;
 	if (post?.data.path === normalizedPath) return post;
 
-	return (
-		(await getPublishedPosts()).find(
-			(entry) => entry.data.path === normalizedPath,
-		) ?? null
+	const { entries } = await getEmDashCollection("posts", {
+		status: "published",
+		limit: 1,
+		where: { path: normalizedPath },
+	});
+	const entry = entries[0];
+	if (!entry) return null;
+	const matched = normalizeEntry(
+		entry as unknown as EmDashContentEntry<PostData>,
+		"posts",
 	);
+	return isPublicEntry(matched) ? matched : null;
 }
 
 export async function getPostBySlug(slug: string) {
@@ -222,10 +311,6 @@ export async function getPostBySlug(slug: string) {
 	return isPublicEntry(post) ? post : null;
 }
 
-export function getPostsByCategory(slug: string) {
-	return getPublishedCollectionByTerm<PostData>("posts", "category", slug);
-}
-
 export async function getProjectBySlug(slug: string) {
 	const { entry } = await getEmDashEntry("projects", slug);
 	if (!entry) return null;
@@ -234,10 +319,6 @@ export async function getProjectBySlug(slug: string) {
 		"projects",
 	);
 	return isPublicEntry(project) ? project : null;
-}
-
-export function getProjectsByTaxonomy(taxonomy: string, slug: string) {
-	return getPublishedCollectionByTerm<ProjectData>("projects", taxonomy, slug);
 }
 
 export function getTaxonomyTerm(taxonomy: string, slug: string) {
@@ -273,8 +354,9 @@ export function getEntryTermSlugs(
 }
 
 export async function getTermsBySlugs(taxonomy: string, slugs: string[]) {
-	const wanted = new Set(slugs);
-	return (await getTaxonomyTerms(taxonomy)).filter((term) =>
-		wanted.has(term.slug),
+	const uniqueSlugs = [...new Set(slugs)];
+	const terms = await Promise.all(
+		uniqueSlugs.map((slug) => getTerm(taxonomy, slug)),
 	);
+	return terms.filter((term) => term !== null);
 }

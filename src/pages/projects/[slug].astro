@@ -1,46 +1,12 @@
 ---
-import RichContent from "../../components/RichContent.astro";
-import Base from "../../layouts/Base.astro";
-import { getEmDashEntry } from "emdash";
 import { getProjectBySlug } from "../../lib/content";
-import { getEntryContent } from "../../lib/rich-text";
 
 const { slug = "" } = Astro.params;
 const project = await getProjectBySlug(slug);
 
-const liveProject = project
-	? null
-	: await getEmDashEntry("projects", slug).then((result) => result.entry);
-
-if (!project && !liveProject) {
+if (!project) {
 	return Astro.redirect("/404");
 }
 
-if (project) {
-	return Astro.redirect(`/${project.data.path}/`);
-}
-
-const liveEntry = liveProject!;
-const title =
-	typeof liveEntry.data.title === "string" ? liveEntry.data.title : "";
-const content = getEntryContent(liveEntry.data);
+return Astro.redirect(`/${project.data.path}/`, 301);
 ---
-
-<Base title={title} bodyClass="single single-project">
-	<section id="primary" class="col-12 px-4">
-		<main id="content">
-			<article class="project type-project status-publish">
-				<header class="page-header">
-					<h1 class="entry-title">{title}</h1>
-				</header>
-				<div class="entry-content">
-					<div class="row">
-						<div class="col-lg-9">
-							<RichContent value={content} />
-						</div>
-					</div>
-				</div>
-			</article>
-		</main>
-	</section>
-</Base>

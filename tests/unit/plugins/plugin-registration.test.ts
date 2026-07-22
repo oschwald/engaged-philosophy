@@ -1,10 +1,11 @@
 import { describe, expect, test } from "vitest";
 
+import { emdashPlugins } from "../../../astro.config.mjs";
+
 import { createPlugin as createAuditLogPlugin } from "../../../src/plugins/audit-log";
-import { createPlugin as createEmbedsPlugin } from "../../../src/plugins/embeds";
 import { createPlugin as createLegacyImagePlugin } from "../../../src/plugins/legacy-image-blocks";
 
-describe("plugin configuration", () => {
+describe("EmDash plugin registration", () => {
 	test("registers legacy media portable text blocks", () => {
 		const plugin = createLegacyImagePlugin();
 		const blocks = plugin.admin?.portableTextBlocks ?? [];
@@ -33,15 +34,14 @@ describe("plugin configuration", () => {
 	});
 
 	test("registers configured embed blocks", () => {
-		const plugin = createEmbedsPlugin({ types: ["youtube", "vimeo"] });
-		const blocks = plugin.admin?.portableTextBlocks ?? [];
+		const embeds = emdashPlugins.find((plugin) => plugin.id === "embeds");
 
-		expect(blocks.find((item) => item.type === "youtube")?.label).toBe(
-			"YouTube Video",
-		);
-		expect(blocks.find((item) => item.type === "vimeo")?.label).toBe(
-			"Vimeo Video",
-		);
+		expect(embeds).toMatchObject({
+			id: "embeds",
+			entrypoint: "@emdash-cms/plugin-embeds",
+			componentsEntry: "@emdash-cms/plugin-embeds/astro",
+			options: { types: ["youtube", "vimeo"] },
+		});
 	});
 
 	test("registers audit log native hooks and admin UI", () => {

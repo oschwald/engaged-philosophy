@@ -1,44 +1,12 @@
 ---
-import RichContent from "../../components/RichContent.astro";
-import Base from "../../layouts/Base.astro";
-import { getEmDashEntry } from "emdash";
 import { getPageBySlug } from "../../lib/content";
-import { getEntryContent } from "../../lib/rich-text";
 
 const { slug = "" } = Astro.params;
 const page = await getPageBySlug(slug);
 
-const livePage = page
-	? null
-	: await getEmDashEntry("pages", slug).then((result) => result.entry);
-
-if (!page && !livePage) {
+if (!page) {
 	return Astro.redirect("/404");
 }
 
-if (page) {
-	return Astro.redirect(page.data.path ? `/${page.data.path}/` : "/");
-}
-
-const liveEntry = livePage!;
-const title =
-	typeof liveEntry.data.title === "string" ? liveEntry.data.title : "";
-const content = getEntryContent(liveEntry.data);
+return Astro.redirect(page.data.path ? `/${page.data.path}/` : "/", 301);
 ---
-
-<Base title={title}>
-	<div class="container-fluid">
-		<section id="primary" class="p-4">
-			<div id="content" role="main">
-				<article>
-					<header class="page-header">
-						<h1 class="entry-title">{title}</h1>
-					</header>
-					<div class="entry-content">
-						<RichContent value={content} />
-					</div>
-				</article>
-			</div>
-		</section>
-	</div>
-</Base>

@@ -120,7 +120,7 @@ export function publicPathForItem(
 }
 
 export function canonicalAliasForItem(
-	collection: Exclude<CollectionSlug, "pages">,
+	collection: CollectionSlug,
 	item: ContentItem,
 ) {
 	const slug = item.slug ?? item.id;

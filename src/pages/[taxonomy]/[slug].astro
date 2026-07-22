@@ -3,14 +3,11 @@ import Base from "../../layouts/Base.astro";
 import TaxonomyArchive from "../../components/TaxonomyArchive.astro";
 import {
 	getPageByPath,
-	getProjectsByTaxonomy,
+	getProjectsPageByTaxonomy,
 	getTaxonomyTerm,
 } from "../../lib/content";
-import { getEmDashEditEntryAttrs } from "../../lib/editing";
-import { sortByPublishedOn } from "../../lib/path-utils";
 import { getEntryContent } from "../../lib/rich-text";
 import { isProjectTaxonomy } from "../../lib/taxonomy-utils";
-import type { ContentEntry, ProjectData } from "../../lib/types";
 import RichContent from "../../components/RichContent.astro";
 
 const { taxonomy = "", slug = "" } = Astro.params;
@@ -30,34 +27,26 @@ if (isProjectArchive && !term) {
 	return Astro.redirect("/404");
 }
 
-const projects = isProjectArchive
-	? sortByPublishedOn(
-			(await getProjectsByTaxonomy(
-				taxonomy,
-				slug,
-			)) as ContentEntry<ProjectData>[],
-		)
-	: [];
+const projectPage = isProjectArchive
+	? await getProjectsPageByTaxonomy(taxonomy, slug, 1)
+	: { entries: [], hasMore: false };
 ---
 
 {
 	page ? (
-		<Base title={page.data.title}>
+		<Base
+			title={page.data.title}
+			content={{ collection: "pages", entry: page }}
+		>
 			<section id="primary" class="col-12 px-4">
 				<main id="content">
-					<article {...getEmDashEditEntryAttrs("pages", page)}>
+					<article {...page.edit}>
 						<header class="page-header">
-							<h1
-								class="entry-title"
-								{...getEmDashEditEntryAttrs("pages", page, "title")}
-							>
+							<h1 class="entry-title" {...page.edit.title}>
 								{page.data.title}
 							</h1>
 						</header>
-						<div
-							class="entry-content"
-							{...getEmDashEditEntryAttrs("pages", page, "content")}
-						>
+						<div class="entry-content" {...page.edit.content}>
 							<RichContent value={getEntryContent(page.data)} />
 						</div>
 					</article>
@@ -68,11 +57,13 @@ const projects = isProjectArchive
 		<Base
 			title={term?.label}
 			bodyClass={`archive tax-${taxonomy} term-${slug} wp-theme-engaged-philosophy-20 content-sidebar`}
+			cacheTags={["projects"]}
 		>
 			<TaxonomyArchive
 				taxonomy={taxonomy}
 				label={term?.label ?? ""}
-				projects={projects}
+				projects={projectPage.entries}
+				hasMore={projectPage.hasMore}
 				page={1}
 			/>
 		</Base>

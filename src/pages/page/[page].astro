@@ -1,19 +1,34 @@
 ---
 import SearchResults from "../../components/SearchResults.astro";
 import Base from "../../layouts/Base.astro";
-import { searchSite } from "../../lib/search";
+import { isValidSearchCursorHistory, searchSite } from "../../lib/search";
 import { getMediaUrlPrefix } from "../../lib/media";
+import { InvalidCursorError } from "emdash";
 
 const pageNumber = Number(Astro.params.page ?? "1");
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
+const cursor = Astro.url.searchParams.get("cursor") ?? undefined;
+const history = Astro.url.searchParams.getAll("before");
 
-if (!query) {
+if (
+	!query ||
+	!Number.isInteger(pageNumber) ||
+	pageNumber < 2 ||
+	!cursor ||
+	!isValidSearchCursorHistory(pageNumber, history)
+) {
 	return Astro.redirect("/404");
 }
 
 const mediaUrlPrefix = getMediaUrlPrefix();
-const search = await searchSite(query, pageNumber, mediaUrlPrefix);
-if (search.totalPages > 0 && pageNumber > search.totalPages) {
+let search;
+try {
+	search = await searchSite(query, cursor, mediaUrlPrefix);
+} catch (error) {
+	if (!(error instanceof InvalidCursorError)) throw error;
+	return Astro.redirect("/404");
+}
+if (search.results.length === 0) {
 	return Astro.redirect("/404");
 }
 ---
@@ -22,5 +37,11 @@ if (search.totalPages > 0 && pageNumber > search.totalPages) {
 	title={`Search Results for: ${query}${pageNumber > 1 ? ` – Page ${pageNumber}` : ""}`}
 	bodyClass={`search search-results${pageNumber > 1 ? ` paged paged-${pageNumber}` : ""} wp-theme-engaged-philosophy-20 content-sidebar`}
 >
-	<SearchResults query={query} page={pageNumber} />
+	<SearchResults
+		query={query}
+		search={search}
+		page={pageNumber}
+		cursor={cursor}
+		history={history}
+	/>
 </Base>

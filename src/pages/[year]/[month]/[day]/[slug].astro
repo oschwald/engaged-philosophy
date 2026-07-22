@@ -7,7 +7,6 @@ import {
 	getPostByPath,
 	getTermsBySlugs,
 } from "../../../../lib/content";
-import { getEmDashEditEntryAttrs } from "../../../../lib/editing";
 import { joinPath } from "../../../../lib/path-utils";
 import { getEntryContent } from "../../../../lib/rich-text";
 
@@ -28,15 +27,14 @@ const categories = await getTermsBySlugs(
 <Base
 	title={post.data.title}
 	bodyClass={`wp-singular post-template-default single single-post${post.data.id ? ` postid-${post.data.id}` : ""} single-format-standard wp-theme-engaged-philosophy-20 content-sidebar`}
+	content={{ collection: "posts", entry: post }}
+	cacheTags={["posts"]}
 >
 	<section id="primary" class="col-lg-8 px-4">
 		<div id="content" role="main">
-			<article class="post" {...getEmDashEditEntryAttrs("posts", post)}>
+			<article class="post" {...post.edit}>
 				<header class="page-header">
-					<h1
-						class="entry-title"
-						{...getEmDashEditEntryAttrs("posts", post, "title")}
-					>
+					<h1 class="entry-title" {...post.edit.title}>
 						{post.data.title}
 					</h1>
 					<div class="entry-meta">
@@ -47,10 +45,7 @@ const categories = await getTermsBySlugs(
 						}
 					</div>
 				</header>
-				<div
-					class="entry-content"
-					{...getEmDashEditEntryAttrs("posts", post, "content")}
-				>
+				<div class="entry-content" {...post.edit.content}>
 					<RichContent value={getEntryContent(post.data)} />
 				</div>
 				{

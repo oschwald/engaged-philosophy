@@ -1,3 +1,4 @@
+import type { ContentEntry as EmDashContentEntry, ContentSeo } from "emdash";
 import type { RichTextValue } from "./rich-text-types";
 
 export type { RichTextValue } from "./rich-text-types";
@@ -9,6 +10,8 @@ export interface MediaField {
 
 export interface PageData {
 	id?: string;
+	slug?: string | null;
+	status?: string;
 	title?: string;
 	path?: string;
 	content?: RichTextValue;
@@ -21,16 +24,28 @@ export interface PageData {
 	box_middle_html?: RichTextValue;
 	box_right_title?: string;
 	box_right_html?: RichTextValue;
+	author_name?: string;
+	createdAt?: Date | string | null;
+	updatedAt?: Date | string | null;
+	publishedAt?: Date | string | null;
+	seo?: ContentSeo;
 }
 
 export interface PostData {
 	id?: string;
+	slug?: string | null;
+	status?: string;
 	title?: string;
 	path?: string;
 	excerpt?: RichTextValue;
 	content?: RichTextValue;
 	featured_image?: MediaField;
 	published_on?: string;
+	author_name?: string;
+	createdAt?: Date | string | null;
+	updatedAt?: Date | string | null;
+	publishedAt?: Date | string | null;
+	seo?: ContentSeo;
 }
 
 export interface ProjectData extends PostData {
@@ -38,7 +53,4 @@ export interface ProjectData extends PostData {
 	menu_order?: number;
 }
 
-export interface ContentEntry<T> {
-	id: string;
-	data: T;
-}
+export type ContentEntry<T> = EmDashContentEntry<T>;

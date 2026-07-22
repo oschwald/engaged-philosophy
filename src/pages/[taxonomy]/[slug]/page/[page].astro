@@ -2,12 +2,10 @@
 import Base from "../../../../layouts/Base.astro";
 import TaxonomyArchive from "../../../../components/TaxonomyArchive.astro";
 import {
-	getProjectsByTaxonomy,
+	getProjectsPageByTaxonomy,
 	getTaxonomyTerm,
 } from "../../../../lib/content";
-import { sortByPublishedOn } from "../../../../lib/path-utils";
 import { isProjectTaxonomy } from "../../../../lib/taxonomy-utils";
-import type { ContentEntry, ProjectData } from "../../../../lib/types";
 
 const { taxonomy = "", slug = "", page = "1" } = Astro.params;
 
@@ -25,12 +23,12 @@ if (!Number.isFinite(pageNumber) || pageNumber < 2) {
 	return Astro.redirect(`/${taxonomy}/${slug}/`);
 }
 
-const projects = sortByPublishedOn(
-	(await getProjectsByTaxonomy(taxonomy, slug)) as ContentEntry<ProjectData>[],
+const { entries: projects, hasMore } = await getProjectsPageByTaxonomy(
+	taxonomy,
+	slug,
+	pageNumber,
 );
-const totalPages = Math.max(1, Math.ceil(projects.length / 10));
-
-if (pageNumber > totalPages) {
+if (projects.length === 0) {
 	return Astro.redirect("/404");
 }
 ---
@@ -38,11 +36,13 @@ if (pageNumber > totalPages) {
 <Base
 	title={`${term.label} – Page ${pageNumber}`}
 	bodyClass={`archive paged tax-${taxonomy} term-${slug} paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
+	cacheTags={["projects"]}
 >
 	<TaxonomyArchive
 		taxonomy={taxonomy}
 		label={term.label}
 		projects={projects}
+		hasMore={hasMore}
 		page={pageNumber}
 	/>
 </Base>

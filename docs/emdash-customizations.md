@@ -16,7 +16,10 @@ Cloudflare constraints.
   email to a Zero Trust EMAIL list referenced by the admin Access policy.
 - `src/lib/anonymous-cloudflare-cache.ts` caches anonymous HTML page responses in
   the Workers Cache API while bypassing signed-in, preview, admin, API, and
-  static-asset requests.
+  static-asset requests. Detail pages use their EmDash entry ID as the cache
+  tag; collection tags are reserved for list pages that actually depend on the
+  collection. Cached HTML is fresh for five minutes and may be served stale for
+  at most another five minutes while it revalidates.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
   controls wait for pending inline saves. EmDash 0.30 flushes edits when the
   browser navigates away, but its toolbar can still publish before a Portable
@@ -31,7 +34,45 @@ scheduled Worker handler. Administrators can enable daily archives under
 Settings -> Backups; archives contain content and media metadata, not media
 binaries, user accounts, or secrets.
 
-### Cloudflare Access Invites
+The upstream Cloudflare route-cache provider is not used because this site must
+bypass additional Cloudflare Access, preview, and visual-editing cookies. The
+EmDash KV object cache is also intentionally disabled on Workers Free: the
+[KV free allowance](https://developers.cloudflare.com/kv/platform/limits/) is
+100,000 reads and 1,000 writes per day, while the
+[D1 free allowance](https://developers.cloudflare.com/workers/platform/pricing/#d1)
+is 5 million rows read per day. The existing anonymous HTML cache avoids most
+repeat D1 work without consuming the smaller KV write budget.
+
+## Public Rendering
+
+- Public entry annotations come directly from EmDash's `ContentEntry.edit`
+  proxy; there is no site-level editing adapter.
+- Search uses EmDash full-text search, then batch-hydrates only the entries on
+  the current result page. Archives use database limit/offset queries, and
+  exhaustive jobs such as the sitemap walk collection cursors.
+- The base layout uses `EmDashHead`, `EmDashBodyStart`, and `EmDashBodyEnd` so
+  EmDash SEO settings and plugin page contributions are rendered through the
+  standard pipeline.
+- The sitemap remains site-specific because imported WordPress posts use a
+  stored `path` such as `2022/05/31/post-slug`. EmDash collection URL patterns
+  can interpolate an entry slug or ID, but cannot interpolate this custom path.
+  The custom sitemap still honors EmDash noindex and canonical settings.
+- Current Portable Text image and gallery nodes use the EmDash renderers.
+  Legacy renderers remain only for imported WordPress alignment, link, gallery,
+  and media shapes that do not have direct EmDash equivalents.
+
+## Imported Field Names
+
+EmDash system properties use camelCase (`createdAt`, `updatedAt`, and
+`publishedAt`). Imported WordPress fields retain their persisted schema slugs,
+which use snake_case (`published_on`, `featured_image`, `author_name`, and
+`menu_order`). These names are database and admin-schema identifiers, not a
+style choice in new application code. New application-facing APIs should use
+camelCase and keep legacy names inside content adapters. Renaming a persisted
+field requires a backup-backed content/schema migration and should be handled
+separately from routine refactoring.
+
+## Cloudflare Access Invites
 
 To let EmDash user invites grant Zero Trust access, create a Zero Trust
 Reusable components EMAIL list for admin users and reference that list from the
@@ -56,8 +97,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 - `src/plugins/audit-log.ts` adapts the audit-log plugin's sandbox definition to
   native hooks/routes so it can run on the current Cloudflare plan.
-- `src/plugins/embeds.ts` registers YouTube and Vimeo editor blocks while using
-  the upstream embed renderer.
+- The upstream embeds plugin registers and renders the enabled YouTube and Vimeo
+  blocks directly.
 - `src/plugins/legacy-image-blocks.ts` preserves edit controls for imported
   WordPress-only Portable Text blocks such as floated images, playlist videos,
   legacy embeds, and page lists.

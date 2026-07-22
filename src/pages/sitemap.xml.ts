@@ -1,11 +1,17 @@
 import type { APIRoute } from "astro";
+import { getSeoMeta, type ContentSeo } from "emdash";
 
 import {
 	getPublishedPages,
 	getPublishedPosts,
 	getPublishedProjects,
+	getRuntimeSiteSettings,
 } from "../lib/content";
-import { renderSitemapXml, type SitemapInputEntry } from "../lib/sitemap";
+import {
+	renderSitemapXml,
+	sitemapOrigin,
+	type SitemapInputEntry,
+} from "../lib/sitemap";
 
 interface SitemapSourceEntry {
 	id: string;
@@ -14,12 +20,16 @@ interface SitemapSourceEntry {
 	published_at?: string | null;
 	publishedAt?: string | Date | null;
 	createdAt?: string | Date | null;
-	data: SitemapInputEntry["data"];
+	data: Omit<SitemapInputEntry["data"], "seo"> & { seo?: ContentSeo };
 }
 
-function toSitemapEntry(entry: SitemapSourceEntry): SitemapInputEntry {
+function toSitemapEntry(
+	entry: SitemapSourceEntry,
+	siteUrl: string,
+): SitemapInputEntry {
 	return {
 		id: entry.id,
+		image: getSeoMeta(entry, { siteUrl }).ogImage,
 		updated_at: entry.updated_at,
 		updatedAt: entry.updatedAt,
 		published_at: entry.published_at,
@@ -32,6 +42,7 @@ function toSitemapEntry(entry: SitemapSourceEntry): SitemapInputEntry {
 			published_at: entry.data.published_at,
 			publishedAt: entry.data.publishedAt,
 			published_on: entry.data.published_on,
+			seo: entry.data.seo,
 		},
 	};
 }
@@ -39,15 +50,17 @@ function toSitemapEntry(entry: SitemapSourceEntry): SitemapInputEntry {
 export const prerender = false;
 
 export const GET: APIRoute = async ({ url }) => {
-	const [pages, posts, projects] = await Promise.all([
+	const [settings, pages, posts, projects] = await Promise.all([
+		getRuntimeSiteSettings(),
 		getPublishedPages(),
 		getPublishedPosts(),
 		getPublishedProjects(),
 	]);
-	const body = renderSitemapXml(url.origin, [
-		...pages.map(toSitemapEntry),
-		...posts.map(toSitemapEntry),
-		...projects.map(toSitemapEntry),
+	const origin = sitemapOrigin(settings?.url, url.origin);
+	const body = renderSitemapXml(origin, [
+		...pages.map((entry) => toSitemapEntry(entry, origin)),
+		...posts.map((entry) => toSitemapEntry(entry, origin)),
+		...projects.map((entry) => toSitemapEntry(entry, origin)),
 	]);
 
 	return new Response(body, {
