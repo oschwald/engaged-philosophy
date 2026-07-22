@@ -36,6 +36,7 @@ if (projects.length === 0) {
 <Base
 	title={`${term.label} – Page ${pageNumber}`}
 	bodyClass={`archive paged tax-${taxonomy} term-${slug} paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
+	cacheTags={["projects"]}
 >
 	<TaxonomyArchive
 		taxonomy={taxonomy}

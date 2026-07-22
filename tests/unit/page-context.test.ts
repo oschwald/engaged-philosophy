@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
 
-import { createSitePageContext } from "../../src/lib/page-context";
+import {
+	createSitePageContext,
+	getSitePageCacheTags,
+} from "../../src/lib/page-context";
 import type { ContentEntry, PostData } from "../../src/lib/types";
 
 function postEntry(data: PostData): ContentEntry<PostData> {
@@ -12,6 +15,14 @@ function postEntry(data: PostData): ContentEntry<PostData> {
 }
 
 describe("site page context", () => {
+	test("uses entry IDs and explicit list dependencies as cache tags", () => {
+		const entry = postEntry({ id: "legacy-content-id" });
+
+		expect(
+			getSitePageCacheTags({ collection: "posts", entry }, ["posts", "posts"]),
+		).toEqual(["post-row-id", "posts"]);
+	});
+
 	test("builds canonical metadata for custom pages", () => {
 		const page = createSitePageContext({
 			url: new URL("https://worker.example/blog/?utm_source=test"),

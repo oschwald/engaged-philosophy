@@ -57,6 +57,7 @@ const projectPage = isProjectArchive
 		<Base
 			title={term?.label}
 			bodyClass={`archive tax-${taxonomy} term-${slug} wp-theme-engaged-philosophy-20 content-sidebar`}
+			cacheTags={["projects"]}
 		>
 			<TaxonomyArchive
 				taxonomy={taxonomy}

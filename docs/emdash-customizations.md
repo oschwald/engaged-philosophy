@@ -16,7 +16,10 @@ Cloudflare constraints.
   email to a Zero Trust EMAIL list referenced by the admin Access policy.
 - `src/lib/anonymous-cloudflare-cache.ts` caches anonymous HTML page responses in
   the Workers Cache API while bypassing signed-in, preview, admin, API, and
-  static-asset requests.
+  static-asset requests. Detail pages use their EmDash entry ID as the cache
+  tag; collection tags are reserved for list pages that actually depend on the
+  collection. Cached HTML is fresh for five minutes and may be served stale for
+  at most another five minutes while it revalidates.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
   controls wait for pending inline saves. EmDash 0.30 flushes edits when the
   browser navigates away, but its toolbar can still publish before a Portable
@@ -30,6 +33,15 @@ EmDash 0.30's backup page works with the existing R2 storage adapter and
 scheduled Worker handler. Administrators can enable daily archives under
 Settings -> Backups; archives contain content and media metadata, not media
 binaries, user accounts, or secrets.
+
+The upstream Cloudflare route-cache provider is not used because this site must
+bypass additional Cloudflare Access, preview, and visual-editing cookies. The
+EmDash KV object cache is also intentionally disabled on Workers Free: the
+[KV free allowance](https://developers.cloudflare.com/kv/platform/limits/) is
+100,000 reads and 1,000 writes per day, while the
+[D1 free allowance](https://developers.cloudflare.com/workers/platform/pricing/#d1)
+is 5 million rows read per day. The existing anonymous HTML cache avoids most
+repeat D1 work without consuming the smaller KV write budget.
 
 ### Cloudflare Access Invites
 

@@ -10,6 +10,15 @@ export interface SiteContentContext {
 	entry: ContentEntry<SiteContentData>;
 }
 
+export function getSitePageCacheTags(
+	content?: SiteContentContext,
+	dependencies: string[] = [],
+) {
+	return [
+		...new Set([...(content ? [content.entry.id] : []), ...dependencies]),
+	];
+}
+
 interface CreateSitePageContextOptions {
 	url: URL;
 	siteTitle: string;

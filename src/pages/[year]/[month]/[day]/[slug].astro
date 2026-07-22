@@ -28,6 +28,7 @@ const categories = await getTermsBySlugs(
 	title={post.data.title}
 	bodyClass={`wp-singular post-template-default single single-post${post.data.id ? ` postid-${post.data.id}` : ""} single-format-standard wp-theme-engaged-philosophy-20 content-sidebar`}
 	content={{ collection: "posts", entry: post }}
+	cacheTags={["posts"]}
 >
 	<section id="primary" class="col-lg-8 px-4">
 		<div id="content" role="main">

@@ -3,7 +3,11 @@ import Base from "../layouts/Base.astro";
 import ThemeSidebar from "../components/ThemeSidebar.astro";
 ---
 
-<Base title="Not Found" bodyClass="error404 not-found content-sidebar">
+<Base
+	title="Not Found"
+	bodyClass="error404 not-found content-sidebar"
+	cacheTags={["posts"]}
+>
 	<section id="primary" class="col-lg-8 px-4">
 		<div id="content" role="main">
 			<article class="post error404 not-found">

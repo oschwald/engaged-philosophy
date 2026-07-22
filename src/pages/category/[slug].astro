@@ -15,6 +15,7 @@ const { entries: posts, hasMore } = await getPostsPageByCategory(slug, 1);
 <Base
 	title={`Category: ${term.label}`}
 	bodyClass={`archive category category-${slug} wp-theme-engaged-philosophy-20 content-sidebar`}
+	cacheTags={["posts"]}
 >
 	<div class="container-fluid">
 		<div class="row">

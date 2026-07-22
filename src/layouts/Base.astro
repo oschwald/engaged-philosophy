@@ -7,9 +7,15 @@ import { getPrimaryMenu, getRuntimeSiteSettings } from "../lib/content";
 import { getMediaUrlPrefix, rewriteInternalMediaFileUrl } from "../lib/media";
 import {
 	createSitePageContext,
+	getSitePageCacheTags,
 	type SiteContentContext,
 } from "../lib/page-context";
-import { SITE_TAGLINE_FALLBACK, SITE_TITLE_FALLBACK } from "../lib/site-config";
+import {
+	ANONYMOUS_PAGE_CACHE_MAX_AGE_SECONDS,
+	ANONYMOUS_PAGE_CACHE_SWR_SECONDS,
+	SITE_TAGLINE_FALLBACK,
+	SITE_TITLE_FALLBACK,
+} from "../lib/site-config";
 import { EmDashBodyEnd, EmDashBodyStart } from "emdash/ui";
 import "../scss/style.scss";
 
@@ -18,13 +24,21 @@ interface Props {
 	description?: string;
 	bodyClass?: string;
 	content?: SiteContentContext;
+	cacheTags?: string[];
 }
 
-const { title, description, bodyClass = "", content } = Astro.props;
+const {
+	title,
+	description,
+	bodyClass = "",
+	content,
+	cacheTags = [],
+} = Astro.props;
+const routeCacheTags = getSitePageCacheTags(content, cacheTags);
 Astro.cache.set({
-	maxAge: 300,
-	swr: 86400,
-	tags: ["pages", "posts", "projects"],
+	maxAge: ANONYMOUS_PAGE_CACHE_MAX_AGE_SECONDS,
+	swr: ANONYMOUS_PAGE_CACHE_SWR_SECONDS,
+	...(routeCacheTags.length > 0 ? { tags: routeCacheTags } : {}),
 });
 const settings = await getRuntimeSiteSettings();
 const siteTitle = settings?.title || SITE_TITLE_FALLBACK;
