@@ -1,4 +1,4 @@
-import type { PortableTextBlock } from "emdash/ui";
+import type { PortableTextBlock } from "emdash";
 
 export interface RichTextAssetRef {
 	_ref?: string;
@@ -14,9 +14,7 @@ export interface RichTextRequiredAssetRef extends RichTextAssetRef {
 	_ref: string;
 }
 
-export interface RichTextImageNode {
-	_type: "image";
-	_key: string;
+interface RichTextImageFields {
 	id?: string;
 	asset?: RichTextAssetRef;
 	url?: string;
@@ -32,27 +30,27 @@ export interface RichTextImageNode {
 	shape?: "rounded";
 }
 
-export interface RichTextLegacyImageNode extends Omit<
-	RichTextImageNode,
-	"_type"
-> {
+export interface RichTextImageNode
+	extends PortableTextBlock, RichTextImageFields {
+	_type: "image";
+}
+
+export interface RichTextLegacyImageNode
+	extends PortableTextBlock, RichTextImageFields {
 	_type: "legacyImage";
 }
 
 export type RichTextRenderableImageNode =
 	RichTextImageNode | RichTextLegacyImageNode;
 
-export interface RichTextGalleryImageNode extends Omit<
-	RichTextImageNode,
-	"_type" | "asset"
-> {
+export interface RichTextGalleryImageNode
+	extends PortableTextBlock, RichTextImageFields {
 	_type: "image";
 	asset: RichTextRequiredAssetRef;
 }
 
-export interface RichTextGalleryNode {
+export interface RichTextGalleryNode extends PortableTextBlock {
 	_type: "gallery";
-	_key: string;
 	align?: "left" | "right" | "center";
 	caption?: string;
 	layout?: "figure" | "shortcode";
@@ -60,9 +58,8 @@ export interface RichTextGalleryNode {
 	columns?: number;
 }
 
-export interface RichTextVideoNode {
+export interface RichTextVideoNode extends PortableTextBlock {
 	_type: "legacyVideo";
-	_key: string;
 	url?: string;
 	title?: string;
 	mimeType?: string;
@@ -70,23 +67,20 @@ export interface RichTextVideoNode {
 	height?: number;
 }
 
-export interface RichTextEmbedNode {
+export interface RichTextEmbedNode extends PortableTextBlock {
 	_type: "legacyEmbed";
-	_key: string;
 	provider?: string;
 	url?: string;
 	embedUrl?: string;
 	title?: string;
 }
 
-export interface RichTextPageListNode {
+export interface RichTextPageListNode extends PortableTextBlock {
 	_type: "legacyPageList";
-	_key: string;
 }
 
-export interface RichTextNumberedHeadingNode {
+export interface RichTextNumberedHeadingNode extends PortableTextBlock {
 	_type: "numberedHeading";
-	_key: string;
 	level?: number;
 	index: number;
 	block: PortableTextBlock;

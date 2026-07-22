@@ -1,4 +1,4 @@
-import type { PortableTextBlock } from "emdash/ui";
+import type { PortableTextBlock } from "emdash";
 
 type RichTextFieldValue = PortableTextBlock[] | null | undefined;
 
