@@ -26,6 +26,7 @@ export interface SiteSearchResponse {
 }
 
 const PAGE_SIZE = 10;
+export const MAX_SEARCH_CURSOR_HISTORY = 20;
 const SEARCH_COLLECTIONS = ["pages", "posts", "projects"] as const;
 type SearchCollection = (typeof SEARCH_COLLECTIONS)[number];
 type SearchEntryData = PageData | PostData | ProjectData;
@@ -40,6 +41,24 @@ function resultKind(collection: SearchCollection): SearchResult["kind"] {
 		: collection === "posts"
 			? "post"
 			: "project";
+}
+
+export function searchCursorHistoryForNextPage(
+	history: string[],
+	cursor?: string,
+) {
+	if (history.length >= MAX_SEARCH_CURSOR_HISTORY) return null;
+	return [...history, cursor ?? ""];
+}
+
+export function isValidSearchCursorHistory(
+	pageNumber: number,
+	history: string[],
+) {
+	return (
+		history.length <= MAX_SEARCH_CURSOR_HISTORY &&
+		history.length === pageNumber - 1
+	);
 }
 
 export async function searchSite(

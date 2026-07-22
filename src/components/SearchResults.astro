@@ -1,7 +1,10 @@
 ---
 import EntrySummary from "./content/EntrySummary.astro";
 import ThemeSidebar from "./ThemeSidebar.astro";
-import type { SiteSearchResponse } from "../lib/search";
+import {
+	searchCursorHistoryForNextPage,
+	type SiteSearchResponse,
+} from "../lib/search";
 
 interface Props {
 	query: string;
@@ -37,9 +40,11 @@ function searchHref(
 const previousCursor = history.at(-1) || undefined;
 const previousHref =
 	page > 1 ? searchHref(page - 1, previousCursor, history.slice(0, -1)) : "";
-const nextHref = nextCursor
-	? searchHref(page + 1, nextCursor, [...history, cursor ?? ""])
-	: "";
+const nextHistory = searchCursorHistoryForNextPage(history, cursor);
+const nextHref =
+	nextCursor && nextHistory
+		? searchHref(page + 1, nextCursor, nextHistory)
+		: "";
 ---
 
 <div class="container-fluid">

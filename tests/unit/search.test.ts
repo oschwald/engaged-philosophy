@@ -8,7 +8,12 @@ const { emdashSearch, getPublishedEntriesByIds } = vi.hoisted(() => ({
 vi.mock("emdash", () => ({ search: emdashSearch }));
 vi.mock("../../src/lib/content", () => ({ getPublishedEntriesByIds }));
 
-import { searchSite } from "../../src/lib/search";
+import {
+	isValidSearchCursorHistory,
+	MAX_SEARCH_CURSOR_HISTORY,
+	searchCursorHistoryForNextPage,
+	searchSite,
+} from "../../src/lib/search";
 
 describe("site search", () => {
 	beforeEach(() => {
@@ -86,5 +91,28 @@ describe("site search", () => {
 				},
 			],
 		});
+	});
+
+	test("bounds cursor history and requires it to match the page", () => {
+		expect(searchCursorHistoryForNextPage([], undefined)).toEqual([""]);
+		expect(isValidSearchCursorHistory(2, [""])).toBe(true);
+		expect(isValidSearchCursorHistory(3, [""])).toBe(false);
+
+		const maximumHistory = Array.from(
+			{ length: MAX_SEARCH_CURSOR_HISTORY },
+			(_, index) => `cursor-${index}`,
+		);
+		expect(
+			isValidSearchCursorHistory(MAX_SEARCH_CURSOR_HISTORY + 1, maximumHistory),
+		).toBe(true);
+		expect(
+			searchCursorHistoryForNextPage(maximumHistory, "one-too-many"),
+		).toBeNull();
+		expect(
+			isValidSearchCursorHistory(MAX_SEARCH_CURSOR_HISTORY + 2, [
+				...maximumHistory,
+				"one-too-many",
+			]),
+		).toBe(false);
 	});
 });

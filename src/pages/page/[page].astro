@@ -1,7 +1,7 @@
 ---
 import SearchResults from "../../components/SearchResults.astro";
 import Base from "../../layouts/Base.astro";
-import { searchSite } from "../../lib/search";
+import { isValidSearchCursorHistory, searchSite } from "../../lib/search";
 import { getMediaUrlPrefix } from "../../lib/media";
 import { InvalidCursorError } from "emdash";
 
@@ -10,7 +10,13 @@ const query = Astro.url.searchParams.get("s")?.trim() ?? "";
 const cursor = Astro.url.searchParams.get("cursor") ?? undefined;
 const history = Astro.url.searchParams.getAll("before");
 
-if (!query || !Number.isInteger(pageNumber) || pageNumber < 2 || !cursor) {
+if (
+	!query ||
+	!Number.isInteger(pageNumber) ||
+	pageNumber < 2 ||
+	!cursor ||
+	!isValidSearchCursorHistory(pageNumber, history)
+) {
 	return Astro.redirect("/404");
 }
 
