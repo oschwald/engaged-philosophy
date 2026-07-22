@@ -62,7 +62,8 @@ function sitemapEntryUrl(origin: string, entry: SitemapInputEntry) {
 			configuredCanonical,
 			`${canonicalSitemapOrigin(origin)}/`,
 		);
-		return canonical.origin === new URL(origin).origin ? canonical.href : null;
+		if (canonical.origin !== new URL(origin).origin) return null;
+		return sitemapPathToUrl(origin, canonical.pathname);
 	} catch {
 		return sitemapPathToUrl(origin, entry.data.path);
 	}

@@ -101,8 +101,12 @@ describe("sitemap helpers", () => {
 				id: "canonical",
 				data: {
 					path: "old-path",
-					seo: { canonical: "/preferred/" },
+					seo: { canonical: "/preferred" },
 				},
+			},
+			{
+				id: "canonical-duplicate",
+				data: { path: "preferred" },
 			},
 			{
 				id: "noindex",
