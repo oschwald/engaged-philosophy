@@ -2,8 +2,10 @@
 import ProjectTermsList from "../../components/content/ProjectTermsList.astro";
 import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
+import { taxonomyCacheTag } from "../../lib/cache-tags";
 import { getEntryTerms, getProjectBySlug } from "../../lib/content";
 import { getEntryContent } from "../../lib/rich-text";
+import { PROJECT_TAXONOMIES } from "../../lib/taxonomy-utils";
 
 const { slug } = Astro.params;
 const project = await getProjectBySlug(slug ?? "");
@@ -30,6 +32,7 @@ const termGroups = [
 	title={project.data.title}
 	bodyClass={`wp-singular project-template-default single single-project${project.data.id ? ` postid-${project.data.id}` : ""} wp-theme-engaged-philosophy-20 content-sidebar`}
 	content={{ collection: "projects", entry: project }}
+	cacheTags={PROJECT_TAXONOMIES.map(taxonomyCacheTag)}
 >
 	<section id="primary" class="col-12 px-4">
 		<main id="content">

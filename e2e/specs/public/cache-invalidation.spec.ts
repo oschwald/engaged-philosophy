@@ -17,6 +17,8 @@ test.describe("public page cache", () => {
 		expect(anonymousResponse.headers()["cache-control"]).toBe(
 			"public, max-age=0, must-revalidate",
 		);
+		expect(anonymousResponse.headers()["cache-tag"]).toContain("site-settings");
+		expect(anonymousResponse.headers()["cache-tag"]).toContain("menu:primary");
 
 		await publicPage.context().addCookies([
 			{

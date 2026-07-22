@@ -20,7 +20,7 @@ describe("site page context", () => {
 
 		expect(
 			getSitePageCacheTags({ collection: "posts", entry }, ["posts", "posts"]),
-		).toEqual(["post-row-id", "posts"]);
+		).toEqual(["site-settings", "menu:primary", "post-row-id", "posts"]);
 	});
 
 	test("builds canonical metadata for custom pages", () => {

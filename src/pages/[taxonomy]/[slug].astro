@@ -7,6 +7,7 @@ import {
 	getTaxonomyTerm,
 } from "../../lib/content";
 import { getEntryContent } from "../../lib/rich-text";
+import { taxonomyCacheTag } from "../../lib/cache-tags";
 import { isProjectTaxonomy } from "../../lib/taxonomy-utils";
 import RichContent from "../../components/RichContent.astro";
 
@@ -57,7 +58,7 @@ const projectPage = isProjectArchive
 		<Base
 			title={term?.label}
 			bodyClass={`archive tax-${taxonomy} term-${slug} wp-theme-engaged-philosophy-20 content-sidebar`}
-			cacheTags={["projects"]}
+			cacheTags={["projects", taxonomyCacheTag(taxonomy)]}
 		>
 			<TaxonomyArchive
 				taxonomy={taxonomy}
