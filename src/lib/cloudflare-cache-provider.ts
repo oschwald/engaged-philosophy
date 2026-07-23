@@ -14,7 +14,18 @@ const factory: CacheProviderFactory = (config) => {
 
 			const tags = collectInvalidationTags(options);
 			if (tags.length === 0) return;
-			await cache.purge({ tags });
+
+			const result = await cache.purge({ tags });
+			if (!result.success) {
+				const details = result.errors
+					.map(({ code, message }) => `[${code}] ${message}`)
+					.join("; ");
+				throw new Error(
+					details
+						? `Cloudflare cache purge failed: ${details}`
+						: "Cloudflare cache purge failed",
+				);
+			}
 		},
 	};
 };
