@@ -1,6 +1,7 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { d1, r2 } from "@emdash-cms/cloudflare";
+import auditLogPlugin from "@emdash-cms/plugin-audit-log";
 import { embedsPlugin } from "@emdash-cms/plugin-embeds";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
@@ -11,9 +12,6 @@ import {
 	PUBLIC_MEDIA_URL,
 } from "./src/lib/site-config.ts";
 
-const auditLogPluginEntrypoint = fileURLToPath(
-	new URL("./src/plugins/audit-log.ts", import.meta.url),
-);
 const legacyImagePluginEntrypoint = fileURLToPath(
 	new URL("./src/plugins/legacy-image-blocks.ts", import.meta.url),
 );
@@ -56,11 +54,7 @@ function localEmDashRoutes() {
 }
 
 export const emdashPlugins = [
-	{
-		id: "audit-log",
-		version: "0.2.0",
-		entrypoint: auditLogPluginEntrypoint,
-	},
+	auditLogPlugin,
 	embedsPlugin({ types: ["youtube", "vimeo"] }),
 	{
 		id: "legacy-image-blocks",

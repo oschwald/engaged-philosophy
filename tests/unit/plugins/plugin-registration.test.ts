@@ -1,8 +1,9 @@
 import { describe, expect, test } from "vitest";
 
+import auditLogPlugin from "@emdash-cms/plugin-audit-log";
+
 import { emdashPlugins } from "../../../astro.config.mjs";
 
-import { createPlugin as createAuditLogPlugin } from "../../../src/plugins/audit-log";
 import { createPlugin as createLegacyImagePlugin } from "../../../src/plugins/legacy-image-blocks";
 
 describe("EmDash plugin registration", () => {
@@ -44,24 +45,14 @@ describe("EmDash plugin registration", () => {
 		});
 	});
 
-	test("registers audit log native hooks and admin UI", () => {
-		const plugin = createAuditLogPlugin();
+	test("registers the standard audit log plugin directly", () => {
+		const plugin = emdashPlugins.find(({ id }) => id === "audit-log");
 
-		expect(plugin.id).toBe("audit-log");
-		expect(plugin.capabilities).toEqual([
-			"content:read",
-			"content:write",
-			"media:read",
-		]);
-		expect(plugin.allowedHosts).toEqual([]);
-		expect(plugin.storage.entries.indexes).toEqual([
-			"timestamp",
-			"action",
-			"resourceType",
-			"collection",
-		]);
-		expect(plugin.admin.pages?.[0]?.path).toBe("/history");
-		expect(plugin.admin.widgets?.[0]?.id).toBe("recent-activity");
-		expect(typeof plugin.routes.admin?.handler).toBe("function");
+		expect(plugin).toBe(auditLogPlugin);
+		expect(plugin).toMatchObject({
+			format: "standard",
+			entrypoint: "@emdash-cms/plugin-audit-log/sandbox",
+			capabilities: ["content:read"],
+		});
 	});
 });

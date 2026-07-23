@@ -103,8 +103,9 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Plugins
 
-- `src/plugins/audit-log.ts` adapts the audit-log plugin's sandbox definition to
-  native hooks/routes so it can run on the current Cloudflare plan.
+- The upstream audit-log descriptor is registered directly. EmDash adapts its
+  standard-format entrypoint for trusted in-process execution, so it works
+  without Dynamic Worker loaders on the current Cloudflare plan.
 - The upstream embeds plugin registers and renders the enabled YouTube and Vimeo
   blocks directly.
 - `src/plugins/legacy-image-blocks.ts` preserves edit controls for imported
@@ -122,8 +123,6 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Removal Candidates
 
-- Revisit the audit-log native adapter if Cloudflare sandbox support becomes
-  available or the upstream plugin ships a native/free-plan mode.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   waits for Portable Text saves before publishing or leaving edit mode.
 - Remove the local cache-provider wrapper when Wrangler exposes
