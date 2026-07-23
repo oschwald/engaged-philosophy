@@ -49,10 +49,13 @@ describe("Worker security headers", () => {
 		expect(response.headers.get("vary")).toBe("Accept-Encoding, Cookie");
 	});
 
-	test("bypasses the edge cache for cookie and query variants", () => {
+	test("bypasses the edge cache for stateful and query variants", () => {
 		for (const request of [
 			new Request("https://www.engagedphilosophy.com/about/", {
 				headers: { cookie: "CF_Authorization=abc" },
+			}),
+			new Request("https://www.engagedphilosophy.com/about/", {
+				headers: { "cf-access-jwt-assertion": "jwt" },
 			}),
 			new Request("https://www.engagedphilosophy.com/about/?utm_source=test"),
 		]) {

@@ -105,7 +105,11 @@ export function applySecurityHeaders(request: Request, response: Response) {
 	const url = new URL(request.url);
 	if (!isAdminPath(url.pathname) && isHtmlResponse(securedResponse)) {
 		appendVary(securedResponse.headers, "Cookie");
-		if (request.headers.get("cookie")?.trim() || url.search) {
+		if (
+			request.headers.get("cookie")?.trim() ||
+			isStatefulRequest(request) ||
+			url.search
+		) {
 			securedResponse.headers.set("cloudflare-cdn-cache-control", "no-store");
 		}
 
