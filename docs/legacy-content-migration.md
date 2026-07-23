@@ -67,18 +67,57 @@ The classifications are migration guidance, not an automatic approval to
 remove code. Before deleting a renderer, the inventory must show that both
 current content and revisions are compatible with the proposed replacement.
 
+## Plan Native Conversions
+
+After reviewing the inventory, run the conversion planner against the same
+backup:
+
+```sh
+pnpm run plan:legacy-content-conversion -- \
+  --input .migration/emdash-backup-<date>.json
+```
+
+For a deterministic machine-readable report:
+
+```sh
+pnpm run plan:legacy-content-conversion -- \
+  --input .migration/emdash-backup-<date>.json \
+  --json > .migration/legacy-content-conversion-plan.json
+```
+
+The planner creates a converted backup copy in memory so the transformation can
+be tested, but the command emits only the report and discards that copy. It does
+not overwrite the input, create a new backup file, connect to Cloudflare, or
+write to D1.
+
+The current safe transformations are:
+
+- `legacyImage` to EmDash `image` when the image is unlinked, unshaped, and has
+  a resolvable media source;
+- imported image alignment from `align` to EmDash's native `alignment`;
+- legacy or incomplete image sources to standard EmDash `asset` references;
+  and
+- valid YouTube and Vimeo legacy embeds to the standard embeds-plugin blocks,
+  preserving supported player parameters and accessible titles.
+
+Unsupported providers, linked or shaped images, legacy gallery behavior,
+playlist videos, page lists, and numbered headings remain unchanged and appear
+as blocked or deferred occurrences. Reports include before/after type summaries
+and exact identifier/block paths, but no content body text or source URLs.
+
+The converter is idempotent: planning against its in-memory result produces no
+additional changes. This property is required before an eventual writer can use
+the same transformation.
+
 ## Follow-up Migration Work
 
-Keep later phases separate from this audit:
+Keep later phases separate from the inventory and planner:
 
-1. Capture and review a fresh production inventory.
-2. Implement an idempotent, pure converter against backup fixtures, with
-   explicit before/after summaries and no database access.
-3. Add a dry-run command that reports the exact rows and fields it would
-   change, then verify rendering and editing against the converted fixture.
-4. Only then design an explicit production writer with a fresh backup,
+1. Capture and review a fresh production inventory and conversion plan.
+2. Verify rendering and editing against a converted production-shaped fixture.
+3. Only then design an explicit production writer with a fresh backup,
    rollback instructions, and post-migration verification.
-5. Remove renderers and editor plugins in independent commits after production
+4. Remove renderers and editor plugins in independent commits after production
    content no longer needs them.
 
 The live site uses Cloudflare Workers Free. Inventory and conversion work should
