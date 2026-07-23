@@ -67,7 +67,9 @@ consuming the smaller KV write budget or requiring a paid service.
   The custom sitemap still honors EmDash noindex and canonical settings.
 - Current Portable Text image and gallery nodes use the EmDash renderers.
   Legacy renderers remain only for imported WordPress alignment, link, gallery,
-  and media shapes that do not have direct EmDash equivalents.
+  and media shapes that do not have direct EmDash equivalents. The
+  [legacy content migration workflow](./legacy-content-migration.md) inventories
+  current content and revision history before any renderer is removed.
 
 ## Imported Field Names
 
@@ -123,6 +125,9 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Removal Candidates
 
+- Use the legacy content inventory to replace compatible imported blocks with
+  standard EmDash image, gallery, and embed blocks, then remove each unused
+  renderer independently.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   waits for Portable Text saves before publishing or leaving edit mode.
 - Remove the local cache-provider wrapper when Wrangler exposes
