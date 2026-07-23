@@ -1,0 +1,118 @@
+{
+	"format": "emdash-backup",
+	"formatVersion": 1,
+	"emdashVersion": "0.30.0",
+	"generatedAt": "2026-07-23T12:00:00.000Z",
+	"schema": {},
+	"tables": {
+		"_emdash_collections": [
+			{
+				"id": "collection-pages",
+				"slug": "pages"
+			},
+			{
+				"id": "collection-posts",
+				"slug": "posts"
+			}
+		],
+		"_emdash_fields": [
+			{
+				"id": "field-page-content",
+				"collection_id": "collection-pages",
+				"slug": "content",
+				"type": "portableText"
+			},
+			{
+				"id": "field-page-about",
+				"collection_id": "collection-pages",
+				"slug": "about_html",
+				"type": "portableText"
+			},
+			{
+				"id": "field-post-content",
+				"collection_id": "collection-posts",
+				"slug": "content",
+				"type": "portableText"
+			},
+			{
+				"id": "field-post-excerpt",
+				"collection_id": "collection-posts",
+				"slug": "excerpt",
+				"type": "portableText"
+			},
+			{
+				"id": "field-page-title",
+				"collection_id": "collection-pages",
+				"slug": "title",
+				"type": "text"
+			}
+		],
+		"media": [
+			{
+				"id": "media-1",
+				"filename": "first.jpg",
+				"mime_type": "image/jpeg",
+				"storage_key": "wp-content/uploads/first.jpg",
+				"status": "ready"
+			},
+			{
+				"id": "media-2",
+				"filename": "second.jpg",
+				"mime_type": "image/jpeg",
+				"storage_key": "wp-content/uploads/second.jpg",
+				"status": "ready"
+			}
+		],
+		"ec_pages": [
+			{
+				"id": "page-1",
+				"slug": "sample-page",
+				"path": "/sample-page/",
+				"status": "published",
+				"content": "[{\"_type\":\"block\",\"_key\":\"body\",\"style\":\"normal\",\"children\":[{\"_type\":\"span\",\"text\":\"DO NOT LEAK THIS BODY TEXT\"}]},{\"_type\":\"legacyImage\",\"_key\":\"image-ready\",\"asset\":{\"_ref\":\"media-1\",\"url\":\"/_emdash/api/media/file/media-1\"},\"align\":\"left\",\"caption\":\"A safe caption that is not emitted\"},{\"_type\":\"legacyImage\",\"_key\":\"image-blocked\",\"id\":\"/wp-content/uploads/second.jpg\",\"href\":\"https://example.test/destination\",\"shape\":\"rounded\"},{\"_type\":\"gallery\",\"_key\":\"gallery-legacy\",\"layout\":\"figure\",\"align\":\"center\",\"caption\":\"A gallery caption\",\"images\":[{\"_type\":\"image\",\"_key\":\"gallery-image\",\"asset\":{\"_ref\":\"media-1\",\"url\":\"/_emdash/api/media/file/media-1\"}}]},{\"_type\":\"legacyEmbed\",\"_key\":\"youtube\",\"provider\":\"youtube\",\"embedUrl\":\"https://www.youtube.com/embed/abcdefghijk\"},{\"_type\":\"legacyVideo\",\"_key\":\"video\",\"url\":\"https://media.example.test/movie.mp4\",\"title\":\"A video title\",\"mimeType\":\"video/mp4\",\"width\":640,\"height\":360},{\"_type\":\"legacyPageList\",\"_key\":\"page-list\"},{\"_type\":\"block\",\"_key\":\"numbered-heading\",\"style\":\"h2\",\"listItem\":\"number\",\"children\":[{\"_type\":\"span\",\"text\":\"A numbered heading\"}]},{\"_type\":\"youtube\",\"_key\":\"native-youtube\",\"id\":\"abcdefghijk\"}]",
+				"about_html": "{not valid json"
+			},
+			{
+				"id": "page-scheduled",
+				"slug": "scheduled-page",
+				"path": "/scheduled-page/",
+				"status": "scheduled",
+				"content": "[]",
+				"about_html": null
+			}
+		],
+		"ec_posts": [
+			{
+				"id": "post-1",
+				"slug": "sample-post",
+				"path": "/sample-post/",
+				"status": "draft",
+				"content": "[{\"_type\":\"gallery\",\"_key\":\"gallery-native\",\"columns\":2,\"images\":[{\"_type\":\"image\",\"_key\":\"normalized-image\",\"asset\":{\"url\":\"/_emdash/api/media/file/media-2\",\"meta\":{\"storageKey\":\"wp-content/uploads/second.jpg\"}}}]}]",
+				"excerpt": null
+			},
+			{
+				"id": "post-trashed",
+				"slug": "trashed-post",
+				"path": "/trashed-post/",
+				"status": "published",
+				"deleted_at": "2026-07-22T12:00:00.000Z",
+				"content": "[]",
+				"excerpt": null
+			}
+		],
+		"revisions": [
+			{
+				"id": "revision-1",
+				"collection": "pages",
+				"entry_id": "page-1",
+				"data": "{\"content\":[{\"_type\":\"legacyEmbed\",\"_key\":\"vimeo\",\"provider\":\"vimeo\",\"url\":\"https://player.vimeo.com/video/12345\"},{\"_type\":\"legacyEmbed\",\"_key\":\"animoto\",\"provider\":\"animoto\",\"url\":\"https://video214.com/play/example\"},{\"_type\":\"columns\",\"_key\":\"columns\",\"columns\":[{\"content\":[{\"_type\":\"legacyImage\",\"_key\":\"nested-image\",\"url\":\"https://cdn.example.test/nested.jpg\"}]}]}],\"about_html\":[]}"
+			},
+			{
+				"id": "revision-invalid",
+				"collection": "pages",
+				"entry_id": "page-1",
+				"data": "{invalid revision json"
+			}
+		]
+	}
+}

@@ -36,6 +36,7 @@
 		"test:e2e:ui": "playwright test --ui",
 		"smoke:live": "node scripts/test-smoke-live.mjs",
 		"smoke:live:sitemap": "LIVE_SMOKE_SITEMAP=1 LIVE_SMOKE_REQUIRE_SITEMAP=1 node scripts/test-smoke-live.mjs",
+		"audit:legacy-content": "node scripts/audit-legacy-content.mjs",
 		"preview": "astro preview",
 		"deploy": "pnpm run build && wrangler deploy",
 		"typecheck": "astro check",
