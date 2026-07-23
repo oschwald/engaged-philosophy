@@ -105,7 +105,7 @@
 				"id": "revision-1",
 				"collection": "pages",
 				"entry_id": "page-1",
-				"data": "{\"content\":[{\"_type\":\"legacyEmbed\",\"_key\":\"vimeo\",\"provider\":\"vimeo\",\"url\":\"https://player.vimeo.com/video/12345\"},{\"_type\":\"legacyEmbed\",\"_key\":\"animoto\",\"provider\":\"animoto\",\"url\":\"https://video214.com/play/example\"},{\"_type\":\"columns\",\"_key\":\"columns\",\"columns\":[{\"content\":[{\"_type\":\"legacyImage\",\"_key\":\"nested-image\",\"url\":\"https://cdn.example.test/nested.jpg\"}]}]}],\"about_html\":[]}"
+				"data": "{\"content\":[{\"_type\":\"legacyEmbed\",\"_key\":\"vimeo\",\"provider\":\"vimeo\",\"url\":\"https://player.vimeo.com/video/12345\"},{\"_type\":\"legacyEmbed\",\"_key\":\"animoto\",\"provider\":\"animoto\",\"url\":\"https://video214.com/play/example\"},{\"_type\":\"legacyEmbed\",\"_key\":\"invalid-youtube\",\"provider\":\"youtube\",\"url\":\"https://example.test/not-a-video\"},{\"_type\":\"columns\",\"_key\":\"columns\",\"columns\":[{\"content\":[{\"_type\":\"legacyImage\",\"_key\":\"nested-image\",\"url\":\"https://cdn.example.test/nested.jpg\"}]}]}],\"about_html\":[]}"
 			},
 			{
 				"id": "revision-invalid",

@@ -136,6 +136,14 @@ describe("legacy content inventory", () => {
 			classification: "blocked",
 			mediaResolution: "media-row",
 		});
+		expect(
+			findOccurrence(inventory, "legacyEmbed", (occurrence) =>
+				occurrence.blockers.includes("invalid-provider-source"),
+			),
+		).toMatchObject({
+			classification: "blocked",
+			provider: "youtube",
+		});
 		expect(inventory.summary.byType.gallery).toMatchObject({
 			total: 2,
 			classifications: {

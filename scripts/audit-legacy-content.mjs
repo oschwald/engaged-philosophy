@@ -429,19 +429,72 @@ function embedProvider(node) {
 	};
 }
 
+function nativeEmbedId(provider, source) {
+	if (!source) return undefined;
+
+	if (provider === "youtube") {
+		if (/^[A-Za-z0-9_-]{11}$/.test(source)) return source;
+
+		const parsed = safeUrl(source);
+		if (!parsed?.hostname) return undefined;
+		if (
+			parsed.hostname !== "youtu.be" &&
+			!parsed.hostname.endsWith("youtube.com") &&
+			!parsed.hostname.endsWith("youtube-nocookie.com")
+		) {
+			return undefined;
+		}
+
+		const url = new URL(source);
+		const candidate =
+			url.searchParams.get("v") ??
+			url.pathname.match(
+				/^\/(?:embed|shorts|live)\/([A-Za-z0-9_-]{11})/,
+			)?.[1] ??
+			(parsed.hostname === "youtu.be"
+				? url.pathname.match(/^\/([A-Za-z0-9_-]{11})/)?.[1]
+				: undefined);
+		return candidate && /^[A-Za-z0-9_-]{11}$/.test(candidate)
+			? candidate
+			: undefined;
+	}
+
+	if (provider === "vimeo") {
+		if (/^\d{1,20}$/.test(source)) return source;
+
+		const parsed = safeUrl(source);
+		if (
+			!parsed?.hostname ||
+			(parsed.hostname !== "vimeo.com" &&
+				!parsed.hostname.endsWith(".vimeo.com"))
+		) {
+			return undefined;
+		}
+
+		return parsed.pathname.match(/\/(?:video\/)?(\d{1,20})(?:\/|$)/)?.[1];
+	}
+
+	return undefined;
+}
+
 function classifyLegacyEmbed(node) {
 	const { provider, hostname, source } = embedProvider(node);
 	const blockers = [];
 	let classification = "blocked";
 	let targetType;
 
-	if ((provider === "youtube" || provider === "vimeo") && source) {
+	if (
+		(provider === "youtube" || provider === "vimeo") &&
+		nativeEmbedId(provider, source)
+	) {
 		classification = "native-ready";
 		targetType = provider;
 	} else if (!source) {
 		blockers.push("missing-embed-source");
 	} else if (provider === "animoto") {
 		blockers.push("unsupported-provider");
+	} else if (provider === "youtube" || provider === "vimeo") {
+		blockers.push("invalid-provider-source");
 	} else {
 		blockers.push("unknown-provider");
 	}
