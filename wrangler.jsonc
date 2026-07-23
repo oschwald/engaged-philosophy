@@ -16,8 +16,12 @@
 			"custom_domain": true,
 		},
 	],
-	"compatibility_date": "2026-05-25",
+	"compatibility_date": "2026-07-21",
 	"compatibility_flags": ["nodejs_compat"],
+	"cache": {
+		"enabled": true,
+		"cross_version_cache": false,
+	},
 	"observability": {
 		"traces": {
 			"enabled": true,

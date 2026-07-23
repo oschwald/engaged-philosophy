@@ -7,7 +7,6 @@ import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
 
 import {
-	ANONYMOUS_PAGE_CACHE_NAME,
 	CLOUDFLARE_ACCESS_TEAM_DOMAIN,
 	PUBLIC_MEDIA_URL,
 } from "./src/lib/site-config.ts";
@@ -27,8 +26,8 @@ const cloudflareAccessAuthEntrypoint = fileURLToPath(
 const testAuthEntrypoint = fileURLToPath(
 	new URL("./src/lib/test-auth.ts", import.meta.url),
 );
-const anonymousCloudflareCacheEntrypoint = fileURLToPath(
-	new URL("./src/lib/anonymous-cloudflare-cache.ts", import.meta.url),
+const cloudflareCacheProviderEntrypoint = fileURLToPath(
+	new URL("./src/lib/cloudflare-cache-provider.ts", import.meta.url),
 );
 const cloudflareAccessInviteRouteEntrypoint = fileURLToPath(
 	new URL("./src/emdash-routes/cloudflare-access-invite.ts", import.meta.url),
@@ -76,10 +75,8 @@ export default defineConfig({
 	adapter: cloudflare(),
 	cache: {
 		provider: {
-			entrypoint: anonymousCloudflareCacheEntrypoint,
-			config: {
-				cacheName: ANONYMOUS_PAGE_CACHE_NAME,
-			},
+			name: "cloudflare",
+			entrypoint: cloudflareCacheProviderEntrypoint,
 		},
 	},
 	vite: {

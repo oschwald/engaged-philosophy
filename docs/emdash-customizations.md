@@ -14,12 +14,20 @@ Cloudflare constraints.
   invite flow with local user creation plus an admin URL, because sign-in is
   protected by Cloudflare Access. If configured, it also appends the invited
   email to a Zero Trust EMAIL list referenced by the admin Access policy.
-- `src/lib/anonymous-cloudflare-cache.ts` caches anonymous HTML page responses in
-  the Workers Cache API while bypassing signed-in, preview, admin, API, and
-  static-asset requests. Detail pages use their EmDash entry ID as the cache
-  tag; collection tags are reserved for list pages that actually depend on the
-  collection. Cached HTML is fresh for five minutes and may be served stale for
-  at most another five minutes while it revalidates.
+- Astro's Cloudflare route-cache provider caches public HTML and generated site
+  metadata in Workers Cache. `src/lib/cloudflare-cache-provider.ts` delegates
+  header generation to the upstream provider and only skips tag purges when
+  local Wrangler does not expose `cache.purge()`.
+- Public responses are fresh at the edge for one day and may be served stale
+  for one hour while they revalidate. Browsers receive `max-age=0` and
+  revalidate instead of retaining HTML or generated metadata independently.
+  Cookie-bearing and query-string HTML responses are `no-store`; public HTML
+  varies on `Cookie` so a cached anonymous response cannot hide that bypass.
+- Page cache tags describe the content entry, collection lists, site settings,
+  primary menu, and taxonomy data actually rendered. EmDash already invalidates
+  entry and collection tags. Site middleware adds settings, primary-menu, and
+  taxonomy invalidation, batching every affected tag into one purge request.
+  This keeps the additional purge load small on Workers Free.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
   controls wait for pending inline saves. EmDash 0.30 flushes edits when the
   browser navigates away, but its toolbar can still publish before a Portable
@@ -34,14 +42,14 @@ scheduled Worker handler. Administrators can enable daily archives under
 Settings -> Backups; archives contain content and media metadata, not media
 binaries, user accounts, or secrets.
 
-The upstream Cloudflare route-cache provider is not used because this site must
-bypass additional Cloudflare Access, preview, and visual-editing cookies. The
-EmDash KV object cache is also intentionally disabled on Workers Free: the
+The upstream Cloudflare route-cache provider is used with response safeguards
+for Cloudflare Access, preview, visual-editing, and other cookies. The EmDash KV
+object cache is still intentionally disabled on Workers Free: the
 [KV free allowance](https://developers.cloudflare.com/kv/platform/limits/) is
 100,000 reads and 1,000 writes per day, while the
 [D1 free allowance](https://developers.cloudflare.com/workers/platform/pricing/#d1)
-is 5 million rows read per day. The existing anonymous HTML cache avoids most
-repeat D1 work without consuming the smaller KV write budget.
+is 5 million rows read per day. Workers Cache avoids most repeat D1 work without
+consuming the smaller KV write budget or requiring a paid service.
 
 ## Public Rendering
 
@@ -107,8 +115,10 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 - `astro.config.mjs` keeps the Vite chunk-size warning limit aligned with the
   admin bundle size while leaving upstream build warnings visible.
-- `wrangler.jsonc` enables Cloudflare logs/traces and includes both current and
-  legacy binding names for D1/R2 compatibility.
+- `wrangler.jsonc` enables Workers Cache with per-deployment version isolation,
+  enables Cloudflare logs/traces, and includes both current and legacy binding
+  names for D1/R2 compatibility. A deployment starts with a cold route cache;
+  stale entries are not reused across Worker versions.
 
 ## Removal Candidates
 
@@ -116,6 +126,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   available or the upstream plugin ships a native/free-plan mode.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   waits for Portable Text saves before publishing or leaving edit mode.
+- Remove the local cache-provider wrapper when Wrangler exposes
+  `cache.purge()` for its local Workers Cache implementation.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a
   Cloudflare Email Sending plugin, but that only handles email delivery; this

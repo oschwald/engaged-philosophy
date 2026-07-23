@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import { taxonomyCacheTag } from "../../lib/cache-tags";
 import { getTaxonomyTerms } from "../../lib/content";
 
 const allTopics = await getTaxonomyTerms("topic");
@@ -30,7 +31,7 @@ const maxCount = counts.length ? Math.max(...counts) : 0;
 <Base
 	title="Civic Engagement Projects"
 	bodyClass="post-type-archive post-type-archive-project"
-	cacheTags={["projects"]}
+	cacheTags={["projects", taxonomyCacheTag("topic")]}
 >
 	<div class="container-fluid">
 		<section id="primary" class="p-4">

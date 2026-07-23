@@ -245,26 +245,23 @@ async function checkCacheSignal(path) {
 	const url = absoluteUrl(path);
 	const first = await expectOk(url, `Cache probe ${path}`);
 	const second = await expectOk(url, `Cache probe ${path}`);
-	const epCache =
-		second.headers.get("x-ep-cache") ?? first.headers.get("x-ep-cache") ?? "";
-	const cfCache =
-		second.headers.get("cf-cache-status") ??
-		first.headers.get("cf-cache-status") ??
-		"";
-
-	assert.match(
-		epCache,
-		/^(HIT|MISS|STALE)$/i,
-		`Cache probe ${path} should expose X-EP-Cache, got ${epCache || "none"}`,
+	const cacheStatuses = [first, second].map(
+		(response) => response.headers.get("cf-cache-status") ?? "",
 	);
-	if (cfCache) {
+
+	for (const cacheStatus of cacheStatuses) {
 		assert.match(
-			cfCache,
-			/^(HIT|MISS|EXPIRED|STALE|BYPASS|DYNAMIC|REVALIDATED)$/i,
-			`Cache probe ${path} returned unexpected CF-Cache-Status: ${cfCache}`,
+			cacheStatus,
+			/^(HIT|MISS|EXPIRED|STALE|UPDATING|REVALIDATED)$/i,
+			`Cache probe ${path} returned unexpected CF-Cache-Status: ${cacheStatus || "none"}`,
 		);
 	}
-	console.log(`ok cache ${path} (${epCache}${cfCache ? `, ${cfCache}` : ""})`);
+	assert.match(
+		cacheStatuses[1],
+		/^(HIT|STALE|UPDATING|REVALIDATED)$/i,
+		`Second cache probe ${path} should be served from cache, got ${cacheStatuses[1]}`,
+	);
+	console.log(`ok cache ${path} (${cacheStatuses.join(", ")})`);
 }
 
 function isAllowedAdminRedirect(location) {

@@ -47,7 +47,7 @@ jobs:
           set -o pipefail
           cp -a test-results/e2e-static test-results/e2e-static-initial || true
           cp -a playwright-report-static playwright-report-static-initial || true
-          pnpm run test:static -- --last-failed 2>&1 | tee playwright-debug-static.log
+          pnpm run test:static --last-failed 2>&1 | tee playwright-debug-static.log
 
       - name: Typecheck app
         run: pnpm run typecheck
@@ -80,7 +80,7 @@ jobs:
           set -o pipefail
           cp -a test-results/e2e test-results/e2e-initial || true
           cp -a playwright-report playwright-report-initial || true
-          pnpm run test:e2e -- --last-failed 2>&1 | tee playwright-debug-e2e.log
+          pnpm run test:e2e --last-failed 2>&1 | tee playwright-debug-e2e.log
 
       - name: Upload Playwright failure artifacts
         if: failure()

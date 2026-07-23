@@ -1,8 +1,21 @@
+import type { APIRoute } from "astro";
+
+import { SITE_SETTINGS_CACHE_TAG } from "../lib/cache-tags";
 import { getRuntimeSiteSettings } from "../lib/content";
 import { rewriteInternalMediaFileUrl } from "../lib/media";
-import { SITE_TAGLINE_FALLBACK, SITE_TITLE_FALLBACK } from "../lib/site-config";
+import {
+	PUBLIC_EDGE_CACHE_MAX_AGE_SECONDS,
+	PUBLIC_EDGE_CACHE_SWR_SECONDS,
+	SITE_TAGLINE_FALLBACK,
+	SITE_TITLE_FALLBACK,
+} from "../lib/site-config";
 
-export async function GET() {
+export const GET: APIRoute = async ({ cache }) => {
+	cache.set({
+		maxAge: PUBLIC_EDGE_CACHE_MAX_AGE_SECONDS,
+		swr: PUBLIC_EDGE_CACHE_SWR_SECONDS,
+		tags: [SITE_SETTINGS_CACHE_TAG],
+	});
 	const settings = await getRuntimeSiteSettings();
 	const siteTitle = settings?.title || SITE_TITLE_FALLBACK;
 	const favicon = settings?.favicon;
@@ -37,7 +50,8 @@ export async function GET() {
 		{
 			headers: {
 				"Content-Type": "application/manifest+json; charset=utf-8",
+				"Cache-Control": "public, max-age=0, must-revalidate",
 			},
 		},
 	);
-}
+};

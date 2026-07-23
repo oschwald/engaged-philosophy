@@ -127,13 +127,13 @@ export function canonicalAliasForItem(
 	return `/${collection}/${slug}/`;
 }
 
-export async function dismissWelcome(page: Page, timeoutMs = 2000) {
+export async function dismissWelcome(page: Page, timeoutMs = 15_000) {
+	await page
+		.locator("#emdash-boot-loader")
+		.waitFor({ state: "hidden", timeout: timeoutMs });
+
 	const dialog = page.getByRole("dialog", { name: /Welcome to EmDash/ });
-	try {
-		await dialog.waitFor({ state: "visible", timeout: timeoutMs });
-	} catch {
-		return;
-	}
+	if (!(await dialog.isVisible())) return;
 
 	const primary = dialog.getByRole("button", { name: "Get Started" });
 	const close = dialog.getByRole("button", { name: "Close" });

@@ -1,6 +1,7 @@
 import { getSeoMeta, type PublicPageContext } from "emdash";
 import { createPublicPageContext } from "emdash/page";
 
+import { PRIMARY_MENU_CACHE_TAG, SITE_SETTINGS_CACHE_TAG } from "./cache-tags";
 import type { ContentEntry, PageData, PostData, ProjectData } from "./types";
 
 type SiteContentData = PageData | PostData | ProjectData;
@@ -15,7 +16,12 @@ export function getSitePageCacheTags(
 	dependencies: string[] = [],
 ) {
 	return [
-		...new Set([...(content ? [content.entry.id] : []), ...dependencies]),
+		...new Set([
+			SITE_SETTINGS_CACHE_TAG,
+			PRIMARY_MENU_CACHE_TAG,
+			...(content ? [content.entry.id] : []),
+			...dependencies,
+		]),
 	];
 }
 

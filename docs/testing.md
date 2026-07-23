@@ -30,10 +30,18 @@ browser timing in `e2e-static/`, and admin/public workflows in `e2e/`.
 - `pnpm run test:e2e:admin`, `pnpm run test:e2e:editing`, and
   `pnpm run test:e2e:public` run focused Worker-backed Playwright groups.
 - `pnpm run smoke:live` runs lightweight checks against a deployed site. Set
-  `LIVE_BASE_URL` to target a non-default hostname.
+  `LIVE_BASE_URL` to target a non-default hostname. The smoke test requests one
+  public page twice and requires Cloudflare's second response to report a cache
+  hit (or a stale/revalidated equivalent).
 - `pnpm run smoke:live:sitemap` runs the deployed smoke checks plus every same
   origin URL listed in the sitemap, and fails if the sitemap is empty.
 - Use `LIVE_SMOKE_PATH_FILE` with `pnpm run smoke:live` to check one URL/path
   per line from a custom list.
 - `pnpm run ci` runs linting, fast tests, typecheck, build, Worker checks, and
   Worker-backed Playwright.
+
+Wrangler's local runtime exposes route-cache headers but does not currently
+emulate production tag purging or `CF-Cache-Status`. The Worker-backed cache
+tests therefore verify cache policy, tags, stateful/query bypasses, and content
+refresh behavior locally; `pnpm run smoke:live` is the production cache-hit
+check after deployment.

@@ -5,6 +5,7 @@ import {
 	getProjectsPageByTaxonomy,
 	getTaxonomyTerm,
 } from "../../../../lib/content";
+import { taxonomyCacheTag } from "../../../../lib/cache-tags";
 import { isProjectTaxonomy } from "../../../../lib/taxonomy-utils";
 
 const { taxonomy = "", slug = "", page = "1" } = Astro.params;
@@ -36,7 +37,7 @@ if (projects.length === 0) {
 <Base
 	title={`${term.label} – Page ${pageNumber}`}
 	bodyClass={`archive paged tax-${taxonomy} term-${slug} paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
-	cacheTags={["projects"]}
+	cacheTags={["projects", taxonomyCacheTag(taxonomy)]}
 >
 	<TaxonomyArchive
 		taxonomy={taxonomy}
