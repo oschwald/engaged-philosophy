@@ -578,7 +578,7 @@ test.describe("public migrated content rendering", () => {
 			).resolves.toEqual({
 				counterIncrement: "imported-numbered-heading 1",
 				listTag: "OL",
-				listPaddingLeft: "36px",
+				listPaddingLeft: "24px",
 				headingMarginBottom: "0px",
 				markerContent: 'counter(imported-numbered-heading) ". "',
 			});

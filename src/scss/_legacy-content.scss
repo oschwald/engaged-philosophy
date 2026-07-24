@@ -188,11 +188,6 @@
 	counter-reset: imported-numbered-heading;
 }
 
-.legacy-content > ol:has(> li > :is(h1, h2, h3, h4, h5, h6):only-child) {
-	margin-bottom: 1rem;
-	padding-left: 2.25rem;
-}
-
 .legacy-content > ol > li:has(> :is(h1, h2, h3, h4, h5, h6):only-child) {
 	counter-increment: imported-numbered-heading;
 }
