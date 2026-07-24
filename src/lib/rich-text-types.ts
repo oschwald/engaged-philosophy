@@ -54,11 +54,4 @@ export interface RichTextPageListNode extends PortableTextBlock {
 	_type: "legacyPageList";
 }
 
-export type RichTextBlock =
-	| PortableTextBlock
-	| RichTextGalleryNode
-	| RichTextVideoNode
-	| RichTextEmbedNode
-	| RichTextPageListNode;
-
-export type RichTextValue = RichTextBlock[];
+export type RichTextValue = PortableTextBlock[];

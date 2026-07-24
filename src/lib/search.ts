@@ -89,7 +89,8 @@ export async function searchSite(
 				ids,
 			);
 			return entries.map(
-				(entry) => [`${collection}:${entry.id}`, entry] as const,
+				(entry) =>
+					[`${collection}:${entry.data.id || entry.id}`, entry] as const,
 			);
 		}),
 	);
@@ -106,7 +107,7 @@ export async function searchSite(
 
 		return [
 			{
-				id: entry.id,
+				id: hit.id,
 				kind: resultKind(collection),
 				title,
 				path,

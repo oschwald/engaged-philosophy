@@ -27,7 +27,8 @@
 					"slug": "title",
 					"label": "Title",
 					"type": "string",
-					"required": true
+					"required": true,
+					"searchable": true
 				},
 				{
 					"slug": "path",
@@ -40,6 +41,7 @@
 					"slug": "content",
 					"label": "Content",
 					"type": "portableText",
+					"searchable": true,
 					"widget": "portableText"
 				},
 				{
@@ -113,7 +115,8 @@
 					"slug": "title",
 					"label": "Title",
 					"type": "string",
-					"required": true
+					"required": true,
+					"searchable": true
 				},
 				{
 					"slug": "path",
@@ -126,12 +129,14 @@
 					"slug": "excerpt",
 					"label": "Excerpt",
 					"type": "portableText",
+					"searchable": true,
 					"widget": "portableText"
 				},
 				{
 					"slug": "content",
 					"label": "Content",
 					"type": "portableText",
+					"searchable": true,
 					"widget": "portableText"
 				},
 				{
@@ -166,7 +171,8 @@
 					"slug": "title",
 					"label": "Title",
 					"type": "string",
-					"required": true
+					"required": true,
+					"searchable": true
 				},
 				{
 					"slug": "path",
@@ -179,12 +185,14 @@
 					"slug": "excerpt",
 					"label": "Excerpt",
 					"type": "portableText",
+					"searchable": true,
 					"widget": "portableText"
 				},
 				{
 					"slug": "content",
 					"label": "Content",
 					"type": "portableText",
+					"searchable": true,
 					"widget": "portableText"
 				},
 				{

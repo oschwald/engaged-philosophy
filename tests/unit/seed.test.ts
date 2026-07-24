@@ -4,7 +4,11 @@ import { describe, expect, test } from "vitest";
 import { validateSeed } from "emdash";
 
 interface CheckedInSeed {
-	collections?: Array<{ slug?: string }>;
+	collections?: Array<{
+		slug?: string;
+		supports?: string[];
+		fields?: Array<{ slug?: string; searchable?: boolean }>;
+	}>;
 	content?: unknown;
 	[key: string]: unknown;
 }
@@ -39,6 +43,27 @@ describe("checked-in EmDash seed", () => {
 			expect(collectionSlugs.has(slug), `Missing ${slug} collection`).toBe(
 				true,
 			);
+		}
+	});
+
+	test("indexes the public search fields", () => {
+		for (const collection of seed.collections ?? []) {
+			if (!["pages", "posts", "projects"].includes(collection.slug ?? "")) {
+				continue;
+			}
+
+			expect(collection.supports).toContain("search");
+			const searchableFields = new Set(
+				collection.fields
+					?.filter((field) => field.searchable)
+					.map((field) => field.slug),
+			);
+			const expectedFields =
+				collection.slug === "pages"
+					? ["title", "content"]
+					: ["title", "excerpt", "content"];
+
+			expect(searchableFields).toEqual(new Set(expectedFields));
 		}
 	});
 
