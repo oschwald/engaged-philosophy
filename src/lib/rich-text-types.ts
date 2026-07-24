@@ -54,19 +54,11 @@ export interface RichTextPageListNode extends PortableTextBlock {
 	_type: "legacyPageList";
 }
 
-export interface RichTextNumberedHeadingNode extends PortableTextBlock {
-	_type: "numberedHeading";
-	level?: number;
-	index: number;
-	block: PortableTextBlock;
-}
-
 export type RichTextBlock =
 	| PortableTextBlock
 	| RichTextGalleryNode
 	| RichTextVideoNode
 	| RichTextEmbedNode
-	| RichTextPageListNode
-	| RichTextNumberedHeadingNode;
+	| RichTextPageListNode;
 
 export type RichTextValue = RichTextBlock[];

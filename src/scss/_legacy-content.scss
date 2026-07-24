@@ -184,16 +184,25 @@
 	}
 }
 
-.legacy-numbered-heading {
+.legacy-content {
+	counter-reset: imported-numbered-heading;
+}
+
+.legacy-content > ol:has(> li > :is(h1, h2, h3, h4, h5, h6):only-child) {
 	margin-bottom: 1rem;
 	padding-left: 2.25rem;
 }
 
-.legacy-numbered-heading h1,
-.legacy-numbered-heading h2,
-.legacy-numbered-heading h3,
-.legacy-numbered-heading h4,
-.legacy-numbered-heading h5,
-.legacy-numbered-heading h6 {
+.legacy-content > ol > li:has(> :is(h1, h2, h3, h4, h5, h6):only-child) {
+	counter-increment: imported-numbered-heading;
+}
+
+.legacy-content
+	> ol
+	> li:has(> :is(h1, h2, h3, h4, h5, h6):only-child)::marker {
+	content: counter(imported-numbered-heading) ". ";
+}
+
+.legacy-content > ol > li > :is(h1, h2, h3, h4, h5, h6):only-child {
 	margin-bottom: 0;
 }
