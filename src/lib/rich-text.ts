@@ -1,4 +1,4 @@
-import type { PortableTextBlock } from "emdash";
+import { extractPlainText, type PortableTextBlock } from "emdash";
 
 type RichTextFieldValue = PortableTextBlock[] | null | undefined;
 
@@ -52,36 +52,30 @@ function stripWordPressShortcodes(value: string) {
 	return value.replace(/\[(?:\/)?[a-z][\w-]*(?:[^\]]*)\]/gi, " ");
 }
 
+function getImageAlt(block: PortableTextBlock) {
+	return typeof block.alt === "string" ? block.alt : "";
+}
+
+function getGalleryImageText(block: PortableTextBlock) {
+	if (!("images" in block) || !Array.isArray(block.images)) return "";
+
+	return block.images
+		.map((image: { alt?: unknown; caption?: unknown }) =>
+			typeof image.alt === "string"
+				? image.alt
+				: typeof image.caption === "string"
+					? image.caption
+					: "",
+		)
+		.join(" ");
+}
+
 function portableTextToPlainText(value: PortableTextBlock[]) {
 	return value
 		.map((block) => {
-			if (block._type === "block" && Array.isArray(block.children)) {
-				const children = block.children as Array<{ text?: unknown }>;
-				return children
-					.map((child: { text?: unknown }) =>
-						typeof child.text === "string" ? child.text : "",
-					)
-					.join("");
-			}
-			if (block._type === "image") {
-				return typeof block.alt === "string" ? block.alt : "";
-			}
-			if ("images" in block && Array.isArray(block.images)) {
-				const images = block.images as Array<{
-					alt?: unknown;
-					caption?: unknown;
-				}>;
-				return images
-					.map((image) =>
-						typeof image.alt === "string"
-							? image.alt
-							: typeof image.caption === "string"
-								? image.caption
-								: "",
-					)
-					.join(" ");
-			}
-			return "";
+			if (block._type === "image") return getImageAlt(block);
+			if (block._type === "gallery") return getGalleryImageText(block);
+			return extractPlainText([block]);
 		})
 		.join(" ");
 }
