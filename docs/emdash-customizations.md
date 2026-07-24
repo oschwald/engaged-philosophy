@@ -71,9 +71,14 @@ consuming the smaller KV write budget or requiring a paid service.
   small screens. Migrated images keep their reliable source width but omit
   unreliable imported heights, so they render directly from the public R2
   domain instead of consuming Cloudflare image transformations.
-- Legacy renderers remain for WordPress galleries, Animoto embeds, playlist
-  videos, page lists, and numbered headings that do not yet have direct EmDash
-  equivalents.
+- Portable Text galleries delegate their markup, image loading, and captions to
+  EmDash. A small adapter resolves migrated image references to the public R2
+  domain and preserves imported shortcode/figure layouts. CSP-safe column
+  classes replace EmDash's inline `--columns` property because the production
+  policy intentionally rejects inline styles. This avoids both Worker media
+  proxy requests and Cloudflare image transformations on the Free plan.
+- Legacy renderers remain for Animoto embeds, playlist videos, page lists, and
+  numbered headings that do not yet have direct EmDash equivalents.
 
 ## Imported Field Names
 
