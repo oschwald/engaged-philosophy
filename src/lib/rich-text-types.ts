@@ -12,18 +12,11 @@ export interface RichTextRequiredAssetRef extends RichTextAssetRef {
 }
 
 interface RichTextGalleryImageFields {
-	id?: string;
 	asset?: RichTextAssetRef;
-	url?: string;
 	alt?: string;
 	caption?: string;
-	href?: string;
-	align?: "left" | "right" | "center";
 	width?: number;
 	height?: number;
-	displayWidth?: number;
-	displayHeight?: number;
-	shape?: "rounded";
 }
 
 export interface RichTextGalleryImageNode
@@ -34,7 +27,6 @@ export interface RichTextGalleryImageNode
 
 export interface RichTextGalleryNode extends PortableTextBlock {
 	_type: "gallery";
-	align?: "left" | "right" | "center";
 	caption?: string;
 	layout?: "figure" | "shortcode";
 	images: RichTextGalleryImageNode[];
