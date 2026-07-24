@@ -71,6 +71,34 @@ img.legacy-image--rounded {
 	margin: 0 0 20px 20px;
 }
 
+// Preserve imported image dimensions while using EmDash's native float layout.
+.entry-content .emdash-image.emdash-image--align-left,
+.entry-content .emdash-image.emdash-image--align-right {
+	max-width: calc(100% - 1.5rem);
+}
+
+.entry-content .emdash-image.emdash-image--align-center img {
+	display: block;
+	margin-inline: auto;
+}
+
+@media (width <= 640px) {
+	.entry-content .emdash-image.emdash-image--align-left,
+	.entry-content .emdash-image.emdash-image--align-right {
+		width: fit-content;
+	}
+
+	.entry-content .emdash-image.emdash-image--align-left {
+		margin-right: auto;
+		margin-left: 0;
+	}
+
+	.entry-content .emdash-image.emdash-image--align-right {
+		margin-right: 0;
+		margin-left: auto;
+	}
+}
+
 .gallery-caption {
 	padding: 0 9px 9px;
 	text-align: center;

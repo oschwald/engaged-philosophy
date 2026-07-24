@@ -65,9 +65,15 @@ consuming the smaller KV write budget or requiring a paid service.
   stored `path` such as `2022/05/31/post-slug`. EmDash collection URL patterns
   can interpolate an entry slug or ID, but cannot interpolate this custom path.
   The custom sitemap still honors EmDash noindex and canonical settings.
-- Current Portable Text image and gallery nodes use the EmDash renderers.
-  Legacy renderers remain only for imported WordPress alignment, link, gallery,
-  and media shapes that do not have direct EmDash equivalents.
+- Portable Text images use the EmDash renderer. A narrow CSS compatibility
+  layer preserves imported float dimensions, centers images when long captions
+  widen their figures, and retains left/right placement when floats stack on
+  small screens. Migrated images keep their reliable source width but omit
+  unreliable imported heights, so they render directly from the public R2
+  domain instead of consuming Cloudflare image transformations.
+- Legacy renderers remain for WordPress galleries, Animoto embeds, playlist
+  videos, page lists, and numbered headings that do not yet have direct EmDash
+  equivalents.
 
 ## Imported Field Names
 
@@ -108,9 +114,10 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   without Dynamic Worker loaders on the current Cloudflare plan.
 - The upstream embeds plugin registers and renders the enabled YouTube and Vimeo
   blocks directly.
-- `src/plugins/legacy-image-blocks.ts` preserves edit controls for imported
-  WordPress-only Portable Text blocks such as floated images, playlist videos,
-  legacy embeds, and page lists.
+- `src/plugins/legacy-content-blocks.ts` preserves edit controls for imported
+  WordPress-only Portable Text blocks such as playlist videos, remaining legacy
+  embeds, and page lists. Its registered plugin ID remains
+  `legacy-image-blocks` for compatibility with existing plugin state.
 
 ## Build Compatibility
 

@@ -7,14 +7,11 @@ export interface RichTextAssetRef {
 	meta?: Record<string, unknown>;
 }
 
-export type RichTextImageAlignment =
-	"left" | "right" | "center" | "wide" | "full";
-
 export interface RichTextRequiredAssetRef extends RichTextAssetRef {
 	_ref: string;
 }
 
-interface RichTextImageFields {
+interface RichTextGalleryImageFields {
 	id?: string;
 	asset?: RichTextAssetRef;
 	url?: string;
@@ -22,7 +19,6 @@ interface RichTextImageFields {
 	caption?: string;
 	href?: string;
 	align?: "left" | "right" | "center";
-	alignment?: RichTextImageAlignment;
 	width?: number;
 	height?: number;
 	displayWidth?: number;
@@ -30,21 +26,8 @@ interface RichTextImageFields {
 	shape?: "rounded";
 }
 
-export interface RichTextImageNode
-	extends PortableTextBlock, RichTextImageFields {
-	_type: "image";
-}
-
-export interface RichTextLegacyImageNode
-	extends PortableTextBlock, RichTextImageFields {
-	_type: "legacyImage";
-}
-
-export type RichTextRenderableImageNode =
-	RichTextImageNode | RichTextLegacyImageNode;
-
 export interface RichTextGalleryImageNode
-	extends PortableTextBlock, RichTextImageFields {
+	extends PortableTextBlock, RichTextGalleryImageFields {
 	_type: "image";
 	asset: RichTextRequiredAssetRef;
 }
@@ -88,7 +71,6 @@ export interface RichTextNumberedHeadingNode extends PortableTextBlock {
 
 export type RichTextBlock =
 	| PortableTextBlock
-	| RichTextRenderableImageNode
 	| RichTextGalleryNode
 	| RichTextVideoNode
 	| RichTextEmbedNode

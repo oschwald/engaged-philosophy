@@ -30,14 +30,11 @@ test.describe("admin worker integration", () => {
 		const plugins = manifest?.data?.plugins ?? {};
 		const legacyBlocks =
 			plugins["legacy-image-blocks"]?.portableTextBlocks ?? [];
-		expect(legacyBlocks.map((block: { type: string }) => block.type)).toEqual(
-			expect.arrayContaining([
-				"legacyImage",
-				"legacyVideo",
-				"legacyEmbed",
-				"legacyPageList",
-			]),
-		);
+		expect(legacyBlocks.map((block: { type: string }) => block.type)).toEqual([
+			"legacyVideo",
+			"legacyEmbed",
+			"legacyPageList",
+		]);
 		const embedBlocks = plugins.embeds?.portableTextBlocks ?? [];
 		expect(embedBlocks.map((block: { type: string }) => block.type)).toEqual(
 			expect.arrayContaining(["youtube", "vimeo"]),
