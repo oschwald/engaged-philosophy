@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import { getExcerptText, stripHtml } from "../../src/lib/rich-text";
 
 describe("rich text", () => {
-	test("uses EmDash text extraction for standard Portable Text blocks", () => {
+	test("extracts plain text from standard Portable Text blocks", () => {
 		expect(
 			stripHtml([
 				{
