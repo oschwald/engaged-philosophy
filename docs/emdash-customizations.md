@@ -77,8 +77,11 @@ consuming the smaller KV write budget or requiring a paid service.
   classes replace EmDash's inline `--columns` property because the production
   policy intentionally rejects inline styles. This avoids both Worker media
   proxy requests and Cloudflare image transformations on the Free plan.
-- Legacy renderers remain for Animoto embeds, playlist videos, page lists, and
-  numbered headings that do not yet have direct EmDash equivalents.
+- Imported numbered headings use EmDash's native Portable Text list and heading
+  rendering. A CSS counter preserves interview numbering across the answer
+  blocks between headings without changing ordinary ordered lists.
+- Legacy renderers remain for Animoto embeds, playlist videos, and page lists
+  that do not have direct EmDash equivalents.
 
 ## Imported Field Names
 

@@ -483,4 +483,117 @@ test.describe("public migrated content rendering", () => {
 		await publicPage.locator(".navbar-toggler").click();
 		await expect(publicPage.locator("#navbarNav")).not.toHaveClass(/show/);
 	});
+
+	test("renders imported numbered headings with native Portable Text lists", async ({
+		authedRequest,
+		publicPage,
+	}, testInfo) => {
+		const title = uniqueTitle("E2E Numbered Headings", testInfo.testId);
+		const bodyText = `${title} answer between imported headings.`;
+		const textBlock = (
+			key: string,
+			text: string,
+			options: {
+				style?: string;
+				listItem?: "number";
+			} = {},
+		) => ({
+			_type: "block",
+			_key: key,
+			style: options.style ?? "normal",
+			...(options.listItem
+				? {
+						listItem: options.listItem,
+						level: 1,
+					}
+				: {}),
+			markDefs: [],
+			children: [
+				{
+					_type: "span",
+					_key: `${key}-span`,
+					text,
+					marks: [],
+				},
+			],
+		});
+
+		const { publicPath } = await createAndPublishContentViaApi(
+			authedRequest,
+			"pages",
+			{
+				title,
+				content: bodyText,
+				data: {
+					content: [
+						textBlock("question-one", "First imported question", {
+							style: "h4",
+							listItem: "number",
+						}),
+						textBlock("answer", bodyText),
+						textBlock("question-two", "Second imported question", {
+							style: "h4",
+							listItem: "number",
+						}),
+						textBlock("list-separator", "Ordinary ordered list follows."),
+						textBlock("list-one", "Ordinary first item", {
+							listItem: "number",
+						}),
+						textBlock("list-two", "Ordinary second item", {
+							listItem: "number",
+						}),
+					],
+				},
+			},
+		);
+
+		await expectPublicContent(publicPage, publicPath, title, bodyText);
+
+		const headings = publicPage.locator(
+			".legacy-content :is(h1, h2, h3, h4, h5, h6)",
+		);
+		await expect(headings).toHaveCount(2);
+		await expect(headings.nth(0)).toHaveText("First imported question");
+		await expect(headings.nth(1)).toHaveText("Second imported question");
+		await expect(publicPage.locator(".legacy-numbered-heading")).toHaveCount(0);
+
+		const headingItems = headings.locator("xpath=..");
+		await expect(headingItems).toHaveCount(2);
+		for (const headingItem of await headingItems.all()) {
+			await expect(headingItem).toHaveJSProperty("tagName", "LI");
+			await expect(
+				headingItem.evaluate((item) => {
+					const list = item.parentElement;
+					const heading = item.firstElementChild;
+					return {
+						counterIncrement: getComputedStyle(item).counterIncrement,
+						listTag: list?.tagName,
+						listPaddingLeft: list ? getComputedStyle(list).paddingLeft : null,
+						headingMarginBottom: heading
+							? getComputedStyle(heading).marginBottom
+							: null,
+						markerContent: getComputedStyle(item, "::marker").content,
+					};
+				}),
+			).resolves.toEqual({
+				counterIncrement: "imported-numbered-heading 1",
+				listTag: "OL",
+				listPaddingLeft: "24px",
+				headingMarginBottom: "0px",
+				markerContent: 'counter(imported-numbered-heading) ". "',
+			});
+		}
+
+		const ordinaryList = publicPage
+			.getByText("Ordinary first item")
+			.locator("xpath=ancestor::ol[1]");
+		await expect(ordinaryList).toHaveJSProperty("tagName", "OL");
+		await expect(ordinaryList.locator(":scope > li")).toHaveCount(2);
+		await expect(
+			ordinaryList
+				.locator(":scope > li")
+				.first()
+				.evaluate((item) => getComputedStyle(item).counterIncrement),
+		).resolves.toBe("none");
+	});
 });
