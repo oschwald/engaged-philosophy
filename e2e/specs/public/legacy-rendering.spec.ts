@@ -8,13 +8,15 @@ import {
 } from "../../support/content";
 
 const NATIVE_IMAGE_PATH = "/wp-content/uploads/2026/06/e2e-native-image.jpg";
-const LEGACY_GALLERY_PATHS = [
+const GALLERY_PATHS = [
 	"/wp-content/uploads/2026/06/e2e-gallery-one.jpg",
 	"/wp-content/uploads/2026/06/e2e-gallery-two.jpg",
 ];
-const LEGACY_BLOCK_GALLERY_PATHS = [
+const FIGURE_GALLERY_PATHS = [
 	"/wp-content/uploads/2026/06/e2e-block-gallery-one.jpg",
 	"/wp-content/uploads/2026/06/e2e-block-gallery-two.jpg",
+	"/wp-content/uploads/2026/06/e2e-block-gallery-three.jpg",
+	"/wp-content/uploads/2026/06/e2e-block-gallery-four.jpg",
 ];
 const CENTERED_IMAGE_PATH =
 	"/wp-content/uploads/2026/06/e2e-centered-image.jpg";
@@ -75,13 +77,14 @@ test.describe("public migrated content rendering", () => {
 							layout: "shortcode",
 							columns: 2,
 							images: [
-								...LEGACY_GALLERY_PATHS.map((url, index) => ({
+								...GALLERY_PATHS.map((url, index) => ({
 									_type: "image",
-									_key: `legacy-gallery-${index + 1}`,
+									_key: `gallery-${index + 1}`,
 									asset: {
+										_ref: `${MEDIA_BASE}${url}`,
 										url,
 									},
-									alt: `Legacy gallery image ${index + 1}`,
+									alt: `Gallery image ${index + 1}`,
 								})),
 								{
 									_type: "image",
@@ -98,14 +101,24 @@ test.describe("public migrated content rendering", () => {
 							_key: "legacy-block-gallery",
 							layout: "figure",
 							columns: 2,
+							caption: "Imported outer gallery caption",
 							images: [
-								...LEGACY_BLOCK_GALLERY_PATHS.map((url, index) => ({
+								...FIGURE_GALLERY_PATHS.map((url, index) => ({
 									_type: "image",
-									_key: `legacy-block-gallery-${index + 1}`,
+									_key: `figure-gallery-${index + 1}`,
 									asset: {
+										_ref: `${MEDIA_BASE}${url}`,
 										url,
 									},
-									alt: `Legacy block gallery image ${index + 1}`,
+									alt: `Figure gallery image ${index + 1}`,
+									...(index === 0
+										? { caption: "First image caption" }
+										: index === 3
+											? {
+													caption:
+														"A deliberately long orphan-row caption that must not wrap more than before",
+												}
+											: {}),
 								})),
 								{
 									_type: "image",
@@ -116,6 +129,23 @@ test.describe("public migrated content rendering", () => {
 									alt: "Unsafe legacy block gallery image",
 								},
 							],
+						},
+						{
+							_type: "gallery",
+							_key: "lead-gallery",
+							layout: "shortcode",
+							columns: 3,
+							images: [...GALLERY_PATHS, ...GALLERY_PATHS].map(
+								(url, index) => ({
+									_type: "image",
+									_key: `lead-gallery-${index + 1}`,
+									asset: {
+										_ref: `${MEDIA_BASE}${url}`,
+										url,
+									},
+									alt: `Lead gallery image ${index + 1}`,
+								}),
+							),
 						},
 						{
 							_type: "youtube",
@@ -171,7 +201,7 @@ test.describe("public migrated content rendering", () => {
 		);
 
 		const gallery = publicPage.locator(
-			".legacy-gallery.legacy-gallery-shortcode.legacy-gallery-columns-2",
+			".legacy-gallery-compat--shortcode.legacy-gallery-compat--columns-2 .emdash-gallery",
 		);
 		await expect(gallery.locator("img")).toHaveCount(2);
 		await expect(
@@ -179,16 +209,26 @@ test.describe("public migrated content rendering", () => {
 		).toHaveCount(0);
 		await expect(gallery.locator("img").first()).toHaveAttribute(
 			"src",
-			`${MEDIA_BASE}${LEGACY_GALLERY_PATHS[0]}`,
+			`${MEDIA_BASE}${GALLERY_PATHS[0]}`,
 		);
 		await expect(
-			gallery.evaluate((element) => getComputedStyle(element).display),
-		).resolves.toBe("grid");
+			gallery.evaluate((element) => {
+				const style = getComputedStyle(element);
+				return {
+					display: style.display,
+					columns: style.gridTemplateColumns.split(" ").length,
+				};
+			}),
+		).resolves.toEqual({ display: "grid", columns: 2 });
+		await expect(gallery.locator("a")).toHaveCount(0);
 
-		const blockGallery = publicPage.locator(
-			".legacy-gallery.blocks-gallery-grid.columns-2",
+		const blockGalleryWrapper = publicPage.locator(
+			".legacy-gallery-compat--figure.legacy-gallery-compat--columns-2",
 		);
-		await expect(blockGallery.locator("img")).toHaveCount(2);
+		const blockGallery = blockGalleryWrapper.locator(
+			":scope > .emdash-gallery",
+		);
+		await expect(blockGallery.locator("img")).toHaveCount(4);
 		await expect(
 			publicPage.getByAltText("Unsafe legacy block gallery image"),
 		).toHaveCount(0);
@@ -197,13 +237,62 @@ test.describe("public migrated content rendering", () => {
 				const style = getComputedStyle(element);
 				return {
 					display: style.display,
-					listStyleType: style.listStyleType,
+					flexWrap: style.flexWrap,
 				};
 			}),
 		).resolves.toEqual({
 			display: "flex",
-			listStyleType: "none",
+			flexWrap: "wrap",
 		});
+		const importedCaption = blockGalleryWrapper.getByText(
+			"Imported outer gallery caption",
+		);
+		await expect(importedCaption).toBeVisible();
+		await expect(blockGallery.getByText("First image caption")).toBeVisible();
+		await expect(
+			importedCaption.evaluate((caption) => {
+				const style = getComputedStyle(caption);
+				return {
+					color: style.color,
+					fontSize: style.fontSize,
+					lineHeight: style.lineHeight,
+				};
+			}),
+		).resolves.toEqual({
+			color: "rgb(33, 37, 41)",
+			fontSize: "16px",
+			lineHeight: "27.2px",
+		});
+		const orphanWidths = await blockGallery.evaluate((element) => {
+			const lastItem = element.lastElementChild;
+			return lastItem
+				? {
+						gallery: element.getBoundingClientRect().width,
+						orphan: lastItem.getBoundingClientRect().width,
+					}
+				: null;
+		});
+		expect(orphanWidths).not.toBeNull();
+		expect(Math.abs(orphanWidths!.gallery - orphanWidths!.orphan)).toBeLessThan(
+			2,
+		);
+		await expect(blockGallery.locator("a")).toHaveCount(0);
+
+		const leadGallery = publicPage.locator(
+			".legacy-gallery-compat--lead .emdash-gallery",
+		);
+		await expect(leadGallery.locator("img")).toHaveCount(4);
+		const leadWidths = await leadGallery.evaluate((element) => {
+			const firstItem = element.firstElementChild;
+			return firstItem
+				? {
+						gallery: element.getBoundingClientRect().width,
+						lead: firstItem.getBoundingClientRect().width,
+					}
+				: null;
+		});
+		expect(leadWidths).not.toBeNull();
+		expect(Math.abs(leadWidths!.gallery - leadWidths!.lead)).toBeLessThan(2);
 
 		await expect(publicPage.locator("lite-youtube")).toHaveAttribute(
 			"videoid",
@@ -222,6 +311,22 @@ test.describe("public migrated content rendering", () => {
 		await expectPageTextNotToContain(publicPage, "[playlist");
 
 		await publicPage.setViewportSize({ width: 390, height: 844 });
+		await expect(
+			gallery.evaluate(
+				(element) => getComputedStyle(element).gridTemplateColumns,
+			),
+		).resolves.not.toContain(" ");
+		for (const galleryElement of [blockGallery, leadGallery]) {
+			await expect(
+				galleryElement.evaluate((element) => {
+					const galleryWidth = element.getBoundingClientRect().width;
+					return [...element.children].every(
+						(item) =>
+							Math.abs(item.getBoundingClientRect().width - galleryWidth) < 2,
+					);
+				}),
+			).resolves.toBe(true);
+		}
 		await expect(
 			nativeFigure.evaluate((figure) => {
 				const content =
