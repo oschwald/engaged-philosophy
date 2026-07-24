@@ -7,7 +7,7 @@ import {
 	uniqueTitle,
 } from "../../support/content";
 
-const LEGACY_IMAGE_PATH = "/wp-content/uploads/2026/06/e2e-legacy-image.jpg";
+const NATIVE_IMAGE_PATH = "/wp-content/uploads/2026/06/e2e-native-image.jpg";
 const LEGACY_GALLERY_PATHS = [
 	"/wp-content/uploads/2026/06/e2e-gallery-one.jpg",
 	"/wp-content/uploads/2026/06/e2e-gallery-two.jpg",
@@ -18,6 +18,7 @@ const LEGACY_BLOCK_GALLERY_PATHS = [
 ];
 const CENTERED_IMAGE_PATH =
 	"/wp-content/uploads/2026/06/e2e-centered-image.jpg";
+const RIGHT_IMAGE_PATH = "/wp-content/uploads/2026/06/e2e-right-image.jpg";
 const LEGACY_VIDEO_PATH = "/wp-content/uploads/2026/06/e2e-video.mp4";
 const MEDIA_BASE = "https://media.engagedphilosophy.com";
 
@@ -26,14 +27,13 @@ async function expectPageTextNotToContain(page: Page, text: string) {
 	expect(pageText).not.toContain(text);
 }
 
-test.describe("public legacy rendering", () => {
-	test("renders migrated media and embed blocks with legacy classes", async ({
+test.describe("public migrated content rendering", () => {
+	test("renders native images and embeds alongside remaining legacy media", async ({
 		authedRequest,
 		publicPage,
 	}, testInfo) => {
 		const title = uniqueTitle("E2E Legacy Rendering", testInfo.testId);
 		const bodyText = `${title} body with migrated media blocks.`;
-		const embedUrl = "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ";
 		const videoTitle = "E2E imported video";
 
 		const { publicPath } = await createAndPublishContentViaApi(
@@ -59,33 +59,15 @@ test.describe("public legacy rendering", () => {
 							],
 						},
 						{
-							_type: "legacyImage",
-							_key: "legacy-image",
-							url: LEGACY_IMAGE_PATH,
-							alt: "Legacy floated image",
-							align: "left",
-							shape: "rounded",
+							_type: "image",
+							_key: "native-image",
+							asset: {
+								_ref: `${MEDIA_BASE}${NATIVE_IMAGE_PATH}`,
+								url: `${MEDIA_BASE}${NATIVE_IMAGE_PATH}`,
+							},
+							alt: "Native floated image",
+							alignment: "left",
 							width: 120,
-							height: 120,
-						},
-						{
-							_type: "legacyImage",
-							_key: "unsafe-legacy-image",
-							url: "javascript:alert(1)",
-							alt: "Unsafe legacy image",
-							align: "left",
-							width: 120,
-							height: 120,
-						},
-						{
-							_type: "legacyImage",
-							_key: "unsafe-legacy-image-link",
-							url: LEGACY_IMAGE_PATH,
-							href: "javascript:alert(1)",
-							alt: "Legacy image with unsafe link",
-							align: "right",
-							width: 120,
-							height: 120,
 						},
 						{
 							_type: "gallery",
@@ -136,11 +118,10 @@ test.describe("public legacy rendering", () => {
 							],
 						},
 						{
-							_type: "legacyEmbed",
-							_key: "legacy-embed",
-							provider: "youtube",
-							embedUrl,
-							title: "E2E imported YouTube embed",
+							_type: "youtube",
+							_key: "youtube",
+							id: "dQw4w9WgXcQ",
+							title: "E2E migrated YouTube embed",
 						},
 						{
 							_type: "legacyVideo",
@@ -158,37 +139,29 @@ test.describe("public legacy rendering", () => {
 
 		await expectPublicContent(publicPage, publicPath, title, bodyText);
 
-		const legacyImage = publicPage.locator(
-			".entry-content img.alignleft.legacy-image--rounded",
+		const nativeFigure = publicPage.locator(
+			".entry-content .emdash-image--align-left",
 		);
-		await expect(legacyImage).toHaveAttribute(
+		const nativeImage = nativeFigure.locator("img");
+		await expect(nativeImage).toHaveAttribute(
 			"src",
-			`${MEDIA_BASE}${LEGACY_IMAGE_PATH}`,
+			`${MEDIA_BASE}${NATIVE_IMAGE_PATH}`,
 		);
-		await expect(legacyImage).toHaveAttribute("alt", "Legacy floated image");
+		await expect(nativeImage).toHaveAttribute("alt", "Native floated image");
 		await expect(
-			legacyImage.evaluate((image) => {
-				const style = getComputedStyle(image);
+			nativeFigure.evaluate((figure) => {
+				const style = getComputedStyle(figure);
 				return {
-					borderTopLeftRadius: style.borderTopLeftRadius,
 					floatValue: style.float,
+					maxWidth: style.maxWidth,
 				};
 			}),
 		).resolves.toEqual({
-			borderTopLeftRadius: "9999px",
 			floatValue: "left",
+			maxWidth: "calc(100% - 24px)",
 		});
-		await expect(publicPage.getByAltText("Unsafe legacy image")).toHaveCount(0);
-
-		const unsafeLinkedImage = publicPage.getByAltText(
-			"Legacy image with unsafe link",
-		);
-		await expect(unsafeLinkedImage).toHaveAttribute(
-			"src",
-			`${MEDIA_BASE}${LEGACY_IMAGE_PATH}`,
-		);
 		await expect(
-			publicPage.locator('a:has(img[alt="Legacy image with unsafe link"])'),
+			publicPage.locator('a:has(img[alt="Native floated image"])'),
 		).toHaveCount(0);
 		await expect(publicPage.locator('.entry-content img[src=""]')).toHaveCount(
 			0,
@@ -232,9 +205,10 @@ test.describe("public legacy rendering", () => {
 			listStyleType: "none",
 		});
 
-		await expect(
-			publicPage.locator(".legacy-embed--youtube iframe"),
-		).toHaveAttribute("src", embedUrl);
+		await expect(publicPage.locator("lite-youtube")).toHaveAttribute(
+			"videoid",
+			"dQw4w9WgXcQ",
+		);
 		await expect(publicPage.locator(".legacy-video video")).toHaveAttribute(
 			"aria-label",
 			videoTitle,
@@ -246,6 +220,24 @@ test.describe("public legacy rendering", () => {
 		await expectPageTextNotToContain(publicPage, "[gallery");
 		await expectPageTextNotToContain(publicPage, "[youtube");
 		await expectPageTextNotToContain(publicPage, "[playlist");
+
+		await publicPage.setViewportSize({ width: 390, height: 844 });
+		await expect(
+			nativeFigure.evaluate((figure) => {
+				const content =
+					figure.closest(".legacy-content") ?? figure.closest(".entry-content");
+				if (!content) return null;
+				const figureBox = figure.getBoundingClientRect();
+				const contentBox = content.getBoundingClientRect();
+				return {
+					floatValue: getComputedStyle(figure).float,
+					leftOffset: Math.abs(figureBox.left - contentBox.left),
+				};
+			}),
+		).resolves.toEqual({
+			floatValue: "none",
+			leftOffset: 0,
+		});
 
 		await publicPage.context().addCookies([
 			{
@@ -260,13 +252,13 @@ test.describe("public legacy rendering", () => {
 		});
 		expect(signedInResponse?.status()).toBe(200);
 		await expect(publicPage.getByText(bodyText)).toBeVisible();
-		await expect(legacyImage).toHaveAttribute(
+		await expect(nativeImage).toHaveAttribute(
 			"src",
-			`${MEDIA_BASE}${LEGACY_IMAGE_PATH}`,
+			`${MEDIA_BASE}${NATIVE_IMAGE_PATH}`,
 		);
 	});
 
-	test("preserves centered legacy images, page lists, and mobile nav", async ({
+	test("centers native images with captions and preserves page lists and mobile nav", async ({
 		authedRequest,
 		publicPage,
 	}, testInfo) => {
@@ -296,19 +288,32 @@ test.describe("public legacy rendering", () => {
 							],
 						},
 						{
-							_type: "legacyImage",
+							_type: "image",
 							_key: "centered-image",
-							url: CENTERED_IMAGE_PATH,
-							alt: "Centered legacy image",
-							align: "center",
-							shape: "rounded",
-							caption: "Centered legacy image caption",
+							asset: {
+								_ref: `${MEDIA_BASE}${CENTERED_IMAGE_PATH}`,
+								url: `${MEDIA_BASE}${CENTERED_IMAGE_PATH}`,
+							},
+							alt: "Centered native image",
+							alignment: "center",
+							caption:
+								"A deliberately long caption that is wider than the image",
 							width: 404,
-							height: 553,
 						},
 						{
 							_type: "legacyPageList",
 							_key: "legacy-page-list",
+						},
+						{
+							_type: "image",
+							_key: "right-image",
+							asset: {
+								_ref: `${MEDIA_BASE}${RIGHT_IMAGE_PATH}`,
+								url: `${MEDIA_BASE}${RIGHT_IMAGE_PATH}`,
+							},
+							alt: "Right-aligned native image",
+							alignment: "right",
+							width: 120,
 						},
 					],
 				},
@@ -318,14 +323,14 @@ test.describe("public legacy rendering", () => {
 		await expectPublicContent(publicPage, publicPath, title, bodyText);
 
 		const centeredFigure = publicPage.locator(
-			".entry-content .emdash-image.aligncenter.legacy-image--rounded",
+			".entry-content .emdash-image--align-center",
 		);
 		const centeredImage = centeredFigure.locator("img");
 		await expect(centeredImage).toHaveAttribute(
 			"src",
 			`${MEDIA_BASE}${CENTERED_IMAGE_PATH}`,
 		);
-		await expect(centeredImage).toHaveAttribute("alt", "Centered legacy image");
+		await expect(centeredImage).toHaveAttribute("alt", "Centered native image");
 
 		const centerOffset = await centeredFigure.evaluate((figure) => {
 			const content = figure.closest(".entry-content");
@@ -340,17 +345,34 @@ test.describe("public legacy rendering", () => {
 		});
 		expect(centerOffset).toBeLessThanOrEqual(2);
 
+		const rightFigure = publicPage.locator(
+			".entry-content .emdash-image--align-right",
+		);
 		await expect(
-			centeredImage.evaluate(
-				(image) => getComputedStyle(image).borderTopLeftRadius,
-			),
-		).resolves.toBe("9999px");
+			rightFigure.evaluate((figure) => getComputedStyle(figure).float),
+		).resolves.toBe("right");
 
 		const pageList = publicPage.locator(".legacy-page-list");
 		await expect(pageList.locator(`a[href="${publicPath}"]`)).toHaveText(title);
 		await expectPageTextNotToContain(publicPage, "[list-pages");
 
 		await publicPage.setViewportSize({ width: 390, height: 844 });
+		await expect(
+			rightFigure.evaluate((figure) => {
+				const content =
+					figure.closest(".legacy-content") ?? figure.closest(".entry-content");
+				if (!content) return null;
+				const figureBox = figure.getBoundingClientRect();
+				const contentBox = content.getBoundingClientRect();
+				return {
+					floatValue: getComputedStyle(figure).float,
+					rightOffset: Math.abs(figureBox.right - contentBox.right),
+				};
+			}),
+		).resolves.toEqual({
+			floatValue: "none",
+			rightOffset: 0,
+		});
 		await publicPage.locator(".navbar-toggler").click();
 		await expect(publicPage.locator("#navbarNav")).toHaveClass(/show/);
 		await publicPage.locator(".navbar-toggler").click();

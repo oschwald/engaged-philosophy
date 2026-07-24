@@ -4,11 +4,11 @@ import auditLogPlugin from "@emdash-cms/plugin-audit-log";
 
 import { emdashPlugins } from "../../../astro.config.mjs";
 
-import { createPlugin as createLegacyImagePlugin } from "../../../src/plugins/legacy-image-blocks";
+import { createPlugin as createLegacyContentPlugin } from "../../../src/plugins/legacy-content-blocks";
 
 describe("EmDash plugin registration", () => {
-	test("registers legacy media portable text blocks", () => {
-		const plugin = createLegacyImagePlugin();
+	test("registers the remaining legacy portable text blocks", () => {
+		const plugin = createLegacyContentPlugin();
 		const blocks = plugin.admin?.portableTextBlocks ?? [];
 		const getBlock = (type: string) => {
 			const block = blocks.find((item) => item.type === type);
@@ -25,7 +25,7 @@ describe("EmDash plugin registration", () => {
 			return field!;
 		};
 
-		expect(getField("legacyImage", "id").type).toBe("media_picker");
+		expect(blocks.map(({ type }) => type)).not.toContain("legacyImage");
 		expect(getField("legacyVideo", "url")).toMatchObject({
 			type: "text_input",
 			label: "Video URL",

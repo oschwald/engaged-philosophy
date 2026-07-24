@@ -12,11 +12,8 @@ import {
 	PUBLIC_MEDIA_URL,
 } from "./src/lib/site-config.ts";
 
-const legacyImagePluginEntrypoint = fileURLToPath(
-	new URL("./src/plugins/legacy-image-blocks.ts", import.meta.url),
-);
-const legacyImagePluginAdminEntrypoint = fileURLToPath(
-	new URL("./src/plugins/legacy-image-blocks-admin.ts", import.meta.url),
+const legacyContentPluginEntrypoint = fileURLToPath(
+	new URL("./src/plugins/legacy-content-blocks.ts", import.meta.url),
 );
 const cloudflareAccessAuthEntrypoint = fileURLToPath(
 	new URL("./src/lib/cloudflare-access-auth.ts", import.meta.url),
@@ -59,8 +56,7 @@ export const emdashPlugins = [
 	{
 		id: "legacy-image-blocks",
 		version: "0.1.0",
-		entrypoint: legacyImagePluginEntrypoint,
-		adminEntry: legacyImagePluginAdminEntrypoint,
+		entrypoint: legacyContentPluginEntrypoint,
 	},
 ];
 
