@@ -49,6 +49,9 @@ jobs:
           cp -a playwright-report-static playwright-report-static-initial || true
           pnpm run test:static --last-failed 2>&1 | tee playwright-debug-static.log
 
+      - name: Check EmDash generated types
+        run: pnpm run check:emdash-types
+
       - name: Typecheck app
         run: pnpm run typecheck
 
