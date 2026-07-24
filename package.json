@@ -12,7 +12,8 @@
 	"scripts": {
 		"dev": "astro dev",
 		"build": "pnpm run test:seed && node scripts/clean-build-output.mjs && astro build",
-		"ci": "pnpm run lint && pnpm run test && pnpm run typecheck && pnpm run typecheck:tests && pnpm run build && pnpm run test:worker-bundle && pnpm run test:worker-runtime && pnpm run test:e2e",
+		"ci": "pnpm run lint && pnpm run test && pnpm run check:emdash-types && pnpm run typecheck && pnpm run typecheck:tests && pnpm run build && pnpm run test:worker-bundle && pnpm run test:worker-runtime && pnpm run test:e2e",
+		"check:emdash-types": "node scripts/check-emdash-types.mjs",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
 		"lint:css": "stylelint \"src/scss/**/*.scss\"",
