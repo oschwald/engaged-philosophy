@@ -8,7 +8,6 @@ import {
 	getExcerptText,
 	stripHtml,
 } from "./rich-text";
-import type { PageData, PostData, ProjectData } from "./types";
 
 export interface SearchResult {
 	id: string;
@@ -29,7 +28,6 @@ const PAGE_SIZE = 10;
 export const MAX_SEARCH_CURSOR_HISTORY = 20;
 const SEARCH_COLLECTIONS = ["pages", "posts", "projects"] as const;
 type SearchCollection = (typeof SEARCH_COLLECTIONS)[number];
-type SearchEntryData = PageData | PostData | ProjectData;
 
 function isSearchCollection(value: string): value is SearchCollection {
 	return SEARCH_COLLECTIONS.some((collection) => collection === value);
@@ -84,10 +82,7 @@ export async function searchSite(
 			const ids = hits
 				.filter((item) => item.collection === collection)
 				.map((item) => item.id);
-			const entries = await getPublishedEntriesByIds<SearchEntryData>(
-				collection,
-				ids,
-			);
+			const entries = await getPublishedEntriesByIds(collection, ids);
 			return entries.map(
 				(entry) =>
 					[`${collection}:${entry.data.id || entry.id}`, entry] as const,

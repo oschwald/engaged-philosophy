@@ -4,6 +4,7 @@
 		"types": ["@cloudflare/workers-types"]
 	},
 	"include": [
+		"emdash-env.d.ts",
 		"src/**/*.astro",
 		"src/**/*.ts",
 		"src/**/*.mts",
