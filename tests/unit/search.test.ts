@@ -42,9 +42,10 @@ describe("site search", () => {
 				if (collection === "projects") {
 					return [
 						{
-							id: "project-1",
+							id: "project-one",
 							edit: {},
 							data: {
+								id: "project-1",
 								title: "Project One",
 								path: "project/project-one",
 							},
@@ -53,9 +54,9 @@ describe("site search", () => {
 				}
 				return [
 					{
-						id: "page-1",
+						id: "about",
 						edit: {},
-						data: { title: "About", path: "about" },
+						data: { id: "page-1", title: "About", path: "about" },
 					},
 				];
 			},
