@@ -29,6 +29,7 @@ const cloudflareAccessInviteRouteEntrypoint = fileURLToPath(
 );
 const useTestAuth = process.env.EMDASH_TEST_AUTH === "1";
 const allowTestAuth = process.env.EMDASH_ALLOW_TEST_AUTH === "1";
+const emdashTypesCheckState = process.env.EMDASH_TYPES_CHECK_STATE;
 
 if (useTestAuth && !allowTestAuth) {
 	throw new Error(
@@ -62,7 +63,11 @@ export const emdashPlugins = [
 
 export default defineConfig({
 	output: "server",
-	adapter: cloudflare(),
+	adapter: cloudflare({
+		...(emdashTypesCheckState
+			? { persistState: { path: emdashTypesCheckState } }
+			: {}),
+	}),
 	cache: {
 		provider: {
 			name: "cloudflare",

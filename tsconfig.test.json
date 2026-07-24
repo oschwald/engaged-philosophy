@@ -6,6 +6,7 @@
 		"types": ["node", "@cloudflare/workers-types", "vitest"]
 	},
 	"include": [
+		"emdash-env.d.ts",
 		"e2e/**/*.ts",
 		"e2e-static/**/*.ts",
 		"playwright.config.ts",

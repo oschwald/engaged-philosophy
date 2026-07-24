@@ -6,10 +6,19 @@ import {
 } from "../../src/lib/page-context";
 import type { ContentEntry, PostData } from "../../src/lib/types";
 
-function postEntry(data: PostData): ContentEntry<PostData> {
+function postEntry(data: Partial<PostData>): ContentEntry<PostData> {
 	return {
 		id: "post-row-id",
-		data,
+		data: {
+			id: "content-id",
+			slug: "post",
+			status: "published",
+			title: "Post",
+			createdAt: new Date(0),
+			updatedAt: new Date(0),
+			publishedAt: null,
+			...data,
+		},
 		edit: {} as ContentEntry<PostData>["edit"],
 	};
 }
@@ -58,7 +67,7 @@ describe("site page context", () => {
 			slug: "an-essay",
 			title: "An essay",
 			published_on: "2026-07-01T10:00:00Z",
-			updatedAt: "2026-07-02T11:00:00Z",
+			updatedAt: new Date("2026-07-02T11:00:00Z"),
 			author_name: "A. Philosopher",
 			seo: {
 				title: "A better title",

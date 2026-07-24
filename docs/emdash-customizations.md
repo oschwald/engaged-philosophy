@@ -55,6 +55,12 @@ consuming the smaller KV write budget or requiring a paid service.
 
 - Public entry annotations come directly from EmDash's `ContentEntry.edit`
   proxy; there is no site-level editing adapter.
+- Collection query types come from EmDash's generated `emdash-env.d.ts`.
+  Starting `pnpm run dev` regenerates the file from the local database; run it
+  after changing the checked-in seed schema and include the generated update in
+  the same commit. `pnpm run check:emdash-types` starts an isolated local
+  instance and fails when the committed declarations differ from the seed
+  schema; the full CI command includes this check.
 - Search uses EmDash full-text search, then batch-hydrates only the entries on
   the current result page. Archives use database limit/offset queries, and
   exhaustive jobs such as the sitemap walk collection cursors.

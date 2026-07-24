@@ -20,9 +20,8 @@ import { getPublicMediaStorageUrl, rewriteInternalMediaFileUrl } from "./media";
 import type {
 	ContentEntry,
 	MediaField,
-	PageData,
-	PostData,
-	ProjectData,
+	RawCollectionData,
+	SiteCollection,
 } from "./types";
 
 type TaxonomyMap = Record<string, string[]>;
@@ -33,6 +32,9 @@ type RuntimeEntry<T> = ContentEntry<T> & {
 		status?: string;
 		terms?: EmDashTermsMap;
 	};
+};
+type NormalizedEntryData<T> = Omit<T, "featured_image"> & {
+	featured_image?: MediaField;
 };
 type RawMediaField = MediaField & {
 	provider?: string;
@@ -85,12 +87,11 @@ function normalizeMediaField(
 function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 	entry: EmDashContentEntry<T>,
 	collection?: string,
-): RuntimeEntry<Omit<T, "featured_image"> & { featured_image?: MediaField }> {
+): RuntimeEntry<NormalizedEntryData<T>> {
 	const data = {
 		...entry.data,
 		featured_image: normalizeMediaField(entry.data.featured_image),
-	} as Omit<T, "featured_image"> & {
-		featured_image?: MediaField;
+	} as NormalizedEntryData<T> & {
 		path?: string;
 		slug?: string;
 		published_on?: string;
@@ -126,10 +127,8 @@ function flattenTerms<T extends { children?: T[] }>(terms: T[]): T[] {
 	return terms.flatMap((term) => [term, ...flattenTerms(term.children ?? [])]);
 }
 
-async function getPublishedCollection<
-	T extends { path?: string; featured_image?: RawMediaField | null },
->(collection: "pages" | "posts" | "projects") {
-	const entries: Array<EmDashContentEntry<T>> = [];
+async function getPublishedCollection<C extends SiteCollection>(collection: C) {
+	const entries: Array<EmDashContentEntry<RawCollectionData<C>>> = [];
 	let cursor: string | undefined;
 	do {
 		const result = await getEmDashCollection(collection, {
@@ -137,11 +136,7 @@ async function getPublishedCollection<
 			limit: COLLECTION_PAGE_SIZE,
 			cursor,
 		});
-		entries.push(
-			...result.entries.map(
-				(entry) => entry as unknown as EmDashContentEntry<T>,
-			),
-		);
+		entries.push(...result.entries);
 		cursor = result.nextCursor;
 	} while (cursor);
 
@@ -150,10 +145,8 @@ async function getPublishedCollection<
 		.filter(isPublicEntry);
 }
 
-async function getPublishedCollectionPage<
-	T extends { path?: string; featured_image?: RawMediaField | null },
->(
-	collection: "posts" | "projects",
+async function getPublishedCollectionPage<C extends "posts" | "projects">(
+	collection: C,
 	options: {
 		limit: number;
 		offset?: number;
@@ -167,18 +160,17 @@ async function getPublishedCollectionPage<
 	});
 	return {
 		entries: result.entries
-			.map((entry) =>
-				normalizeEntry(entry as unknown as EmDashContentEntry<T>, collection),
-			)
+			.map((entry) => normalizeEntry(entry, collection))
 			.filter(isPublicEntry),
 		hasMore: result.hasMore ?? false,
 		cacheHint: result.cacheHint,
 	};
 }
 
-export async function getPublishedEntriesByIds<
-	T extends { path?: string; featured_image?: RawMediaField | null },
->(collection: "pages" | "posts" | "projects", ids: string[]) {
+export async function getPublishedEntriesByIds<C extends SiteCollection>(
+	collection: C,
+	ids: string[],
+) {
 	if (ids.length === 0) return [];
 
 	const { entries } = await getEmDashCollection(collection, {
@@ -187,21 +179,19 @@ export async function getPublishedEntriesByIds<
 		where: { id: ids },
 	});
 	return entries
-		.map((entry) =>
-			normalizeEntry(entry as unknown as EmDashContentEntry<T>, collection),
-		)
+		.map((entry) => normalizeEntry(entry, collection))
 		.filter(isPublicEntry);
 }
 
 export function getRecentPosts(limit = 25) {
-	return getPublishedCollectionPage<PostData>("posts", {
+	return getPublishedCollectionPage("posts", {
 		limit,
 		orderBy: { published_on: "desc", title: "asc" },
 	});
 }
 
 export function getHighlightedProjects(limit = 6) {
-	return getPublishedCollectionPage<ProjectData>("projects", {
+	return getPublishedCollectionPage("projects", {
 		limit,
 		where: { highlight: "1" },
 		orderBy: { menu_order: "asc", published_on: "desc", title: "asc" },
@@ -209,7 +199,7 @@ export function getHighlightedProjects(limit = 6) {
 }
 
 export function getPostsPageByCategory(slug: string, page: number, limit = 10) {
-	return getPublishedCollectionPage<PostData>("posts", {
+	return getPublishedCollectionPage("posts", {
 		limit,
 		offset: Math.max(0, page - 1) * limit,
 		where: { category: slug },
@@ -223,7 +213,7 @@ export function getProjectsPageByTaxonomy(
 	page: number,
 	limit = 10,
 ) {
-	return getPublishedCollectionPage<ProjectData>("projects", {
+	return getPublishedCollectionPage("projects", {
 		limit,
 		offset: Math.max(0, page - 1) * limit,
 		where: { [taxonomy]: slug },
@@ -240,24 +230,21 @@ export async function getPrimaryMenu() {
 }
 
 export async function getPublishedPages() {
-	return getPublishedCollection<PageData>("pages");
+	return getPublishedCollection("pages");
 }
 
 export async function getPublishedPosts() {
-	return getPublishedCollection<PostData>("posts");
+	return getPublishedCollection("posts");
 }
 
 export async function getPublishedProjects() {
-	return getPublishedCollection<ProjectData>("projects");
+	return getPublishedCollection("projects");
 }
 
 export async function getPageBySlug(slug: string) {
 	const { entry } = await getEmDashEntry("pages", slug);
 	if (!entry) return null;
-	const page = normalizeEntry(
-		entry as unknown as EmDashContentEntry<PageData>,
-		"pages",
-	);
+	const page = normalizeEntry(entry, "pages");
 	return isPublicEntry(page) ? page : null;
 }
 
@@ -274,10 +261,7 @@ export async function getPageByPath(path: string) {
 	});
 	const entry = entries[0];
 	if (!entry) return null;
-	const matched = normalizeEntry(
-		entry as unknown as EmDashContentEntry<PageData>,
-		"pages",
-	);
+	const matched = normalizeEntry(entry, "pages");
 	return isPublicEntry(matched) ? matched : null;
 }
 
@@ -294,30 +278,21 @@ export async function getPostByPath(path: string) {
 	});
 	const entry = entries[0];
 	if (!entry) return null;
-	const matched = normalizeEntry(
-		entry as unknown as EmDashContentEntry<PostData>,
-		"posts",
-	);
+	const matched = normalizeEntry(entry, "posts");
 	return isPublicEntry(matched) ? matched : null;
 }
 
 export async function getPostBySlug(slug: string) {
 	const { entry } = await getEmDashEntry("posts", slug);
 	if (!entry) return null;
-	const post = normalizeEntry(
-		entry as unknown as EmDashContentEntry<PostData>,
-		"posts",
-	);
+	const post = normalizeEntry(entry, "posts");
 	return isPublicEntry(post) ? post : null;
 }
 
 export async function getProjectBySlug(slug: string) {
 	const { entry } = await getEmDashEntry("projects", slug);
 	if (!entry) return null;
-	const project = normalizeEntry(
-		entry as unknown as EmDashContentEntry<ProjectData>,
-		"projects",
-	);
+	const project = normalizeEntry(entry, "projects");
 	return isPublicEntry(project) ? project : null;
 }
 
