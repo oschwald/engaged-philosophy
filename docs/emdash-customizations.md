@@ -80,8 +80,17 @@ consuming the smaller KV write budget or requiring a paid service.
 - Imported numbered headings use EmDash's native Portable Text list and heading
   rendering. A CSS counter preserves interview numbering across the answer
   blocks between headings without changing ordinary ordered lists.
-- Legacy renderers remain for Animoto embeds, playlist videos, and page lists
-  that do not have direct EmDash equivalents.
+- Archive and search excerpts use EmDash's Portable Text plain-text extractor
+  for standard blocks. The site adapter only preserves the imported image-alt
+  and gallery-caption fallback behavior that EmDash cannot infer from the
+  nested legacy gallery shape.
+- Legacy renderers remain for Animoto embeds, playlist videos, and dynamic page
+  lists. EmDash does not support Animoto or the page-list behavior. Its
+  self-hosted embed currently forces videos into 16:9 and omits intrinsic
+  dimensions and `playsinline`, while its media component serves local files
+  through the Worker. Keeping the small video adapter therefore preserves the
+  square and portrait videos and direct public-R2 delivery on the Cloudflare
+  Free plan.
 
 ## Imported Field Names
 
