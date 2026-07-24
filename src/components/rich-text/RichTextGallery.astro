@@ -27,6 +27,9 @@ const images = node.images
 const usesLeadLayout =
 	node.layout === "shortcode" && node.columns === 3 && images.length === 4;
 const firstImage = images[0];
+const hasSeparateCaption = Boolean(
+	node.caption && firstImage && firstImage.caption,
+);
 const galleryNode =
 	node.caption && firstImage && !firstImage.caption
 		? {
@@ -42,7 +45,13 @@ const galleryNode =
 		node.layout && `legacy-gallery-compat--${node.layout}`,
 		node.columns && `legacy-gallery-compat--columns-${node.columns}`,
 		usesLeadLayout && "legacy-gallery-compat--lead",
+		hasSeparateCaption && "legacy-gallery-compat--separate-caption",
 	]}
 >
 	<EmDashGallery node={galleryNode} />
+	{
+		hasSeparateCaption && (
+			<p class="legacy-gallery-compat__caption">{node.caption}</p>
+		)
+	}
 </div>

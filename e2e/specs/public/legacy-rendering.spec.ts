@@ -111,12 +111,14 @@ test.describe("public migrated content rendering", () => {
 										url,
 									},
 									alt: `Figure gallery image ${index + 1}`,
-									...(index === 3
-										? {
-												caption:
-													"A deliberately long orphan-row caption that must not wrap more than before",
-											}
-										: {}),
+									...(index === 0
+										? { caption: "First image caption" }
+										: index === 3
+											? {
+													caption:
+														"A deliberately long orphan-row caption that must not wrap more than before",
+												}
+											: {}),
 								})),
 								{
 									_type: "image",
@@ -220,8 +222,11 @@ test.describe("public migrated content rendering", () => {
 		).resolves.toEqual({ display: "grid", columns: 2 });
 		await expect(gallery.locator("a")).toHaveCount(0);
 
-		const blockGallery = publicPage.locator(
-			".legacy-gallery-compat--figure.legacy-gallery-compat--columns-2 .emdash-gallery",
+		const blockGalleryWrapper = publicPage.locator(
+			".legacy-gallery-compat--figure.legacy-gallery-compat--columns-2",
+		);
+		const blockGallery = blockGalleryWrapper.locator(
+			":scope > .emdash-gallery",
 		);
 		await expect(blockGallery.locator("img")).toHaveCount(4);
 		await expect(
@@ -239,10 +244,11 @@ test.describe("public migrated content rendering", () => {
 			display: "flex",
 			flexWrap: "wrap",
 		});
-		const importedCaption = blockGallery.getByText(
+		const importedCaption = blockGalleryWrapper.getByText(
 			"Imported outer gallery caption",
 		);
 		await expect(importedCaption).toBeVisible();
+		await expect(blockGallery.getByText("First image caption")).toBeVisible();
 		await expect(
 			importedCaption.evaluate((caption) => {
 				const style = getComputedStyle(caption);

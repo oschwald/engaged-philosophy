@@ -99,6 +99,16 @@
 	margin: 0 0 20px;
 }
 
+.legacy-content .legacy-gallery-compat--separate-caption .emdash-gallery {
+	margin-bottom: 0;
+}
+
+.legacy-gallery-compat__caption {
+	margin: 0 0 20px;
+	padding-top: 0.5rem;
+	text-align: center;
+}
+
 .legacy-content .legacy-gallery-compat--figure .emdash-gallery {
 	display: flex !important;
 	flex-wrap: wrap;
@@ -130,6 +140,8 @@
 .legacy-content
 	.legacy-gallery-compat--shortcode.legacy-gallery-compat--columns-1
 	.emdash-gallery,
+// The sole imported four-column gallery rendered as one column before this
+// refactor. Keep that A/B-tested layout instead of silently rearranging it.
 .legacy-content
 	.legacy-gallery-compat--shortcode.legacy-gallery-compat--columns-4
 	.emdash-gallery {
