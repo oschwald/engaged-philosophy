@@ -5,8 +5,10 @@ import {
 	portableTextParagraph,
 	publishContentViaApi,
 	updateContentViaApi,
+	uploadMediaViaApi,
 	uniqueTitle,
 } from "../../support/content";
+import { PUBLIC_MEDIA_URL } from "../../../src/lib/site-config";
 
 test.describe("public page cache", () => {
 	test("caches generated metadata with its data dependencies", async ({
@@ -22,6 +24,53 @@ test.describe("public page cache", () => {
 			maxRedirects: 0,
 		});
 		expect(faviconResponse.headers()["cache-tag"]).toContain("site-settings");
+	});
+
+	test("advertises the public media URL for the browser favicon", async ({
+		authedRequest,
+		publicPage,
+	}, testInfo) => {
+		const filename = `e2e-favicon-${testInfo.workerIndex}-${Date.now()}.svg`;
+		const media = await uploadMediaViaApi(authedRequest, {
+			filename,
+			mimeType: "image/svg+xml",
+			buffer: Buffer.from(
+				'<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>',
+			),
+			width: 1,
+			height: 1,
+		});
+		expect(media.storageKey).toBeTruthy();
+
+		try {
+			const settingsResponse = await authedRequest.post(
+				"/_emdash/api/settings",
+				{
+					data: {
+						favicon: { mediaId: media.id },
+					},
+				},
+			);
+			expect(settingsResponse.ok()).toBe(true);
+
+			const pageResponse = await publicPage.request.get("/");
+			const html = await pageResponse.text();
+			const publicHref = `${PUBLIC_MEDIA_URL}/${media.storageKey}`;
+			const internalHref = `/_emdash/api/media/file/${media.storageKey}`;
+
+			expect(html).toContain(`href="${internalHref}"`);
+			expect(html).toContain(
+				`href="${publicHref}" type="image/svg+xml" sizes="1x1"`,
+			);
+			expect(html.indexOf(`href="${publicHref}"`)).toBeGreaterThan(
+				html.indexOf(`href="${internalHref}"`),
+			);
+		} finally {
+			const deleteResponse = await authedRequest.delete(
+				`/_emdash/api/media/${media.id}`,
+			);
+			expect(deleteResponse.ok()).toBe(true);
+		}
 	});
 
 	test("keeps stateful and query-string HTML out of the shared cache", async ({

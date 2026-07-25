@@ -1,11 +1,10 @@
 import type { APIRoute } from "astro";
-import { getSeoMeta, type ContentSeo } from "emdash";
+import { getSeoMeta, getSiteSettings, type ContentSeo } from "emdash";
 
 import {
 	getPublishedPages,
 	getPublishedPosts,
 	getPublishedProjects,
-	getRuntimeSiteSettings,
 } from "../lib/content";
 import { SITE_SETTINGS_CACHE_TAG } from "../lib/cache-tags";
 import {
@@ -61,7 +60,7 @@ export const GET: APIRoute = async ({ cache, url }) => {
 		tags: [SITE_SETTINGS_CACHE_TAG, "pages", "posts", "projects"],
 	});
 	const [settings, pages, posts, projects] = await Promise.all([
-		getRuntimeSiteSettings(),
+		getSiteSettings(),
 		getPublishedPages(),
 		getPublishedPosts(),
 		getPublishedProjects(),

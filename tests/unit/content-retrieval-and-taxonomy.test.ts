@@ -1,18 +1,14 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const { getEmDashCollection, getEmDashEntry, getTerm } = vi.hoisted(() => ({
+const { getEmDashCollection, getEmDashEntry } = vi.hoisted(() => ({
 	getEmDashCollection: vi.fn(),
 	getEmDashEntry: vi.fn(),
-	getTerm: vi.fn(),
 }));
 
 vi.mock("emdash", () => ({
 	getEmDashCollection,
 	getEmDashEntry,
-	getMenu: vi.fn(),
-	getSiteSettings: vi.fn(),
 	getTaxonomyTerms: vi.fn(),
-	getTerm,
 }));
 
 import {
@@ -146,6 +142,5 @@ describe("content retrieval and taxonomy", () => {
 				},
 			},
 		);
-		expect(getTerm).not.toHaveBeenCalled();
 	});
 });
