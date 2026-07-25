@@ -29,10 +29,11 @@ browser timing in `e2e-static/`, and admin/public workflows in `e2e/`.
 - `pnpm run test:e2e` runs the Worker-backed Playwright suite.
 - `pnpm run test:e2e:admin`, `pnpm run test:e2e:editing`, and
   `pnpm run test:e2e:public` run focused Worker-backed Playwright groups.
-- `pnpm run smoke:live` runs lightweight checks against a deployed site. Set
-  `LIVE_BASE_URL` to target a non-default hostname. The smoke test requests one
-  public page twice and requires Cloudflare's second response to report a cache
-  hit (or a stale/revalidated equivalent).
+- `pnpm run smoke:live` runs lightweight checks against
+  `https://www.engagedphilosophy.com`. Set `LIVE_BASE_URL` to target another
+  deployment. The smoke test requests one public page twice and requires
+  Cloudflare's second response to report a cache hit (or a stale/revalidated
+  equivalent).
 - `pnpm run smoke:live:sitemap` runs the deployed smoke checks plus every same
   origin URL listed in the sitemap, and fails if the sitemap is empty.
 - Use `LIVE_SMOKE_PATH_FILE` with `pnpm run smoke:live` to check one URL/path

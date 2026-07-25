@@ -13,7 +13,7 @@ import {
 	normalizeContentPath,
 	slugFromPath,
 } from "./content-paths";
-import { getPublicMediaStorageUrl, rewriteInternalMediaFileUrl } from "./media";
+import { getPublicMediaStorageUrl } from "./media";
 import type {
 	ContentEntry,
 	MediaField,
@@ -32,50 +32,22 @@ type NormalizedEntryData<T> = Omit<T, "featured_image"> & {
 };
 type RawMediaField = MediaField & {
 	provider?: string;
-	id?: string;
 	meta?: {
 		storageKey?: string;
-	};
-	$media?: {
-		url?: string;
-		alt?: string;
 	};
 };
 
 const COLLECTION_PAGE_SIZE = 1000;
 
-function normalizeLocalMediaField(
-	media: RawMediaField,
+function normalizeMediaField(
+	media?: RawMediaField | null,
 ): MediaField | undefined {
-	if (media.provider !== "local" || !media.meta?.storageKey) return undefined;
+	if (media?.provider !== "local" || !media.meta?.storageKey) return undefined;
 
 	return {
 		src: getPublicMediaStorageUrl(media.meta.storageKey),
 		alt: media.alt,
 	};
-}
-
-function normalizeSeedMediaFallback(
-	media: RawMediaField,
-): MediaField | undefined {
-	// Compatibility for older generated seed data. Current imports emit local
-	// EmDash media values before content reaches runtime.
-	if (!media.$media?.url) return undefined;
-	return {
-		src: rewriteInternalMediaFileUrl(media.$media.url),
-		alt: media.$media.alt,
-	};
-}
-
-function normalizeMediaField(
-	media?: RawMediaField | null,
-): MediaField | undefined {
-	if (!media) return undefined;
-	const localMedia = normalizeLocalMediaField(media);
-	if (localMedia) return localMedia;
-	if (media.src)
-		return { src: rewriteInternalMediaFileUrl(media.src), alt: media.alt };
-	return normalizeSeedMediaFallback(media);
 }
 
 function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(

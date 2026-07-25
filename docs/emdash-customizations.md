@@ -81,6 +81,10 @@ consuming the smaller KV write budget or requiring a paid service.
   small screens. Migrated images keep their reliable source width but omit
   unreliable imported heights, so they render directly from the public R2
   domain instead of consuming Cloudflare image transformations.
+- Featured images use EmDash's native local-media metadata. The public content
+  adapter maps each storage key directly to the public R2 domain once, so
+  homepage, archive, and search renderers can use the normalized URL without
+  retaining older seed-media shapes or repeating WordPress URL rewrites.
 - Portable Text galleries delegate their markup, image loading, and captions to
   EmDash, and EmDash 0.31 keeps those native gallery blocks visible and editable
   in the admin editor. A small public-rendering adapter resolves migrated image

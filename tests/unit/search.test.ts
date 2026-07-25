@@ -48,6 +48,10 @@ describe("site search", () => {
 								id: "project-1",
 								title: "Project One",
 								path: "project/project-one",
+								featured_image: {
+									src: "https://media.example.com/project-one.jpg",
+									alt: "Project One",
+								},
 							},
 						},
 					];
@@ -62,11 +66,7 @@ describe("site search", () => {
 			},
 		);
 
-		const result = await searchSite(
-			"community",
-			"current-page",
-			"https://media.example.com",
-		);
+		const result = await searchSite("community", "current-page");
 
 		expect(emdashSearch).toHaveBeenCalledWith("community", {
 			collections: ["pages", "posts", "projects"],
@@ -83,6 +83,7 @@ describe("site search", () => {
 					kind: "project",
 					title: "Project One",
 					path: "project/project-one",
+					imageSrc: "https://media.example.com/project-one.jpg",
 				},
 				{
 					id: "page-1",

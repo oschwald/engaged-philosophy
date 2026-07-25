@@ -2,7 +2,6 @@
 import SearchResults from "../../components/SearchResults.astro";
 import Base from "../../layouts/Base.astro";
 import { isValidSearchCursorHistory, searchSite } from "../../lib/search";
-import { getMediaUrlPrefix } from "../../lib/media";
 import { InvalidCursorError } from "emdash";
 
 const pageNumber = Number(Astro.params.page ?? "1");
@@ -20,10 +19,9 @@ if (
 	return Astro.redirect("/404");
 }
 
-const mediaUrlPrefix = getMediaUrlPrefix();
 let search;
 try {
-	search = await searchSite(query, cursor, mediaUrlPrefix);
+	search = await searchSite(query, cursor);
 } catch (error) {
 	if (!(error instanceof InvalidCursorError)) throw error;
 	return Astro.redirect("/404");

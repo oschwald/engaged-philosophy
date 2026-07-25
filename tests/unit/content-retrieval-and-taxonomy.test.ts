@@ -72,6 +72,40 @@ describe("content retrieval and taxonomy", () => {
 		});
 	});
 
+	test("serves native local featured images from public storage", async () => {
+		getEmDashCollection.mockResolvedValue({
+			entries: [
+				entry("post-1", {
+					slug: "first-post",
+					path: "2026/01/02/first-post",
+					title: "First post",
+					featured_image: {
+						provider: "local",
+						meta: {
+							storageKey: "wp-content/uploads/2026/01/featured.jpg",
+						},
+						alt: "Featured",
+					},
+				}),
+			],
+			hasMore: false,
+			cacheHint: {},
+		});
+
+		await expect(getRecentPosts(1)).resolves.toMatchObject({
+			entries: [
+				{
+					data: {
+						featured_image: {
+							src: "https://media.engagedphilosophy.com/wp-content/uploads/2026/01/featured.jpg",
+							alt: "Featured",
+						},
+					},
+				},
+			],
+		});
+	});
+
 	test("walks collection cursors instead of truncating full listings", async () => {
 		getEmDashCollection
 			.mockResolvedValueOnce({

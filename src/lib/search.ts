@@ -1,7 +1,6 @@
 import { search as searchEmDash } from "emdash";
 
 import { getPublishedEntriesByIds } from "./content";
-import { rewriteWordPressUploadUrl } from "./media";
 import {
 	getEntryContent,
 	getEntryExcerpt,
@@ -62,7 +61,6 @@ export function isValidSearchCursorHistory(
 export async function searchSite(
 	rawQuery: string,
 	cursor?: string,
-	mediaUrlPrefix = "",
 ): Promise<SiteSearchResponse> {
 	const query = rawQuery.trim();
 	if (!query) return { query, results: [] };
@@ -110,10 +108,7 @@ export async function searchSite(
 					getEntryExcerpt(entry.data),
 					getEntryContent(entry.data),
 				),
-				imageSrc: rewriteWordPressUploadUrl(
-					entry.data.featured_image?.src,
-					mediaUrlPrefix,
-				),
+				imageSrc: entry.data.featured_image?.src,
 			},
 		];
 	});
