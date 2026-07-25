@@ -21,7 +21,6 @@ export interface Page {
   box_middle_html?: PortableTextBlock[];
   box_right_title?: string;
   box_right_html?: PortableTextBlock[];
-  author_name?: string;
   legacy_wp_id?: number;
   createdAt: Date;
   updatedAt: Date;
@@ -39,7 +38,6 @@ export interface Post {
   excerpt?: PortableTextBlock[];
   content?: PortableTextBlock[];
   featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> };
-  author_name?: string;
   legacy_wp_id?: number;
   createdAt: Date;
   updatedAt: Date;
@@ -59,7 +57,6 @@ export interface Project {
   featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> };
   highlight?: boolean;
   menu_order?: number;
-  author_name?: string;
   legacy_wp_id?: number;
   createdAt: Date;
   updatedAt: Date;

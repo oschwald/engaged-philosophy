@@ -100,6 +100,9 @@ consuming the smaller KV write budget or requiring a paid service.
   for standard blocks. The site adapter only preserves the imported image-alt
   and gallery-caption fallback behavior that EmDash cannot infer from the
   nested legacy gallery shape.
+- Article author metadata uses the primary credit from EmDash's hydrated
+  `data.bylines`. Imported WordPress author values were migrated to native
+  byline profiles and credits, so there is no separate author field adapter.
 - Legacy renderers remain for Animoto embeds, playlist videos, and dynamic page
   lists. EmDash does not support Animoto or the page-list behavior. Its
   self-hosted embed currently forces videos into 16:9 and omits intrinsic
@@ -112,12 +115,12 @@ consuming the smaller KV write budget or requiring a paid service.
 
 EmDash system properties use camelCase (`createdAt`, `updatedAt`, and
 `publishedAt`). Imported WordPress fields retain their persisted schema slugs,
-which use snake_case (`featured_image`, `author_name`, and `menu_order`). These
-names are database and admin-schema identifiers, not a style choice in new
-application code. New application-facing APIs should use camelCase and keep
-legacy names inside content adapters. Renaming a persisted field requires a
-backup-backed content/schema migration and should be handled separately from
-routine refactoring.
+which use snake_case (`featured_image` and `menu_order`). These names are
+database and admin-schema identifiers, not a style choice in new application
+code. New application-facing APIs should use camelCase and keep legacy names
+inside content adapters. Renaming a persisted field requires a backup-backed
+content/schema migration and should be handled separately from routine
+refactoring.
 
 ## Cloudflare Access Invites
 

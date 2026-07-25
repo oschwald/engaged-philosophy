@@ -94,11 +94,6 @@
 					"widget": "portableText"
 				},
 				{
-					"slug": "author_name",
-					"label": "Author Name",
-					"type": "string"
-				},
-				{
 					"slug": "legacy_wp_id",
 					"label": "Legacy WordPress ID",
 					"type": "integer"
@@ -143,11 +138,6 @@
 					"slug": "featured_image",
 					"label": "Featured Image",
 					"type": "image"
-				},
-				{
-					"slug": "author_name",
-					"label": "Author Name",
-					"type": "string"
 				},
 				{
 					"slug": "legacy_wp_id",
@@ -206,11 +196,6 @@
 					"label": "Menu Order",
 					"type": "integer",
 					"defaultValue": 0
-				},
-				{
-					"slug": "author_name",
-					"label": "Author Name",
-					"type": "string"
 				},
 				{
 					"slug": "legacy_wp_id",

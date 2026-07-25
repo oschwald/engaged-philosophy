@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import type { ContentBylineCredit } from "emdash";
 
 import {
 	createSitePageContext,
@@ -20,6 +21,28 @@ function postEntry(data: Partial<PostData>): ContentEntry<PostData> {
 			...data,
 		},
 		edit: {} as ContentEntry<PostData>["edit"],
+	};
+}
+
+function bylineCredit(displayName: string): ContentBylineCredit {
+	return {
+		byline: {
+			id: "byline-id",
+			slug: "a-philosopher",
+			displayName,
+			bio: null,
+			avatarMediaId: null,
+			websiteUrl: null,
+			userId: null,
+			isGuest: true,
+			createdAt: "2026-07-01T00:00:00.000Z",
+			updatedAt: "2026-07-01T00:00:00.000Z",
+			locale: "en",
+			translationGroup: "byline-id",
+		},
+		sortOrder: 0,
+		roleLabel: null,
+		source: "explicit",
 	};
 }
 
@@ -68,7 +91,7 @@ describe("site page context", () => {
 			title: "An essay",
 			publishedAt: new Date("2026-07-01T10:00:00Z"),
 			updatedAt: new Date("2026-07-02T11:00:00Z"),
-			author_name: "A. Philosopher",
+			bylines: [bylineCredit("A. Philosopher")],
 			seo: {
 				title: "A better title",
 				description: "A concise description",
