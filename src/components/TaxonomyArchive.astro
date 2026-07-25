@@ -7,7 +7,6 @@ import {
 	getEntryExcerpt,
 	getExcerptText,
 } from "../lib/rich-text";
-import { getMediaUrlPrefix, rewriteWordPressUploadUrl } from "../lib/media";
 import type { ContentEntry, ProjectData } from "../lib/types";
 
 interface Props {
@@ -24,7 +23,6 @@ const hasResults = projects.length > 0;
 const showSidebar = taxonomy !== "topic";
 const titlePrefix = taxonomy === "topic" ? "Project Topic: " : "";
 const basePath = `/${taxonomy}/${Astro.params.slug}/`;
-const mediaUrlPrefix = getMediaUrlPrefix();
 
 function pageHref(pageNumber: number) {
 	return pageNumber === 1 ? basePath : `${basePath}page/${pageNumber}/`;
@@ -51,12 +49,7 @@ function pageHref(pageNumber: number) {
 							getEntryContent(project.data),
 						)}
 						image={{
-							src: project.data.featured_image?.src
-								? rewriteWordPressUploadUrl(
-										project.data.featured_image.src,
-										mediaUrlPrefix,
-									)
-								: undefined,
+							src: project.data.featured_image?.src,
 							alt: project.data.featured_image?.alt || project.data.title,
 						}}
 					/>

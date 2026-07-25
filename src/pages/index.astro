@@ -4,7 +4,6 @@ import SearchResults from "../components/SearchResults.astro";
 import Base from "../layouts/Base.astro";
 import { getHighlightedProjects, getPageBySlug } from "../lib/content";
 import { searchSite } from "../lib/search";
-import { getMediaUrlPrefix, rewriteWordPressUploadUrl } from "../lib/media";
 import {
 	getEntryContent,
 	getEntryExcerpt,
@@ -14,10 +13,7 @@ import {
 const home = await getPageBySlug("home");
 const { entries: highlightedProjects } = await getHighlightedProjects();
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
-const mediaUrlPrefix = getMediaUrlPrefix();
-const search = query
-	? await searchSite(query, undefined, mediaUrlPrefix)
-	: null;
+const search = query ? await searchSite(query) : null;
 const homeEntryAttrs = home?.edit ?? {};
 const homeBoxes = home
 	? [
@@ -69,10 +65,7 @@ const homeBoxes = home
 									<div class:list={["carousel-item", index === 0 && "active"]}>
 										{project.data.featured_image?.src && (
 											<img
-												src={rewriteWordPressUploadUrl(
-													project.data.featured_image.src,
-													mediaUrlPrefix,
-												)}
+												src={project.data.featured_image.src}
 												alt={`${project.data.title} project image`}
 												width="700"
 												height="460"
