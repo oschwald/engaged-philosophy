@@ -3,11 +3,7 @@ import RichContent from "../../../../components/RichContent.astro";
 import ThemeSidebar from "../../../../components/ThemeSidebar.astro";
 import Base from "../../../../layouts/Base.astro";
 import { taxonomyCacheTag } from "../../../../lib/cache-tags";
-import {
-	getEntryTermSlugs,
-	getPostByPath,
-	getTermsBySlugs,
-} from "../../../../lib/content";
+import { getPostByPath } from "../../../../lib/content";
 import { joinPath } from "../../../../lib/path-utils";
 import { getEntryContent } from "../../../../lib/rich-text";
 
@@ -19,10 +15,7 @@ if (!post) {
 	return Astro.redirect("/404");
 }
 
-const categories = await getTermsBySlugs(
-	"category",
-	getEntryTermSlugs(post, "category"),
-);
+const categories = post.data.terms?.category ?? [];
 ---
 
 <Base

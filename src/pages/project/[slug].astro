@@ -3,7 +3,7 @@ import ProjectTermsList from "../../components/content/ProjectTermsList.astro";
 import RichContent from "../../components/RichContent.astro";
 import Base from "../../layouts/Base.astro";
 import { taxonomyCacheTag } from "../../lib/cache-tags";
-import { getEntryTerms, getProjectBySlug } from "../../lib/content";
+import { getProjectBySlug } from "../../lib/content";
 import { getEntryContent } from "../../lib/rich-text";
 import { PROJECT_TAXONOMIES } from "../../lib/taxonomy-utils";
 
@@ -14,17 +14,32 @@ if (!project) {
 	return Astro.redirect("/404");
 }
 
-const schools = getEntryTerms(project, "schools");
-const professors = getEntryTerms(project, "professors");
-const courses = getEntryTerms(project, "courses");
-const semesters = getEntryTerms(project, "semesters");
-const topics = getEntryTerms(project, "topic");
 const termGroups = [
-	{ label: "College", pathPrefix: "schools", terms: schools },
-	{ label: "Professor", pathPrefix: "professors", terms: professors },
-	{ label: "Course", pathPrefix: "courses", terms: courses },
-	{ label: "Semester", pathPrefix: "semesters", terms: semesters },
-	{ label: "Topics", pathPrefix: "topic", terms: topics },
+	{
+		label: "College",
+		pathPrefix: "schools",
+		terms: project.data.terms?.schools ?? [],
+	},
+	{
+		label: "Professor",
+		pathPrefix: "professors",
+		terms: project.data.terms?.professors ?? [],
+	},
+	{
+		label: "Course",
+		pathPrefix: "courses",
+		terms: project.data.terms?.courses ?? [],
+	},
+	{
+		label: "Semester",
+		pathPrefix: "semesters",
+		terms: project.data.terms?.semesters ?? [],
+	},
+	{
+		label: "Topics",
+		pathPrefix: "topic",
+		terms: project.data.terms?.topic ?? [],
+	},
 ];
 ---
 

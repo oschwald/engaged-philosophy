@@ -23,6 +23,13 @@ export interface MediaItem {
 	url?: string;
 }
 
+export interface TaxonomyTerm {
+	id: string;
+	name: string;
+	slug: string;
+	label: string;
+}
+
 const SINGULAR_LABEL: Record<CollectionSlug, string> = {
 	pages: "Page",
 	posts: "Post",
@@ -154,12 +161,14 @@ export async function createContentViaApi(
 		slug?: string;
 		data?: Record<string, unknown>;
 		publishedAt?: string;
+		taxonomies?: Record<string, string[]>;
 	},
 ) {
 	const response = await request.post(`/_emdash/api/content/${collection}`, {
 		data: {
 			slug: options.slug,
 			publishedAt: options.publishedAt,
+			taxonomies: options.taxonomies,
 			data: {
 				title: options.title,
 				content: portableTextParagraph(options.content ?? options.title),
@@ -194,6 +203,33 @@ export async function uploadMediaViaApi(
 	});
 	const body = await expectJsonResponse(response, "upload media");
 	return body?.data?.item as MediaItem;
+}
+
+export async function createTaxonomyTermViaApi(
+	request: APIRequestContext,
+	taxonomy: string,
+	options: { slug: string; label: string },
+): Promise<TaxonomyTerm> {
+	const response = await request.post(
+		`/_emdash/api/taxonomies/${taxonomy}/terms`,
+		{ data: options },
+	);
+	const body = await expectJsonResponse(
+		response,
+		`create ${taxonomy} taxonomy term`,
+	);
+	return body?.data?.term as TaxonomyTerm;
+}
+
+export async function deleteTaxonomyTermViaApi(
+	request: APIRequestContext,
+	taxonomy: string,
+	slug: string,
+): Promise<void> {
+	const response = await request.delete(
+		`/_emdash/api/taxonomies/${taxonomy}/terms/${slug}`,
+	);
+	await expectJsonResponse(response, `delete ${taxonomy} taxonomy term`);
 }
 
 export async function publishContentViaApi(
