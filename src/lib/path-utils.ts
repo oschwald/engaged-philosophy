@@ -2,18 +2,6 @@ export function joinPath(parts: string[]) {
 	return parts.filter(Boolean).join("/");
 }
 
-export function ensureTrailingSlash(value: string) {
-	if (value === "/") return value;
-	return value.endsWith("/") ? value : `${value}/`;
-}
-
-export function findEntryByPath<T extends { path?: string }>(
-	items: Array<{ data: T }>,
-	path: string,
-) {
-	return items.find((item) => item.data.path === path) ?? null;
-}
-
 export function formatPathDate(path?: string) {
 	const parts = (path ?? "").split("/");
 	if (parts.length < 3) return "";
