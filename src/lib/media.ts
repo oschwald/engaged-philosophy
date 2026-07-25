@@ -5,7 +5,6 @@ import { safeUrlForMediaSrc } from "./url-safety";
 
 export { PUBLIC_MEDIA_URL, WORDPRESS_SITE_URL };
 
-const WORDPRESS_SITE_HOST_RE = /^(?:www\.)?engagedphilosophy\.com$/i;
 const EMDASH_MEDIA_FILE_PREFIX = "/_emdash/api/media/file/";
 
 function normalizeMediaHost(value: string) {
@@ -170,23 +169,6 @@ export function rewriteWordPressUploadUrl(
 				? sanitizeUploadPath(url.pathname)
 				: url.pathname;
 			return `${normalizedPrefix}${pathname}${url.search}${url.hash}`;
-		}
-	} catch {
-		return normalized;
-	}
-
-	return normalized;
-}
-
-export function rewriteWordPressSiteUrl(value?: string | null) {
-	const normalized = (value ?? "").trim();
-	if (!normalized) return "";
-	if (normalized.startsWith("/")) return normalized;
-
-	try {
-		const url = new URL(normalized);
-		if (WORDPRESS_SITE_HOST_RE.test(url.hostname)) {
-			return `${url.pathname}${url.search}${url.hash}` || "/";
 		}
 	} catch {
 		return normalized;
