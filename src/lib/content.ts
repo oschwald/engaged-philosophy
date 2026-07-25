@@ -1,10 +1,7 @@
 import {
 	getEmDashCollection,
 	getEmDashEntry,
-	getMenu,
-	getSiteSettings as getEmDashSiteSettings,
 	getTaxonomyTerms as getEmDashTaxonomyTerms,
-	getTerm,
 	type ContentEntry as EmDashContentEntry,
 } from "emdash";
 
@@ -218,14 +215,6 @@ export function getProjectsPageByTaxonomy(
 	});
 }
 
-export async function getRuntimeSiteSettings() {
-	return getEmDashSiteSettings();
-}
-
-export async function getPrimaryMenu() {
-	return (await getMenu("primary"))?.items ?? [];
-}
-
 export async function getPublishedPages() {
 	return getPublishedCollection("pages");
 }
@@ -291,10 +280,6 @@ export async function getProjectBySlug(slug: string) {
 	if (!entry) return null;
 	const project = normalizeEntry(entry, "projects");
 	return isPublicEntry(project) ? project : null;
-}
-
-export function getTaxonomyTerm(taxonomy: string, slug: string) {
-	return getTerm(taxonomy, slug);
 }
 
 export async function getTaxonomyTerms(taxonomy: string) {

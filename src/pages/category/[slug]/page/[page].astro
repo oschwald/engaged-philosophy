@@ -1,14 +1,13 @@
 ---
+import { getTerm } from "emdash";
+
 import CategoryArchive from "../../../../components/CategoryArchive.astro";
 import Base from "../../../../layouts/Base.astro";
 import { taxonomyCacheTag } from "../../../../lib/cache-tags";
-import {
-	getPostsPageByCategory,
-	getTaxonomyTerm,
-} from "../../../../lib/content";
+import { getPostsPageByCategory } from "../../../../lib/content";
 
 const { slug = "", page = "1" } = Astro.params;
-const term = await getTaxonomyTerm("category", slug);
+const term = await getTerm("category", slug);
 
 if (!term) {
 	return Astro.redirect("/404");

@@ -1,10 +1,9 @@
 ---
+import { getTerm } from "emdash";
+
 import Base from "../../../../layouts/Base.astro";
 import TaxonomyArchive from "../../../../components/TaxonomyArchive.astro";
-import {
-	getProjectsPageByTaxonomy,
-	getTaxonomyTerm,
-} from "../../../../lib/content";
+import { getProjectsPageByTaxonomy } from "../../../../lib/content";
 import { taxonomyCacheTag } from "../../../../lib/cache-tags";
 import { isProjectTaxonomy } from "../../../../lib/taxonomy-utils";
 
@@ -14,7 +13,7 @@ if (!isProjectTaxonomy(taxonomy)) {
 	return Astro.redirect("/404");
 }
 
-const term = await getTaxonomyTerm(taxonomy, slug);
+const term = await getTerm(taxonomy, slug);
 if (!term) {
 	return Astro.redirect("/404");
 }
