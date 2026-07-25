@@ -88,8 +88,8 @@ function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 	} as NormalizedEntryData<T> & {
 		path?: string;
 		slug?: string;
-		publishedAt?: Date | string | null;
-		createdAt?: Date | string | null;
+		publishedAt?: Date | null;
+		createdAt?: Date | null;
 	};
 
 	if (collection === "pages") {
