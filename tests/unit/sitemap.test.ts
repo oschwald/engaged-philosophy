@@ -39,10 +39,10 @@ describe("sitemap helpers", () => {
 		expect(
 			sitemapEntryLastmod({
 				id: "post",
-				updatedAt: new Date("2026-06-07T00:00:00Z"),
 				data: {
 					path: "2022/05/31/jason-swartwood",
-					published_on: "2022-06-01T00:12:21Z",
+					updatedAt: new Date("2026-06-07T00:00:00Z"),
+					publishedAt: new Date("2022-06-01T00:12:21Z"),
 				},
 			}),
 		).toBe("2026-06-07T00:00:00.000Z");
@@ -52,31 +52,31 @@ describe("sitemap helpers", () => {
 				id: "page",
 				data: {
 					path: "about",
-					updatedAt: new Date("2026-06-07T00:00:00Z"),
+					publishedAt: new Date("2022-06-01T00:12:21Z"),
 				},
 			}),
-		).toBe("2026-06-07T00:00:00.000Z");
+		).toBe("2022-06-01T00:12:21.000Z");
 	});
 
 	test("renders unique XML sitemap URLs with escaped values", () => {
 		const xml = renderSitemapXml("https://www.engagedphilosophy.com", [
 			{
 				id: "home",
-				data: { path: "", updated_at: "2026-06-07T00:00:00Z" },
+				data: { path: "", updatedAt: "2026-06-07T00:00:00Z" },
 			},
 			{
 				id: "project",
 				image: "https://media.example/project&image.jpg",
 				data: {
 					path: "project/a-b",
-					updated_at: "2026-06-07T00:00:00Z",
+					updatedAt: "2026-06-07T00:00:00Z",
 				},
 			},
 			{
 				id: "duplicate",
 				data: {
 					path: "project/a-b",
-					updated_at: "2026-06-08T00:00:00Z",
+					updatedAt: "2026-06-08T00:00:00Z",
 				},
 			},
 		]);

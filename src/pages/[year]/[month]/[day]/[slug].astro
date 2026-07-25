@@ -32,11 +32,7 @@ const categories = post.data.terms?.category ?? [];
 						{post.data.title}
 					</h1>
 					<div class="entry-meta">
-						{
-							post.data.published_on
-								? new Date(post.data.published_on).toLocaleDateString()
-								: ""
-						}
+						{post.data.publishedAt?.toLocaleDateString() ?? ""}
 					</div>
 				</header>
 				<div class="entry-content" {...post.edit.content}>

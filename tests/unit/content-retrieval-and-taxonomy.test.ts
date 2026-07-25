@@ -48,7 +48,7 @@ describe("content retrieval and taxonomy", () => {
 			limit: 10,
 			offset: 20,
 			where: { category: "news" },
-			orderBy: { published_on: "desc", title: "asc" },
+			orderBy: { published_at: "desc", title: "asc" },
 		});
 		expect(result).toMatchObject({
 			hasMore: true,
@@ -68,7 +68,7 @@ describe("content retrieval and taxonomy", () => {
 		expect(getEmDashCollection).toHaveBeenCalledWith("posts", {
 			status: "published",
 			limit: 25,
-			orderBy: { published_on: "desc", title: "asc" },
+			orderBy: { published_at: "desc", title: "asc" },
 		});
 	});
 

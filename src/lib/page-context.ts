@@ -41,10 +41,6 @@ function toIsoDate(value?: Date | string | null) {
 	return Number.isNaN(date.valueOf()) ? null : date.toISOString();
 }
 
-function getLegacyPublishedOn(data: SiteContentData) {
-	return "published_on" in data ? data.published_on : undefined;
-}
-
 function absoluteCanonical(value: string | null, siteUrl: string) {
 	if (!value) return null;
 	try {
@@ -128,9 +124,7 @@ export function createSitePageContext({
 		},
 		articleMeta: article
 			? {
-					publishedTime: toIsoDate(
-						data.publishedAt || getLegacyPublishedOn(data),
-					),
+					publishedTime: toIsoDate(data.publishedAt),
 					modifiedTime: toIsoDate(data.updatedAt),
 					author: data.author_name || null,
 				}

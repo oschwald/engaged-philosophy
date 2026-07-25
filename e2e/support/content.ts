@@ -117,12 +117,7 @@ export function publicPathForItem(
 		return `/${storedPath || `project/${slug}`}/`;
 	}
 
-	const publishedOn =
-		typeof item.data.published_on === "string" ? item.data.published_on : null;
-	const parts =
-		dateParts(publishedOn) ??
-		dateParts(item.publishedAt) ??
-		dateParts(item.createdAt);
+	const parts = dateParts(item.publishedAt) ?? dateParts(item.createdAt);
 	return `/${storedPath || [...(parts ?? []), slug].join("/")}/`;
 }
 
