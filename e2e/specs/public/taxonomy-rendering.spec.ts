@@ -70,6 +70,20 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 			categoryFooter.getByRole("link", { name: "E2E Category" }),
 		).toHaveAttribute("href", "/category/e2e-category/");
 
+		await publicPage.goto("/category/e2e-category/", {
+			waitUntil: "domcontentloaded",
+		});
+		await expect(
+			publicPage.getByRole("heading", {
+				name: "Category Archives: E2E Category",
+			}),
+		).toBeVisible();
+		await expect(
+			publicPage
+				.locator("#content")
+				.getByRole("link", { name: postTitle, exact: true }),
+		).toHaveAttribute("href", post.publicPath);
+
 		await publicPage.goto(project.publicPath, {
 			waitUntil: "domcontentloaded",
 		});
@@ -93,6 +107,21 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 		await expect(
 			termList.getByRole("link", { name: "E2E Topic Two" }),
 		).toHaveAttribute("href", "/topic/e2e-topic-two/");
+
+		await publicPage.goto("/topic/e2e-topic-one/", {
+			waitUntil: "domcontentloaded",
+		});
+		await expect(
+			publicPage.getByRole("heading", {
+				name: "Project Topic: E2E Topic One",
+			}),
+		).toBeVisible();
+		await expect(
+			publicPage.getByRole("heading", { name: projectTitle, exact: true }),
+		).toBeVisible();
+		await expect(
+			publicPage.getByRole("link", { name: /Continue reading/ }),
+		).toHaveAttribute("href", project.publicPath);
 	} finally {
 		await deleteContentViaApi(authedRequest, "posts", post.published.id);
 		await deleteContentViaApi(authedRequest, "projects", project.published.id);
