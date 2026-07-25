@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 
-const DEFAULT_BASE_URL = "https://engaged-philosophy.ramona75.workers.dev";
+const DEFAULT_BASE_URL = "https://www.engagedphilosophy.com";
 const REQUEST_TIMEOUT_MS = Number.parseInt(
 	process.env.LIVE_SMOKE_TIMEOUT_MS ?? "12000",
 	10,
