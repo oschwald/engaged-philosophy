@@ -83,14 +83,28 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 				.locator("#content")
 				.getByRole("link", { name: postTitle, exact: true }),
 		).toHaveAttribute("href", post.publicPath);
-		await expect(
-			publicPage.locator("#recent-posts-2 li").filter({
-				has: publicPage.getByRole("link", {
-					name: postTitle,
-					exact: true,
-				}),
+		const recentInterview = publicPage.locator("#recent-posts-2 li").filter({
+			has: publicPage.getByRole("link", {
+				name: postTitle,
+				exact: true,
 			}),
-		).toContainText(`${postTitle} July 25, 2026`);
+		});
+		const recentInterviewLink = recentInterview.getByRole("link", {
+			name: postTitle,
+			exact: true,
+		});
+		const recentInterviewDate = recentInterview.locator(".post-date");
+		await expect(recentInterview).toContainText(`${postTitle} July 25, 2026`);
+		await expect(recentInterviewDate).toHaveCSS("display", "block");
+		const [linkFontSize, dateFontSize] = await Promise.all([
+			recentInterviewLink.evaluate((element) =>
+				Number.parseFloat(getComputedStyle(element).fontSize),
+			),
+			recentInterviewDate.evaluate((element) =>
+				Number.parseFloat(getComputedStyle(element).fontSize),
+			),
+		]);
+		expect(dateFontSize).toBeLessThan(linkFontSize);
 
 		await publicPage.goto(project.publicPath, {
 			waitUntil: "domcontentloaded",
