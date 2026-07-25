@@ -2,6 +2,7 @@
 import { getTerm } from "emdash";
 
 import CategoryArchive from "../../../../components/CategoryArchive.astro";
+import NotFound from "../../../../components/NotFound.astro";
 import Base from "../../../../layouts/Base.astro";
 import { taxonomyCacheTag } from "../../../../lib/cache-tags";
 import { getPostsPageByCategory } from "../../../../lib/content";
@@ -9,38 +10,38 @@ import { getPostsPageByCategory } from "../../../../lib/content";
 const { slug = "", page = "1" } = Astro.params;
 const term = await getTerm("category", slug);
 
-if (!term) {
-	return Astro.redirect("/404");
-}
-
 const pageNumber = Number.parseInt(page, 10);
-if (!Number.isFinite(pageNumber) || pageNumber < 2) {
+if (term && (!Number.isFinite(pageNumber) || pageNumber < 2)) {
 	return Astro.redirect(`/category/${slug}/`);
 }
 
-const { entries: posts, hasMore } = await getPostsPageByCategory(
-	slug,
-	pageNumber,
-);
-if (posts.length === 0) {
-	return Astro.redirect("/404");
-}
+const postPage = term
+	? await getPostsPageByCategory(slug, pageNumber)
+	: { entries: [], hasMore: false };
+const found = term && postPage.entries.length > 0;
+if (!found) Astro.response.status = 404;
 ---
 
-<Base
-	title={`Category: ${term.label} – Page ${pageNumber}`}
-	bodyClass={`archive category category-${slug} paged paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
-	cacheTags={["posts", taxonomyCacheTag("category")]}
->
-	<div class="container-fluid">
-		<div class="row">
-			<CategoryArchive
-				slug={slug}
-				label={term.label}
-				posts={posts}
-				hasMore={hasMore}
-				page={pageNumber}
-			/>
-		</div>
-	</div>
-</Base>
+{
+	found ? (
+		<Base
+			title={`Category: ${term.label} – Page ${pageNumber}`}
+			bodyClass={`archive category category-${slug} paged paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
+			cacheTags={["posts", taxonomyCacheTag("category")]}
+		>
+			<div class="container-fluid">
+				<div class="row">
+					<CategoryArchive
+						slug={slug}
+						label={term.label}
+						posts={postPage.entries}
+						hasMore={postPage.hasMore}
+						page={pageNumber}
+					/>
+				</div>
+			</div>
+		</Base>
+	) : (
+		<NotFound />
+	)
+}

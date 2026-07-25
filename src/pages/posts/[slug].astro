@@ -1,12 +1,14 @@
 ---
+import NotFound from "../../components/NotFound.astro";
 import { getPostBySlug } from "../../lib/content";
 
 const { slug = "" } = Astro.params;
 const post = await getPostBySlug(slug);
 
-if (!post) {
-	return Astro.redirect("/404");
+if (post) {
+	return Astro.redirect(`/${post.data.path}/`, 301);
 }
-
-return Astro.redirect(`/${post.data.path}/`, 301);
+Astro.response.status = 404;
 ---
+
+<NotFound />

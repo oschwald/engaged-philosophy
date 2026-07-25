@@ -1,4 +1,5 @@
 ---
+import NotFound from "../components/NotFound.astro";
 import RichContent from "../components/RichContent.astro";
 import Base from "../layouts/Base.astro";
 import { getPageByPath, getPageBySlug, getProjectBySlug } from "../lib/content";
@@ -18,58 +19,46 @@ if (!page) {
 	if (project?.data.path) {
 		return Astro.redirect(`/${project.data.path}/`);
 	}
-	return Astro.redirect("/404");
 }
 
-if (page.data.path !== path) {
+if (page && page.data.path !== path) {
 	return Astro.redirect(page.data.path ? `/${page.data.path}/` : "/");
 }
 
+if (!page) Astro.response.status = 404;
+
 const useFullWidthTemplate =
-	page.data.template === "templates/_full_width.php" &&
+	page?.data.template === "templates/_full_width.php" &&
 	page.data.path !== "faq";
-const bodyClass = [
-	"wp-singular",
-	...(useFullWidthTemplate
-		? [
-				"page-template",
-				"page-template-templates_full_width",
-				"page-template-templates_full_width-php",
-			]
-		: ["page-template-default", "content-sidebar"]),
-	"page",
-	page.data.id ? `page-id-${page.data.id}` : null,
-	"wp-theme-engaged-philosophy-20",
-]
-	.filter(Boolean)
-	.join(" ");
+const bodyClass = page
+	? [
+			"wp-singular",
+			...(useFullWidthTemplate
+				? [
+						"page-template",
+						"page-template-templates_full_width",
+						"page-template-templates_full_width-php",
+					]
+				: ["page-template-default", "content-sidebar"]),
+			"page",
+			page.data.id ? `page-id-${page.data.id}` : null,
+			"wp-theme-engaged-philosophy-20",
+		]
+			.filter(Boolean)
+			.join(" ")
+	: "";
 ---
 
-<Base
-	title={page.data.title}
-	bodyClass={bodyClass}
-	content={{ collection: "pages", entry: page }}
->
-	{
-		useFullWidthTemplate ? (
-			<section id="primary" class="col-12 px-4">
-				<main id="content">
-					<article {...page.edit}>
-						<header class="page-header">
-							<h1 class="entry-title" {...page.edit.title}>
-								{page.data.title}
-							</h1>
-						</header>
-						<div class="entry-content" {...page.edit.content}>
-							<RichContent value={getEntryContent(page.data)} />
-						</div>
-					</article>
-				</main>
-			</section>
-		) : (
-			<div class="container-fluid">
-				<section id="primary" class="p-4">
-					<div id="content" role="main">
+{
+	page ? (
+		<Base
+			title={page.data.title}
+			bodyClass={bodyClass}
+			content={{ collection: "pages", entry: page }}
+		>
+			{useFullWidthTemplate ? (
+				<section id="primary" class="col-12 px-4">
+					<main id="content">
 						<article {...page.edit}>
 							<header class="page-header">
 								<h1 class="entry-title" {...page.edit.title}>
@@ -80,9 +69,28 @@ const bodyClass = [
 								<RichContent value={getEntryContent(page.data)} />
 							</div>
 						</article>
-					</div>
+					</main>
 				</section>
-			</div>
-		)
-	}
-</Base>
+			) : (
+				<div class="container-fluid">
+					<section id="primary" class="p-4">
+						<div id="content" role="main">
+							<article {...page.edit}>
+								<header class="page-header">
+									<h1 class="entry-title" {...page.edit.title}>
+										{page.data.title}
+									</h1>
+								</header>
+								<div class="entry-content" {...page.edit.content}>
+									<RichContent value={getEntryContent(page.data)} />
+								</div>
+							</article>
+						</div>
+					</section>
+				</div>
+			)}
+		</Base>
+	) : (
+		<NotFound />
+	)
+}
