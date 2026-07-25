@@ -29,7 +29,7 @@ Cloudflare constraints.
   taxonomy invalidation, batching every affected tag into one purge request.
   This keeps the additional purge load small on Workers Free.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
-  controls wait for pending inline saves. EmDash 0.30 flushes edits when the
+  controls wait for pending inline saves. EmDash 0.31 flushes edits when the
   browser navigates away, but its toolbar can still publish before a Portable
   Text blur save finishes. The gate also ignores redundant keepalive saves when
   EmDash reports no unsaved changes, while retaining the unload protection for
@@ -37,10 +37,10 @@ Cloudflare constraints.
 - `src/worker.ts` logs selected admin/signed-in request metadata and slow
   observed requests without serializing cookie values.
 
-EmDash 0.30's backup page works with the existing R2 storage adapter and
-scheduled Worker handler. Administrators can enable daily archives under
-Settings -> Backups; archives contain content and media metadata, not media
-binaries, user accounts, or secrets.
+EmDash's backup page works with the existing R2 storage adapter and scheduled
+Worker handler. Administrators can enable daily archives under Settings ->
+Backups; archives contain content and media metadata, not media binaries, user
+accounts, or secrets.
 
 The upstream Cloudflare route-cache provider is used with response safeguards
 for Cloudflare Access, preview, visual-editing, and other cookies. The EmDash KV
@@ -64,6 +64,10 @@ consuming the smaller KV write budget or requiring a paid service.
 - Search uses EmDash full-text search, then batch-hydrates only the entries on
   the current result page. Archives use database limit/offset queries, and
   exhaustive jobs such as the sitemap walk collection cursors.
+- EmDash 0.31.1 avoids computing taxonomy usage counts during ordinary layout
+  prefetches. The project index still requests counts intentionally for its
+  topic cloud; other public pages no longer pay for the assignment-table
+  aggregate, which reduces D1 rows read on Workers Free.
 - The base layout uses `EmDashHead`, `EmDashBodyStart`, and `EmDashBodyEnd` so
   EmDash SEO settings and plugin page contributions are rendered through the
   standard pipeline.
@@ -78,11 +82,13 @@ consuming the smaller KV write budget or requiring a paid service.
   unreliable imported heights, so they render directly from the public R2
   domain instead of consuming Cloudflare image transformations.
 - Portable Text galleries delegate their markup, image loading, and captions to
-  EmDash. A small adapter resolves migrated image references to the public R2
-  domain and preserves imported shortcode/figure layouts. CSP-safe column
-  classes replace EmDash's inline `--columns` property because the production
-  policy intentionally rejects inline styles. This avoids both Worker media
-  proxy requests and Cloudflare image transformations on the Free plan.
+  EmDash, and EmDash 0.31 keeps those native gallery blocks visible and editable
+  in the admin editor. A small public-rendering adapter resolves migrated image
+  references to the public R2 domain and preserves imported shortcode/figure
+  layouts. CSP-safe column classes replace EmDash's inline `--columns` property
+  because the production policy intentionally rejects inline styles. This
+  avoids both Worker media proxy requests and Cloudflare image transformations
+  on the Free plan.
 - Imported numbered headings use EmDash's native Portable Text list and heading
   rendering. A CSS counter preserves interview numbering across the answer
   blocks between headings without changing ordinary ordered lists.
