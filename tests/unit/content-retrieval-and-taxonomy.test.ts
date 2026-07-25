@@ -17,10 +17,10 @@ vi.mock("emdash", () => ({
 
 import {
 	getPageByPath,
+	getPostByPath,
 	getPostsPageByCategory,
 	getPublishedPages,
 	getRecentPosts,
-	getTermsBySlugs,
 } from "../../src/lib/content";
 
 function entry(id: string, data: Record<string, unknown>) {
@@ -119,19 +119,33 @@ describe("content retrieval and taxonomy", () => {
 		});
 	});
 
-	test("resolves only assigned taxonomy terms", async () => {
-		getTerm
-			.mockResolvedValueOnce({ slug: "ethics", label: "Ethics" })
-			.mockResolvedValueOnce({ slug: "teaching", label: "Teaching" });
+	test("preserves taxonomy terms hydrated by EmDash", async () => {
+		getEmDashEntry.mockResolvedValue({
+			entry: entry("post-1", {
+				slug: "first-post",
+				path: "2026/01/02/first-post",
+				title: "First post",
+				terms: {
+					category: [
+						{ slug: "ethics", label: "Ethics" },
+						{ slug: "teaching", label: "Teaching" },
+					],
+				},
+			}),
+		});
 
-		await expect(
-			getTermsBySlugs("category", ["ethics", "ethics", "teaching"]),
-		).resolves.toEqual([
-			{ slug: "ethics", label: "Ethics" },
-			{ slug: "teaching", label: "Teaching" },
-		]);
-		expect(getTerm).toHaveBeenCalledTimes(2);
-		expect(getTerm).toHaveBeenNthCalledWith(1, "category", "ethics");
-		expect(getTerm).toHaveBeenNthCalledWith(2, "category", "teaching");
+		await expect(getPostByPath("2026/01/02/first-post")).resolves.toMatchObject(
+			{
+				data: {
+					terms: {
+						category: [
+							{ slug: "ethics", label: "Ethics" },
+							{ slug: "teaching", label: "Teaching" },
+						],
+					},
+				},
+			},
+		);
+		expect(getTerm).not.toHaveBeenCalled();
 	});
 });

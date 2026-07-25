@@ -24,13 +24,10 @@ import type {
 	SiteCollection,
 } from "./types";
 
-type TaxonomyMap = Record<string, string[]>;
-type EmDashTermsMap = Record<string, Array<{ slug: string; label: string }>>;
 type RuntimeEntry<T> = ContentEntry<T> & {
 	data: T & {
 		id?: string;
 		status?: string;
-		terms?: EmDashTermsMap;
 	};
 };
 type NormalizedEntryData<T> = Omit<T, "featured_image"> & {
@@ -302,36 +299,4 @@ export function getTaxonomyTerm(taxonomy: string, slug: string) {
 
 export async function getTaxonomyTerms(taxonomy: string) {
 	return flattenTerms(await getEmDashTaxonomyTerms(taxonomy));
-}
-
-export function getEntryTerms(
-	entry: {
-		data?: Record<string, unknown> & {
-			terms?: EmDashTermsMap;
-		};
-		taxonomies?: TaxonomyMap;
-	},
-	taxonomy: string,
-) {
-	return entry.data?.terms?.[taxonomy] ?? [];
-}
-
-export function getEntryTermSlugs(
-	entry: {
-		data?: Record<string, unknown> & {
-			terms?: EmDashTermsMap;
-		};
-		taxonomies?: TaxonomyMap;
-	},
-	taxonomy: string,
-) {
-	return getEntryTerms(entry, taxonomy).map((term) => term.slug);
-}
-
-export async function getTermsBySlugs(taxonomy: string, slugs: string[]) {
-	const uniqueSlugs = [...new Set(slugs)];
-	const terms = await Promise.all(
-		uniqueSlugs.map((slug) => getTerm(taxonomy, slug)),
-	);
-	return terms.filter((term) => term !== null);
 }
