@@ -232,6 +232,17 @@ export async function updateContentViaApi(
 	return body?.data?.item as ContentItem;
 }
 
+export async function deleteContentViaApi(
+	request: APIRequestContext,
+	collection: CollectionSlug,
+	id: string,
+) {
+	const response = await request.delete(
+		`/_emdash/api/content/${collection}/${id}`,
+	);
+	await expectJsonResponse(response, `delete ${collection}`);
+}
+
 export async function createAndPublishContentViaApi(
 	request: APIRequestContext,
 	collection: CollectionSlug,
