@@ -83,6 +83,14 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 				.locator("#content")
 				.getByRole("link", { name: postTitle, exact: true }),
 		).toHaveAttribute("href", post.publicPath);
+		await expect(
+			publicPage.locator("#recent-posts-2 li").filter({
+				has: publicPage.getByRole("link", {
+					name: postTitle,
+					exact: true,
+				}),
+			}),
+		).toContainText(`${postTitle} July 25, 2026`);
 
 		await publicPage.goto(project.publicPath, {
 			waitUntil: "domcontentloaded",

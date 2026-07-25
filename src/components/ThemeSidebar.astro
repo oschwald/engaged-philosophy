@@ -12,7 +12,7 @@ const { entries: recentPosts } = await getRecentPosts();
 			{
 				recentPosts.map((post) => (
 					<li>
-						<a href={`/${post.data.path}/`}>{post.data.title}</a>
+						<a href={`/${post.data.path}/`}>{post.data.title}</a>{" "}
 						<span class="post-date">{formatPathDate(post.data.path)}</span>
 					</li>
 				))
