@@ -55,8 +55,19 @@ test("uses Bootstrap data APIs for public theme interactions", async ({
 			resources.locator("xpath=..").locator(".dropdown-menu"),
 		).toHaveClass(/show/);
 	} finally {
+		const cleanupErrors: unknown[] = [];
 		for (const id of projectIds) {
-			await deleteContentViaApi(authedRequest, "projects", id);
+			try {
+				await deleteContentViaApi(authedRequest, "projects", id);
+			} catch (error) {
+				cleanupErrors.push(error);
+			}
+		}
+		if (cleanupErrors.length > 0) {
+			throw new AggregateError(
+				cleanupErrors,
+				"Failed to clean up one or more test projects",
+			);
 		}
 	}
 });
