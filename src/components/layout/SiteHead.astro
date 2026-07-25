@@ -4,9 +4,12 @@ import type { PublicPageContext } from "emdash";
 
 interface Props {
 	page: PublicPageContext;
+	faviconHref?: string;
+	faviconType?: string;
+	faviconSizes?: string;
 }
 
-const { page } = Astro.props;
+const { page, faviconHref, faviconType, faviconSizes } = Astro.props;
 ---
 
 <head>
@@ -15,6 +18,16 @@ const { page } = Astro.props;
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>{page.title}</title>
 	<EmDashHead page={page} />
+	{
+		faviconHref && (
+			<link
+				rel="icon"
+				href={faviconHref}
+				type={faviconType}
+				sizes={faviconSizes}
+			/>
+		)
+	}
 	<link rel="manifest" href="/site.webmanifest" />
 	<meta name="theme-color" content="#fd7e14" />
 	<meta name="msapplication-TileColor" content="#fd7e14" />

@@ -3,6 +3,7 @@ import PrimaryNav from "../components/layout/PrimaryNav.astro";
 import SiteFooter from "../components/layout/SiteFooter.astro";
 import SiteHead from "../components/layout/SiteHead.astro";
 import SiteHeader from "../components/layout/SiteHeader.astro";
+import { getConfiguredFaviconHref } from "../lib/favicon";
 import { getMediaUrlPrefix, rewriteInternalMediaFileUrl } from "../lib/media";
 import {
 	createSitePageContext,
@@ -50,6 +51,12 @@ const siteDescription = settings?.tagline || SITE_TAGLINE_FALLBACK;
 const menuItems = (await getMenu("primary"))?.items ?? [];
 const currentPath = Astro.url.pathname;
 const mediaUrlPrefix = getMediaUrlPrefix();
+const favicon = settings?.favicon;
+const faviconHref = getConfiguredFaviconHref(settings, mediaUrlPrefix);
+const faviconSizes =
+	favicon?.width && favicon?.height
+		? `${favicon.width}x${favicon.height}`
+		: undefined;
 const logo = settings?.logo;
 const logoSrc = logo?.url
 	? rewriteInternalMediaFileUrl(logo.url, mediaUrlPrefix)
@@ -68,7 +75,12 @@ const page = createSitePageContext({
 
 <!doctype html>
 <html class="no-js" lang="en-US">
-	<SiteHead page={page} />
+	<SiteHead
+		page={page}
+		faviconHref={faviconHref}
+		faviconType={favicon?.contentType}
+		faviconSizes={faviconSizes}
+	/>
 	<body class={bodyClass}>
 		<EmDashBodyStart page={page} />
 		<div class="container">
