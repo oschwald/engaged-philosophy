@@ -136,6 +136,11 @@ async function checkPublicPage(path) {
 		false,
 		`Public page ${path} should not advertise the removed SVG favicon`,
 	);
+	assert.equal(
+		/<a\b[^>]*\bhref=["'][^"']*\/_emdash\/api\/media\/file\//i.test(text),
+		false,
+		`Public page ${path} should not link to an Access-protected media route`,
+	);
 
 	console.log(`ok public ${path}`);
 }
