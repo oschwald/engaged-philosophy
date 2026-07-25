@@ -19,11 +19,6 @@ import {
 
 interface SitemapSourceEntry {
 	id: string;
-	updated_at?: string | null;
-	updatedAt?: string | Date | null;
-	published_at?: string | null;
-	publishedAt?: string | Date | null;
-	createdAt?: string | Date | null;
 	data: Omit<SitemapInputEntry["data"], "seo"> & { seo?: ContentSeo };
 }
 
@@ -34,18 +29,11 @@ function toSitemapEntry(
 	return {
 		id: entry.id,
 		image: getSeoMeta(entry, { siteUrl }).ogImage,
-		updated_at: entry.updated_at,
-		updatedAt: entry.updatedAt,
-		published_at: entry.published_at,
-		publishedAt: entry.publishedAt,
-		createdAt: entry.createdAt,
 		data: {
 			path: entry.data.path,
-			updated_at: entry.data.updated_at,
 			updatedAt: entry.data.updatedAt,
-			published_at: entry.data.published_at,
 			publishedAt: entry.data.publishedAt,
-			published_on: entry.data.published_on,
+			createdAt: entry.data.createdAt,
 			seo: entry.data.seo,
 		},
 	};

@@ -88,9 +88,8 @@ function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 	} as NormalizedEntryData<T> & {
 		path?: string;
 		slug?: string;
-		published_on?: string;
-		publishedAt?: Date | string | null;
-		createdAt?: Date | string | null;
+		publishedAt?: Date | null;
+		createdAt?: Date | null;
 	};
 
 	if (collection === "pages") {
@@ -99,7 +98,6 @@ function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 		data.path = derivePostPath(
 			data.path,
 			data.slug || entry.id,
-			data.published_on,
 			data.publishedAt,
 			data.createdAt,
 		);
@@ -180,7 +178,7 @@ export async function getPublishedEntriesByIds<C extends SiteCollection>(
 export function getRecentPosts(limit = 25) {
 	return getPublishedCollectionPage("posts", {
 		limit,
-		orderBy: { published_on: "desc", title: "asc" },
+		orderBy: { published_at: "desc", title: "asc" },
 	});
 }
 
@@ -188,7 +186,7 @@ export function getHighlightedProjects(limit = 6) {
 	return getPublishedCollectionPage("projects", {
 		limit,
 		where: { highlight: "1" },
-		orderBy: { menu_order: "asc", published_on: "desc", title: "asc" },
+		orderBy: { menu_order: "asc", published_at: "desc", title: "asc" },
 	});
 }
 
@@ -197,7 +195,7 @@ export function getPostsPageByCategory(slug: string, page: number, limit = 10) {
 		limit,
 		offset: Math.max(0, page - 1) * limit,
 		where: { category: slug },
-		orderBy: { published_on: "desc", title: "asc" },
+		orderBy: { published_at: "desc", title: "asc" },
 	});
 }
 
@@ -211,7 +209,7 @@ export function getProjectsPageByTaxonomy(
 		limit,
 		offset: Math.max(0, page - 1) * limit,
 		where: { [taxonomy]: slug },
-		orderBy: { menu_order: "asc", published_on: "desc", title: "asc" },
+		orderBy: { menu_order: "asc", published_at: "desc", title: "asc" },
 	});
 }
 

@@ -22,7 +22,7 @@ describe("content path derivation", () => {
 		).toBe("about-ce-projects/leaf");
 	});
 
-	test("derives dated post paths from path, published, and created dates", () => {
+	test("derives dated post paths from path and native publication dates", () => {
 		expect(derivePostPath("2022/05/31/jason-swartwood", "updated-post")).toBe(
 			"2022/05/31/updated-post",
 		);
@@ -33,16 +33,10 @@ describe("content path derivation", () => {
 			"2026/05/31/new-post",
 		);
 		expect(
-			derivePostPath(null, "published-post", null, "2025-04-03T11:00:00.000Z"),
+			derivePostPath(null, "published-post", "2025-04-03T11:00:00.000Z"),
 		).toBe("2025/04/03/published-post");
 		expect(
-			derivePostPath(
-				null,
-				"created-post",
-				null,
-				null,
-				"2024-03-02T11:00:00.000Z",
-			),
+			derivePostPath(null, "created-post", null, "2024-03-02T11:00:00.000Z"),
 		).toBe("2024/03/02/created-post");
 		expect(derivePostPath(null, "undated-post")).toBe("undated-post");
 	});

@@ -48,7 +48,6 @@ export function derivePagePath(path?: string | null, slug?: string | null) {
 export function derivePostPath(
 	path?: string | null,
 	slug?: string | null,
-	publishedOn?: DateValue,
 	publishedAt?: DateValue,
 	createdAt?: DateValue,
 ) {
@@ -58,7 +57,6 @@ export function derivePostPath(
 
 	const dateParts =
 		datePartsFromPath(normalizedPath) ??
-		datePartsFromValue(publishedOn) ??
 		datePartsFromValue(publishedAt) ??
 		datePartsFromValue(createdAt);
 

@@ -61,12 +61,12 @@ describe("site page context", () => {
 		expect(page.title).toBe("Engaged Philosophy – Philosophy in practice");
 	});
 
-	test("uses EmDash SEO fields and legacy publication metadata", () => {
+	test("uses EmDash SEO fields and native publication metadata", () => {
 		const entry = postEntry({
 			id: "content-id",
 			slug: "an-essay",
 			title: "An essay",
-			published_on: "2026-07-01T10:00:00Z",
+			publishedAt: new Date("2026-07-01T10:00:00Z"),
 			updatedAt: new Date("2026-07-02T11:00:00Z"),
 			author_name: "A. Philosopher",
 			seo: {

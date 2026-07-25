@@ -7,18 +7,11 @@ const APOS_RE = /'/g;
 export interface SitemapInputEntry {
 	id: string;
 	image?: string | null;
-	updated_at?: string | null;
-	updatedAt?: string | Date | null;
-	published_at?: string | null;
-	publishedAt?: string | Date | null;
-	createdAt?: string | Date | null;
 	data: {
 		path?: string | null;
-		updated_at?: string | null;
 		updatedAt?: string | Date | null;
-		published_at?: string | null;
 		publishedAt?: string | Date | null;
-		published_on?: string | null;
+		createdAt?: string | Date | null;
 		seo?: {
 			canonical?: string | null;
 			noIndex?: boolean;
@@ -76,16 +69,9 @@ function timestampValue(value?: string | Date | null) {
 
 export function sitemapEntryLastmod(entry: SitemapInputEntry) {
 	return (
-		timestampValue(entry.updated_at) ||
-		timestampValue(entry.updatedAt) ||
-		timestampValue(entry.data.updated_at) ||
 		timestampValue(entry.data.updatedAt) ||
-		timestampValue(entry.published_at) ||
-		timestampValue(entry.publishedAt) ||
-		timestampValue(entry.data.published_at) ||
 		timestampValue(entry.data.publishedAt) ||
-		timestampValue(entry.data.published_on) ||
-		timestampValue(entry.createdAt)
+		timestampValue(entry.data.createdAt)
 	);
 }
 

@@ -108,12 +108,12 @@ consuming the smaller KV write budget or requiring a paid service.
 
 EmDash system properties use camelCase (`createdAt`, `updatedAt`, and
 `publishedAt`). Imported WordPress fields retain their persisted schema slugs,
-which use snake_case (`published_on`, `featured_image`, `author_name`, and
-`menu_order`). These names are database and admin-schema identifiers, not a
-style choice in new application code. New application-facing APIs should use
-camelCase and keep legacy names inside content adapters. Renaming a persisted
-field requires a backup-backed content/schema migration and should be handled
-separately from routine refactoring.
+which use snake_case (`featured_image`, `author_name`, and `menu_order`). These
+names are database and admin-schema identifiers, not a style choice in new
+application code. New application-facing APIs should use camelCase and keep
+legacy names inside content adapters. Renaming a persisted field requires a
+backup-backed content/schema migration and should be handled separately from
+routine refactoring.
 
 ## Cloudflare Access Invites
 
