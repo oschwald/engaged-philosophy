@@ -3,10 +3,23 @@ import { collectPageErrors } from "../../support/assertions";
 import {
 	canonicalAliasForItem,
 	createAndPublishContentViaAdmin,
+	createContentViaApi,
+	deleteContentViaApi,
 	dismissWelcome,
 	expectPublicContent,
+	portableTextParagraph,
 	uniqueTitle,
 } from "../../support/content";
+
+interface SavedContentResponse {
+	data?: {
+		item?: {
+			data?: {
+				content?: Array<Record<string, unknown>>;
+			};
+		};
+	};
+}
 
 test.describe("admin content workflows", () => {
 	test("creates and publishes a page from the admin editor", async ({
@@ -44,6 +57,99 @@ test.describe("admin content workflows", () => {
 		).toBeVisible();
 
 		pageErrors.expectNone();
+	});
+
+	test("loads and preserves native galleries in the admin editor", async ({
+		authedRequest,
+		page,
+	}, testInfo) => {
+		const pageErrors = collectPageErrors(page);
+		const title = uniqueTitle("E2E Native Gallery", testInfo.testId);
+		const updatedTitle = `${title} updated`;
+		const gallery = {
+			_type: "gallery",
+			_key: "native-gallery",
+			columns: 2,
+			images: [
+				{
+					_type: "image",
+					_key: "gallery-image-1",
+					asset: {
+						_type: "reference",
+						_ref: "gallery-media-1",
+						url: "/img/logo.png",
+					},
+					alt: "Gallery image one",
+				},
+				{
+					_type: "image",
+					_key: "gallery-image-2",
+					asset: {
+						_type: "reference",
+						_ref: "gallery-media-2",
+						url: "/img/logo.png",
+					},
+					alt: "Gallery image two",
+				},
+			],
+		};
+		const created = await createContentViaApi(authedRequest, "pages", {
+			title,
+			data: {
+				content: [...portableTextParagraph(`${title} body.`), gallery],
+			},
+		});
+
+		try {
+			await page.goto(`/_emdash/admin/content/pages/${created.id}`, {
+				waitUntil: "domcontentloaded",
+			});
+			await dismissWelcome(page);
+
+			await expect(
+				page.getByRole("button", { name: "Edit image 1" }),
+			).toBeVisible();
+			await expect(
+				page.getByRole("button", { name: "Edit image 2" }),
+			).toBeVisible();
+
+			await page.getByRole("button", { name: "Edit image 1" }).click();
+			await expect(
+				page.getByRole("heading", { name: "Gallery", exact: true }),
+			).toBeVisible();
+			await page
+				.getByRole("button", { name: "Close gallery settings" })
+				.click();
+
+			await page.getByLabel("Title", { exact: true }).fill(updatedTitle);
+			const saveResponsePromise = page.waitForResponse((response) => {
+				const url = new URL(response.url());
+				return (
+					response.request().method() === "PUT" &&
+					url.pathname === `/_emdash/api/content/pages/${created.id}`
+				);
+			});
+			await page
+				.getByRole("button", { name: "Save", exact: true })
+				.first()
+				.click();
+			const saveResponse = await saveResponsePromise;
+			expect(saveResponse.ok()).toBe(true);
+
+			const saveBody = (await saveResponse.json()) as SavedContentResponse;
+			const savedGallery = saveBody.data?.item?.data?.content?.find(
+				(block) => block._type === "gallery",
+			);
+			expect(savedGallery).toMatchObject({
+				_type: gallery._type,
+				columns: gallery.columns,
+				images: gallery.images,
+			});
+
+			pageErrors.expectNone();
+		} finally {
+			await deleteContentViaApi(authedRequest, "pages", created.id);
+		}
 	});
 
 	test("creates posts and projects with their public canonical routes", async ({
