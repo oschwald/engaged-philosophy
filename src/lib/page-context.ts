@@ -126,7 +126,7 @@ export function createSitePageContext({
 			? {
 					publishedTime: toIsoDate(data.publishedAt),
 					modifiedTime: toIsoDate(data.updatedAt),
-					author: data.author_name || null,
+					author: data.bylines?.[0]?.byline.displayName || null,
 				}
 			: undefined,
 		siteName: siteTitle,
