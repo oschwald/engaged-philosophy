@@ -39,7 +39,6 @@ export interface Post {
   excerpt?: PortableTextBlock[];
   content?: PortableTextBlock[];
   featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> };
-  published_on?: string;
   author_name?: string;
   legacy_wp_id?: number;
   createdAt: Date;
@@ -60,7 +59,6 @@ export interface Project {
   featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> };
   highlight?: boolean;
   menu_order?: number;
-  published_on?: string;
   author_name?: string;
   legacy_wp_id?: number;
   createdAt: Date;

@@ -145,11 +145,6 @@
 					"type": "image"
 				},
 				{
-					"slug": "published_on",
-					"label": "Published On",
-					"type": "datetime"
-				},
-				{
 					"slug": "author_name",
 					"label": "Author Name",
 					"type": "string"
@@ -211,11 +206,6 @@
 					"label": "Menu Order",
 					"type": "integer",
 					"defaultValue": 0
-				},
-				{
-					"slug": "published_on",
-					"label": "Published On",
-					"type": "datetime"
 				},
 				{
 					"slug": "author_name",
