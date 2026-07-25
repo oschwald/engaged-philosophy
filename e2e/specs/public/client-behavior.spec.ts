@@ -5,6 +5,17 @@ import {
 	uniqueTitle,
 } from "../../support/content";
 
+test("links skip navigation only to targets present on every page", async ({
+	publicPage,
+}) => {
+	await publicPage.goto("/");
+
+	const skipLinks = publicPage.locator(".skip-link a");
+	await expect(skipLinks).toHaveCount(1);
+	await expect(skipLinks).toHaveAttribute("href", "#content");
+	await expect(publicPage.locator("#content")).toHaveCount(1);
+});
+
 test("uses Bootstrap data APIs for public theme interactions", async ({
 	authedRequest,
 	publicPage,
