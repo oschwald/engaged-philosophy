@@ -41,7 +41,7 @@ function toSitemapEntry(
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ cache, url }) => {
+export const GET: APIRoute = async ({ cache, site, url }) => {
 	cache.set({
 		maxAge: PUBLIC_EDGE_CACHE_MAX_AGE_SECONDS,
 		swr: PUBLIC_EDGE_CACHE_SWR_SECONDS,
@@ -53,7 +53,7 @@ export const GET: APIRoute = async ({ cache, url }) => {
 		getPublishedPosts(),
 		getPublishedProjects(),
 	]);
-	const origin = sitemapOrigin(settings?.url, url.origin);
+	const origin = sitemapOrigin(settings?.url || site?.origin, url.origin);
 	const body = renderSitemapXml(origin, [
 		...pages.map((entry) => toSitemapEntry(entry, origin)),
 		...posts.map((entry) => toSitemapEntry(entry, origin)),

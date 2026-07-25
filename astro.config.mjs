@@ -10,6 +10,7 @@ import { fileURLToPath } from "node:url";
 import {
 	CLOUDFLARE_ACCESS_TEAM_DOMAIN,
 	PUBLIC_MEDIA_URL,
+	PUBLIC_SITE_URL,
 } from "./src/lib/site-config.ts";
 
 const legacyContentPluginEntrypoint = fileURLToPath(
@@ -62,6 +63,7 @@ export const emdashPlugins = [
 ];
 
 export default defineConfig({
+	site: PUBLIC_SITE_URL,
 	output: "server",
 	adapter: cloudflare({
 		...(emdashTypesCheckState
@@ -95,6 +97,7 @@ export default defineConfig({
 		react(),
 		localEmDashRoutes(),
 		emdash({
+			siteUrl: PUBLIC_SITE_URL,
 			database: d1({ binding: "DB", session: "disabled" }),
 			storage: r2({
 				binding: "MEDIA",

@@ -61,8 +61,16 @@ test.describe("public sitemap", () => {
 		);
 
 		const xml = await response!.text();
+		const locations = parseLocations(xml);
 		const locationPaths = parseLocationPaths(xml);
 
+		expect(locations.length).toBeGreaterThan(0);
+		expect(
+			locations.every(
+				(location) =>
+					new URL(location).origin === "https://www.engagedphilosophy.com",
+			),
+		).toBe(true);
 		expect(locationPaths).toContain(pagePath);
 		expect(locationPaths).toContain(postPath);
 		expect(locationPaths).not.toContain(`/posts/${postSlug}/`);

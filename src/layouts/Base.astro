@@ -66,7 +66,7 @@ const page = createSitePageContext({
 	url: Astro.url,
 	siteTitle,
 	siteDescription,
-	siteUrl: settings?.url,
+	siteUrl: settings?.url || Astro.site?.origin,
 	title,
 	description,
 	content,
