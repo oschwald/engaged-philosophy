@@ -6,6 +6,9 @@
 		"description": "Exported from existing EmDash database"
 	},
 	"settings": {
+		"url": "https://www.engagedphilosophy.com",
+		"timezone": "America/Los_Angeles",
+		"dateFormat": "MMMM d, yyyy",
 		"favicon": {
 			"mediaId": "01KSKNR8TJ18J352FQZ3GKSJ07"
 		},

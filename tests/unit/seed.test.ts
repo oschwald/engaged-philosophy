@@ -4,11 +4,16 @@ import { describe, expect, test } from "vitest";
 import { validateSeed } from "emdash";
 
 interface CheckedInSeed {
+	settings?: {
+		url?: string;
+		timezone?: string;
+		dateFormat?: string;
+	};
 	collections?: Array<{
 		slug?: string;
 		supports?: string[];
 		urlPattern?: string;
-		fields?: Array<{ slug?: string; searchable?: boolean }>;
+		fields?: Array<{ slug?: string; searchable?: boolean; widget?: string }>;
 	}>;
 	content?: unknown;
 	[key: string]: unknown;
@@ -33,6 +38,14 @@ describe("checked-in EmDash seed", () => {
 			Object.hasOwn(seed, "content"),
 			"Checked-in seed should be schema/config only, not content.",
 		).toBe(false);
+	});
+
+	test("defines the native public site presentation settings", () => {
+		expect(seed.settings).toMatchObject({
+			url: "https://www.engagedphilosophy.com",
+			timezone: "America/Los_Angeles",
+			dateFormat: "MMMM d, yyyy",
+		});
 	});
 
 	test("keeps the content collections required by the theme", () => {
