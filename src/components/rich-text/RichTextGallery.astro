@@ -2,15 +2,22 @@
 import { Gallery as EmDashGallery } from "emdash/ui";
 
 import type { RichTextGalleryNode } from "../../lib/rich-text-types";
+import { safeUrlForMediaSrc } from "../../lib/url-safety";
 
 interface Props {
 	node: RichTextGalleryNode;
 }
 
 const { node } = Astro.props;
+const images = node.images.flatMap((image) => {
+	if (!image.asset.url) return [image];
+
+	const url = safeUrlForMediaSrc(image.asset.url);
+	return url ? [{ ...image, asset: { ...image.asset, url } }] : [];
+});
 const usesLeadLayout =
-	node.layout === "shortcode" && node.columns === 3 && node.images.length === 4;
-const firstImage = node.images[0];
+	node.layout === "shortcode" && node.columns === 3 && images.length === 4;
+const firstImage = images[0];
 const hasSeparateCaption = Boolean(
 	node.caption && firstImage && firstImage.caption,
 );
@@ -18,12 +25,9 @@ const galleryNode =
 	node.caption && firstImage && !firstImage.caption
 		? {
 				...node,
-				images: [
-					{ ...firstImage, caption: node.caption },
-					...node.images.slice(1),
-				],
+				images: [{ ...firstImage, caption: node.caption }, ...images.slice(1)],
 			}
-		: node;
+		: { ...node, images };
 ---
 
 <div

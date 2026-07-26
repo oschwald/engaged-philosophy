@@ -86,6 +86,14 @@ test.describe("public migrated content rendering", () => {
 									},
 									alt: `Gallery image ${index + 1}`,
 								})),
+								{
+									_type: "image",
+									_key: "legacy-gallery-unsafe",
+									asset: {
+										url: "javascript:alert(1)",
+									},
+									alt: "Unsafe legacy gallery image",
+								},
 							],
 						},
 						{
@@ -112,6 +120,14 @@ test.describe("public migrated content rendering", () => {
 												}
 											: {}),
 								})),
+								{
+									_type: "image",
+									_key: "legacy-block-gallery-unsafe",
+									asset: {
+										url: "javascript:alert(1)",
+									},
+									alt: "Unsafe legacy block gallery image",
+								},
 							],
 						},
 						{
@@ -142,6 +158,15 @@ test.describe("public migrated content rendering", () => {
 							_key: "legacy-video",
 							url: `${MEDIA_BASE}${LEGACY_VIDEO_PATH}`,
 							title: videoTitle,
+							mimeType: "video/mp4",
+							width: 640,
+							height: 360,
+						},
+						{
+							_type: "legacyVideo",
+							_key: "legacy-video-relative",
+							url: LEGACY_VIDEO_PATH,
+							title: "Unnormalized imported video",
 							mimeType: "video/mp4",
 							width: 640,
 							height: 360,
@@ -188,6 +213,9 @@ test.describe("public migrated content rendering", () => {
 			".legacy-gallery-compat--shortcode.legacy-gallery-compat--columns-2 .emdash-gallery",
 		);
 		await expect(gallery.locator("img")).toHaveCount(2);
+		await expect(
+			publicPage.getByAltText("Unsafe legacy gallery image"),
+		).toHaveCount(0);
 		await expect(gallery.locator("img").first()).toHaveAttribute(
 			"src",
 			`${MEDIA_BASE}${GALLERY_PATHS[0]}`,
@@ -210,6 +238,9 @@ test.describe("public migrated content rendering", () => {
 			":scope > .emdash-gallery",
 		);
 		await expect(blockGallery.locator("img")).toHaveCount(4);
+		await expect(
+			publicPage.getByAltText("Unsafe legacy block gallery image"),
+		).toHaveCount(0);
 		await expect(
 			blockGallery.evaluate((element) => {
 				const style = getComputedStyle(element);
@@ -284,6 +315,7 @@ test.describe("public migrated content rendering", () => {
 			"src",
 			`${MEDIA_BASE}${LEGACY_VIDEO_PATH}`,
 		);
+		await expect(publicPage.locator(".legacy-video")).toHaveCount(1);
 		await expect(
 			publicPage.locator(
 				'[src^="/_emdash/api/media/file/wp-content/uploads/"]',
