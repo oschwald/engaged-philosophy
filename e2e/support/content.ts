@@ -114,7 +114,7 @@ export function publicPathForItem(
 	}
 
 	if (collection === "projects") {
-		return `/${storedPath || `project/${slug}`}/`;
+		return `/project/${slug}/`;
 	}
 
 	const parts = dateParts(item.publishedAt) ?? dateParts(item.createdAt);

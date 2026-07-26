@@ -3,7 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
 	derivePagePath,
 	derivePostPath,
-	deriveProjectPath,
+	projectPath,
 } from "../../src/lib/content-paths";
 
 describe("content path derivation", () => {
@@ -41,13 +41,11 @@ describe("content path derivation", () => {
 		expect(derivePostPath(null, "undated-post")).toBe("undated-post");
 	});
 
-	test("derives project paths under the WordPress project prefix", () => {
-		expect(deriveProjectPath("project/old-project", "new-project")).toBe(
-			"project/new-project",
-		);
-		expect(deriveProjectPath(null, "new-project")).toBe("project/new-project");
-		expect(deriveProjectPath("/project/current-project/", null)).toBe(
+	test("builds project paths from the native URL pattern", () => {
+		expect(projectPath("new-project")).toBe("project/new-project");
+		expect(projectPath("/nested/current-project/")).toBe(
 			"project/current-project",
 		);
+		expect(projectPath(null)).toBe("project");
 	});
 });

@@ -6,6 +6,7 @@ import {
 	getPublishedPosts,
 	getPublishedProjects,
 } from "../lib/content";
+import { projectPath } from "../lib/content-paths";
 import { SITE_SETTINGS_CACHE_TAG } from "../lib/cache-tags";
 import {
 	PUBLIC_EDGE_CACHE_MAX_AGE_SECONDS,
@@ -19,18 +20,22 @@ import {
 
 interface SitemapSourceEntry {
 	id: string;
-	data: Omit<SitemapInputEntry["data"], "seo"> & { seo?: ContentSeo };
+	data: Omit<SitemapInputEntry["data"], "seo"> & {
+		slug?: string | null;
+		seo?: ContentSeo;
+	};
 }
 
 function toSitemapEntry(
 	entry: SitemapSourceEntry,
 	siteUrl: string,
+	path = entry.data.path,
 ): SitemapInputEntry {
 	return {
 		id: entry.id,
 		image: getSeoMeta(entry, { siteUrl }).ogImage,
 		data: {
-			path: entry.data.path,
+			path,
 			updatedAt: entry.data.updatedAt,
 			publishedAt: entry.data.publishedAt,
 			createdAt: entry.data.createdAt,
@@ -57,7 +62,9 @@ export const GET: APIRoute = async ({ cache, site, url }) => {
 	const body = renderSitemapXml(origin, [
 		...pages.map((entry) => toSitemapEntry(entry, origin)),
 		...posts.map((entry) => toSitemapEntry(entry, origin)),
-		...projects.map((entry) => toSitemapEntry(entry, origin)),
+		...projects.map((entry) =>
+			toSitemapEntry(entry, origin, projectPath(entry.data.slug || entry.id)),
+		),
 	]);
 
 	return new Response(body, {

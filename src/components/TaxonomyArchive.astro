@@ -2,6 +2,7 @@
 import EntrySummary from "./content/EntrySummary.astro";
 import Pagination from "./content/Pagination.astro";
 import ThemeSidebar from "./ThemeSidebar.astro";
+import { projectPath } from "../lib/content-paths";
 import {
 	getEntryContent,
 	getEntryExcerpt,
@@ -43,7 +44,7 @@ function pageHref(pageNumber: number) {
 					<EntrySummary
 						articleClass={`mb-5 pb-4 border-bottom ${project.data.featured_image?.src ? "has-post-thumbnail " : ""}project type-project status-publish`}
 						title={project.data.title ?? ""}
-						continueHref={`/${project.data.path}/`}
+						continueHref={`/${projectPath(project.data.slug || project.id)}/`}
 						excerpt={getExcerptText(
 							getEntryExcerpt(project.data),
 							getEntryContent(project.data),
