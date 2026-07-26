@@ -7,9 +7,10 @@ const { slug = "" } = Astro.params;
 const project = await getProjectBySlug(slug);
 
 if (project) {
+	const status = Astro.url.searchParams.has("_preview") ? 302 : 301;
 	return Astro.redirect(
-		`/${projectPath(project.data.slug || project.id)}/`,
-		301,
+		`/${projectPath(project.data.slug || project.id)}/${Astro.url.search}`,
+		status,
 	);
 }
 Astro.response.status = 404;

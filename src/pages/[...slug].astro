@@ -18,7 +18,9 @@ const page =
 if (!page) {
 	const project = slugParts.length === 1 ? await getProjectBySlug(path) : null;
 	if (project) {
-		return Astro.redirect(`/${projectPath(project.data.slug || project.id)}/`);
+		return Astro.redirect(
+			`/${projectPath(project.data.slug || project.id)}/${Astro.url.search}`,
+		);
 	}
 }
 
