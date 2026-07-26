@@ -151,6 +151,7 @@
 			"label": "Projects",
 			"labelSingular": "Project",
 			"supports": ["drafts", "revisions", "search"],
+			"urlPattern": "/project/{slug}",
 			"fields": [
 				{
 					"slug": "title",
@@ -158,13 +159,6 @@
 					"type": "string",
 					"required": true,
 					"searchable": true
-				},
-				{
-					"slug": "path",
-					"label": "Path",
-					"type": "string",
-					"unique": true,
-					"widget": "legacy-image-blocks:hidden"
 				},
 				{
 					"slug": "excerpt",

@@ -46,8 +46,8 @@ describe("site search", () => {
 							edit: {},
 							data: {
 								id: "project-1",
+								slug: "project-one",
 								title: "Project One",
-								path: "project/project-one",
 								featured_image: {
 									src: "https://media.example.com/project-one.jpg",
 									alt: "Project One",

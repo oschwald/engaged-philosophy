@@ -3,6 +3,7 @@ import RichContent from "../components/RichContent.astro";
 import SearchResults from "../components/SearchResults.astro";
 import Base from "../layouts/Base.astro";
 import { getHighlightedProjects, getPageBySlug } from "../lib/content";
+import { projectPath } from "../lib/content-paths";
 import { searchSite } from "../lib/search";
 import {
 	getEntryContent,
@@ -78,7 +79,9 @@ const homeBoxes = home
 													getEntryExcerpt(project.data),
 													getEntryContent(project.data),
 												)}{" "}
-												<a href={`/${project.data.path}/`}>
+												<a
+													href={`/${projectPath(project.data.slug || project.id)}/`}
+												>
 													Continue reading <span class="meta-nav">&rarr;</span>
 												</a>
 											</p>

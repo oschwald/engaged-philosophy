@@ -4,7 +4,8 @@ type DateValue = Date | string | number | null | undefined;
 
 // Canonical URL rules mirror the migrated WordPress shape:
 // pages keep their existing parent path and replace only the leaf slug,
-// posts live under YYYY/MM/DD, and projects live under /project/{slug}/.
+// posts live under YYYY/MM/DD, and projects use EmDash's /project/{slug}
+// collection URL pattern.
 export function normalizeContentPath(path?: string | null) {
 	return (path ?? "").replace(/^\/+|\/+$/g, "");
 }
@@ -63,8 +64,7 @@ export function derivePostPath(
 	return dateParts ? [...dateParts, postSlug].join("/") : postSlug;
 }
 
-export function deriveProjectPath(path?: string | null, slug?: string | null) {
-	const normalizedPath = normalizeContentPath(path);
-	const projectSlug = slugFromPath(slug) || slugFromPath(normalizedPath);
-	return projectSlug ? `project/${projectSlug}` : normalizedPath;
+export function projectPath(slug?: string | null) {
+	const projectSlug = slugFromPath(slug);
+	return projectSlug ? `project/${projectSlug}` : "project";
 }

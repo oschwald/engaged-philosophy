@@ -68,13 +68,22 @@ consuming the smaller KV write budget or requiring a paid service.
   prefetches. The project index still requests counts intentionally for its
   topic cloud; other public pages no longer pay for the assignment-table
   aggregate, which reduces D1 rows read on Workers Free.
+- Projects declare EmDash's native `/project/{slug}` collection URL pattern
+  instead of persisting an identical imported `path` field. EmDash can
+  therefore generate project references and automatic redirects after slug
+  changes. The Astro `/projects/{id-or-slug}` compatibility route remains
+  because EmDash preview URLs use it and the signed `_preview` query parameter
+  must survive the redirect. The legacy root-slug alias also remains; replacing
+  either route with one exact redirect row per project would increase cold
+  redirect-cache reads on Workers Free.
 - The base layout uses `EmDashHead`, `EmDashBodyStart`, and `EmDashBodyEnd` so
   EmDash SEO settings and plugin page contributions are rendered through the
   standard pipeline.
-- The sitemap remains site-specific because imported WordPress posts use a
-  stored `path` such as `2022/05/31/post-slug`. EmDash collection URL patterns
-  can interpolate an entry slug or ID, but cannot interpolate this custom path.
-  The custom sitemap still honors EmDash noindex and canonical settings.
+- The sitemap remains site-specific because imported WordPress pages and posts
+  use stored nested paths, such as `2022/05/31/post-slug`. EmDash collection URL
+  patterns can interpolate an entry slug or ID, but cannot interpolate these
+  custom paths. Projects use their native URL pattern in the custom sitemap,
+  which still honors EmDash noindex and canonical settings.
 - Portable Text images use the EmDash renderer. A narrow CSS compatibility
   layer preserves imported float dimensions, centers images when long captions
   widen their figures, and retains left/right placement when floats stack on

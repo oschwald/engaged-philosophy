@@ -7,6 +7,7 @@ interface CheckedInSeed {
 	collections?: Array<{
 		slug?: string;
 		supports?: string[];
+		urlPattern?: string;
 		fields?: Array<{ slug?: string; searchable?: boolean }>;
 	}>;
 	content?: unknown;
@@ -44,6 +45,15 @@ describe("checked-in EmDash seed", () => {
 				true,
 			);
 		}
+	});
+
+	test("uses the native project URL pattern", () => {
+		const projects = seed.collections?.find(
+			(collection) => collection.slug === "projects",
+		);
+
+		expect(projects?.urlPattern).toBe("/project/{slug}");
+		expect(projects?.fields?.map((field) => field.slug)).not.toContain("path");
 	});
 
 	test("indexes the public search fields", () => {

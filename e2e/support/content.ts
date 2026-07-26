@@ -114,7 +114,7 @@ export function publicPathForItem(
 	}
 
 	if (collection === "projects") {
-		return `/${storedPath || `project/${slug}`}/`;
+		return `/project/${slug}/`;
 	}
 
 	const parts = dateParts(item.publishedAt) ?? dateParts(item.createdAt);
@@ -241,6 +241,18 @@ export async function publishContentViaApi(
 	);
 	const body = await expectJsonResponse(response, `publish ${collection}`);
 	return body?.data?.item as ContentItem;
+}
+
+export async function getPreviewUrlViaApi(
+	request: APIRequestContext,
+	collection: CollectionSlug,
+	id: string,
+) {
+	const response = await request.post(
+		`/_emdash/api/content/${collection}/${id}/preview-url`,
+	);
+	const body = await expectJsonResponse(response, `preview ${collection}`);
+	return body?.data as { url: string; expiresAt: number };
 }
 
 export async function updateContentViaApi(

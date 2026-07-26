@@ -3,6 +3,7 @@ import NotFound from "../components/NotFound.astro";
 import RichContent from "../components/RichContent.astro";
 import Base from "../layouts/Base.astro";
 import { getPageByPath, getPageBySlug, getProjectBySlug } from "../lib/content";
+import { projectPath } from "../lib/content-paths";
 import { joinPath } from "../lib/path-utils";
 import { getEntryContent } from "../lib/rich-text";
 
@@ -16,8 +17,12 @@ const page =
 
 if (!page) {
 	const project = slugParts.length === 1 ? await getProjectBySlug(path) : null;
-	if (project?.data.path) {
-		return Astro.redirect(`/${project.data.path}/`);
+	if (project) {
+		const status = Astro.url.searchParams.has("_preview") ? 302 : 301;
+		return Astro.redirect(
+			`/${projectPath(project.data.slug || project.id)}/${Astro.url.search}`,
+			status,
+		);
 	}
 }
 

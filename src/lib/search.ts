@@ -1,6 +1,7 @@
 import { search as searchEmDash } from "emdash";
 
 import { getPublishedEntriesByIds } from "./content";
+import { projectPath } from "./content-paths";
 import {
 	getEntryContent,
 	getEntryExcerpt,
@@ -95,7 +96,10 @@ export async function searchSite(
 		if (!entry) return [];
 
 		const title = stripHtml(entry.data.title).trim();
-		const path = entry.data.path?.trim() ?? "";
+		const path =
+			collection === "projects"
+				? projectPath(entry.data.slug || entry.id)
+				: (entry.data.path?.trim() ?? "");
 		if (!title || !path) return [];
 
 		return [

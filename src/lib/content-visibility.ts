@@ -8,11 +8,6 @@ export const CONTENT_VISIBILITY_EXCLUSIONS = [
 		reason:
 			"Duplicate imported page superseded by the canonical project guidelines page.",
 	},
-	{
-		path: "project/photos-for-our-furry-friends-2",
-		reason:
-			"Duplicate imported project path superseded by the canonical project entry.",
-	},
 ] as const;
 
 const EXCLUDED_PUBLIC_PATHS: ReadonlySet<string> = new Set(

@@ -1,12 +1,17 @@
 ---
 import NotFound from "../../components/NotFound.astro";
 import { getProjectBySlug } from "../../lib/content";
+import { projectPath } from "../../lib/content-paths";
 
 const { slug = "" } = Astro.params;
 const project = await getProjectBySlug(slug);
 
 if (project) {
-	return Astro.redirect(`/${project.data.path}/`, 301);
+	const status = Astro.url.searchParams.has("_preview") ? 302 : 301;
+	return Astro.redirect(
+		`/${projectPath(project.data.slug || project.id)}/${Astro.url.search}`,
+		status,
+	);
 }
 Astro.response.status = 404;
 ---

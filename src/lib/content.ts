@@ -9,7 +9,6 @@ import { isPublicContentPath } from "./content-visibility";
 import {
 	derivePagePath,
 	derivePostPath,
-	deriveProjectPath,
 	normalizeContentPath,
 	slugFromPath,
 } from "./content-paths";
@@ -29,6 +28,7 @@ type RuntimeEntry<T> = ContentEntry<T> & {
 };
 type NormalizedEntryData<T> = Omit<T, "featured_image"> & {
 	featured_image?: MediaField;
+	path?: string;
 };
 type RawMediaField = MediaField & {
 	provider?: string;
@@ -73,8 +73,6 @@ function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 			data.publishedAt,
 			data.createdAt,
 		);
-	} else if (collection === "projects") {
-		data.path = deriveProjectPath(data.path, data.slug || entry.id);
 	}
 
 	return {

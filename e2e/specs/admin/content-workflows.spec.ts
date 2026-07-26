@@ -2,13 +2,16 @@ import { test, expect } from "../../fixtures/worker";
 import { collectPageErrors } from "../../support/assertions";
 import {
 	canonicalAliasForItem,
+	createAndPublishContentViaApi,
 	createAndPublishContentViaAdmin,
 	createContentViaApi,
 	deleteContentViaApi,
 	dismissWelcome,
 	expectPublicContent,
+	getPreviewUrlViaApi,
 	portableTextParagraph,
 	uniqueTitle,
+	updateContentViaApi,
 } from "../../support/content";
 
 interface SavedContentResponse {
@@ -186,6 +189,94 @@ test.describe("admin content workflows", () => {
 				`Expected ${alias} to redirect or load`,
 			).toBeLessThan(400);
 			expect(new URL(publicPage.url()).pathname).toBe(publicPath);
+
+			if (collection === "projects") {
+				const rootAlias = `/${published.slug}/`;
+				const rootAliasResponse = await publicPage.request.get(rootAlias, {
+					maxRedirects: 0,
+				});
+				expect(rootAliasResponse.status()).toBe(301);
+				expect(rootAliasResponse.headers().location).toBe(publicPath);
+			}
+		}
+	});
+
+	test("previews a draft project on its canonical route", async ({
+		authedRequest,
+		publicPage,
+	}, testInfo) => {
+		const title = uniqueTitle("E2E Draft Project", testInfo.testId);
+		const bodyText = `${title} body visible only through preview.`;
+		const created = await createContentViaApi(authedRequest, "projects", {
+			title,
+			content: bodyText,
+		});
+
+		try {
+			const preview = await getPreviewUrlViaApi(
+				authedRequest,
+				"projects",
+				created.id,
+			);
+			const requestedUrl = new URL(preview.url, "https://example.test");
+			const previewToken = requestedUrl.searchParams.get("_preview");
+
+			expect(requestedUrl.pathname).toBe(`/projects/${created.id}`);
+			expect(previewToken).toBeTruthy();
+
+			const redirectResponse = await publicPage.request.get(preview.url, {
+				maxRedirects: 0,
+			});
+			expect(redirectResponse.status()).toBe(302);
+			expect(redirectResponse.headers().location).toBe(
+				`/project/${created.slug}/${requestedUrl.search}`,
+			);
+
+			await expectPublicContent(publicPage, preview.url, title, bodyText);
+			const finalUrl = new URL(publicPage.url());
+			expect(finalUrl.pathname).toBe(`/project/${created.slug}/`);
+			expect(finalUrl.searchParams.get("_preview")).toBe(previewToken);
+		} finally {
+			await deleteContentViaApi(authedRequest, "projects", created.id);
+		}
+	});
+
+	test("redirects a project's old native URL after its slug changes", async ({
+		authedRequest,
+		publicPage,
+	}, testInfo) => {
+		const title = uniqueTitle("E2E Renamed Project", testInfo.testId);
+		const bodyText = `${title} body remains available after renaming.`;
+		const { published, publicPath } = await createAndPublishContentViaApi(
+			authedRequest,
+			"projects",
+			{ title, content: bodyText },
+		);
+		const newSlug = `${published.slug}-renamed`;
+
+		try {
+			const updated = await updateContentViaApi(
+				authedRequest,
+				"projects",
+				published.id,
+				{ slug: newSlug },
+			);
+			expect(updated.slug).toBe(newSlug);
+
+			const redirectResponse = await publicPage.request.get(publicPath, {
+				maxRedirects: 0,
+			});
+			expect(redirectResponse.status()).toBe(301);
+			expect(redirectResponse.headers().location).toBe(`/project/${newSlug}`);
+
+			await expectPublicContent(
+				publicPage,
+				`/project/${newSlug}/`,
+				title,
+				bodyText,
+			);
+		} finally {
+			await deleteContentViaApi(authedRequest, "projects", published.id);
 		}
 	});
 });
