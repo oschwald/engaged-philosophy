@@ -151,6 +151,7 @@
 			"label": "Projects",
 			"labelSingular": "Project",
 			"supports": ["drafts", "revisions", "search"],
+			"urlPattern": "/project/{slug}",
 			"fields": [
 				{
 					"slug": "title",
