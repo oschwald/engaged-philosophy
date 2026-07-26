@@ -1,12 +1,22 @@
 ---
 import Base from "../layouts/Base.astro";
+import { taxonomyCacheTag } from "../lib/cache-tags";
+import { PROJECT_TAXONOMIES } from "../lib/taxonomy-utils";
 import ThemeSidebar from "./ThemeSidebar.astro";
+
+const cacheTags = [
+	"pages",
+	"posts",
+	"projects",
+	taxonomyCacheTag("category"),
+	...PROJECT_TAXONOMIES.map(taxonomyCacheTag),
+];
 ---
 
 <Base
 	title="Not Found"
 	bodyClass="error404 not-found content-sidebar"
-	cacheTags={["posts"]}
+	cacheTags={cacheTags}
 >
 	<section id="primary" class="col-lg-8 px-4">
 		<div id="content" role="main">

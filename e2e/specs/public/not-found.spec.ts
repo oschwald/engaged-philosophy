@@ -45,6 +45,20 @@ test.describe("public not-found responses", () => {
 		const path = "/e2e-original-404-log-path/";
 		const response = await publicPage.goto(path);
 		expect(response?.status()).toBe(404);
+		const cacheTags = response?.headers()["cache-tag"]?.split(",") ?? [];
+		expect(cacheTags).toEqual(
+			expect.arrayContaining([
+				"pages",
+				"posts",
+				"projects",
+				"taxonomy:category",
+				"taxonomy:topic",
+				"taxonomy:schools",
+				"taxonomy:professors",
+				"taxonomy:courses",
+				"taxonomy:semesters",
+			]),
+		);
 
 		await expect
 			.poll(async () => {
