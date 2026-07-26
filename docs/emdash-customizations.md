@@ -96,12 +96,13 @@ consuming the smaller KV write budget or requiring a paid service.
   retaining older seed-media shapes or repeating WordPress URL rewrites.
 - Portable Text galleries delegate their markup, image loading, and captions to
   EmDash, and EmDash 0.31 keeps those native gallery blocks visible and editable
-  in the admin editor. A small public-rendering adapter resolves migrated image
-  references to the public R2 domain and preserves imported shortcode/figure
-  layouts. CSP-safe column classes replace EmDash's inline `--columns` property
-  because the production policy intentionally rejects inline styles. This
-  avoids both Worker media proxy requests and Cloudflare image transformations
-  on the Free plan.
+  in the admin editor. Imported gallery URLs are normalized to the public R2
+  domain in both live content and revisions, so the site can pass each gallery
+  directly to EmDash without a per-image URL adapter. The outer compatibility
+  wrapper preserves imported shortcode/figure layouts, while CSP-safe column
+  classes replace EmDash's inline `--columns` property because the production
+  policy intentionally rejects inline styles. This avoids both Worker media
+  proxy requests and Cloudflare image transformations on the Free plan.
 - Imported numbered headings use EmDash's native Portable Text list and heading
   rendering. A CSS counter preserves interview numbering across the answer
   blocks between headings without changing ordinary ordered lists.
@@ -116,9 +117,10 @@ consuming the smaller KV write budget or requiring a paid service.
   lists. EmDash does not support Animoto or the page-list behavior. Its
   self-hosted embed currently forces videos into 16:9 and omits intrinsic
   dimensions and `playsinline`, while its media component serves local files
-  through the Worker. Keeping the small video adapter therefore preserves the
-  square and portrait videos and direct public-R2 delivery on the Cloudflare
-  Free plan.
+  through the Worker. Imported legacy-video URLs are normalized to the public R2
+  domain, so the remaining presentation adapter only validates the URL and
+  preserves square and portrait videos, intrinsic dimensions, `playsinline`,
+  and direct public-R2 delivery on the Cloudflare Free plan.
 
 ## Imported Field Names
 
