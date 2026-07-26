@@ -1,29 +1,20 @@
 ---
 import { Gallery as EmDashGallery } from "emdash/ui";
 
-import { getAssetSrc } from "../../lib/media";
 import type { RichTextGalleryNode } from "../../lib/rich-text-types";
+import { safeUrlForMediaSrc } from "../../lib/url-safety";
 
 interface Props {
 	node: RichTextGalleryNode;
 }
 
 const { node } = Astro.props;
-const getPublicMediaUrl = Astro.locals.emdash?.getPublicMediaUrl;
-const images = node.images
-	.map((image) => {
-		const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
-		if (!src) return null;
-		return {
-			...image,
-			alt: image.alt || image.caption || "",
-			asset: {
-				...image.asset,
-				url: src,
-			},
-		};
-	})
-	.filter((image) => image !== null);
+const images = node.images.flatMap((image) => {
+	if (!image.asset.url) return [image];
+
+	const url = safeUrlForMediaSrc(image.asset.url);
+	return url ? [{ ...image, asset: { ...image.asset, url } }] : [];
+});
 const usesLeadLayout =
 	node.layout === "shortcode" && node.columns === 3 && images.length === 4;
 const firstImage = images[0];

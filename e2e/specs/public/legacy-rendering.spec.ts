@@ -82,7 +82,7 @@ test.describe("public migrated content rendering", () => {
 									_key: `gallery-${index + 1}`,
 									asset: {
 										_ref: `${MEDIA_BASE}${url}`,
-										url,
+										url: `${MEDIA_BASE}${url}`,
 									},
 									alt: `Gallery image ${index + 1}`,
 								})),
@@ -108,7 +108,7 @@ test.describe("public migrated content rendering", () => {
 									_key: `figure-gallery-${index + 1}`,
 									asset: {
 										_ref: `${MEDIA_BASE}${url}`,
-										url,
+										url: `${MEDIA_BASE}${url}`,
 									},
 									alt: `Figure gallery image ${index + 1}`,
 									...(index === 0
@@ -141,7 +141,7 @@ test.describe("public migrated content rendering", () => {
 									_key: `lead-gallery-${index + 1}`,
 									asset: {
 										_ref: `${MEDIA_BASE}${url}`,
-										url,
+										url: `${MEDIA_BASE}${url}`,
 									},
 									alt: `Lead gallery image ${index + 1}`,
 								}),
@@ -156,8 +156,17 @@ test.describe("public migrated content rendering", () => {
 						{
 							_type: "legacyVideo",
 							_key: "legacy-video",
-							url: LEGACY_VIDEO_PATH,
+							url: `${MEDIA_BASE}${LEGACY_VIDEO_PATH}`,
 							title: videoTitle,
+							mimeType: "video/mp4",
+							width: 640,
+							height: 360,
+						},
+						{
+							_type: "legacyVideo",
+							_key: "legacy-video-relative",
+							url: LEGACY_VIDEO_PATH,
+							title: "Unnormalized imported video",
 							mimeType: "video/mp4",
 							width: 640,
 							height: 360,
@@ -306,6 +315,12 @@ test.describe("public migrated content rendering", () => {
 			"src",
 			`${MEDIA_BASE}${LEGACY_VIDEO_PATH}`,
 		);
+		await expect(publicPage.locator(".legacy-video")).toHaveCount(1);
+		await expect(
+			publicPage.locator(
+				'[src^="/_emdash/api/media/file/wp-content/uploads/"]',
+			),
+		).toHaveCount(0);
 		await expectPageTextNotToContain(publicPage, "[gallery");
 		await expectPageTextNotToContain(publicPage, "[youtube");
 		await expectPageTextNotToContain(publicPage, "[playlist");
