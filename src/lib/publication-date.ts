@@ -19,18 +19,22 @@ function configuredValue(value: string | undefined, fallback: string) {
 
 export function formatPublicationDate(
 	value: DateValue,
-	settings: DatePresentationSettings = {},
+	settings: DatePresentationSettings | null = {},
 ) {
 	if (value === null || value === undefined || value === "") return "";
 
 	const date = value instanceof Date ? value : new Date(value);
 	if (Number.isNaN(date.valueOf())) return "";
 
+	const resolvedSettings = settings ?? {};
 	const dateFormat = configuredValue(
-		settings.dateFormat,
+		resolvedSettings.dateFormat,
 		SITE_DATE_FORMAT_FALLBACK,
 	);
-	const timezone = configuredValue(settings.timezone, SITE_TIMEZONE_FALLBACK);
+	const timezone = configuredValue(
+		resolvedSettings.timezone,
+		SITE_TIMEZONE_FALLBACK,
+	);
 
 	try {
 		return format(date, dateFormat, { in: tz(timezone) });

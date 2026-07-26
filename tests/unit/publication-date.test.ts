@@ -34,4 +34,10 @@ describe("publication date formatting", () => {
 		expect(formatPublicationDate(null)).toBe("");
 		expect(formatPublicationDate("not a date")).toBe("");
 	});
+
+	test("uses fallbacks when site settings are unavailable", () => {
+		expect(formatPublicationDate("2016-08-24T00:37:36Z", null)).toBe(
+			"August 23, 2016",
+		);
+	});
 });
