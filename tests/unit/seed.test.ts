@@ -87,6 +87,14 @@ describe("checked-in EmDash seed", () => {
 		}
 	});
 
+	test("does not reference field widgets from the deleted legacy admin plugin", () => {
+		for (const collection of seed.collections ?? []) {
+			for (const field of collection.fields ?? []) {
+				expect(field.widget ?? "").not.toMatch(/^legacy-image-blocks:/);
+			}
+		}
+	});
+
 	test("indexes the public search fields", () => {
 		for (const collection of seed.collections ?? []) {
 			if (!["pages", "posts", "projects"].includes(collection.slug ?? "")) {

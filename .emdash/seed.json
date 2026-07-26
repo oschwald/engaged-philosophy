@@ -37,8 +37,7 @@
 					"slug": "path",
 					"label": "Path",
 					"type": "string",
-					"unique": true,
-					"widget": "legacy-image-blocks:hidden"
+					"unique": true
 				},
 				{
 					"slug": "content",
@@ -109,8 +108,7 @@
 					"slug": "path",
 					"label": "Path",
 					"type": "string",
-					"unique": true,
-					"widget": "legacy-image-blocks:hidden"
+					"unique": true
 				},
 				{
 					"slug": "excerpt",
