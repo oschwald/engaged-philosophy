@@ -189,6 +189,15 @@ test.describe("admin content workflows", () => {
 				`Expected ${alias} to redirect or load`,
 			).toBeLessThan(400);
 			expect(new URL(publicPage.url()).pathname).toBe(publicPath);
+
+			if (collection === "projects") {
+				const rootAlias = `/${published.slug}/`;
+				const rootAliasResponse = await publicPage.request.get(rootAlias, {
+					maxRedirects: 0,
+				});
+				expect(rootAliasResponse.status()).toBe(301);
+				expect(rootAliasResponse.headers().location).toBe(publicPath);
+			}
 		}
 	});
 

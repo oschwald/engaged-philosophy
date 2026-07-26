@@ -18,8 +18,10 @@ const page =
 if (!page) {
 	const project = slugParts.length === 1 ? await getProjectBySlug(path) : null;
 	if (project) {
+		const status = Astro.url.searchParams.has("_preview") ? 302 : 301;
 		return Astro.redirect(
 			`/${projectPath(project.data.slug || project.id)}/${Astro.url.search}`,
+			status,
 		);
 	}
 }
