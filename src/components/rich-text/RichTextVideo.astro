@@ -1,14 +1,13 @@
 ---
-import { getAssetSrc } from "../../lib/media";
 import type { RichTextVideoNode } from "../../lib/rich-text-types";
+import { safeUrlForMediaSrc } from "../../lib/url-safety";
 
 interface Props {
 	node: RichTextVideoNode;
 }
 
 const { node } = Astro.props;
-const getPublicMediaUrl = Astro.locals.emdash?.getPublicMediaUrl;
-const src = getAssetSrc(null, node.url, getPublicMediaUrl);
+const src = safeUrlForMediaSrc(node.url);
 ---
 
 {

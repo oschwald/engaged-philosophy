@@ -1,7 +1,6 @@
 ---
 import { Gallery as EmDashGallery } from "emdash/ui";
 
-import { getAssetSrc } from "../../lib/media";
 import type { RichTextGalleryNode } from "../../lib/rich-text-types";
 
 interface Props {
@@ -9,24 +8,9 @@ interface Props {
 }
 
 const { node } = Astro.props;
-const getPublicMediaUrl = Astro.locals.emdash?.getPublicMediaUrl;
-const images = node.images
-	.map((image) => {
-		const src = getAssetSrc(image.asset, undefined, getPublicMediaUrl);
-		if (!src) return null;
-		return {
-			...image,
-			alt: image.alt || image.caption || "",
-			asset: {
-				...image.asset,
-				url: src,
-			},
-		};
-	})
-	.filter((image) => image !== null);
 const usesLeadLayout =
-	node.layout === "shortcode" && node.columns === 3 && images.length === 4;
-const firstImage = images[0];
+	node.layout === "shortcode" && node.columns === 3 && node.images.length === 4;
+const firstImage = node.images[0];
 const hasSeparateCaption = Boolean(
 	node.caption && firstImage && firstImage.caption,
 );
@@ -34,9 +18,12 @@ const galleryNode =
 	node.caption && firstImage && !firstImage.caption
 		? {
 				...node,
-				images: [{ ...firstImage, caption: node.caption }, ...images.slice(1)],
+				images: [
+					{ ...firstImage, caption: node.caption },
+					...node.images.slice(1),
+				],
 			}
-		: { ...node, images };
+		: node;
 ---
 
 <div
