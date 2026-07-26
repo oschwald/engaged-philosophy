@@ -55,12 +55,6 @@
 					"type": "string"
 				},
 				{
-					"slug": "about_html",
-					"label": "About HTML",
-					"type": "portableText",
-					"widget": "portableText"
-				},
-				{
 					"slug": "box_left_title",
 					"label": "Left Box Title",
 					"type": "string"
@@ -92,11 +86,6 @@
 					"label": "Right Box HTML",
 					"type": "portableText",
 					"widget": "portableText"
-				},
-				{
-					"slug": "legacy_wp_id",
-					"label": "Legacy WordPress ID",
-					"type": "integer"
 				}
 			]
 		},
@@ -138,11 +127,6 @@
 					"slug": "featured_image",
 					"label": "Featured Image",
 					"type": "image"
-				},
-				{
-					"slug": "legacy_wp_id",
-					"label": "Legacy WordPress ID",
-					"type": "integer"
 				}
 			]
 		},
@@ -190,11 +174,6 @@
 					"label": "Menu Order",
 					"type": "integer",
 					"defaultValue": 0
-				},
-				{
-					"slug": "legacy_wp_id",
-					"label": "Legacy WordPress ID",
-					"type": "integer"
 				}
 			]
 		}

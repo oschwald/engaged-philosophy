@@ -56,6 +56,24 @@ describe("checked-in EmDash seed", () => {
 		expect(projects?.fields?.map((field) => field.slug)).not.toContain("path");
 	});
 
+	test("omits unused WordPress migration fields", () => {
+		for (const slug of ["pages", "posts", "projects"]) {
+			const collection = seed.collections?.find(
+				(candidate) => candidate.slug === slug,
+			);
+			expect(collection, `Missing ${slug} collection`).toBeDefined();
+			expect(
+				collection?.fields?.length,
+				`Missing fields for ${slug} collection`,
+			).toBeGreaterThan(0);
+			const fieldSlugs = collection?.fields?.map((field) => field.slug);
+			expect(fieldSlugs).not.toContain("legacy_wp_id");
+			if (slug === "pages") {
+				expect(fieldSlugs).not.toContain("about_html");
+			}
+		}
+	});
+
 	test("indexes the public search fields", () => {
 		for (const collection of seed.collections ?? []) {
 			if (!["pages", "posts", "projects"].includes(collection.slug ?? "")) {
