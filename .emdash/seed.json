@@ -6,6 +6,9 @@
 		"description": "Exported from existing EmDash database"
 	},
 	"settings": {
+		"url": "https://www.engagedphilosophy.com",
+		"timezone": "America/Los_Angeles",
+		"dateFormat": "MMMM d, yyyy",
 		"favicon": {
 			"mediaId": "01KSKNR8TJ18J352FQZ3GKSJ07"
 		},
@@ -34,8 +37,7 @@
 					"slug": "path",
 					"label": "Path",
 					"type": "string",
-					"unique": true,
-					"widget": "legacy-image-blocks:hidden"
+					"unique": true
 				},
 				{
 					"slug": "content",
@@ -106,8 +108,7 @@
 					"slug": "path",
 					"label": "Path",
 					"type": "string",
-					"unique": true,
-					"widget": "legacy-image-blocks:hidden"
+					"unique": true
 				},
 				{
 					"slug": "excerpt",
@@ -426,11 +427,6 @@
 					"id": "term:semesters:spring-2021",
 					"slug": "spring-2021",
 					"label": "Spring 2021"
-				},
-				{
-					"id": "term:semesters:spring2018",
-					"slug": "spring2018",
-					"label": "Spring2018"
 				},
 				{
 					"id": "term:semesters:spring-2023",

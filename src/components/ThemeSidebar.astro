@@ -1,8 +1,13 @@
 ---
-import { getRecentPosts } from "../lib/content";
-import { formatPathDate } from "../lib/path-utils";
+import { getSiteSettings } from "emdash";
 
-const { entries: recentPosts } = await getRecentPosts();
+import { getRecentPosts } from "../lib/content";
+import { formatPublicationDate } from "../lib/publication-date";
+
+const [{ entries: recentPosts }, settings] = await Promise.all([
+	getRecentPosts(),
+	getSiteSettings(),
+]);
 ---
 
 <section id="secondary" class="widget-area col-lg-4 p-3" role="complementary">
@@ -13,7 +18,9 @@ const { entries: recentPosts } = await getRecentPosts();
 				recentPosts.map((post) => (
 					<li>
 						<a href={`/${post.data.path}/`}>{post.data.title}</a>{" "}
-						<span class="post-date">{formatPathDate(post.data.path)}</span>
+						<span class="post-date">
+							{formatPublicationDate(post.data.publishedAt, settings)}
+						</span>
 					</li>
 				))
 			}

@@ -1,4 +1,6 @@
 ---
+import { getSiteSettings } from "emdash";
+
 import NotFound from "../../../../components/NotFound.astro";
 import RichContent from "../../../../components/RichContent.astro";
 import ThemeSidebar from "../../../../components/ThemeSidebar.astro";
@@ -6,11 +8,15 @@ import Base from "../../../../layouts/Base.astro";
 import { taxonomyCacheTag } from "../../../../lib/cache-tags";
 import { getPostByPath } from "../../../../lib/content";
 import { joinPath } from "../../../../lib/path-utils";
+import { formatPublicationDate } from "../../../../lib/publication-date";
 import { getEntryContent } from "../../../../lib/rich-text";
 
 const { year = "", month = "", day = "", slug = "" } = Astro.params;
 const path = joinPath([year, month, day, slug]);
-const post = await getPostByPath(path);
+const [post, settings] = await Promise.all([
+	getPostByPath(path),
+	getSiteSettings(),
+]);
 
 if (!post) Astro.response.status = 404;
 
@@ -33,7 +39,7 @@ const categories = post?.data.terms?.category ?? [];
 								{post.data.title}
 							</h1>
 							<div class="entry-meta">
-								{post.data.publishedAt?.toLocaleDateString() ?? ""}
+								{formatPublicationDate(post.data.publishedAt, settings)}
 							</div>
 						</header>
 						<div class="entry-content" {...post.edit.content}>

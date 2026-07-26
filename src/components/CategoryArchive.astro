@@ -1,8 +1,10 @@
 ---
+import { getSiteSettings } from "emdash";
+
 import EntrySummary from "./content/EntrySummary.astro";
 import Pagination from "./content/Pagination.astro";
 import ThemeSidebar from "./ThemeSidebar.astro";
-import { formatPathDate } from "../lib/path-utils";
+import { formatPublicationDate } from "../lib/publication-date";
 import {
 	getEntryContent,
 	getEntryExcerpt,
@@ -19,6 +21,7 @@ interface Props {
 }
 
 const { slug, label, posts, hasMore, page } = Astro.props;
+const settings = await getSiteSettings();
 
 function pageHref(pageNumber: number) {
 	return pageNumber === 1
@@ -42,7 +45,7 @@ function pageHref(pageNumber: number) {
 						articleClass="mb-5 pb-4 border-bottom post"
 						title={post.data.title ?? ""}
 						titleHref={`/${post.data.path}/`}
-						meta={formatPathDate(post.data.path)}
+						meta={formatPublicationDate(post.data.publishedAt, settings)}
 						continueHref={`/${post.data.path}/`}
 						excerpt={getExcerptText(
 							getEntryExcerpt(post.data),

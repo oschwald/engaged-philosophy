@@ -40,7 +40,7 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 
 	const post = await createAndPublishContentViaApi(authedRequest, "posts", {
 		title: postTitle,
-		publishedAt: "2026-07-25T12:00:00.000Z",
+		publishedAt: "2026-07-26T00:30:00.000Z",
 		taxonomies: {
 			category: ["e2e-category"],
 		},
@@ -66,6 +66,7 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 		});
 		const categoryFooter = publicPage.locator(".cat-links");
 		await expect(categoryFooter).toContainText("Posted in");
+		await expect(publicPage.locator(".entry-meta")).toHaveText("July 25, 2026");
 		await expect(
 			categoryFooter.getByRole("link", { name: "E2E Category" }),
 		).toHaveAttribute("href", "/category/e2e-category/");
@@ -78,11 +79,18 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 				name: "Category Archives: E2E Category",
 			}),
 		).toBeVisible();
+		const categoryEntry = publicPage.locator("#content article").filter({
+			has: publicPage.getByRole("link", {
+				name: postTitle,
+				exact: true,
+			}),
+		});
 		await expect(
-			publicPage
-				.locator("#content")
-				.getByRole("link", { name: postTitle, exact: true }),
+			categoryEntry.getByRole("link", { name: postTitle, exact: true }),
 		).toHaveAttribute("href", post.publicPath);
+		await expect(categoryEntry.locator(".entry-meta")).toHaveText(
+			"July 25, 2026",
+		);
 		const recentInterview = publicPage.locator("#recent-posts-2 li").filter({
 			has: publicPage.getByRole("link", {
 				name: postTitle,
