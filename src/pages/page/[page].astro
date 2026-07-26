@@ -1,5 +1,6 @@
 ---
 import SearchResults from "../../components/SearchResults.astro";
+import NotFound from "../../components/NotFound.astro";
 import Base from "../../layouts/Base.astro";
 import { isValidSearchCursorHistory, searchSite } from "../../lib/search";
 import { InvalidCursorError } from "emdash";
@@ -9,37 +10,39 @@ const query = Astro.url.searchParams.get("s")?.trim() ?? "";
 const cursor = Astro.url.searchParams.get("cursor") ?? undefined;
 const history = Astro.url.searchParams.getAll("before");
 
-if (
-	!query ||
-	!Number.isInteger(pageNumber) ||
-	pageNumber < 2 ||
-	!cursor ||
-	!isValidSearchCursorHistory(pageNumber, history)
-) {
-	return Astro.redirect("/404");
-}
+const validRequest =
+	Boolean(query) &&
+	Number.isInteger(pageNumber) &&
+	pageNumber >= 2 &&
+	Boolean(cursor) &&
+	isValidSearchCursorHistory(pageNumber, history);
 
-let search;
-try {
-	search = await searchSite(query, cursor);
-} catch (error) {
-	if (!(error instanceof InvalidCursorError)) throw error;
-	return Astro.redirect("/404");
+let search: Awaited<ReturnType<typeof searchSite>> | undefined;
+if (validRequest) {
+	try {
+		search = await searchSite(query, cursor);
+	} catch (error) {
+		if (!(error instanceof InvalidCursorError)) throw error;
+	}
 }
-if (search.results.length === 0) {
-	return Astro.redirect("/404");
-}
+if (!search?.results.length) Astro.response.status = 404;
 ---
 
-<Base
-	title={`Search Results for: ${query}${pageNumber > 1 ? ` – Page ${pageNumber}` : ""}`}
-	bodyClass={`search search-results${pageNumber > 1 ? ` paged paged-${pageNumber}` : ""} wp-theme-engaged-philosophy-20 content-sidebar`}
->
-	<SearchResults
-		query={query}
-		search={search}
-		page={pageNumber}
-		cursor={cursor}
-		history={history}
-	/>
-</Base>
+{
+	search && search.results.length > 0 ? (
+		<Base
+			title={`Search Results for: ${query}${pageNumber > 1 ? ` – Page ${pageNumber}` : ""}`}
+			bodyClass={`search search-results${pageNumber > 1 ? ` paged paged-${pageNumber}` : ""} wp-theme-engaged-philosophy-20 content-sidebar`}
+		>
+			<SearchResults
+				query={query}
+				search={search}
+				page={pageNumber}
+				cursor={cursor}
+				history={history}
+			/>
+		</Base>
+	) : (
+		<NotFound />
+	)
+}

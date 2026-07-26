@@ -2,6 +2,7 @@
 import { getTerm } from "emdash";
 
 import Base from "../../layouts/Base.astro";
+import NotFound from "../../components/NotFound.astro";
 import TaxonomyArchive from "../../components/TaxonomyArchive.astro";
 import { getPageByPath, getProjectsPageByTaxonomy } from "../../lib/content";
 import { getEntryContent } from "../../lib/rich-text";
@@ -13,26 +14,19 @@ const { taxonomy = "", slug = "" } = Astro.params;
 const pagePath = `${taxonomy}/${slug}`;
 const isProjectArchive = isProjectTaxonomy(taxonomy);
 const page = isProjectArchive ? null : await getPageByPath(pagePath);
-
-if (!isProjectArchive) {
-	if (!page) {
-		return Astro.redirect("/404");
-	}
-}
-
 const term = isProjectArchive ? await getTerm(taxonomy, slug) : null;
-
-if (isProjectArchive && !term) {
-	return Astro.redirect("/404");
-}
-
-const projectPage = isProjectArchive
-	? await getProjectsPageByTaxonomy(taxonomy, slug, 1)
-	: { entries: [], hasMore: false };
+const projectPage =
+	isProjectArchive && term
+		? await getProjectsPageByTaxonomy(taxonomy, slug, 1)
+		: { entries: [], hasMore: false };
+const notFound = !page && !term;
+if (notFound) Astro.response.status = 404;
 ---
 
 {
-	page ? (
+	notFound ? (
+		<NotFound />
+	) : page ? (
 		<Base
 			title={page.data.title}
 			content={{ collection: "pages", entry: page }}

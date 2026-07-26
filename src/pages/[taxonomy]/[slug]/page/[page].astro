@@ -2,47 +2,44 @@
 import { getTerm } from "emdash";
 
 import Base from "../../../../layouts/Base.astro";
+import NotFound from "../../../../components/NotFound.astro";
 import TaxonomyArchive from "../../../../components/TaxonomyArchive.astro";
 import { getProjectsPageByTaxonomy } from "../../../../lib/content";
 import { taxonomyCacheTag } from "../../../../lib/cache-tags";
 import { isProjectTaxonomy } from "../../../../lib/taxonomy-utils";
 
 const { taxonomy = "", slug = "", page = "1" } = Astro.params;
-
-if (!isProjectTaxonomy(taxonomy)) {
-	return Astro.redirect("/404");
-}
-
-const term = await getTerm(taxonomy, slug);
-if (!term) {
-	return Astro.redirect("/404");
-}
+const projectTaxonomy = isProjectTaxonomy(taxonomy);
+const term = projectTaxonomy ? await getTerm(taxonomy, slug) : null;
 
 const pageNumber = Number.parseInt(page, 10);
-if (!Number.isFinite(pageNumber) || pageNumber < 2) {
+if (term && (!Number.isFinite(pageNumber) || pageNumber < 2)) {
 	return Astro.redirect(`/${taxonomy}/${slug}/`);
 }
 
-const { entries: projects, hasMore } = await getProjectsPageByTaxonomy(
-	taxonomy,
-	slug,
-	pageNumber,
-);
-if (projects.length === 0) {
-	return Astro.redirect("/404");
-}
+const projectPage = term
+	? await getProjectsPageByTaxonomy(taxonomy, slug, pageNumber)
+	: { entries: [], hasMore: false };
+const found = term && projectPage.entries.length > 0;
+if (!found) Astro.response.status = 404;
 ---
 
-<Base
-	title={`${term.label} – Page ${pageNumber}`}
-	bodyClass={`archive paged tax-${taxonomy} term-${slug} paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
-	cacheTags={["projects", taxonomyCacheTag(taxonomy)]}
->
-	<TaxonomyArchive
-		taxonomy={taxonomy}
-		label={term.label}
-		projects={projects}
-		hasMore={hasMore}
-		page={pageNumber}
-	/>
-</Base>
+{
+	found ? (
+		<Base
+			title={`${term.label} – Page ${pageNumber}`}
+			bodyClass={`archive paged tax-${taxonomy} term-${slug} paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
+			cacheTags={["projects", taxonomyCacheTag(taxonomy)]}
+		>
+			<TaxonomyArchive
+				taxonomy={taxonomy}
+				label={term.label}
+				projects={projectPage.entries}
+				hasMore={projectPage.hasMore}
+				page={pageNumber}
+			/>
+		</Base>
+	) : (
+		<NotFound />
+	)
+}
