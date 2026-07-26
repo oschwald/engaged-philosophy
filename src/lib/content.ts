@@ -5,7 +5,6 @@ import {
 	type ContentEntry as EmDashContentEntry,
 } from "emdash";
 
-import { isPublicContentPath } from "./content-visibility";
 import {
 	derivePagePath,
 	derivePostPath,
@@ -81,10 +80,6 @@ function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 	};
 }
 
-function isPublicEntry(entry: { data: { path?: string } }) {
-	return isPublicContentPath(entry.data.path);
-}
-
 function flattenTerms<T extends { children?: T[] }>(terms: T[]): T[] {
 	return terms.flatMap((term) => [term, ...flattenTerms(term.children ?? [])]);
 }
@@ -102,9 +97,7 @@ async function getPublishedCollection<C extends SiteCollection>(collection: C) {
 		cursor = result.nextCursor;
 	} while (cursor);
 
-	return entries
-		.map((entry) => normalizeEntry(entry, collection))
-		.filter(isPublicEntry);
+	return entries.map((entry) => normalizeEntry(entry, collection));
 }
 
 async function getPublishedCollectionPage<C extends "posts" | "projects">(
@@ -121,9 +114,7 @@ async function getPublishedCollectionPage<C extends "posts" | "projects">(
 		...options,
 	});
 	return {
-		entries: result.entries
-			.map((entry) => normalizeEntry(entry, collection))
-			.filter(isPublicEntry),
+		entries: result.entries.map((entry) => normalizeEntry(entry, collection)),
 		hasMore: result.hasMore ?? false,
 		cacheHint: result.cacheHint,
 	};
@@ -140,9 +131,7 @@ export async function getPublishedEntriesByIds<C extends SiteCollection>(
 		limit: ids.length,
 		where: { id: ids },
 	});
-	return entries
-		.map((entry) => normalizeEntry(entry, collection))
-		.filter(isPublicEntry);
+	return entries.map((entry) => normalizeEntry(entry, collection));
 }
 
 export function getRecentPosts(limit = 25) {
@@ -198,8 +187,7 @@ export async function getPublishedProjects() {
 export async function getPageBySlug(slug: string) {
 	const { entry } = await getEmDashEntry("pages", slug);
 	if (!entry) return null;
-	const page = normalizeEntry(entry, "pages");
-	return isPublicEntry(page) ? page : null;
+	return normalizeEntry(entry, "pages");
 }
 
 export async function getPageByPath(path: string) {
@@ -215,8 +203,7 @@ export async function getPageByPath(path: string) {
 	});
 	const entry = entries[0];
 	if (!entry) return null;
-	const matched = normalizeEntry(entry, "pages");
-	return isPublicEntry(matched) ? matched : null;
+	return normalizeEntry(entry, "pages");
 }
 
 export async function getPostByPath(path: string) {
@@ -232,22 +219,19 @@ export async function getPostByPath(path: string) {
 	});
 	const entry = entries[0];
 	if (!entry) return null;
-	const matched = normalizeEntry(entry, "posts");
-	return isPublicEntry(matched) ? matched : null;
+	return normalizeEntry(entry, "posts");
 }
 
 export async function getPostBySlug(slug: string) {
 	const { entry } = await getEmDashEntry("posts", slug);
 	if (!entry) return null;
-	const post = normalizeEntry(entry, "posts");
-	return isPublicEntry(post) ? post : null;
+	return normalizeEntry(entry, "posts");
 }
 
 export async function getProjectBySlug(slug: string) {
 	const { entry } = await getEmDashEntry("projects", slug);
 	if (!entry) return null;
-	const project = normalizeEntry(entry, "projects");
-	return isPublicEntry(project) ? project : null;
+	return normalizeEntry(entry, "projects");
 }
 
 export async function getTaxonomyTerms(taxonomy: string) {
