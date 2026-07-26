@@ -40,7 +40,7 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 
 	const post = await createAndPublishContentViaApi(authedRequest, "posts", {
 		title: postTitle,
-		publishedAt: "2026-07-25T12:00:00.000Z",
+		publishedAt: "2026-07-26T00:30:00.000Z",
 		taxonomies: {
 			category: ["e2e-category"],
 		},
@@ -66,6 +66,7 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 		});
 		const categoryFooter = publicPage.locator(".cat-links");
 		await expect(categoryFooter).toContainText("Posted in");
+		await expect(publicPage.locator(".entry-meta")).toHaveText("July 25, 2026");
 		await expect(
 			categoryFooter.getByRole("link", { name: "E2E Category" }),
 		).toHaveAttribute("href", "/category/e2e-category/");
