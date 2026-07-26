@@ -429,11 +429,6 @@
 					"label": "Spring 2021"
 				},
 				{
-					"id": "term:semesters:spring2018",
-					"slug": "spring2018",
-					"label": "Spring2018"
-				},
-				{
 					"id": "term:semesters:spring-2023",
 					"slug": "spring-2023",
 					"label": "spring 2023"

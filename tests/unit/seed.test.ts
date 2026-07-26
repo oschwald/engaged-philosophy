@@ -15,6 +15,10 @@ interface CheckedInSeed {
 		urlPattern?: string;
 		fields?: Array<{ slug?: string; searchable?: boolean; widget?: string }>;
 	}>;
+	taxonomies?: Array<{
+		name?: string;
+		terms?: Array<{ slug?: string }>;
+	}>;
 	content?: unknown;
 	[key: string]: unknown;
 }
@@ -93,6 +97,16 @@ describe("checked-in EmDash seed", () => {
 				expect(field.widget ?? "").not.toMatch(/^legacy-image-blocks:/);
 			}
 		}
+	});
+
+	test("omits the unused duplicate Spring 2018 semester", () => {
+		const semesters = seed.taxonomies?.find(
+			(taxonomy) => taxonomy.name === "semesters",
+		);
+		const slugs = semesters?.terms?.map((term) => term.slug);
+
+		expect(slugs).toContain("spring-2018");
+		expect(slugs).not.toContain("spring2018");
 	});
 
 	test("indexes the public search fields", () => {
