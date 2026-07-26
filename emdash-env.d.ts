@@ -51,7 +51,6 @@ export interface Project {
   slug: string | null;
   status: string;
   title: string;
-  path?: string;
   excerpt?: PortableTextBlock[];
   content?: PortableTextBlock[];
   featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> };

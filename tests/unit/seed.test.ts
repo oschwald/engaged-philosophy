@@ -53,6 +53,7 @@ describe("checked-in EmDash seed", () => {
 		);
 
 		expect(projects?.urlPattern).toBe("/project/{slug}");
+		expect(projects?.fields?.map((field) => field.slug)).not.toContain("path");
 	});
 
 	test("indexes the public search fields", () => {

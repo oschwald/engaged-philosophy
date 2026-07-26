@@ -28,6 +28,7 @@ type RuntimeEntry<T> = ContentEntry<T> & {
 };
 type NormalizedEntryData<T> = Omit<T, "featured_image"> & {
 	featured_image?: MediaField;
+	path?: string;
 };
 type RawMediaField = MediaField & {
 	provider?: string;
