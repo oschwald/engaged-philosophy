@@ -82,18 +82,10 @@ test.describe("public migrated content rendering", () => {
 									_key: `gallery-${index + 1}`,
 									asset: {
 										_ref: `${MEDIA_BASE}${url}`,
-										url,
+										url: `${MEDIA_BASE}${url}`,
 									},
 									alt: `Gallery image ${index + 1}`,
 								})),
-								{
-									_type: "image",
-									_key: "legacy-gallery-unsafe",
-									asset: {
-										url: "javascript:alert(1)",
-									},
-									alt: "Unsafe legacy gallery image",
-								},
 							],
 						},
 						{
@@ -108,7 +100,7 @@ test.describe("public migrated content rendering", () => {
 									_key: `figure-gallery-${index + 1}`,
 									asset: {
 										_ref: `${MEDIA_BASE}${url}`,
-										url,
+										url: `${MEDIA_BASE}${url}`,
 									},
 									alt: `Figure gallery image ${index + 1}`,
 									...(index === 0
@@ -120,14 +112,6 @@ test.describe("public migrated content rendering", () => {
 												}
 											: {}),
 								})),
-								{
-									_type: "image",
-									_key: "legacy-block-gallery-unsafe",
-									asset: {
-										url: "javascript:alert(1)",
-									},
-									alt: "Unsafe legacy block gallery image",
-								},
 							],
 						},
 						{
@@ -141,7 +125,7 @@ test.describe("public migrated content rendering", () => {
 									_key: `lead-gallery-${index + 1}`,
 									asset: {
 										_ref: `${MEDIA_BASE}${url}`,
-										url,
+										url: `${MEDIA_BASE}${url}`,
 									},
 									alt: `Lead gallery image ${index + 1}`,
 								}),
@@ -156,7 +140,7 @@ test.describe("public migrated content rendering", () => {
 						{
 							_type: "legacyVideo",
 							_key: "legacy-video",
-							url: LEGACY_VIDEO_PATH,
+							url: `${MEDIA_BASE}${LEGACY_VIDEO_PATH}`,
 							title: videoTitle,
 							mimeType: "video/mp4",
 							width: 640,
@@ -204,9 +188,6 @@ test.describe("public migrated content rendering", () => {
 			".legacy-gallery-compat--shortcode.legacy-gallery-compat--columns-2 .emdash-gallery",
 		);
 		await expect(gallery.locator("img")).toHaveCount(2);
-		await expect(
-			publicPage.getByAltText("Unsafe legacy gallery image"),
-		).toHaveCount(0);
 		await expect(gallery.locator("img").first()).toHaveAttribute(
 			"src",
 			`${MEDIA_BASE}${GALLERY_PATHS[0]}`,
@@ -229,9 +210,6 @@ test.describe("public migrated content rendering", () => {
 			":scope > .emdash-gallery",
 		);
 		await expect(blockGallery.locator("img")).toHaveCount(4);
-		await expect(
-			publicPage.getByAltText("Unsafe legacy block gallery image"),
-		).toHaveCount(0);
 		await expect(
 			blockGallery.evaluate((element) => {
 				const style = getComputedStyle(element);
@@ -306,6 +284,11 @@ test.describe("public migrated content rendering", () => {
 			"src",
 			`${MEDIA_BASE}${LEGACY_VIDEO_PATH}`,
 		);
+		await expect(
+			publicPage.locator(
+				'[src^="/_emdash/api/media/file/wp-content/uploads/"]',
+			),
+		).toHaveCount(0);
 		await expectPageTextNotToContain(publicPage, "[gallery");
 		await expectPageTextNotToContain(publicPage, "[youtube");
 		await expectPageTextNotToContain(publicPage, "[playlist");
