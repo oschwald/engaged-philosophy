@@ -14,14 +14,12 @@ export interface Page {
   content?: PortableTextBlock[];
   featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> };
   template?: string;
-  about_html?: PortableTextBlock[];
   box_left_title?: string;
   box_left_html?: PortableTextBlock[];
   box_middle_title?: string;
   box_middle_html?: PortableTextBlock[];
   box_right_title?: string;
   box_right_html?: PortableTextBlock[];
-  legacy_wp_id?: number;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -38,7 +36,6 @@ export interface Post {
   excerpt?: PortableTextBlock[];
   content?: PortableTextBlock[];
   featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> };
-  legacy_wp_id?: number;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
@@ -56,7 +53,6 @@ export interface Project {
   featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number; provider?: string; previewUrl?: string; meta?: Record<string, unknown> };
   highlight?: boolean;
   menu_order?: number;
-  legacy_wp_id?: number;
   createdAt: Date;
   updatedAt: Date;
   publishedAt: Date | null;
