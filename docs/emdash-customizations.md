@@ -170,10 +170,9 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 - `astro.config.mjs` keeps the Vite chunk-size warning limit aligned with the
   admin bundle size while leaving upstream build warnings visible.
-- `wrangler.jsonc` enables Workers Cache with per-deployment version isolation,
-  enables Cloudflare logs/traces, and includes both current and legacy binding
-  names for D1/R2 compatibility. A deployment starts with a cold route cache;
-  stale entries are not reused across Worker versions.
+- `wrangler.jsonc` enables Workers Cache with per-deployment version isolation
+  and enables Cloudflare logs/traces. A deployment starts with a cold route
+  cache; stale entries are not reused across Worker versions.
 
 ## Removal Candidates
 
