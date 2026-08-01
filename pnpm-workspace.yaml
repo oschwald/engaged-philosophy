@@ -38,4 +38,5 @@ minimumReleaseAgeExclude:
 
 overrides:
   "@astro-community/astro-embed-integration>astro-auto-import": ^0.5.1
+  "@bruits/satteri-wasm32-wasi>@napi-rs/wasm-runtime": 1.1.6
   yaml-language-server>yaml: ^2.8.3
