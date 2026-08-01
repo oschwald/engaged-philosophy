@@ -48,20 +48,11 @@
 			"database_name": "engaged-philosophy",
 			"database_id": "4fdc5af5-10a0-4aca-9e5f-54db71066fbd",
 		},
-		{
-			"binding": "engaged_philosophy",
-			"database_name": "engaged-philosophy",
-			"database_id": "4fdc5af5-10a0-4aca-9e5f-54db71066fbd",
-		},
 	],
 	"r2_buckets": [
 		{
 			"binding": "MEDIA",
 			"bucket_name": "engaged-philosophy-media",
-		},
-		{
-			"bucket_name": "engaged-philosophy-media",
-			"binding": "engaged_philosophy_media",
 		},
 	],
 	"env": {
@@ -79,20 +70,11 @@
 					"database_name": "engaged-philosophy",
 					"database_id": "4fdc5af5-10a0-4aca-9e5f-54db71066fbd",
 				},
-				{
-					"binding": "engaged_philosophy",
-					"database_name": "engaged-philosophy",
-					"database_id": "4fdc5af5-10a0-4aca-9e5f-54db71066fbd",
-				},
 			],
 			"r2_buckets": [
 				{
 					"binding": "MEDIA",
 					"bucket_name": "engaged-philosophy-media",
-				},
-				{
-					"bucket_name": "engaged-philosophy-media",
-					"binding": "engaged_philosophy_media",
 				},
 			],
 		},
