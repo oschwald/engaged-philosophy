@@ -311,7 +311,10 @@ export async function startWorkerServer(
 		{
 			cwd: ROOT,
 			detached: true,
-			env: childProcessEnv(),
+			env: childProcessEnv({
+				X_LOCAL_EXPLORER: "false",
+				X_LOCAL_OBSERVABILITY: "false",
+			}),
 			stdio: ["ignore", "pipe", "pipe"],
 		},
 	);
