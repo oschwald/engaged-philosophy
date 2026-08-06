@@ -28,10 +28,23 @@ test("opens AI search without replacing conventional search", async ({
 		}
 	});
 	await publicPage.route("**/api/ai-search/search", async (route) => {
-		expect(route.request().postDataJSON()).toMatchObject({
-			messages: [{ role: "user", content: "community partnerships" }],
+		const requestBody = route.request().postDataJSON();
+		expect(requestBody).toMatchObject({
 			ai_search_options: { retrieval: { max_num_results: 8 } },
 		});
+
+		if (requestBody.messages[0].content === "unavailable") {
+			await route.fulfill({
+				status: 503,
+				contentType: "application/json",
+				body: JSON.stringify({ success: false }),
+			});
+			return;
+		}
+
+		expect(requestBody.messages).toEqual([
+			{ role: "user", content: "community partnerships" },
+		]);
 		await route.fulfill({
 			contentType: "application/json",
 			body: JSON.stringify({
@@ -93,6 +106,13 @@ test("opens AI search without replacing conventional search", async ({
 		"Enter at least two characters to search.",
 	);
 	await expect(modal.locator("[data-ai-search-results] li")).toHaveCount(0);
+	await searchInput.fill("unavailable");
+	await expect(modal.getByRole("status")).toHaveText(
+		"AI search is temporarily unavailable. Try conventional search instead.",
+	);
+	await expect(
+		modal.getByRole("link", { name: "Use conventional search" }),
+	).toHaveAttribute("href", "/?s=unavailable");
 	await modal.getByRole("button", { name: "Close AI search" }).click();
 
 	await publicPage.setViewportSize({ width: 390, height: 844 });
