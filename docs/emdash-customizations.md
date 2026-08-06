@@ -25,9 +25,10 @@ Cloudflare constraints.
   varies on `Cookie` so a cached anonymous response cannot hide that bypass.
 - Page cache tags describe the content entry, collection lists, site settings,
   primary menu, and taxonomy data actually rendered. EmDash already invalidates
-  entry and collection tags. Site middleware adds settings, primary-menu, and
-  taxonomy invalidation, batching every affected tag into one purge request.
-  This keeps the additional purge load small on Workers Free.
+  entry and collection tags, and EmDash 0.32 avoids purging them for draft-only
+  revision saves that cannot change public HTML. Site middleware adds settings,
+  primary-menu, and taxonomy invalidation, batching every affected tag into one
+  purge request. This keeps the additional purge load small on Workers Free.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
   controls wait for pending inline saves. EmDash 0.31 flushes edits when the
   browser navigates away, but its toolbar can still publish before a Portable
@@ -64,10 +65,10 @@ consuming the smaller KV write budget or requiring a paid service.
 - Search uses EmDash full-text search, then batch-hydrates only the entries on
   the current result page. Archives use database limit/offset queries, and
   exhaustive jobs such as the sitemap walk collection cursors.
-- EmDash 0.31.1 avoids computing taxonomy usage counts during ordinary layout
-  prefetches. The project index still requests counts intentionally for its
-  topic cloud; other public pages no longer pay for the assignment-table
-  aggregate, which reduces D1 rows read on Workers Free.
+- EmDash avoids computing taxonomy usage counts during ordinary layout and
+  editor prefetches. The project index still requests counts intentionally for
+  its topic cloud; EmDash 0.32 drives that aggregate from the taxonomy pivot to
+  avoid near-quadratic D1 row reads as the site grows.
 - Projects declare EmDash's native `/project/{slug}` collection URL pattern
   instead of persisting an identical imported `path` field. EmDash can
   therefore generate project references and automatic redirects after slug
