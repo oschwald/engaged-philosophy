@@ -360,7 +360,7 @@ export async function createAndPublishContentViaAdmin(
 	);
 	await page
 		.getByRole("button", {
-			name: `Publish ${SINGULAR_LABEL[collection]}`,
+			name: "Publish",
 			exact: true,
 		})
 		.first()

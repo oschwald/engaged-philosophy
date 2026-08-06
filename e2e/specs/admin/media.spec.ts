@@ -31,7 +31,7 @@ test.describe("admin media library", () => {
 			const url = new URL(response.url());
 			return (
 				response.request().method() === "POST" &&
-				url.pathname === "/_emdash/api/media"
+				/^\/_emdash\/api\/media\/[^/]+\/confirm$/.test(url.pathname)
 			);
 		});
 		await page.getByLabel("Upload files").setInputFiles({

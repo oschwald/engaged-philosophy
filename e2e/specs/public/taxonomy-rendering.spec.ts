@@ -138,6 +138,18 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 			termList.getByRole("link", { name: "E2E Topic Two" }),
 		).toHaveAttribute("href", "/topic/e2e-topic-two/");
 
+		await publicPage.goto("/project/", {
+			waitUntil: "domcontentloaded",
+		});
+		await expect(
+			publicPage.getByRole("heading", { name: "Civic Engagement Projects" }),
+		).toBeVisible();
+		const topicLinks = publicPage.locator(".tag-cloud-projects .tag-link");
+		await expect(topicLinks.first()).toBeVisible();
+		expect(await topicLinks.count()).toBeGreaterThan(0);
+		await expect(topicLinks.first()).toHaveAttribute("href", /^\/topic\//);
+		await expect(topicLinks.first()).toHaveClass(/tag-link-size-\d+/);
+
 		await publicPage.goto("/topic/e2e-topic-one/", {
 			waitUntil: "domcontentloaded",
 		});

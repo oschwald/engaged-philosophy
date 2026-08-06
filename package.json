@@ -4,10 +4,10 @@
 	"private": true,
 	"type": "module",
 	"description": "Engaged Philosophy migrated to Astro + EmDash on Cloudflare Workers",
-	"packageManager": "pnpm@11.17.0",
+	"packageManager": "pnpm@11.20.0",
 	"engines": {
-		"node": "24.18.1",
-		"pnpm": "11.17.0"
+		"node": "24.19.0",
+		"pnpm": "11.20.0"
 	},
 	"scripts": {
 		"dev": "astro dev",
@@ -43,20 +43,20 @@
 		"typecheck:tests": "tsc --noEmit -p tsconfig.test.json"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "^14.1.5",
-		"@astrojs/react": "^6.0.1",
+		"@astrojs/cloudflare": "^14.1.7",
+		"@astrojs/react": "^6.0.2",
 		"@astrojs/rss": "^4.0.19",
 		"@date-fns/tz": "^1.5.0",
-		"@emdash-cms/auth": "^0.31.1",
-		"@emdash-cms/cloudflare": "^0.31.1",
+		"@emdash-cms/auth": "^0.32.0",
+		"@emdash-cms/cloudflare": "^0.32.0",
 		"@emdash-cms/plugin-audit-log": "^0.2.0",
-		"@emdash-cms/plugin-embeds": "^0.1.39",
-		"astro": "^7.1.4",
+		"@emdash-cms/plugin-embeds": "^0.1.40",
+		"astro": "^7.1.6",
 		"bootstrap": "^5.3.8",
 		"bootstrap-icons": "1.13.1",
 		"date-fns": "^4.4.0",
-		"emdash": "^0.31.1",
-		"jose": "^6.2.4",
+		"emdash": "^0.32.0",
+		"jose": "^6.2.8",
 		"kysely": "^0.29.4",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
@@ -64,21 +64,21 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
-		"@cloudflare/workers-types": "^5.20260728.1",
-		"@playwright/test": "^1.62.0",
+		"@cloudflare/workers-types": "^5.20260804.1",
+		"@playwright/test": "^1.62.1",
 		"@types/node": "^26.1.2",
-		"@typescript-eslint/eslint-plugin": "^8.65.0",
-		"@typescript-eslint/parser": "^8.65.0",
+		"@typescript-eslint/eslint-plugin": "^8.66.0",
+		"@typescript-eslint/parser": "^8.66.0",
 		"eslint": "^10.8.0",
-		"eslint-plugin-astro": "^3.0.1",
-		"playwright": "^1.62.0",
+		"eslint-plugin-astro": "^3.1.0",
+		"playwright": "^1.62.1",
 		"prettier": "^3.9.6",
 		"prettier-plugin-astro": "^0.14.1",
 		"stylelint": "^17.14.1",
 		"stylelint-config-standard-scss": "^17.0.0",
 		"typescript": "^6.0.3",
-		"vite": "^8.1.5",
+		"vite": "^8.2.0",
 		"vitest": "^4.1.10",
-		"wrangler": "^4.114.0"
+		"wrangler": "^4.119.0"
 	}
 }
