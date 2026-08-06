@@ -162,10 +162,30 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   without Dynamic Worker loaders on the current Cloudflare plan.
 - The upstream embeds plugin registers and renders the enabled YouTube and Vimeo
   blocks directly.
+- The upstream Cloudflare AI Search plugin owns the `engaged-philosophy`
+  instance, initial and incremental indexing, admin controls, result URL
+  generation, and the public search endpoint. The public pilot keeps the
+  conventional EmDash full-text search available and adds only a small
+  CSP-compatible dialog. EmDash's provided snippet currently injects inline
+  styles that the site's public Content Security Policy rejects.
 - `src/plugins/legacy-content-blocks.ts` preserves edit controls for imported
   WordPress-only Portable Text blocks such as playlist videos, remaining legacy
   embeds, and page lists. Its registered plugin ID remains
   `legacy-image-blocks` for compatibility with existing plugin state.
+
+### AI Search pilot setup
+
+After deploying a preview for the first time, open **Plugins -> Cloudflare AI
+Search**, select `pages`, `posts`, and `projects`, and choose **Sync All
+Content**. The plugin indexes later content changes automatically. Preview and
+production use the same named instance in the account's `default` namespace,
+so a preview sync does not need to be repeated after promotion.
+
+Cloudflare AI Search is currently free during its open beta. Workers Free
+allows 20,000 queries per month and 100,000 files per instance; the conventional
+search remains available if AI Search is unavailable or reaches a limit. See
+Cloudflare's [AI Search limits and pricing](https://developers.cloudflare.com/ai-search/platform/limits-pricing/)
+for the current limits.
 
 ## Build Compatibility
 
