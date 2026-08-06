@@ -95,6 +95,7 @@ const child = spawn(
 		env: {
 			...process.env,
 			ASTRO_DEV_BACKGROUND: "1",
+			CLOUDFLARE_VITE_FORCE_LOCAL: "true",
 			EMDASH_TYPES_CHECK_STATE: statePath,
 		},
 		stdio: ["ignore", "pipe", "pipe"],
