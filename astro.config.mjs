@@ -1,6 +1,7 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
 import { d1, r2 } from "@emdash-cms/cloudflare";
+import { aiSearch } from "@emdash-cms/cloudflare/plugins";
 import auditLogPlugin from "@emdash-cms/plugin-audit-log";
 import { embedsPlugin } from "@emdash-cms/plugin-embeds";
 import { defineConfig } from "astro/config";
@@ -55,6 +56,14 @@ function localEmDashRoutes() {
 export const emdashPlugins = [
 	auditLogPlugin,
 	embedsPlugin({ types: ["youtube", "vimeo"] }),
+	aiSearch({
+		instanceName: "engaged-philosophy",
+		urlTemplates: {
+			pages: "/pages/{slug}",
+			posts: "/posts/{slug}",
+			projects: "/project/{slug}",
+		},
+	}),
 	{
 		id: "legacy-image-blocks",
 		version: "0.1.0",

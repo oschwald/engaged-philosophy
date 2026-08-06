@@ -55,6 +55,12 @@
 			"bucket_name": "engaged-philosophy-media",
 		},
 	],
+	"ai_search_namespaces": [
+		{
+			"binding": "AI_SEARCH",
+			"namespace": "default",
+		},
+	],
 	"env": {
 		"production": {
 			"name": "engaged-philosophy",
@@ -75,6 +81,12 @@
 				{
 					"binding": "MEDIA",
 					"bucket_name": "engaged-philosophy-media",
+				},
+			],
+			"ai_search_namespaces": [
+				{
+					"binding": "AI_SEARCH",
+					"namespace": "default",
 				},
 			],
 		},

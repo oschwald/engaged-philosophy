@@ -55,4 +55,21 @@ describe("EmDash plugin registration", () => {
 			capabilities: ["content:read"],
 		});
 	});
+
+	test("registers AI Search with compatibility result routes", () => {
+		const plugin = emdashPlugins.find(({ id }) => id === "ai-search");
+
+		expect(plugin).toMatchObject({
+			entrypoint: "@emdash-cms/cloudflare/plugins/ai-search",
+			capabilities: ["read:content"],
+			options: {
+				instanceName: "engaged-philosophy",
+				urlTemplates: {
+					pages: "/pages/{slug}",
+					posts: "/posts/{slug}",
+					projects: "/project/{slug}",
+				},
+			},
+		});
+	});
 });
