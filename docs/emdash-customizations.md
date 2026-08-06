@@ -175,11 +175,15 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ### AI Search pilot setup
 
-After deploying a preview for the first time, open **Plugins -> Cloudflare AI
-Search**, select `pages`, `posts`, and `projects`, and choose **Sync All
-Content**. The plugin indexes later content changes automatically. Preview and
-production use the same named instance in the account's `default` namespace,
-so a preview sync does not need to be repeated after promotion.
+Open **Plugins -> Cloudflare AI Search**, select `pages`, `posts`, and
+`projects`, and choose **Sync All Content**. The plugin indexes later content
+changes automatically. Cloudflare branch previews do not receive Cron Trigger
+events, so an initial sync started from a preview remains queued unless a
+maintainer manually runs that branch's scheduled handler against its remote D1
+and AI Search bindings. The production deployment processes the job normally.
+Preview and production use the same named instance in the account's `default`
+namespace, so a completed preview sync does not need to be repeated after
+promotion.
 
 Cloudflare AI Search is currently free during its open beta. Workers Free
 allows 20,000 queries per month and 100,000 files per instance; the conventional
