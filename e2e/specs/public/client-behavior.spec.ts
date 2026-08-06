@@ -47,6 +47,12 @@ test("opens AI search without replacing conventional search", async ({
 								},
 							},
 						},
+						{
+							item: {
+								key: "https://example.com/not-a-site-result",
+								metadata: { title: "External result" },
+							},
+						},
 					],
 				},
 			}),
@@ -81,6 +87,13 @@ test("opens AI search without replacing conventional search", async ({
 	expect(contentSecurityPolicyErrors).toEqual(
 		baselineContentSecurityPolicyErrors,
 	);
+	await publicPage.getByRole("button", { name: "AI search" }).click();
+	await expect(searchInput).toHaveValue("");
+	await expect(modal.getByRole("status")).toHaveText(
+		"Enter at least two characters to search.",
+	);
+	await expect(modal.locator("[data-ai-search-results] li")).toHaveCount(0);
+	await modal.getByRole("button", { name: "Close AI search" }).click();
 
 	await publicPage.setViewportSize({ width: 390, height: 844 });
 	await publicPage.getByRole("button", { name: "Toggle navigation" }).click();

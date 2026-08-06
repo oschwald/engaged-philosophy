@@ -39,6 +39,7 @@ function resultUrl(value: string): URL | null {
 
 function renderResults(container: HTMLOListElement, chunks: AISearchChunk[]) {
 	container.replaceChildren();
+	let renderedCount = 0;
 
 	for (const chunk of chunks) {
 		const url = resultUrl(chunk.item.key);
@@ -60,7 +61,10 @@ function renderResults(container: HTMLOListElement, chunks: AISearchChunk[]) {
 		link.appendChild(path);
 		item.appendChild(link);
 		container.appendChild(item);
+		renderedCount += 1;
 	}
+
+	return renderedCount;
 }
 
 function initializeAISearch(dialog: HTMLDialogElement) {
@@ -100,7 +104,8 @@ function initializeAISearch(dialog: HTMLDialogElement) {
 	}
 
 	async function search(query: string) {
-		activeRequest = new AbortController();
+		const controller = new AbortController();
+		activeRequest = controller;
 		status.textContent = "Searching...";
 		results.replaceChildren();
 
@@ -114,21 +119,29 @@ function initializeAISearch(dialog: HTMLDialogElement) {
 						retrieval: { max_num_results: SEARCH_RESULT_LIMIT },
 					},
 				}),
-				signal: activeRequest.signal,
+				signal: controller.signal,
 			});
 			const body = (await response.json()) as AISearchResponse;
 			if (!response.ok || !body.success) throw new Error("AI search failed");
+			if (activeRequest !== controller) return;
 
 			const chunks = body.result?.chunks ?? [];
-			renderResults(results, chunks);
+			const renderedCount = renderResults(results, chunks);
 			status.textContent =
-				chunks.length === 0
+				renderedCount === 0
 					? "No related content found."
-					: `${chunks.length} related result${chunks.length === 1 ? "" : "s"}.`;
+					: `${renderedCount} related result${renderedCount === 1 ? "" : "s"}.`;
 		} catch (error) {
-			if (error instanceof DOMException && error.name === "AbortError") return;
+			if (
+				activeRequest !== controller ||
+				(error instanceof DOMException && error.name === "AbortError")
+			) {
+				return;
+			}
 			status.textContent =
 				"AI search is temporarily unavailable. Try conventional search instead.";
+		} finally {
+			if (activeRequest === controller) activeRequest = undefined;
 		}
 	}
 
@@ -151,7 +164,13 @@ function initializeAISearch(dialog: HTMLDialogElement) {
 		debounce = window.setTimeout(() => void search(query), SEARCH_DEBOUNCE_MS);
 	});
 
-	dialog.addEventListener("close", resetRequest);
+	dialog.addEventListener("close", () => {
+		resetRequest();
+		input.value = "";
+		fallback.href = "/";
+		results.replaceChildren();
+		status.textContent = "Enter at least two characters to search.";
+	});
 }
 
 document
