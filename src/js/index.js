@@ -6,4 +6,5 @@ import "bootstrap/js/dist/dropdown";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 // Import custom JavaScript modules
+import "./ai-search-dialog";
 import "./emdash-save-gate.js";
