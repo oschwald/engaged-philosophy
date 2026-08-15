@@ -17,7 +17,9 @@ Cloudflare constraints.
 - Astro's Cloudflare route-cache provider caches public HTML and generated site
   metadata in Workers Cache. `src/lib/cloudflare-cache-provider.ts` delegates
   header generation to the upstream provider and only skips tag purges when
-  local Wrangler does not expose `cache.purge()`.
+  local Wrangler does not expose `cache.purge()`. This is the native Workers
+  Caching path recommended by EmDash 0.33; the deprecated EmDash
+  `cloudflareCache()` provider is not used here.
 - Public responses are fresh at the edge for one day and may be served stale
   for one hour while they revalidate. Browsers receive `max-age=0` and
   revalidate instead of retaining HTML or generated metadata independently.
@@ -69,6 +71,9 @@ consuming the smaller KV write budget or requiring a paid service.
   editor prefetches. The project index still requests counts intentionally for
   its topic cloud; EmDash 0.32 drives that aggregate from the taxonomy pivot to
   avoid near-quadratic D1 row reads as the site grows.
+- EmDash 0.33 persists manual taxonomy ordering. The upgrade migration keeps
+  the existing English term order, and editors can reorder terms afterwards.
+  The project topic cloud still applies its deliberate daily shuffle.
 - Projects declare EmDash's native `/project/{slug}` collection URL pattern
   instead of persisting an identical imported `path` field. EmDash can
   therefore generate project references and automatic redirects after slug
@@ -105,8 +110,10 @@ consuming the smaller KV write budget or requiring a paid service.
   policy intentionally rejects inline styles. This avoids both Worker media
   proxy requests and Cloudflare image transformations on the Free plan.
 - Imported numbered headings use EmDash's native Portable Text list and heading
-  rendering. A CSS counter preserves interview numbering across the answer
-  blocks between headings without changing ordinary ordered lists.
+  rendering. Their imported segments share one stable EmDash 0.33 `listId` and
+  base, so EmDash emits semantic continuation starts across intervening answers.
+  The remaining CSS only removes the heading's extra bottom margin; it does not
+  implement numbering.
 - Archive and search excerpts use EmDash's Portable Text plain-text extractor
   for standard blocks. The site adapter only preserves the imported image-alt
   and gallery-caption fallback behavior that EmDash cannot infer from the
@@ -159,7 +166,9 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 - The upstream audit-log descriptor is registered directly. EmDash adapts its
   standard-format entrypoint for trusted in-process execution, so it works
-  without Dynamic Worker loaders on the current Cloudflare plan.
+  without Dynamic Worker loaders on the current Cloudflare plan. EmDash 0.33
+  also materializes the plugin's storage index instead of scanning the audit
+  table for dashboard queries.
 - The upstream embeds plugin registers and renders the enabled YouTube and Vimeo
   blocks directly.
 - `src/plugins/legacy-content-blocks.ts` preserves edit controls for imported
@@ -174,13 +183,19 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 - `wrangler.jsonc` enables Workers Cache with per-deployment version isolation
   and enables Cloudflare logs/traces. A deployment starts with a cold route
   cache; stale entries are not reused across Worker versions.
+- EmDash currently resolves `image-size` 2.0.2, whose ICNS, HEIF, and JXL
+  parsers have published infinite-loop advisories without an upstream patched
+  release. `patches/image-size@2.0.2.patch` rejects zero-length entries and
+  boxes; its unit test runs each malformed parser input in a timeout-isolated
+  process. Remove the patch when EmDash resolves a fixed upstream release.
 
 ## Removal Candidates
 
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   waits for Portable Text saves before publishing or leaving edit mode.
 - Remove the local cache-provider wrapper when Wrangler exposes
-  `cache.purge()` for its local Workers Cache implementation.
+  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.123
+  still lacks it locally.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a
   Cloudflare Email Sending plugin, but that only handles email delivery; this
