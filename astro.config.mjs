@@ -52,8 +52,13 @@ function localEmDashRoutes() {
 	};
 }
 
+export const configuredAuditLogPlugin = {
+	...auditLogPlugin,
+	capabilities: ["content:read", "content:write", "media:read"],
+};
+
 export const emdashPlugins = [
-	auditLogPlugin,
+	configuredAuditLogPlugin,
 	embedsPlugin({ types: ["youtube", "vimeo"] }),
 	{
 		id: "legacy-image-blocks",
