@@ -510,7 +510,9 @@ test.describe("public migrated content rendering", () => {
 			text: string,
 			options: {
 				style?: string;
+				listId?: string;
 				listItem?: "number";
+				listStart?: number;
 			} = {},
 		) => ({
 			_type: "block",
@@ -520,6 +522,8 @@ test.describe("public migrated content rendering", () => {
 				? {
 						listItem: options.listItem,
 						level: 1,
+						...(options.listId ? { listId: options.listId } : {}),
+						...(options.listStart ? { listStart: options.listStart } : {}),
 					}
 				: {}),
 			markDefs: [],
@@ -543,12 +547,16 @@ test.describe("public migrated content rendering", () => {
 					content: [
 						textBlock("question-one", "First imported question", {
 							style: "h4",
+							listId: "e2e-numbered-headings",
 							listItem: "number",
+							listStart: 1,
 						}),
 						textBlock("answer", bodyText),
 						textBlock("question-two", "Second imported question", {
 							style: "h4",
+							listId: "e2e-numbered-headings",
 							listItem: "number",
+							listStart: 1,
 						}),
 						textBlock("list-separator", "Ordinary ordered list follows."),
 						textBlock("list-one", "Ordinary first item", {
@@ -574,6 +582,13 @@ test.describe("public migrated content rendering", () => {
 
 		const headingItems = headings.locator("xpath=..");
 		await expect(headingItems).toHaveCount(2);
+		const headingLists = headingItems.locator("xpath=..");
+		await expect(headingLists).toHaveCount(2);
+		expect(
+			await headingLists.evaluateAll((lists) =>
+				lists.map((list) => (list as HTMLOListElement).start),
+			),
+		).toEqual([1, 2]);
 		for (const headingItem of await headingItems.all()) {
 			await expect(headingItem).toHaveJSProperty("tagName", "LI");
 			await expect(
@@ -587,15 +602,13 @@ test.describe("public migrated content rendering", () => {
 						headingMarginBottom: heading
 							? getComputedStyle(heading).marginBottom
 							: null,
-						markerContent: getComputedStyle(item, "::marker").content,
 					};
 				}),
 			).resolves.toEqual({
-				counterIncrement: "imported-numbered-heading 1",
+				counterIncrement: "none",
 				listTag: "OL",
 				listPaddingLeft: "24px",
 				headingMarginBottom: "0px",
-				markerContent: 'counter(imported-numbered-heading) ". "',
 			});
 		}
 
