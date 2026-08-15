@@ -1,8 +1,13 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import auditLogPlugin from "@emdash-cms/plugin-audit-log";
+import auditLogDefinition from "@emdash-cms/plugin-audit-log/sandbox";
+import { adaptSandboxEntry, HookPipeline } from "emdash";
 
-import { emdashPlugins } from "../../../astro.config.mjs";
+import {
+	configuredAuditLogPlugin,
+	emdashPlugins,
+} from "../../../astro.config.mjs";
 
 import { createPlugin as createLegacyContentPlugin } from "../../../src/plugins/legacy-content-blocks";
 
@@ -45,14 +50,30 @@ describe("EmDash plugin registration", () => {
 		});
 	});
 
-	test("registers the standard audit log plugin directly", () => {
-		const plugin = emdashPlugins.find(({ id }) => id === "audit-log");
+	test("grants the capabilities required by the audit log hooks", () => {
+		const plugin = configuredAuditLogPlugin;
 
-		expect(plugin).toBe(auditLogPlugin);
+		expect(emdashPlugins).toContain(plugin);
+		expect(plugin).not.toBe(auditLogPlugin);
 		expect(plugin).toMatchObject({
 			format: "standard",
 			entrypoint: "@emdash-cms/plugin-audit-log/sandbox",
-			capabilities: ["content:read"],
+			capabilities: ["content:read", "content:write", "media:read"],
 		});
+
+		const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+		try {
+			const resolved = adaptSandboxEntry(auditLogDefinition, plugin);
+			const hooks = new HookPipeline([resolved]).getRegisteredHooks();
+
+			expect(hooks).toEqual(
+				expect.arrayContaining(["content:beforeSave", "media:afterUpload"]),
+			);
+			expect(warn).not.toHaveBeenCalledWith(
+				expect.stringContaining('Plugin "audit-log" declares'),
+			);
+		} finally {
+			warn.mockRestore();
+		}
 	});
 });

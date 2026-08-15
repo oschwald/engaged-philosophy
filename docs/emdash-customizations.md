@@ -164,11 +164,13 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Plugins
 
-- The upstream audit-log descriptor is registered directly. EmDash adapts its
-  standard-format entrypoint for trusted in-process execution, so it works
-  without Dynamic Worker loaders on the current Cloudflare plan. EmDash 0.33
-  also materializes the plugin's storage index instead of scanning the audit
-  table for dashboard queries.
+- The upstream audit-log descriptor runs through EmDash's standard-format
+  adapter for trusted in-process execution, so it works without Dynamic Worker
+  loaders on the current Cloudflare plan. Audit-log 0.2.0 under-declares the
+  capabilities required by its hooks, so `astro.config.mjs` adds
+  `content:write` and `media:read`; otherwise EmDash skips the before-save
+  snapshot and media-upload hooks. EmDash 0.33 also materializes the plugin's
+  storage index instead of scanning the audit table for dashboard queries.
 - The upstream embeds plugin registers and renders the enabled YouTube and Vimeo
   blocks directly.
 - `src/plugins/legacy-content-blocks.ts` preserves edit controls for imported
@@ -191,6 +193,13 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Removal Candidates
 
+- Remove the audit-log capability override when a published
+  `@emdash-cms/plugin-audit-log` descriptor includes both `content:write` and
+  `media:read` (the fix tracked by
+  [EmDash #1263](https://github.com/emdash-cms/emdash/issues/1263) and
+  [PR #1897](https://github.com/emdash-cms/emdash/pull/1897)). Restore direct
+  descriptor registration and keep the hook-registration test to confirm
+  EmDash no longer skips either hook.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   waits for Portable Text saves before publishing or leaving edit mode.
 - Remove the local cache-provider wrapper when Wrangler exposes
