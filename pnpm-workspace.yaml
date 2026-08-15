@@ -8,41 +8,46 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - "@playwright/test@1.62.1"
   - playwright@1.62.1
-  - sass@1.101.7
+  - sass@1.102.0
   - vitest@4.1.10
-  - "@astrojs/cloudflare@14.1.7"
+  - "@astrojs/cloudflare@14.2.1"
   - "@astrojs/react@6.0.2"
-  - "@emdash-cms/admin@0.32.0"
-  - "@emdash-cms/auth@0.32.0"
-  - "@emdash-cms/blocks@0.32.0"
-  - "@emdash-cms/cloudflare@0.32.0"
-  - "@emdash-cms/gutenberg-to-portable-text@0.32.0"
-  - "@emdash-cms/plugin-embeds@0.1.40"
+  - "@emdash-cms/admin@0.33.0"
+  - "@emdash-cms/auth@0.33.0"
+  - "@emdash-cms/blocks@0.33.0"
+  - "@emdash-cms/cloudflare@0.33.0"
+  - "@emdash-cms/gutenberg-to-portable-text@0.33.0"
+  - "@emdash-cms/plugin-embeds@0.1.41"
   - "@emdash-cms/plugin-types@0.3.0"
   - "@emdash-cms/registry-client@0.3.4"
   - "@emdash-cms/registry-lexicons@0.3.0"
-  - astro@7.1.6
-  - emdash@0.32.0
+  - astro@7.2.2
+  - emdash@0.33.0
   - jose@6.2.8
-  - "@cloudflare/workers-types@5.20260804.1"
-  - "@typescript-eslint/eslint-plugin@8.66.0"
-  - "@typescript-eslint/parser@8.66.0"
-  - "@typescript-eslint/project-service@8.66.0"
-  - "@typescript-eslint/scope-manager@8.66.0"
-  - "@typescript-eslint/tsconfig-utils@8.66.0"
-  - "@typescript-eslint/type-utils@8.66.0"
-  - "@typescript-eslint/types@8.66.0"
-  - "@typescript-eslint/typescript-estree@8.66.0"
-  - "@typescript-eslint/utils@8.66.0"
-  - "@typescript-eslint/visitor-keys@8.66.0"
+  - "@cloudflare/workers-types@5.20260814.1"
+  - "@typescript-eslint/eslint-plugin@8.67.0"
+  - "@typescript-eslint/parser@8.67.0"
+  - "@typescript-eslint/project-service@8.67.0"
+  - "@typescript-eslint/scope-manager@8.67.0"
+  - "@typescript-eslint/tsconfig-utils@8.67.0"
+  - "@typescript-eslint/type-utils@8.67.0"
+  - "@typescript-eslint/types@8.67.0"
+  - "@typescript-eslint/typescript-estree@8.67.0"
+  - "@typescript-eslint/utils@8.67.0"
+  - "@typescript-eslint/visitor-keys@8.67.0"
   - eslint-plugin-astro@3.1.0
-  - vite@8.2.0
-  - wrangler@4.119.0
+  - vite@8.2.1
+  - wrangler@4.123.0
   - prettier@3.9.6
-  - miniflare@5.20260801.0-alpha
+  - miniflare@5.20260811.1-alpha
+  - nanoid@3.3.18
 
 overrides:
   "@astro-community/astro-embed-integration>astro-auto-import": ^0.5.1
   "@bruits/satteri-wasm32-wasi>@napi-rs/wasm-runtime": 1.1.6
+  "nanoid@<3.3.18": 3.3.18
   undici: 7.29.0
   yaml-language-server>yaml: ^2.8.3
+
+patchedDependencies:
+  image-size@2.0.2: patches/image-size@2.0.2.patch
