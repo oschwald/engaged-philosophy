@@ -37,7 +37,8 @@
 					"slug": "path",
 					"label": "Path",
 					"type": "string",
-					"unique": true
+					"unique": true,
+					"indexed": true
 				},
 				{
 					"slug": "content",
@@ -108,7 +109,8 @@
 					"slug": "path",
 					"label": "Path",
 					"type": "string",
-					"unique": true
+					"unique": true,
+					"indexed": true
 				},
 				{
 					"slug": "excerpt",
@@ -135,6 +137,9 @@
 			"slug": "projects",
 			"label": "Projects",
 			"labelSingular": "Project",
+			"admin": {
+				"listColumns": ["highlight", "menu_order"]
+			},
 			"supports": ["drafts", "revisions", "search"],
 			"urlPattern": "/project/{slug}",
 			"fields": [
@@ -168,12 +173,14 @@
 					"slug": "highlight",
 					"label": "Highlight",
 					"type": "boolean",
+					"indexed": true,
 					"defaultValue": false
 				},
 				{
 					"slug": "menu_order",
 					"label": "Menu Order",
 					"type": "integer",
+					"indexed": true,
 					"defaultValue": 0
 				}
 			]

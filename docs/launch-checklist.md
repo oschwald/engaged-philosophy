@@ -9,7 +9,10 @@ do not reimport from WordPress.
    - `pnpm run ci`
 2. Deploy the Worker:
    - `pnpm run deploy`
-3. Run deployed smoke checks against the canonical hostname:
+3. After the first EmDash 0.34 deploy, verify that the admin dashboard reports a
+   healthy scheduler heartbeat and that Media Usage reconciliation is making
+   progress.
+4. Run deployed smoke checks against the canonical hostname:
    - `LIVE_BASE_URL=https://www.engagedphilosophy.com pnpm run smoke:live`
    - `LIVE_BASE_URL=https://www.engagedphilosophy.com pnpm run smoke:live:sitemap`
 
@@ -18,46 +21,23 @@ Use `LIVE_SMOKE_PATH_FILE` with `pnpm run smoke:live` for one-off path lists.
 ## Post-Migration Maintenance
 
 After a direct content migration or bulk content rewrite that bypasses the
-EmDash content API, authenticate through Cloudflare Access and rebuild
-EmDash's media usage index:
+EmDash content API, monitor Media Usage in the admin until EmDash 0.34's
+scheduled reconciliation reports complete coverage. The dedicated
+`*/2 * * * *` Cron Trigger processes this work in bounded, resumable batches;
+the dashboard reports missing scheduler wiring or stalled maintenance.
 
-```sh
-cloudflared access login https://www.engagedphilosophy.com/_emdash/
-emdash_access_jwt="$(
-  cloudflared access token \
-    --app https://www.engagedphilosophy.com/_emdash/
-)"
-export EMDASH_HEADERS="Cf-Access-Token: ${emdash_access_jwt}"
-pnpm exec emdash media repair-usage --all \
-  --url https://www.engagedphilosophy.com \
-  --json
-unset EMDASH_HEADERS emdash_access_jwt
-```
+The explicit `emdash media repair-usage` command is now a recovery tool rather
+than a routine post-migration step. Use it only when automatic reconciliation
+reports failed work that cannot be retried from the admin.
 
-This site's Cloudflare Access authenticator does not expose EmDash OAuth Device
-Flow, so `emdash login` cannot create a stored CLI session.
+## EmDash 0.34 Schema Follow-up
 
-For noninteractive use with an approved Access service token, read the
-credentials without echoing or placing them in shell history, then provide the
-two standard headers through EmDash's environment variable:
-
-```sh
-read -r -p "Cloudflare Access client ID: " emdash_access_client_id
-read -r -s -p "Cloudflare Access client secret: " emdash_access_client_secret
-printf "\n"
-export EMDASH_HEADERS="$(
-  printf "CF-Access-Client-Id: %s\nCF-Access-Client-Secret: %s" \
-    "${emdash_access_client_id}" \
-    "${emdash_access_client_secret}"
-)"
-# Run the same pnpm exec emdash media repair-usage command shown above.
-unset EMDASH_HEADERS emdash_access_client_id emdash_access_client_secret
-```
-
-Treat the repair as successful only when the JSON result reports
-`"status": "complete"`, every collection is complete, and
-`failedSourceCount` is zero. Rerun the repair after any later migration that
-changes media references.
+The checked-in seed enables indexes for the page and post `path` fields and the
+project `highlight` and `menu_order` fields, and shows the two project fields as
+admin list columns. A seed initializes fresh databases only. After deploying
+0.34 to the existing site, apply those same settings once under **Content
+Types**; the public queries remain compatible while this metadata is being
+updated.
 
 ## Post-Launch State
 

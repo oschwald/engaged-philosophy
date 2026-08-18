@@ -4,10 +4,10 @@
 	"private": true,
 	"type": "module",
 	"description": "Engaged Philosophy migrated to Astro + EmDash on Cloudflare Workers",
-	"packageManager": "pnpm@11.21.0",
+	"packageManager": "pnpm@11.22.0",
 	"engines": {
 		"node": "24.19.0",
-		"pnpm": "11.21.0"
+		"pnpm": "11.22.0"
 	},
 	"scripts": {
 		"dev": "astro dev",
@@ -47,16 +47,16 @@
 		"@astrojs/react": "^6.0.2",
 		"@astrojs/rss": "^4.0.19",
 		"@date-fns/tz": "^1.5.0",
-		"@emdash-cms/auth": "^0.33.0",
-		"@emdash-cms/cloudflare": "^0.33.0",
+		"@emdash-cms/auth": "^0.34.0",
+		"@emdash-cms/cloudflare": "^0.34.0",
 		"@emdash-cms/plugin-audit-log": "^0.2.0",
-		"@emdash-cms/plugin-embeds": "^0.1.41",
+		"@emdash-cms/plugin-embeds": "^0.1.42",
 		"astro": "^7.2.2",
 		"bootstrap": "^5.3.8",
 		"bootstrap-icons": "1.13.1",
 		"date-fns": "^4.4.0",
-		"emdash": "^0.33.0",
-		"jose": "^6.2.8",
+		"emdash": "^0.34.0",
+		"jose": "^6.2.9",
 		"kysely": "^0.29.5",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
@@ -64,7 +64,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
-		"@cloudflare/workers-types": "^5.20260814.1",
+		"@cloudflare/workers-types": "^5.20260818.1",
 		"@playwright/test": "^1.62.1",
 		"@types/node": "^26.2.0",
 		"@typescript-eslint/eslint-plugin": "^8.67.0",
@@ -79,6 +79,6 @@
 		"typescript": "^6.0.3",
 		"vite": "^8.2.1",
 		"vitest": "^4.1.10",
-		"wrangler": "^4.123.0"
+		"wrangler": "^4.124.0"
 	}
 }

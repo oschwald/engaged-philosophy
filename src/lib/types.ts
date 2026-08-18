@@ -9,6 +9,10 @@ export type { RichTextValue } from "./rich-text-types";
 export interface MediaField {
 	src?: string;
 	alt?: string;
+	filename?: string;
+	mimeType?: string;
+	blurhash?: string;
+	dominantColor?: string;
 }
 
 export type SiteCollection = "pages" | "posts" | "projects";
