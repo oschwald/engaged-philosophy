@@ -1,0 +1,53 @@
+<button
+	type="button"
+	class="btn btn-outline-secondary text-nowrap"
+	aria-controls="ai-search-dialog"
+	aria-haspopup="dialog"
+	data-ai-search-open
+>
+	<i class="bi bi-stars" aria-hidden="true"></i> AI search
+</button>
+
+<dialog
+	id="ai-search-dialog"
+	class="ai-search-dialog"
+	aria-labelledby="ai-search-title"
+	data-ai-search-dialog
+	data-api-url="/api/ai-search/search"
+>
+	<div class="ai-search-dialog__panel">
+		<header class="ai-search-dialog__header">
+			<div>
+				<h2 id="ai-search-title" class="h4 mb-1">AI search</h2>
+				<p class="mb-0">Find related content by topic or meaning.</p>
+			</div>
+			<form method="dialog">
+				<button type="submit" class="btn-close" aria-label="Close AI search"
+				></button>
+			</form>
+		</header>
+
+		<div class="ai-search-dialog__body">
+			<label for="ai-search-query" class="visually-hidden"
+				>AI search query</label
+			>
+			<input
+				id="ai-search-query"
+				class="form-control form-control-lg"
+				type="search"
+				placeholder="For example: projects about environmental justice"
+				autocomplete="off"
+				maxlength="200"
+				data-ai-search-query
+			/>
+			<p class="ai-search-dialog__status" role="status" data-ai-search-status>
+				Enter at least two characters to search.
+			</p>
+			<ol class="ai-search-dialog__results" data-ai-search-results></ol>
+		</div>
+
+		<footer class="ai-search-dialog__footer">
+			<a href="/" data-ai-search-fallback>Use conventional search</a>
+		</footer>
+	</div>
+</dialog>

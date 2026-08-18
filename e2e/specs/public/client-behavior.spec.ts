@@ -16,6 +16,119 @@ test("links skip navigation only to targets present on every page", async ({
 	await expect(publicPage.locator("#content")).toHaveCount(1);
 });
 
+test("opens AI search without replacing conventional search", async ({
+	publicPage,
+}) => {
+	const contentSecurityPolicyErrors: string[] = [];
+	publicPage.on("console", (message) => {
+		if (message.text().includes("Content Security Policy")) {
+			contentSecurityPolicyErrors.push(
+				`${message.text()} ${JSON.stringify(message.location())}`,
+			);
+		}
+	});
+	await publicPage.route("**/api/ai-search/search", async (route) => {
+		const requestBody = route.request().postDataJSON();
+		expect(requestBody).toMatchObject({
+			ai_search_options: { retrieval: { max_num_results: 8 } },
+		});
+
+		if (requestBody.messages[0].content === "unavailable") {
+			await route.fulfill({
+				status: 503,
+				contentType: "application/json",
+				body: JSON.stringify({ success: false }),
+			});
+			return;
+		}
+
+		expect(requestBody.messages).toEqual([
+			{ role: "user", content: "community partnerships" },
+		]);
+		await route.fulfill({
+			contentType: "application/json",
+			body: JSON.stringify({
+				success: true,
+				result: {
+					chunks: [
+						{
+							item: {
+								key: "/pages/community-engagement",
+								metadata: {
+									title: "Community engagement",
+									description: "Philosophy beyond the classroom.",
+								},
+							},
+						},
+						{
+							item: {
+								key: "https://example.com/not-a-site-result",
+								metadata: { title: "External result" },
+							},
+						},
+					],
+				},
+			}),
+		});
+	});
+
+	const response = await publicPage.goto("/");
+	expect(response?.headers()["content-security-policy"]).toContain(
+		"style-src 'self'",
+	);
+	const baselineContentSecurityPolicyErrors = [...contentSecurityPolicyErrors];
+
+	await expect(publicPage.locator("#searchform")).toBeVisible();
+	const modal = publicPage.locator("[data-ai-search-dialog]");
+	const searchInput = modal.locator("[data-ai-search-query]");
+	await expect(searchInput).toBeHidden();
+	await publicPage.getByRole("button", { name: "AI search" }).click();
+	await expect(searchInput).toBeVisible();
+	await expect(searchInput).toBeFocused();
+
+	await searchInput.fill("community partnerships");
+	await expect(modal.getByRole("status")).toHaveText("1 related result.");
+	await expect(
+		modal.getByRole("link", { name: /Community engagement/ }),
+	).toHaveAttribute("href", "/pages/community-engagement");
+	await expect(
+		modal.getByRole("link", { name: "Use conventional search" }),
+	).toHaveAttribute("href", "/?s=community%20partnerships");
+
+	await modal.getByRole("button", { name: "Close AI search" }).click();
+	await expect(searchInput).toBeHidden();
+	expect(contentSecurityPolicyErrors).toEqual(
+		baselineContentSecurityPolicyErrors,
+	);
+	await publicPage.getByRole("button", { name: "AI search" }).click();
+	await expect(searchInput).toHaveValue("");
+	await expect(modal.getByRole("status")).toHaveText(
+		"Enter at least two characters to search.",
+	);
+	await expect(modal.locator("[data-ai-search-results] li")).toHaveCount(0);
+	await searchInput.fill("unavailable");
+	await expect(modal.getByRole("status")).toHaveText(
+		"AI search is temporarily unavailable. Try conventional search instead.",
+	);
+	await expect(
+		modal.getByRole("link", { name: "Use conventional search" }),
+	).toHaveAttribute("href", "/?s=unavailable");
+	await modal.getByRole("button", { name: "Close AI search" }).click();
+
+	await publicPage.setViewportSize({ width: 390, height: 844 });
+	await publicPage.getByRole("button", { name: "Toggle navigation" }).click();
+	await expect(publicPage.locator("#searchform")).toBeVisible();
+	await publicPage.getByRole("button", { name: "AI search" }).click();
+	await expect(searchInput).toBeVisible();
+
+	const dialogBounds = await modal.boundingBox();
+	expect(dialogBounds).not.toBeNull();
+	expect(dialogBounds!.x).toBeGreaterThanOrEqual(0);
+	expect(dialogBounds!.x + dialogBounds!.width).toBeLessThanOrEqual(390);
+	expect(dialogBounds!.y).toBeGreaterThanOrEqual(0);
+	expect(dialogBounds!.y + dialogBounds!.height).toBeLessThanOrEqual(844);
+});
+
 test("uses Bootstrap data APIs for public theme interactions", async ({
 	authedRequest,
 	publicPage,

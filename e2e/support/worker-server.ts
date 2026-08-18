@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
@@ -62,6 +62,19 @@ function childProcessEnv(extra: NodeJS.ProcessEnv = {}) {
 	delete env.NO_COLOR;
 
 	return env;
+}
+
+function disableRemoteOnlyBindingsForE2E() {
+	const config = JSON.parse(
+		readFileSync(DIST_WRANGLER_CONFIG, "utf8"),
+	) as Record<string, unknown>;
+
+	// Cloudflare does not provide local simulators for AI Search bindings. The
+	// public browser test mocks the managed response, so keep local Worker tests
+	// offline instead of requiring Cloudflare credentials or consuming quota.
+	config.ai_search_namespaces = [];
+	config.ai_search = [];
+	writeFileSync(DIST_WRANGLER_CONFIG, JSON.stringify(config));
 }
 
 function getFreePort() {
@@ -178,6 +191,7 @@ export function buildWorkerForE2E() {
 			"Expected test-auth build to create dist/server/wrangler.json.",
 		);
 	}
+	disableRemoteOnlyBindingsForE2E();
 
 	process.env.EMDASH_E2E_BUILD_READY = "1";
 }

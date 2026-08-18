@@ -1,6 +1,8 @@
 ---
 import type { MenuItem } from "emdash";
 
+import AISearchDialog from "../AISearchDialog.astro";
+
 interface Props {
 	menuItems: MenuItem[];
 	currentPath: string;
@@ -88,31 +90,34 @@ function isCurrentUrl(url: string) {
 					}
 				</ul>
 			</div>
-			<form
-				id="searchform"
-				class="d-flex ms-auto"
-				method="get"
-				action="/"
-				role="search"
-				aria-label="Search the site"
-			>
-				<label for="s" class="visually-hidden">Search</label>
-				<input
-					type="search"
-					class="form-control"
-					name="s"
-					id="s"
-					placeholder="Search"
+			<div class="site-search-controls d-flex flex-wrap gap-2 ms-auto">
+				<form
+					id="searchform"
+					class="d-flex flex-grow-1"
+					method="get"
+					action="/"
+					role="search"
 					aria-label="Search the site"
-				/>
-				<button
-					type="submit"
-					class="btn btn-outline-secondary ms-1"
-					aria-label="Submit search"
 				>
-					<i class="bi bi-search"></i>
-				</button>
-			</form>
+					<label for="s" class="visually-hidden">Search</label>
+					<input
+						type="search"
+						class="form-control"
+						name="s"
+						id="s"
+						placeholder="Search"
+						aria-label="Search the site"
+					/>
+					<button
+						type="submit"
+						class="btn btn-outline-secondary ms-1"
+						aria-label="Submit search"
+					>
+						<i class="bi bi-search"></i>
+					</button>
+				</form>
+				<AISearchDialog />
+			</div>
 		</div>
 	</div>
 </nav>
