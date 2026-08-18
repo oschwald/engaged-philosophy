@@ -8,7 +8,8 @@ import { tmpdir } from "node:os";
 
 const ROOT = fileURLToPath(new URL("../", import.meta.url));
 const TYPES_PATH = resolve(ROOT, "emdash-env.d.ts");
-const TYPEGEN_TIMEOUT_MS = 30_000;
+const TYPEGEN_TIMEOUT_MS = 60_000;
+const TYPEGEN_REQUEST_TIMEOUT_MS = 30_000;
 const require = createRequire(import.meta.url);
 const astroBin = resolve(
 	dirname(require.resolve("astro/package.json")),
@@ -62,7 +63,12 @@ async function fetchGeneratedTypes(port, child, output) {
 
 		try {
 			const response = await fetch(url, {
-				signal: AbortSignal.timeout(1_000),
+				signal: AbortSignal.timeout(
+					Math.max(
+						1,
+						Math.min(TYPEGEN_REQUEST_TIMEOUT_MS, deadline - Date.now()),
+					),
+				),
 			});
 			if (response.ok) return await response.text();
 		} catch {
