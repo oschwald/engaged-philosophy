@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { test, expect } from "../../fixtures/worker";
 import {
 	collectPageErrors,
@@ -5,11 +6,7 @@ import {
 } from "../../support/assertions";
 import { dismissWelcome } from "../../support/content";
 
-function svgBuffer(label: string) {
-	return Buffer.from(
-		`<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"><title>${label}</title><rect width="1" height="1" fill="#4b8f8c"/></svg>`,
-	);
-}
+const UPLOAD_FIXTURE = new URL("../../../public/img/logo.png", import.meta.url);
 
 test.describe("admin media library", () => {
 	test("uploads and finds an image from the media page", async ({
@@ -18,7 +15,7 @@ test.describe("admin media library", () => {
 		const pageErrors = collectPageErrors(page, {
 			ignore: [/status of 501 \(Not Implemented\)/],
 		});
-		const filename = `e2e-upload-${testInfo.workerIndex}-${Date.now()}.svg`;
+		const filename = `e2e-upload-${testInfo.workerIndex}-${Date.now()}.png`;
 
 		await page.goto("/_emdash/admin/media", { waitUntil: "domcontentloaded" });
 		await dismissWelcome(page);
@@ -36,8 +33,8 @@ test.describe("admin media library", () => {
 		});
 		await page.getByLabel("Upload files").setInputFiles({
 			name: filename,
-			mimeType: "image/svg+xml",
-			buffer: svgBuffer(filename),
+			mimeType: "image/png",
+			buffer: await readFile(UPLOAD_FIXTURE),
 		});
 		const uploadResponse = await uploadResponsePromise;
 		expect(

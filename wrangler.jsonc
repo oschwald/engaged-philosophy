@@ -4,7 +4,7 @@
 	"main": "./src/worker.ts",
 	"preview_urls": true,
 	"triggers": {
-		"crons": ["* * * * *"],
+		"crons": ["* * * * *", "*/2 * * * *"],
 	},
 	"routes": [
 		{

@@ -11,9 +11,15 @@ interface CheckedInSeed {
 	};
 	collections?: Array<{
 		slug?: string;
+		admin?: { listColumns?: string[] };
 		supports?: string[];
 		urlPattern?: string;
-		fields?: Array<{ slug?: string; searchable?: boolean; widget?: string }>;
+		fields?: Array<{
+			slug?: string;
+			indexed?: boolean;
+			searchable?: boolean;
+			widget?: string;
+		}>;
 	}>;
 	taxonomies?: Array<{
 		name?: string;
@@ -71,6 +77,31 @@ describe("checked-in EmDash seed", () => {
 
 		expect(projects?.urlPattern).toBe("/project/{slug}");
 		expect(projects?.fields?.map((field) => field.slug)).not.toContain("path");
+	});
+
+	test("indexes the custom fields used by public collection queries", () => {
+		for (const [collectionSlug, expectedFields] of [
+			["pages", ["path"]],
+			["posts", ["path"]],
+			["projects", ["highlight", "menu_order"]],
+		] as const) {
+			const collection = seed.collections?.find(
+				(candidate) => candidate.slug === collectionSlug,
+			);
+			const indexedFields = collection?.fields
+				?.filter((field) => field.indexed)
+				.map((field) => field.slug);
+
+			expect(indexedFields).toEqual(expectedFields);
+		}
+	});
+
+	test("shows project presentation fields in the admin content list", () => {
+		const projects = seed.collections?.find(
+			(collection) => collection.slug === "projects",
+		);
+
+		expect(projects?.admin?.listColumns).toEqual(["highlight", "menu_order"]);
 	});
 
 	test("omits unused WordPress migration fields", () => {

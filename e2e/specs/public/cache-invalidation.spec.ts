@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { test, expect } from "../../fixtures/worker";
 import {
 	createAndPublishContentViaApi,
@@ -9,6 +10,8 @@ import {
 	uniqueTitle,
 } from "../../support/content";
 import { PUBLIC_MEDIA_URL } from "../../../src/lib/site-config";
+
+const UPLOAD_FIXTURE = new URL("../../../public/img/logo.png", import.meta.url);
 
 test.describe("public page cache", () => {
 	test("caches generated metadata with its data dependencies", async ({
@@ -30,15 +33,13 @@ test.describe("public page cache", () => {
 		authedRequest,
 		publicPage,
 	}, testInfo) => {
-		const filename = `e2e-favicon-${testInfo.workerIndex}-${Date.now()}.svg`;
+		const filename = `e2e-favicon-${testInfo.workerIndex}-${Date.now()}.png`;
 		const media = await uploadMediaViaApi(authedRequest, {
 			filename,
-			mimeType: "image/svg+xml",
-			buffer: Buffer.from(
-				'<svg xmlns="http://www.w3.org/2000/svg" width="1" height="1"></svg>',
-			),
-			width: 1,
-			height: 1,
+			mimeType: "image/png",
+			buffer: await readFile(UPLOAD_FIXTURE),
+			width: 481,
+			height: 102,
 		});
 		expect(media.storageKey).toBeTruthy();
 
@@ -60,7 +61,7 @@ test.describe("public page cache", () => {
 
 			expect(html).toContain(`href="${internalHref}"`);
 			expect(html).toContain(
-				`href="${publicHref}" type="image/svg+xml" sizes="1x1"`,
+				`href="${publicHref}" type="image/png" sizes="481x102"`,
 			);
 			expect(html.indexOf(`href="${publicHref}"`)).toBeGreaterThan(
 				html.indexOf(`href="${internalHref}"`),
