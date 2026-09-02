@@ -15,6 +15,14 @@ const MISSING_ROUTES = [
 		kind: "taxonomy pagination",
 		path: "/schools/e2e-missing-school/page/2/",
 	},
+	{
+		kind: "category pagination with a non-canonical page number",
+		path: "/category/e2e-missing-category/page/1.0/",
+	},
+	{
+		kind: "taxonomy pagination with a non-canonical page number",
+		path: "/schools/e2e-missing-school/page/1.0/",
+	},
 	{ kind: "page alias", path: "/pages/e2e-missing-page/" },
 	{ kind: "post alias", path: "/posts/e2e-missing-post/" },
 	{ kind: "project alias", path: "/projects/e2e-missing-project/" },

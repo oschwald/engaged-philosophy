@@ -62,7 +62,10 @@ content queries are shared across Worker isolates and Cloudflare locations.
 It uses the existing `SESSION` namespace with the distinct
 `ep:object-cache` key prefix; session and cached-content keys cannot collide.
 The one-day cache TTL is only a cleanup backstop because EmDash invalidates
-cached values with content and taxonomy epochs.
+cached values with content and taxonomy epochs. Because Workers KV is
+eventually consistent, another location can remain stale for about 60 seconds
+(or occasionally longer), plus EmDash's default one-second isolate-local
+`revalidate` window.
 
 This deliberately trades a modest number of KV operations for much larger D1
 row-read savings. Production D1 Insights showed a single topic-count query
