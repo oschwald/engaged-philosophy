@@ -34,12 +34,13 @@ function getFreePort() {
 	});
 }
 
-async function fetchWithTimeout(url) {
+async function fetchWithTimeout(url, init = {}) {
 	const controller = new AbortController();
 	const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
 	try {
 		return await fetch(url, {
+			...init,
 			redirect: "manual",
 			signal: controller.signal,
 		});
@@ -153,6 +154,14 @@ try {
 		response.status < 500,
 		`Expected local Worker to return a non-5xx response, got ${response.status}\n${output}`,
 	);
+
+	const crawlerResponse = await fetchWithTimeout(
+		`http://127.0.0.1:${port}/crawler-policy-smoke/`,
+		{ headers: { "user-agent": "MJ12bot/v1.4.8" } },
+	);
+	assert.equal(crawlerResponse.status, 403);
+	assert.equal(crawlerResponse.headers.get("x-blocked-crawler"), "MJ12bot");
+	assert.equal(crawlerResponse.headers.get("server-timing"), null);
 } finally {
 	await stopProcess(child);
 }

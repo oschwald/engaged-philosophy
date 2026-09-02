@@ -1,14 +1,16 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const { getEmDashCollection, getEmDashEntry } = vi.hoisted(() => ({
-	getEmDashCollection: vi.fn(),
-	getEmDashEntry: vi.fn(),
-}));
+const { getEmDashCollection, getEmDashEntry, getEmDashTaxonomyTerms } =
+	vi.hoisted(() => ({
+		getEmDashCollection: vi.fn(),
+		getEmDashEntry: vi.fn(),
+		getEmDashTaxonomyTerms: vi.fn(),
+	}));
 
 vi.mock("emdash", () => ({
 	getEmDashCollection,
 	getEmDashEntry,
-	getTaxonomyTerms: vi.fn(),
+	getTaxonomyTerms: getEmDashTaxonomyTerms,
 }));
 
 import {
@@ -17,6 +19,7 @@ import {
 	getPostsPageByCategory,
 	getPublishedPages,
 	getRecentPosts,
+	getTaxonomyTerm,
 } from "../../src/lib/content";
 
 function entry(id: string, data: Record<string, unknown>) {
@@ -184,5 +187,23 @@ describe("content retrieval and taxonomy", () => {
 				},
 			},
 		);
+	});
+
+	test("resolves archive terms without aggregating usage counts", async () => {
+		getEmDashTaxonomyTerms.mockResolvedValue([
+			{
+				slug: "parent",
+				label: "Parent",
+				children: [{ slug: "ethics", label: "Ethics", children: [] }],
+			},
+		]);
+
+		await expect(getTaxonomyTerm("topic", "ethics")).resolves.toMatchObject({
+			slug: "ethics",
+			label: "Ethics",
+		});
+		expect(getEmDashTaxonomyTerms).toHaveBeenCalledWith("topic", {
+			includeCounts: false,
+		});
 	});
 });

@@ -1,19 +1,20 @@
 ---
-import { getTerm } from "emdash";
-
 import CategoryArchive from "../../../../components/CategoryArchive.astro";
 import NotFound from "../../../../components/NotFound.astro";
 import Base from "../../../../layouts/Base.astro";
 import { taxonomyCacheTag } from "../../../../lib/cache-tags";
-import { getPostsPageByCategory } from "../../../../lib/content";
+import {
+	getPostsPageByCategory,
+	getTaxonomyTerm,
+} from "../../../../lib/content";
 
 const { slug = "", page = "1" } = Astro.params;
-const term = await getTerm("category", slug);
-
-const pageNumber = Number.parseInt(page, 10);
-if (term && (!Number.isFinite(pageNumber) || pageNumber < 2)) {
+const pageNumber = Number(page);
+if (Number.isInteger(pageNumber) && pageNumber === 1) {
 	return Astro.redirect(`/category/${slug}/`);
 }
+const validPageNumber = Number.isInteger(pageNumber) && pageNumber >= 2;
+const term = validPageNumber ? await getTaxonomyTerm("category", slug) : null;
 
 const postPage = term
 	? await getPostsPageByCategory(slug, pageNumber)

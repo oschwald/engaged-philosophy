@@ -39,8 +39,12 @@ Cloudflare constraints.
   Text blur save finishes. The gate also ignores redundant keepalive saves when
   EmDash reports no unsaved changes, while retaining the unload protection for
   real edits.
-- `src/worker.ts` logs selected admin/signed-in request metadata and slow
-  observed requests without serializing cookie values.
+- `src/worker.ts` rejects the two high-volume archival crawlers identified in
+  production analytics before Astro or EmDash initializes, then logs selected
+  admin/signed-in request metadata and slow observed requests without
+  serializing cookie values. `public/robots.txt` advertises the same policy;
+  the Worker check is the enforcement layer because robots directives are
+  voluntary.
 - `wrangler.jsonc` runs general EmDash maintenance every minute and the bounded
   Media Usage lane every two minutes. EmDash 0.34 uses the second schedule to
   reconcile existing content in resumable background batches; sharing one
@@ -52,13 +56,22 @@ Backups; archives contain content and media metadata, not media binaries, user
 accounts, or secrets.
 
 The upstream Cloudflare route-cache provider is used with response safeguards
-for Cloudflare Access, preview, visual-editing, and other cookies. The EmDash KV
-object cache is still intentionally disabled on Workers Free: the
-[KV free allowance](https://developers.cloudflare.com/kv/platform/limits/) is
-100,000 reads and 1,000 writes per day, while the
+for Cloudflare Access, preview, visual-editing, and other cookies. EmDash's
+supported KV object cache is also enabled so expensive taxonomy aggregates and
+content queries are shared across Worker isolates and Cloudflare locations.
+It uses the existing `SESSION` namespace with the distinct
+`ep:object-cache` key prefix; session and cached-content keys cannot collide.
+The one-day cache TTL is only a cleanup backstop because EmDash invalidates
+cached values with content and taxonomy epochs.
+
+This deliberately trades a modest number of KV operations for much larger D1
+row-read savings. Production D1 Insights showed a single topic-count query
+scanning about 80,000 rows and route caching cannot share the result across
+locations. The [KV free allowance](https://developers.cloudflare.com/kv/platform/limits/)
+is 100,000 reads and 1,000 writes per day, while the
 [D1 free allowance](https://developers.cloudflare.com/workers/platform/pricing/#d1)
-is 5 million rows read per day. Workers Cache avoids most repeat D1 work without
-consuming the smaller KV write budget or requiring a paid service.
+is 5 million rows read per day. Monitor both metrics after deployment; cache
+backend failures degrade to D1 reads rather than failing the request.
 
 ## Public Rendering
 

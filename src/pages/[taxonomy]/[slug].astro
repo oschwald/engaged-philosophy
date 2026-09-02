@@ -1,10 +1,12 @@
 ---
-import { getTerm } from "emdash";
-
 import Base from "../../layouts/Base.astro";
 import NotFound from "../../components/NotFound.astro";
 import TaxonomyArchive from "../../components/TaxonomyArchive.astro";
-import { getPageByPath, getProjectsPageByTaxonomy } from "../../lib/content";
+import {
+	getPageByPath,
+	getProjectsPageByTaxonomy,
+	getTaxonomyTerm,
+} from "../../lib/content";
 import { getEntryContent } from "../../lib/rich-text";
 import { taxonomyCacheTag } from "../../lib/cache-tags";
 import { isProjectTaxonomy } from "../../lib/taxonomy-utils";
@@ -14,7 +16,7 @@ const { taxonomy = "", slug = "" } = Astro.params;
 const pagePath = `${taxonomy}/${slug}`;
 const isProjectArchive = isProjectTaxonomy(taxonomy);
 const page = isProjectArchive ? null : await getPageByPath(pagePath);
-const term = isProjectArchive ? await getTerm(taxonomy, slug) : null;
+const term = isProjectArchive ? await getTaxonomyTerm(taxonomy, slug) : null;
 const projectPage =
 	isProjectArchive && term
 		? await getProjectsPageByTaxonomy(taxonomy, slug, 1)

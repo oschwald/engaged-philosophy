@@ -1,6 +1,6 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
-import { d1, r2 } from "@emdash-cms/cloudflare";
+import { d1, kvCache, r2 } from "@emdash-cms/cloudflare";
 import auditLogPlugin from "@emdash-cms/plugin-audit-log";
 import { embedsPlugin } from "@emdash-cms/plugin-embeds";
 import { defineConfig } from "astro/config";
@@ -104,6 +104,11 @@ export default defineConfig({
 		emdash({
 			siteUrl: PUBLIC_SITE_URL,
 			database: d1({ binding: "DB", session: "disabled" }),
+			objectCache: kvCache({
+				binding: "SESSION",
+				keyPrefix: "ep:object-cache",
+				defaultTtl: 86_400,
+			}),
 			storage: r2({
 				binding: "MEDIA",
 				publicUrl: PUBLIC_MEDIA_URL,
