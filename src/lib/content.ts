@@ -241,3 +241,15 @@ export async function getProjectBySlug(slug: string) {
 export async function getTaxonomyTerms(taxonomy: string) {
 	return flattenTerms(await getEmDashTaxonomyTerms(taxonomy));
 }
+
+/**
+ * Resolve public archive metadata without asking EmDash to aggregate usage
+ * counts for every term in the taxonomy. Archive templates only render the
+ * selected term's label, so computing counts here is unnecessary D1 work.
+ */
+export async function getTaxonomyTerm(taxonomy: string, slug: string) {
+	const terms = flattenTerms(
+		await getEmDashTaxonomyTerms(taxonomy, { includeCounts: false }),
+	);
+	return terms.find((term) => term.slug === slug) ?? null;
+}

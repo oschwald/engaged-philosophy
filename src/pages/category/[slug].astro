@@ -1,14 +1,12 @@
 ---
-import { getTerm } from "emdash";
-
 import CategoryArchive from "../../components/CategoryArchive.astro";
 import NotFound from "../../components/NotFound.astro";
 import Base from "../../layouts/Base.astro";
 import { taxonomyCacheTag } from "../../lib/cache-tags";
-import { getPostsPageByCategory } from "../../lib/content";
+import { getPostsPageByCategory, getTaxonomyTerm } from "../../lib/content";
 
 const { slug = "" } = Astro.params;
-const term = await getTerm("category", slug);
+const term = await getTaxonomyTerm("category", slug);
 const postPage = term
 	? await getPostsPageByCategory(slug, 1)
 	: { entries: [], hasMore: false };

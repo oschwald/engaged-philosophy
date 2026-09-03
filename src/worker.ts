@@ -8,6 +8,10 @@ import {
 	getObservedRequestInfo,
 	OBSERVED_REQUEST_SLOW_MS,
 } from "./lib/admin-request-observability";
+import {
+	createBlockedCrawlerResponse,
+	getBlockedCrawler,
+} from "./lib/crawler-policy";
 import { applySecurityHeaders } from "./lib/security-headers";
 
 type Env = Record<string, unknown>;
@@ -74,6 +78,14 @@ const observedHandler: ExportedHandler<Env> = {
 	scheduled: createScheduledHandler(),
 
 	async fetch(request, env, ctx) {
+		const blockedCrawler = getBlockedCrawler(request);
+		if (blockedCrawler) {
+			return applySecurityHeaders(
+				request,
+				createBlockedCrawlerResponse(request, blockedCrawler),
+			);
+		}
+
 		const info = getObservedRequestInfo(request);
 		if (!info) {
 			const response = await astroHandler.fetch(request, env, ctx);

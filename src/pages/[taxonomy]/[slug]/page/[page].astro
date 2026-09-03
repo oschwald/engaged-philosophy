@@ -1,21 +1,25 @@
 ---
-import { getTerm } from "emdash";
-
 import Base from "../../../../layouts/Base.astro";
 import NotFound from "../../../../components/NotFound.astro";
 import TaxonomyArchive from "../../../../components/TaxonomyArchive.astro";
-import { getProjectsPageByTaxonomy } from "../../../../lib/content";
+import {
+	getProjectsPageByTaxonomy,
+	getTaxonomyTerm,
+} from "../../../../lib/content";
 import { taxonomyCacheTag } from "../../../../lib/cache-tags";
 import { isProjectTaxonomy } from "../../../../lib/taxonomy-utils";
 
 const { taxonomy = "", slug = "", page = "1" } = Astro.params;
 const projectTaxonomy = isProjectTaxonomy(taxonomy);
-const term = projectTaxonomy ? await getTerm(taxonomy, slug) : null;
-
-const pageNumber = Number.parseInt(page, 10);
-if (term && (!Number.isFinite(pageNumber) || pageNumber < 2)) {
+const pageNumber = /^[1-9]\d*$/.test(page) ? Number(page) : Number.NaN;
+if (projectTaxonomy && pageNumber === 1) {
 	return Astro.redirect(`/${taxonomy}/${slug}/`);
 }
+const validPageNumber = Number.isSafeInteger(pageNumber) && pageNumber >= 2;
+const term =
+	projectTaxonomy && validPageNumber
+		? await getTaxonomyTerm(taxonomy, slug)
+		: null;
 
 const projectPage = term
 	? await getProjectsPageByTaxonomy(taxonomy, slug, pageNumber)

@@ -1,0 +1,10 @@
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: VelenPublicWebCrawler
+Disallow: /
+
+User-agent: *
+Allow: /
+
+Sitemap: https://www.engagedphilosophy.com/sitemap.xml
