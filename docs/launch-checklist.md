@@ -29,14 +29,14 @@ The explicit `emdash media repair-usage` command is now a recovery tool rather
 than a routine post-migration step. Use it only when automatic reconciliation
 reports failed work that cannot be retried from the admin.
 
-## EmDash 0.34 Schema Follow-up
+## Legacy Schema Follow-up
 
 The checked-in seed enables indexes for the page and post `path` fields and the
 project `highlight` and `menu_order` fields, and shows the two project fields as
-admin list columns. A seed initializes fresh databases only. After deploying
-0.34 to the existing site, apply those same settings once under **Content
-Types**; the public queries remain compatible while this metadata is being
-updated.
+admin list columns. A seed initializes fresh databases only. If the existing
+site skipped the EmDash 0.34 schema follow-up, apply those same settings once
+under **Content Types**; the public queries remain compatible while this
+metadata is being updated.
 
 ## Post-Launch State
 
