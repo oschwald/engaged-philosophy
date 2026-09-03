@@ -3,6 +3,11 @@ import { search as searchEmDash } from "emdash";
 import { getPublishedEntriesByIds } from "./content";
 import { projectPath } from "./content-paths";
 import {
+	isValidSearchCursor,
+	isValidSearchQuery,
+	MAX_SEARCH_CURSOR_HISTORY,
+} from "./search-policy";
+import {
 	getEntryContent,
 	getEntryExcerpt,
 	getExcerptText,
@@ -25,7 +30,6 @@ export interface SiteSearchResponse {
 }
 
 const PAGE_SIZE = 10;
-export const MAX_SEARCH_CURSOR_HISTORY = 20;
 const SEARCH_COLLECTIONS = ["pages", "posts", "projects"] as const;
 type SearchCollection = (typeof SEARCH_COLLECTIONS)[number];
 
@@ -49,22 +53,14 @@ export function searchCursorHistoryForNextPage(
 	return [...history, cursor ?? ""];
 }
 
-export function isValidSearchCursorHistory(
-	pageNumber: number,
-	history: string[],
-) {
-	return (
-		history.length <= MAX_SEARCH_CURSOR_HISTORY &&
-		history.length === pageNumber - 1
-	);
-}
-
 export async function searchSite(
 	rawQuery: string,
 	cursor?: string,
 ): Promise<SiteSearchResponse> {
 	const query = rawQuery.trim();
-	if (!query) return { query, results: [] };
+	if (!isValidSearchQuery(query) || !isValidSearchCursor(cursor)) {
+		return { query, results: [] };
+	}
 
 	const response = await searchEmDash(query, {
 		collections: [...SEARCH_COLLECTIONS],
@@ -123,3 +119,12 @@ export async function searchSite(
 		nextCursor: response.nextCursor,
 	};
 }
+
+export {
+	isValidSearchCursor,
+	isValidSearchCursorHistory,
+	isValidSearchQuery,
+	MAX_SEARCH_CURSOR_HISTORY,
+	MAX_SEARCH_CURSOR_LENGTH,
+	MAX_SEARCH_QUERY_LENGTH,
+} from "./search-policy";

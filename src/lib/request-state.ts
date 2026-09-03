@@ -1,4 +1,4 @@
-const STATEFUL_COOKIE_NAMES = [
+export const STATEFUL_COOKIE_NAMES = [
 	"astro-session",
 	"CF_Authorization",
 	"CF_AppSession",
@@ -21,4 +21,11 @@ function getCookieNames(cookieHeader: string): string[] {
 export function hasStatefulCookie(cookieHeader: string | null): boolean {
 	const names = getCookieNames(cookieHeader ?? "");
 	return names.some((name) => STATEFUL_COOKIE_NAMES.includes(name));
+}
+
+export function isStatefulRequest(request: Request): boolean {
+	return (
+		hasStatefulCookie(request.headers.get("cookie")) ||
+		request.headers.has("cf-access-jwt-assertion")
+	);
 }

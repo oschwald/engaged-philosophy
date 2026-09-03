@@ -28,10 +28,30 @@ const SITEMAP_LIMIT = Number.parseInt(
 	10,
 );
 const PATH_FILE = process.env.LIVE_SMOKE_PATH_FILE;
-const CHECK_CONCURRENCY = Math.max(
+const CHECK_CONCURRENCY = integerOption(
+	"LIVE_SMOKE_CONCURRENCY",
+	CHECK_SITEMAP ? 1 : 6,
 	1,
-	Number.parseInt(process.env.LIVE_SMOKE_CONCURRENCY ?? "6", 10),
 );
+const REQUEST_DELAY_MS = integerOption(
+	"LIVE_SMOKE_DELAY_MS",
+	CHECK_SITEMAP ? 1250 : 0,
+	0,
+);
+
+function integerOption(name, fallback, minimum) {
+	const rawValue = process.env[name];
+	const value = rawValue === undefined ? fallback : Number(rawValue);
+	if (
+		(rawValue !== undefined && rawValue.trim() === "") ||
+		!Number.isSafeInteger(value)
+	) {
+		throw new Error(
+			`${name} must be an integer; received ${JSON.stringify(rawValue)}`,
+		);
+	}
+	return Math.max(minimum, value);
+}
 
 function parseList(value, fallback) {
 	if (!value) return fallback;
@@ -107,6 +127,9 @@ async function expectOk(url, label, init = {}) {
 }
 
 async function checkPublicPage(path) {
+	if (REQUEST_DELAY_MS > 0) {
+		await new Promise((resolve) => setTimeout(resolve, REQUEST_DELAY_MS));
+	}
 	const url = absoluteUrl(path);
 	const response = await expectOk(url, `Public page ${path}`);
 	const text = await response.text();

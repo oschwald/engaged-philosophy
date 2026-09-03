@@ -7,15 +7,17 @@ import {
 	getTaxonomyTerm,
 } from "../../../../lib/content";
 import { taxonomyCacheTag } from "../../../../lib/cache-tags";
+import { parseArchivePage } from "../../../../lib/pagination";
 import { isProjectTaxonomy } from "../../../../lib/taxonomy-utils";
 
 const { taxonomy = "", slug = "", page = "1" } = Astro.params;
 const projectTaxonomy = isProjectTaxonomy(taxonomy);
-const pageNumber = /^[1-9]\d*$/.test(page) ? Number(page) : Number.NaN;
-if (projectTaxonomy && pageNumber === 1) {
+const parsedPageNumber = parseArchivePage(page);
+if (projectTaxonomy && parsedPageNumber === 1) {
 	return Astro.redirect(`/${taxonomy}/${slug}/`);
 }
-const validPageNumber = Number.isSafeInteger(pageNumber) && pageNumber >= 2;
+const pageNumber = parsedPageNumber ?? 0;
+const validPageNumber = pageNumber >= 2;
 const term =
 	projectTaxonomy && validPageNumber
 		? await getTaxonomyTerm(taxonomy, slug)

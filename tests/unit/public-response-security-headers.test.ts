@@ -49,6 +49,29 @@ describe("Worker security headers", () => {
 		expect(response.headers.get("vary")).toBe("Accept-Encoding, Cookie");
 	});
 
+	test("omits cookie variance only when the stateful-cookie edge bypass is active", () => {
+		const response = applySecurityHeaders(
+			new Request("https://www.engagedphilosophy.com/about/"),
+			htmlResponse(),
+			{ statefulCookieBypassActive: true },
+		);
+
+		expect(response.headers.has("vary")).toBe(false);
+	});
+
+	test("allows irrelevant cookies to share the production HTML cache", () => {
+		const response = applySecurityHeaders(
+			new Request("https://www.engagedphilosophy.com/about/", {
+				headers: { cookie: "analytics=value" },
+			}),
+			htmlResponse(),
+			{ statefulCookieBypassActive: true },
+		);
+
+		expect(response.headers.has("cloudflare-cdn-cache-control")).toBe(false);
+		expect(response.headers.has("vary")).toBe(false);
+	});
+
 	test("bypasses the edge cache for stateful and query variants", () => {
 		for (const request of [
 			new Request("https://www.engagedphilosophy.com/about/", {
