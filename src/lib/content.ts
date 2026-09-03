@@ -29,11 +29,12 @@ type NormalizedEntryData<T> = Omit<T, "featured_image"> & {
 	featured_image?: MediaField;
 	path?: string;
 };
-type RawMediaField = MediaField & {
+type RawMediaField = Omit<MediaField, "darkVariant"> & {
 	provider?: string;
 	meta?: {
 		storageKey?: string;
 	};
+	darkVariant?: RawMediaField | null;
 };
 
 const COLLECTION_PAGE_SIZE = 1000;
@@ -50,6 +51,7 @@ function normalizeMediaField(
 		mimeType: media.mimeType,
 		blurhash: media.blurhash,
 		dominantColor: media.dominantColor,
+		darkVariant: normalizeMediaField(media.darkVariant),
 	};
 }
 

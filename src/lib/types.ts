@@ -13,6 +13,7 @@ export interface MediaField {
 	mimeType?: string;
 	blurhash?: string;
 	dominantColor?: string;
+	darkVariant?: MediaField;
 }
 
 export type SiteCollection = "pages" | "posts" | "projects";

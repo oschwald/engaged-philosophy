@@ -20,9 +20,15 @@ test.describe("admin media library", () => {
 		await page.goto("/_emdash/admin/media", { waitUntil: "domcontentloaded" });
 		await dismissWelcome(page);
 		await expectExactHeading(page, "Media Library");
-		await expect(
-			page.getByRole("button", { name: "Upload to Library" }),
-		).toBeVisible();
+		const uploadButton = page
+			.getByRole("button", { name: "Upload Files" })
+			.first();
+		await expect(uploadButton).toBeVisible();
+		await uploadButton.click();
+		const uploadDialog = page.getByRole("dialog", {
+			name: "Upload to Library",
+		});
+		await expect(uploadDialog).toBeVisible();
 
 		const uploadResponsePromise = page.waitForResponse((response) => {
 			const url = new URL(response.url());
@@ -31,7 +37,7 @@ test.describe("admin media library", () => {
 				/^\/_emdash\/api\/media\/[^/]+\/confirm$/.test(url.pathname)
 			);
 		});
-		await page.getByLabel("Upload files").setInputFiles({
+		await uploadDialog.getByLabel("Browse files to upload").setInputFiles({
 			name: filename,
 			mimeType: "image/png",
 			buffer: await readFile(UPLOAD_FIXTURE),

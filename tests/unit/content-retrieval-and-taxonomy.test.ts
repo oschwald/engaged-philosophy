@@ -14,6 +14,7 @@ vi.mock("emdash", () => ({
 }));
 
 import {
+	getHighlightedProjects,
 	getPageByPath,
 	getPostByPath,
 	getPostsPageByCategory,
@@ -75,13 +76,13 @@ describe("content retrieval and taxonomy", () => {
 		});
 	});
 
-	test("serves native local featured images from public storage", async () => {
+	test("normalizes light and dark featured images for every collection", async () => {
 		getEmDashCollection.mockResolvedValue({
 			entries: [
-				entry("post-1", {
-					slug: "first-post",
-					path: "2026/01/02/first-post",
-					title: "First post",
+				entry("entry-1", {
+					slug: "featured-entry",
+					path: "2026/01/02/featured-entry",
+					title: "Featured entry",
 					featured_image: {
 						provider: "local",
 						meta: {
@@ -92,6 +93,17 @@ describe("content retrieval and taxonomy", () => {
 						mimeType: "image/jpeg",
 						blurhash: "LKO2?U%2Tw=w]~RBVZRi};RPxuwH",
 						dominantColor: "#4b8f8c",
+						darkVariant: {
+							provider: "local",
+							meta: {
+								storageKey: "wp-content/uploads/2026/01/featured-dark.webp",
+							},
+							alt: "Featured at night",
+							filename: "featured-dark.webp",
+							mimeType: "image/webp",
+							blurhash: "LEHV6nWB2yk8pyo0adR*.7kCMdnj",
+							dominantColor: "#172133",
+						},
 					},
 				}),
 			],
@@ -99,22 +111,36 @@ describe("content retrieval and taxonomy", () => {
 			cacheHint: {},
 		});
 
-		await expect(getRecentPosts(1)).resolves.toMatchObject({
-			entries: [
-				{
-					data: {
-						featured_image: {
-							src: "https://media.engagedphilosophy.com/wp-content/uploads/2026/01/featured.jpg",
-							alt: "Featured",
-							filename: "featured.jpg",
-							mimeType: "image/jpeg",
-							blurhash: "LKO2?U%2Tw=w]~RBVZRi};RPxuwH",
-							dominantColor: "#4b8f8c",
+		const pages = await getPublishedPages();
+		const posts = await getRecentPosts(1);
+		const projects = await getHighlightedProjects(1);
+
+		for (const normalizedEntry of [
+			pages[0],
+			posts.entries[0],
+			projects.entries[0],
+		]) {
+			expect(normalizedEntry).toMatchObject({
+				data: {
+					featured_image: {
+						src: "https://media.engagedphilosophy.com/wp-content/uploads/2026/01/featured.jpg",
+						alt: "Featured",
+						filename: "featured.jpg",
+						mimeType: "image/jpeg",
+						blurhash: "LKO2?U%2Tw=w]~RBVZRi};RPxuwH",
+						dominantColor: "#4b8f8c",
+						darkVariant: {
+							src: "https://media.engagedphilosophy.com/wp-content/uploads/2026/01/featured-dark.webp",
+							alt: "Featured at night",
+							filename: "featured-dark.webp",
+							mimeType: "image/webp",
+							blurhash: "LEHV6nWB2yk8pyo0adR*.7kCMdnj",
+							dominantColor: "#172133",
 						},
 					},
 				},
-			],
-		});
+			});
+		}
 	});
 
 	test("walks collection cursors instead of truncating full listings", async () => {
