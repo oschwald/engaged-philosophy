@@ -21,6 +21,7 @@ package-lock.json
 build/
 dist/
 .astro/
+.emdash/migrations.json
 .wrangler/
 coverage/
 playwright-report/

@@ -45,10 +45,15 @@ Cloudflare constraints.
   serializing cookie values. `public/robots.txt` advertises the same policy;
   the Worker check is the enforcement layer because robots directives are
   voluntary.
-- `wrangler.jsonc` runs general EmDash maintenance every minute and the bounded
-  Media Usage lane every two minutes. EmDash 0.34 uses the second schedule to
-  reconcile existing content in resumable background batches; sharing one
-  schedule no longer drives both kinds of work.
+- `wrangler.jsonc` runs general EmDash maintenance every minute. EmDash 0.36
+  removed the separate Media Usage schedule; activation and repair now advance
+  in bounded batches while an administrator keeps Settings -> Media usage
+  tracking open.
+- Core database migrations remain in EmDash's default automatic runtime mode.
+  EmDash 0.35 and newer also emit the ignored `.emdash/migrations.json` build
+  artifact for a future deployment-managed migration job; switching to check or
+  manual mode should wait until such a job applies and verifies that exact
+  manifest before every deploy.
 
 EmDash's backup page works with the existing R2 storage adapter and scheduled
 Worker handler. Administrators can enable daily archives under Settings ->
@@ -215,9 +220,9 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 - `astro.config.mjs` keeps the Vite chunk-size warning limit aligned with the
   admin bundle size while leaving upstream build warnings visible.
-- Media uploads retain EmDash 0.34's safer default allowlist, which no longer
-  accepts SVG. Site-owned SVG icons remain versioned static assets; user-uploaded
-  images use raster formats.
+- Media uploads retain EmDash's safer default allowlist, which accepts AVIF and
+  other raster image formats but not SVG. Site-owned SVG icons remain versioned
+  static assets.
 - `wrangler.jsonc` enables Workers Cache with per-deployment version isolation
   and enables Cloudflare logs/traces. A deployment starts with a cold route
   cache; stale entries are not reused across Worker versions.
@@ -237,7 +242,7 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   waits for Portable Text saves before publishing or leaving edit mode.
 - Remove the local cache-provider wrapper when Wrangler exposes
-  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.124
+  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.128
   still lacks it locally.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a

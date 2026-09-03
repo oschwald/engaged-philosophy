@@ -9,9 +9,9 @@ do not reimport from WordPress.
    - `pnpm run ci`
 2. Deploy the Worker:
    - `pnpm run deploy`
-3. After the first EmDash 0.34 deploy, verify that the admin dashboard reports a
-   healthy scheduler heartbeat and that Media Usage reconciliation is making
-   progress.
+3. After the EmDash 0.36 deploy, verify that the admin dashboard reports a
+   healthy scheduler heartbeat. Open **Settings -> Media usage tracking**,
+   enable tracking if needed, and keep the page open until it reports **Ready**.
 4. Run deployed smoke checks against the canonical hostname:
    - `LIVE_BASE_URL=https://www.engagedphilosophy.com pnpm run smoke:live`
    - `LIVE_BASE_URL=https://www.engagedphilosophy.com pnpm run smoke:live:sitemap`
@@ -21,10 +21,9 @@ Use `LIVE_SMOKE_PATH_FILE` with `pnpm run smoke:live` for one-off path lists.
 ## Post-Migration Maintenance
 
 After a direct content migration or bulk content rewrite that bypasses the
-EmDash content API, monitor Media Usage in the admin until EmDash 0.34's
-scheduled reconciliation reports complete coverage. The dedicated
-`*/2 * * * *` Cron Trigger processes this work in bounded, resumable batches;
-the dashboard reports missing scheduler wiring or stalled maintenance.
+EmDash content API, open **Settings -> Media usage tracking** and keep the page
+open until the bounded, resumable scan reports **Ready**. EmDash 0.36 no longer
+runs Media Usage reconciliation from a dedicated Cron Trigger.
 
 The explicit `emdash media repair-usage` command is now a recovery tool rather
 than a routine post-migration step. Use it only when automatic reconciliation
