@@ -12,6 +12,7 @@ import {
 	createBlockedCrawlerResponse,
 	getBlockedCrawler,
 } from "./lib/crawler-policy";
+import { applyPublicRequestPolicy } from "./lib/public-request-policy";
 import { applySecurityHeaders } from "./lib/security-headers";
 
 type Env = Record<string, unknown>;
@@ -78,18 +79,31 @@ const observedHandler: ExportedHandler<Env> = {
 	scheduled: createScheduledHandler(),
 
 	async fetch(request, env, ctx) {
-		const blockedCrawler = getBlockedCrawler(request);
+		const securityOptions = {
+			statefulCookieBypassActive:
+				env.CACHE_STATEFUL_COOKIE_BYPASS_ACTIVE === "true",
+		};
+		const policy = applyPublicRequestPolicy(request);
+		if (policy.response) {
+			return applySecurityHeaders(request, policy.response, securityOptions);
+		}
+		// Cloning a Request with a new URL preserves Cloudflare's incoming `cf`
+		// metadata even though the platform's constructor typing widens it.
+		const routedRequest = policy.request as typeof request;
+
+		const blockedCrawler = getBlockedCrawler(routedRequest);
 		if (blockedCrawler) {
 			return applySecurityHeaders(
-				request,
-				createBlockedCrawlerResponse(request, blockedCrawler),
+				routedRequest,
+				createBlockedCrawlerResponse(routedRequest, blockedCrawler),
+				securityOptions,
 			);
 		}
 
-		const info = getObservedRequestInfo(request);
+		const info = getObservedRequestInfo(routedRequest);
 		if (!info) {
-			const response = await astroHandler.fetch(request, env, ctx);
-			return applySecurityHeaders(request, response);
+			const response = await astroHandler.fetch(routedRequest, env, ctx);
+			return applySecurityHeaders(routedRequest, response, securityOptions);
 		}
 
 		const startedAt = performance.now();
@@ -109,11 +123,15 @@ const observedHandler: ExportedHandler<Env> = {
 		console.log(requestLog("ep.request.start", info, startedAt));
 
 		try {
-			const response = await astroHandler.fetch(request, env, ctx);
+			const response = await astroHandler.fetch(routedRequest, env, ctx);
 			completed = true;
 			console.log(responseLog(info, startedAt, response));
 
-			const observedResponse = applySecurityHeaders(request, response);
+			const observedResponse = applySecurityHeaders(
+				routedRequest,
+				response,
+				securityOptions,
+			);
 			observedResponse.headers.set("X-EP-Request-ID", info.requestId);
 			return observedResponse;
 		} catch (error) {

@@ -9,7 +9,11 @@ vi.mock("emdash", () => ({ search: emdashSearch }));
 vi.mock("../../src/lib/content", () => ({ getPublishedEntriesByIds }));
 
 import {
+	isValidSearchCursor,
 	isValidSearchCursorHistory,
+	isValidSearchQuery,
+	MAX_SEARCH_CURSOR_LENGTH,
+	MAX_SEARCH_QUERY_LENGTH,
 	MAX_SEARCH_CURSOR_HISTORY,
 	searchCursorHistoryForNextPage,
 	searchSite,
@@ -23,6 +27,23 @@ describe("site search", () => {
 	test("does not query EmDash for a blank search", async () => {
 		await expect(searchSite("  ")).resolves.toEqual({
 			query: "",
+			results: [],
+		});
+		expect(emdashSearch).not.toHaveBeenCalled();
+	});
+
+	test("rejects overlong search inputs before querying EmDash", async () => {
+		const query = "x".repeat(MAX_SEARCH_QUERY_LENGTH + 1);
+		const cursor = "x".repeat(MAX_SEARCH_CURSOR_LENGTH + 1);
+
+		expect(isValidSearchQuery(query)).toBe(false);
+		expect(isValidSearchCursor(cursor)).toBe(false);
+		await expect(searchSite(query)).resolves.toEqual({
+			query,
+			results: [],
+		});
+		await expect(searchSite("valid", cursor)).resolves.toEqual({
+			query: "valid",
 			results: [],
 		});
 		expect(emdashSearch).not.toHaveBeenCalled();

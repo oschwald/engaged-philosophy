@@ -1,4 +1,4 @@
-import { hasStatefulCookie } from "./request-state";
+import { isStatefulRequest } from "./request-state";
 
 const PUBLIC_CONTENT_SECURITY_POLICY = [
 	"default-src 'self'",
@@ -62,13 +62,6 @@ function isHtmlResponse(response: Response) {
 		.includes("text/html");
 }
 
-function isStatefulRequest(request: Request) {
-	return (
-		hasStatefulCookie(request.headers.get("cookie")) ||
-		request.headers.has("cf-access-jwt-assertion")
-	);
-}
-
 function appendVary(headers: Headers, name: string) {
 	const values = (headers.get("vary") ?? "")
 		.split(",")
@@ -83,7 +76,15 @@ function appendVary(headers: Headers, name: string) {
 	headers.set("vary", [...values, name].join(", "));
 }
 
-export function applySecurityHeaders(request: Request, response: Response) {
+export interface SecurityHeaderOptions {
+	statefulCookieBypassActive?: boolean;
+}
+
+export function applySecurityHeaders(
+	request: Request,
+	response: Response,
+	options: SecurityHeaderOptions = {},
+) {
 	const securedResponse = new Response(response.body, response);
 
 	for (const [name, value] of Object.entries(BASELINE_SECURITY_HEADERS)) {
@@ -104,12 +105,12 @@ export function applySecurityHeaders(request: Request, response: Response) {
 
 	const url = new URL(request.url);
 	if (!isAdminPath(url.pathname) && isHtmlResponse(securedResponse)) {
-		appendVary(securedResponse.headers, "Cookie");
-		if (
-			request.headers.get("cookie")?.trim() ||
-			isStatefulRequest(request) ||
-			url.search
-		) {
+		// Omit Cookie variance only when an edge Cache Rule is known to bypass
+		// shared caching for every stateful cookie before the Worker runs.
+		if (!options.statefulCookieBypassActive) {
+			appendVary(securedResponse.headers, "Cookie");
+		}
+		if (isStatefulRequest(request) || url.search) {
 			securedResponse.headers.set("cloudflare-cdn-cache-control", "no-store");
 		}
 

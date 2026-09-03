@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
 
-import { hasStatefulCookie } from "../../src/lib/request-state";
+import {
+	hasStatefulCookie,
+	isStatefulRequest,
+} from "../../src/lib/request-state";
 
 describe("request state", () => {
 	test("detects cookies that imply personalized state", () => {
@@ -9,5 +12,22 @@ describe("request state", () => {
 		expect(hasStatefulCookie("foo=bar; astro-session=abc")).toBe(true);
 		expect(hasStatefulCookie("foo=bar; __em_d1_bookmark=abc")).toBe(true);
 		expect(hasStatefulCookie("foo=bar; _ga=abc")).toBe(false);
+	});
+
+	test("detects stateful requests without treating arbitrary cookies as state", () => {
+		expect(
+			isStatefulRequest(
+				new Request("https://example.com", {
+					headers: { cookie: "analytics=value" },
+				}),
+			),
+		).toBe(false);
+		expect(
+			isStatefulRequest(
+				new Request("https://example.com", {
+					headers: { "cf-access-jwt-assertion": "jwt" },
+				}),
+			),
+		).toBe(true);
 	});
 });

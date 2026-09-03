@@ -74,7 +74,7 @@ test.describe("public page cache", () => {
 		}
 	});
 
-	test("keeps stateful and query-string HTML out of the shared cache", async ({
+	test("keeps stateful HTML private and normalizes irrelevant variants", async ({
 		publicPage,
 	}) => {
 		const anonymousResponse = await publicPage.request.get("/");
@@ -93,13 +93,25 @@ test.describe("public page cache", () => {
 			},
 		]);
 		const cookieResponse = await publicPage.request.get("/");
-		expect(cookieResponse.headers()["cloudflare-cdn-cache-control"]).toBe(
+		expect(cookieResponse.headers()["cloudflare-cdn-cache-control"]).not.toBe(
 			"no-store",
 		);
 		await publicPage.context().clearCookies();
 
-		const queryResponse = await publicPage.request.get("/?preview=1");
-		expect(queryResponse.headers()["cloudflare-cdn-cache-control"]).toBe(
+		const statefulResponse = await publicPage.request.get("/", {
+			headers: { Cookie: "emdash-edit-mode=true" },
+		});
+		expect(statefulResponse.headers()["cloudflare-cdn-cache-control"]).toBe(
+			"no-store",
+		);
+
+		const ignoredQueryResponse = await publicPage.request.get("/?unused=1");
+		expect(
+			ignoredQueryResponse.headers()["cloudflare-cdn-cache-control"],
+		).not.toBe("no-store");
+
+		const searchResponse = await publicPage.request.get("/?s=community");
+		expect(searchResponse.headers()["cloudflare-cdn-cache-control"]).toBe(
 			"no-store",
 		);
 	});

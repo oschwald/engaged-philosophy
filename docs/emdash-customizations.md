@@ -45,6 +45,19 @@ Cloudflare constraints.
   serializing cookie values. `public/robots.txt` advertises the same policy;
   the Worker check is the enforcement layer because robots directives are
   voluntary.
+- The outer Worker also applies a public request budget before Astro or EmDash
+  initializes. It rejects unsupported methods and pathological URL shapes,
+  validates preview-token syntax, bounds search queries and cursor history,
+  and removes query parameters that public routes do not use. Search pages keep
+  `s`, `cursor`, and `before`; preview, edit, and `/_emdash` requests retain
+  their complete request state.
+- Production caching relies on a zone Cache Rule that bypasses the shared cache
+  for the stateful cookie names in `src/lib/request-state.ts`. Public HTML on
+  the apex and `www` stops varying on arbitrary cookies only when
+  `CACHE_STATEFUL_COOKIE_BYPASS_ACTIVE` is `"true"`, while the application
+  still emits `no-store` for every recognized session, Access, preview, and
+  edit request. The default retains `Vary: Cookie`, so deployments without the
+  zone rule fail safely.
 - `wrangler.jsonc` runs general EmDash maintenance every minute. EmDash 0.36
   removed the separate Media Usage schedule; activation and repair now advance
   in bounded batches while an administrator keeps Settings -> Media usage
@@ -94,8 +107,10 @@ backend failures degrade to D1 reads rather than failing the request.
 - Search uses EmDash full-text search, then batch-hydrates only the entries on
   the current result page. EmDash 0.34 indexes visible Portable Text prose
   instead of its JSON representation and avoids rewriting the FTS index for
-  metadata-only saves. Archives use database limit/offset queries, and
-  exhaustive jobs such as the sitemap walk collection cursors.
+  metadata-only saves. Searches are limited to 128 Unicode characters, cursors
+  to 1024 characters, and 20 pages of cursor history. Archives use database
+  limit/offset queries capped at 100 public pages, and exhaustive jobs such as
+  the sitemap walk collection cursors.
 - Page and post `path` fields and the project `highlight` and `menu_order`
   fields opt into EmDash 0.34's scalar-field indexes because public collection
   queries filter or sort on them. The project content list also shows highlight

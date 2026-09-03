@@ -6,7 +6,6 @@ const MISSING_ROUTES = [
 	{ kind: "project", path: "/project/e2e-missing-project/" },
 	{ kind: "category", path: "/category/e2e-missing-category/" },
 	{ kind: "taxonomy", path: "/schools/e2e-missing-school/" },
-	{ kind: "search pagination", path: "/page/2/" },
 	{
 		kind: "category pagination",
 		path: "/category/e2e-missing-category/page/2/",
@@ -45,6 +44,23 @@ test.describe("public not-found responses", () => {
 			).toBeVisible();
 		});
 	}
+
+	test("rejects malformed search pagination without rendering the layout", async ({
+		publicPage,
+	}) => {
+		const path = "/page/2/";
+		const response = await publicPage.goto(path);
+
+		expect(response?.status()).toBe(404);
+		expect(response?.headers().location).toBeUndefined();
+		expect(new URL(publicPage.url()).pathname).toBe(path);
+		await expect(publicPage.getByText("Search page not found.")).toBeVisible();
+		await expect(
+			publicPage.getByRole("heading", {
+				name: "This is somewhat embarrassing, isn’t it?",
+			}),
+		).toHaveCount(0);
+	});
 
 	test("EmDash logs the originally requested path", async ({
 		authedRequest,

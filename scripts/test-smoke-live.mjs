@@ -30,7 +30,17 @@ const SITEMAP_LIMIT = Number.parseInt(
 const PATH_FILE = process.env.LIVE_SMOKE_PATH_FILE;
 const CHECK_CONCURRENCY = Math.max(
 	1,
-	Number.parseInt(process.env.LIVE_SMOKE_CONCURRENCY ?? "6", 10),
+	Number.parseInt(
+		process.env.LIVE_SMOKE_CONCURRENCY ?? (CHECK_SITEMAP ? "1" : "6"),
+		10,
+	),
+);
+const REQUEST_DELAY_MS = Math.max(
+	0,
+	Number.parseInt(
+		process.env.LIVE_SMOKE_DELAY_MS ?? (CHECK_SITEMAP ? "1250" : "0"),
+		10,
+	),
 );
 
 function parseList(value, fallback) {
@@ -107,6 +117,9 @@ async function expectOk(url, label, init = {}) {
 }
 
 async function checkPublicPage(path) {
+	if (REQUEST_DELAY_MS > 0) {
+		await new Promise((resolve) => setTimeout(resolve, REQUEST_DELAY_MS));
+	}
 	const url = absoluteUrl(path);
 	const response = await expectOk(url, `Public page ${path}`);
 	const text = await response.text();
