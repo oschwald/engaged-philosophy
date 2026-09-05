@@ -22,6 +22,9 @@ The zone rules for `engagedphilosophy.com` must preserve these invariants:
   into anonymous cache entries.
 - Query strings may be ignored in the cache key only where the application
   does not use them to render a different response.
+- Known PHP, environment, GraphQL, and WordPress-installation probes are
+  rejected by the outer Worker before Astro or EmDash can initialize. Keep
+  legitimate legacy content and `wp-content/uploads` paths out of this list.
 - The public dynamic-page rate limit is 10 requests per 10 seconds per IP and
   Cloudflare location. It excludes verified bots, `/_emdash`, `/_astro`, the
   image endpoint, and paths with file extensions. Full-sitemap smoke checks run
@@ -43,6 +46,11 @@ limits:
 - Worker requests: investigate above 50,000 per day.
 - R2, logs, and traces: investigate when the Cloudflare dashboard reports 50%
   of the applicable monthly or daily allowance.
+
+Keep roughly 14 days of `_emdash_404_log` diagnostic history. Prune older rows
+with EmDash's supported 404-log management operation when reviewing usage; the
+table-wide cap check runs after each recorded 404, so shorter useful retention
+also bounds D1 row reads from scanner misses.
 
 Keep Workers trace sampling at 5% unless measured observability events approach
 their allowance. Exhausting the logs or traces allowance reduces diagnostics;

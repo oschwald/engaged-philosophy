@@ -15,6 +15,29 @@ const MAX_PREVIEW_TOKEN_LENGTH = 1024;
 const PREVIEW_TOKEN_PATTERN = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]{43}$/;
 const SEARCH_PAGE_PATTERN = /^\/page\/([1-9]\d*)\/?$/;
 const CONTROL_CHARACTERS = /[\u0000-\u001f\u007f]/;
+const PHP_PROBE_PATH = /(?:^|\/)[^/]*\.php\d*~?(?:\/|$)/i;
+const SCANNER_PROBE_PATHS = new Set([
+	"/.env",
+	"/.git",
+	"/_environment",
+	"/_profiler/phpinfo",
+	"/api/graphql",
+	"/graphql",
+	"/phpinfo",
+	"/v1/graphql",
+	"/webroot/index.php/_environment",
+	"/wordpress",
+	"/wp",
+]);
+const SCANNER_PROBE_PREFIXES = [
+	"/.env.",
+	"/.git/",
+	"/_environment/",
+	"/_profiler/",
+	"/vendor/phpunit/",
+	"/wordpress/",
+	"/wp/",
+];
 
 export interface PublicRequestPolicyResult {
 	request: Request;
@@ -75,6 +98,16 @@ function validPreviewToken(params: URLSearchParams) {
 	return (
 		token.length <= MAX_PREVIEW_TOKEN_LENGTH &&
 		PREVIEW_TOKEN_PATTERN.test(token)
+	);
+}
+
+function isScannerProbePath(pathname: string) {
+	const normalized =
+		pathname.length > 1 ? pathname.toLowerCase().replace(/\/+$/, "") : pathname;
+	return (
+		SCANNER_PROBE_PATHS.has(normalized) ||
+		SCANNER_PROBE_PREFIXES.some((prefix) => normalized.startsWith(prefix)) ||
+		PHP_PROBE_PATH.test(normalized)
 	);
 }
 
@@ -152,6 +185,12 @@ export function applyPublicRequestPolicy(
 				status: 204,
 				headers: { Allow: "GET, HEAD, OPTIONS" },
 			}),
+		};
+	}
+	if (isScannerProbePath(url.pathname)) {
+		return {
+			request,
+			response: policyResponse(request, 404, "Not found."),
 		};
 	}
 
