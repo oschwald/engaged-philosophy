@@ -58,7 +58,10 @@ Cloudflare constraints.
   still emits `no-store` for every recognized session, Access, preview, and
   edit request. The default retains `Vary: Cookie`, so deployments without the
   zone rule fail safely.
-- `wrangler.jsonc` runs general EmDash maintenance every minute. EmDash 0.36
+- `wrangler.jsonc` runs general EmDash maintenance every five minutes. This
+  keeps the fixed-cost cleanup scans proportionate to a low-traffic site;
+  scheduled publications can appear up to five minutes after their target
+  time. EmDash 0.36
   removed the separate Media Usage schedule; activation and repair now advance
   in bounded batches while an administrator keeps Settings -> Media usage
   tracking open.

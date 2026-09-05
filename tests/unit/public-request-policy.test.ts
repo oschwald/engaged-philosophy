@@ -43,6 +43,39 @@ describe("public request policy", () => {
 		expect(response?.headers.get("allow")).toBe("GET, HEAD, OPTIONS");
 	});
 
+	test("rejects scanner probe paths before rendering", async () => {
+		for (const path of [
+			"/.%65nv",
+			"/.env%2eproduction",
+			"/.env.production",
+			"/%70hpinfo",
+			"/phpinfo.php~",
+			"/webroot/index.php/_environment",
+			"/_ENVIRONMENT",
+			"/_profiler/phpinfo/",
+			"/api/graphql",
+			"/v1/graphql/",
+			"/WP/",
+			"/wordpress/wp-admin/install.php",
+			"/vendor/phpunit/src/Util/PHP/eval-stdin.php",
+		]) {
+			const { response } = apply(path);
+			expect(response?.status, path).toBe(404);
+			expect(response?.headers.get("cache-control"), path).toBe(
+				"public, max-age=300",
+			);
+			await expect(response?.text(), path).resolves.toBe("Not found.\n");
+		}
+	});
+
+	test("preserves legitimate legacy and framework paths", () => {
+		expect(apply("/wp-content/uploads/example.jpg").response).toBeUndefined();
+		expect(apply("/project/phpinfo-documentary/").response).toBeUndefined();
+		expect(
+			apply("/_emdash/api/graphql", { method: "POST" }).response,
+		).toBeUndefined();
+	});
+
 	test("rejects oversized and malformed request targets", () => {
 		expect(apply(`/about/?value=${"x".repeat(2049)}`).response?.status).toBe(
 			414,

@@ -61,7 +61,7 @@ if (!existsSync(DIST_WRANGLER_CONFIG)) {
 const distWranglerConfig = JSON.parse(
 	await readFile(DIST_WRANGLER_CONFIG, "utf8"),
 );
-assert.deepEqual(distWranglerConfig.triggers?.crons, ["* * * * *"]);
+assert.deepEqual(distWranglerConfig.triggers?.crons, ["*/5 * * * *"]);
 
 await rm(OUT_DIR, { recursive: true, force: true });
 
