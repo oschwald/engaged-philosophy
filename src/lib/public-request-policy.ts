@@ -102,8 +102,14 @@ function validPreviewToken(params: URLSearchParams) {
 }
 
 function isScannerProbePath(pathname: string) {
-	const normalized =
-		pathname.length > 1 ? pathname.toLowerCase().replace(/\/+$/, "") : pathname;
+	let normalized: string;
+	try {
+		normalized = decodeURIComponent(pathname).toLowerCase();
+	} catch {
+		return false;
+	}
+	normalized =
+		normalized.length > 1 ? normalized.replace(/\/+$/, "") : normalized;
 	return (
 		SCANNER_PROBE_PATHS.has(normalized) ||
 		SCANNER_PROBE_PREFIXES.some((prefix) => normalized.startsWith(prefix)) ||

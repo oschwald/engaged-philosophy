@@ -45,7 +45,10 @@ describe("public request policy", () => {
 
 	test("rejects scanner probe paths before rendering", async () => {
 		for (const path of [
+			"/.%65nv",
+			"/.env%2eproduction",
 			"/.env.production",
+			"/%70hpinfo",
 			"/phpinfo.php~",
 			"/webroot/index.php/_environment",
 			"/_ENVIRONMENT",
