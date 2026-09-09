@@ -54,7 +54,7 @@ test.describe("public sitemap", () => {
 		const response = await publicPage.goto("/sitemap.xml");
 		expect(response?.status()).toBe(200);
 		expect(response?.headers()["content-type"]).toContain("application/xml");
-		expect(response?.headers()["cache-tag"]).toContain("site-settings");
+		expect(response?.headers()["cache-tag"]).toContain("emdash:settings");
 		expect(response?.headers()["cache-tag"]).toContain("projects");
 		expect(response?.headers()["cloudflare-cdn-cache-control"]).toContain(
 			"max-age=86400",

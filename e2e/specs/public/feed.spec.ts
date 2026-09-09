@@ -27,7 +27,7 @@ test("serves published posts through the legacy RSS feed URL", async ({
 		expect(response?.headers()["content-type"]).toContain(
 			"application/rss+xml",
 		);
-		expect(response?.headers()["cache-tag"]).toContain("site-settings");
+		expect(response?.headers()["cache-tag"]).toContain("emdash:settings");
 		expect(response?.headers()["cache-tag"]).toContain("posts");
 		expect(response?.headers()["cloudflare-cdn-cache-control"]).toContain(
 			"max-age=86400",

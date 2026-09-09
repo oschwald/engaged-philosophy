@@ -18,7 +18,9 @@ test.describe("public page cache", () => {
 		publicPage,
 	}) => {
 		const manifestResponse = await publicPage.request.get("/site.webmanifest");
-		expect(manifestResponse.headers()["cache-tag"]).toContain("site-settings");
+		expect(manifestResponse.headers()["cache-tag"]).toContain(
+			"emdash:settings",
+		);
 		expect(
 			manifestResponse.headers()["cloudflare-cdn-cache-control"],
 		).toContain("max-age=86400");
@@ -26,7 +28,7 @@ test.describe("public page cache", () => {
 		const faviconResponse = await publicPage.request.get("/favicon.ico", {
 			maxRedirects: 0,
 		});
-		expect(faviconResponse.headers()["cache-tag"]).toContain("site-settings");
+		expect(faviconResponse.headers()["cache-tag"]).toContain("emdash:settings");
 	});
 
 	test("advertises the public media URL for the browser favicon", async ({
@@ -82,8 +84,12 @@ test.describe("public page cache", () => {
 		expect(anonymousResponse.headers()["cache-control"]).toBe(
 			"public, max-age=0, must-revalidate",
 		);
-		expect(anonymousResponse.headers()["cache-tag"]).toContain("site-settings");
-		expect(anonymousResponse.headers()["cache-tag"]).toContain("menu:primary");
+		expect(anonymousResponse.headers()["cache-tag"]).toContain(
+			"emdash:settings",
+		);
+		expect(anonymousResponse.headers()["cache-tag"]).toContain(
+			"emdash:menu:primary",
+		);
 
 		await publicPage.context().addCookies([
 			{

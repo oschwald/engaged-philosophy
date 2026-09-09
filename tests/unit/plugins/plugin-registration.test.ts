@@ -4,10 +4,7 @@ import auditLogPlugin from "@emdash-cms/plugin-audit-log";
 import auditLogDefinition from "@emdash-cms/plugin-audit-log/sandbox";
 import { adaptSandboxEntry, HookPipeline } from "emdash";
 
-import {
-	configuredAuditLogPlugin,
-	emdashPlugins,
-} from "../../../astro.config.mjs";
+import { emdashPlugins } from "../../../astro.config.mjs";
 
 import { createPlugin as createLegacyContentPlugin } from "../../../src/plugins/legacy-content-blocks";
 
@@ -51,10 +48,9 @@ describe("EmDash plugin registration", () => {
 	});
 
 	test("grants the capabilities required by the audit log hooks", () => {
-		const plugin = configuredAuditLogPlugin;
+		const plugin = auditLogPlugin;
 
 		expect(emdashPlugins).toContain(plugin);
-		expect(plugin).not.toBe(auditLogPlugin);
 		expect(plugin).toMatchObject({
 			format: "standard",
 			entrypoint: "@emdash-cms/plugin-audit-log/sandbox",
