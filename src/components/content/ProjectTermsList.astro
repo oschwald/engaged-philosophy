@@ -19,26 +19,22 @@ const visibleGroups = Astro.props.groups.filter(
 );
 ---
 
-{
-	visibleGroups.length > 0 && (
-		<div class="well bg-light p-3 border rounded">
-			<dl class="mb-0">
-				{visibleGroups.map((group) => (
-					<>
-						<dt>{group.label}</dt>
-						<dd>
-							{group.terms.map((term, index) => (
-								<>
-									{index > 0 && ", "}
-									<a href={`/${group.pathPrefix}/${term.slug}/`}>
-										{term.label}
-									</a>
-								</>
-							))}
-						</dd>
-					</>
-				))}
-			</dl>
-		</div>
-	)
-}
+{visibleGroups.length > 0 && (
+	<div class="well bg-light p-3 border rounded">
+		<dl class="mb-0">
+			{visibleGroups.map((group) => (
+				<>
+					<dt>{group.label}</dt>
+					<dd>
+						{group.terms.map((term, index) => (
+							<>
+								{index > 0 && ", "}
+								<a href={`/${group.pathPrefix}/${term.slug}/`}>{term.label}</a>
+							</>
+						))}
+					</dd>
+				</>
+			))}
+		</dl>
+	</div>
+)}

@@ -25,42 +25,37 @@ const notFound = !page && !term;
 if (notFound) Astro.response.status = 404;
 ---
 
-{
-	notFound ? (
-		<NotFound />
-	) : page ? (
-		<Base
-			title={page.data.title}
-			content={{ collection: "pages", entry: page }}
-		>
-			<section id="primary" class="col-12 px-4">
-				<main id="content">
-					<article {...page.edit}>
-						<header class="page-header">
-							<h1 class="entry-title" {...page.edit.title}>
-								{page.data.title}
-							</h1>
-						</header>
-						<div class="entry-content" {...page.edit.content}>
-							<RichContent value={getEntryContent(page.data)} />
-						</div>
-					</article>
-				</main>
-			</section>
-		</Base>
-	) : (
-		<Base
-			title={term?.label}
-			bodyClass={`archive tax-${taxonomy} term-${slug} wp-theme-engaged-philosophy-20 content-sidebar`}
-			cacheTags={["projects", taxonomyCacheTag(taxonomy)]}
-		>
-			<TaxonomyArchive
-				taxonomy={taxonomy}
-				label={term?.label ?? ""}
-				projects={projectPage.entries}
-				hasMore={projectPage.hasMore}
-				page={1}
-			/>
-		</Base>
-	)
-}
+{notFound ? (
+	<NotFound />
+) : page ? (
+	<Base title={page.data.title} content={{ collection: "pages", entry: page }}>
+		<section id="primary" class="col-12 px-4">
+			<main id="content">
+				<article {...page.edit}>
+					<header class="page-header">
+						<h1 class="entry-title" {...page.edit.title}>
+							{page.data.title}
+						</h1>
+					</header>
+					<div class="entry-content" {...page.edit.content}>
+						<RichContent value={getEntryContent(page.data)} />
+					</div>
+				</article>
+			</main>
+		</section>
+	</Base>
+) : (
+	<Base
+		title={term?.label}
+		bodyClass={`archive tax-${taxonomy} term-${slug} wp-theme-engaged-philosophy-20 content-sidebar`}
+		cacheTags={["projects", taxonomyCacheTag(taxonomy)]}
+	>
+		<TaxonomyArchive
+			taxonomy={taxonomy}
+			label={term?.label ?? ""}
+			projects={projectPage.entries}
+			hasMore={projectPage.hasMore}
+			page={1}
+		/>
+	</Base>
+)}

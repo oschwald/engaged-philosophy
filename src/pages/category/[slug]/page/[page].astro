@@ -25,26 +25,24 @@ const found = term && postPage.entries.length > 0;
 if (!found) Astro.response.status = 404;
 ---
 
-{
-	found ? (
-		<Base
-			title={`Category: ${term.label} – Page ${pageNumber}`}
-			bodyClass={`archive category category-${slug} paged paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
-			cacheTags={["posts", taxonomyCacheTag("category")]}
-		>
-			<div class="container-fluid">
-				<div class="row">
-					<CategoryArchive
-						slug={slug}
-						label={term.label}
-						posts={postPage.entries}
-						hasMore={postPage.hasMore}
-						page={pageNumber}
-					/>
-				</div>
+{found ? (
+	<Base
+		title={`Category: ${term.label} – Page ${pageNumber}`}
+		bodyClass={`archive category category-${slug} paged paged-${pageNumber} wp-theme-engaged-philosophy-20 content-sidebar`}
+		cacheTags={["posts", taxonomyCacheTag("category")]}
+	>
+		<div class="container-fluid">
+			<div class="row">
+				<CategoryArchive
+					slug={slug}
+					label={term.label}
+					posts={postPage.entries}
+					hasMore={postPage.hasMore}
+					page={pageNumber}
+				/>
 			</div>
-		</Base>
-	) : (
-		<NotFound />
-	)
-}
+		</div>
+	</Base>
+) : (
+	<NotFound />
+)}

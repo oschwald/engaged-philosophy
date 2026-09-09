@@ -54,16 +54,31 @@ const bodyClass = page
 	: "";
 ---
 
-{
-	page ? (
-		<Base
-			title={page.data.title}
-			bodyClass={bodyClass}
-			content={{ collection: "pages", entry: page }}
-		>
-			{useFullWidthTemplate ? (
-				<section id="primary" class="col-12 px-4">
-					<main id="content">
+{page ? (
+	<Base
+		title={page.data.title}
+		bodyClass={bodyClass}
+		content={{ collection: "pages", entry: page }}
+	>
+		{useFullWidthTemplate ? (
+			<section id="primary" class="col-12 px-4">
+				<main id="content">
+					<article {...page.edit}>
+						<header class="page-header">
+							<h1 class="entry-title" {...page.edit.title}>
+								{page.data.title}
+							</h1>
+						</header>
+						<div class="entry-content" {...page.edit.content}>
+							<RichContent value={getEntryContent(page.data)} />
+						</div>
+					</article>
+				</main>
+			</section>
+		) : (
+			<div class="container-fluid">
+				<section id="primary" class="p-4">
+					<div id="content" role="main">
 						<article {...page.edit}>
 							<header class="page-header">
 								<h1 class="entry-title" {...page.edit.title}>
@@ -74,28 +89,11 @@ const bodyClass = page
 								<RichContent value={getEntryContent(page.data)} />
 							</div>
 						</article>
-					</main>
+					</div>
 				</section>
-			) : (
-				<div class="container-fluid">
-					<section id="primary" class="p-4">
-						<div id="content" role="main">
-							<article {...page.edit}>
-								<header class="page-header">
-									<h1 class="entry-title" {...page.edit.title}>
-										{page.data.title}
-									</h1>
-								</header>
-								<div class="entry-content" {...page.edit.content}>
-									<RichContent value={getEntryContent(page.data)} />
-								</div>
-							</article>
-						</div>
-					</section>
-				</div>
-			)}
-		</Base>
-	) : (
-		<NotFound />
-	)
-}
+			</div>
+		)}
+	</Base>
+) : (
+	<NotFound />
+)}

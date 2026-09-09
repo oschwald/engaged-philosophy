@@ -44,92 +44,92 @@ const homeBoxes = home
 	title={query ? `Search Results for: ${query}` : home?.data.title}
 	content={!query && home ? { collection: "pages", entry: home } : undefined}
 	cacheTags={!query ? ["projects"] : undefined}
-	bodyClass={query
-		? "search search-results wp-theme-engaged-philosophy-20 content-sidebar"
-		: "home page-template page-template-templates page-template-home"}
->
-	{
-		query && search ? (
-			<SearchResults query={query} search={search} />
-		) : (
-			<section id="primary" class="col-12">
-				<main id="content" {...homeEntryAttrs}>
-					<div class="row">
-						<div
-							id="projects_carousel"
-							class="carousel slide col-lg-9 ps-3 pe-0"
-							data-bs-ride="carousel"
-							data-bs-interval="30000"
-						>
-							<div class="carousel-inner">
-								{highlightedProjects.map((project, index) => (
-									<div class:list={["carousel-item", index === 0 && "active"]}>
-										{project.data.featured_image?.src && (
-											<img
-												src={project.data.featured_image.src}
-												alt={`${project.data.title} project image`}
-												width="700"
-												height="460"
-											/>
-										)}
-										<div class="carousel-caption">
-											<h4>{project.data.title}</h4>
-											<p>
-												{getExcerptText(
-													getEntryExcerpt(project.data),
-													getEntryContent(project.data),
-												)}{" "}
-												<a
-													href={`/${projectPath(project.data.slug || project.id)}/`}
-												>
-													Continue reading <span class="meta-nav">&rarr;</span>
-												</a>
-											</p>
-										</div>
-									</div>
-								))}
-							</div>
-							<button
-								class="carousel-control-prev"
-								type="button"
-								data-bs-target="#projects_carousel"
-								data-bs-slide="prev"
-							>
-								<span class="carousel-control-prev-icon" aria-hidden="true" />
-								<span class="visually-hidden">Previous</span>
-							</button>
-							<button
-								class="carousel-control-next"
-								type="button"
-								data-bs-target="#projects_carousel"
-								data-bs-slide="next"
-							>
-								<span class="carousel-control-next-icon" aria-hidden="true" />
-								<span class="visually-hidden">Next</span>
-							</button>
-						</div>
-						<div class="col-lg-3">
-							<div class="lead-home" {...(home?.edit.content ?? {})}>
-								<RichContent
-									value={home ? getEntryContent(home.data) : undefined}
-								/>
-							</div>
-						</div>
-					</div>
-					<div class="row mt-4">
-						{homeBoxes.map((box) => (
-							<div class="col-lg-4 mb-4">
-								{box.title && home && (
-									<h2 {...(home.edit[box.titleField] ?? {})}>{box.title}</h2>
-								)}
-								<div {...(home?.edit[box.htmlField] ?? {})}>
-									<RichContent value={box.html} />
-								</div>
-							</div>
-						))}
-					</div>
-				</main>
-			</section>
-		)
+	bodyClass={
+		query
+			? "search search-results wp-theme-engaged-philosophy-20 content-sidebar"
+			: "home page-template page-template-templates page-template-home"
 	}
+>
+	{query && search ? (
+		<SearchResults query={query} search={search} />
+	) : (
+		<section id="primary" class="col-12">
+			<main id="content" {...homeEntryAttrs}>
+				<div class="row">
+					<div
+						id="projects_carousel"
+						class="carousel slide col-lg-9 ps-3 pe-0"
+						data-bs-ride="carousel"
+						data-bs-interval="30000"
+					>
+						<div class="carousel-inner">
+							{highlightedProjects.map((project, index) => (
+								<div class:list={["carousel-item", index === 0 && "active"]}>
+									{project.data.featured_image?.src && (
+										<img
+											src={project.data.featured_image.src}
+											alt={`${project.data.title} project image`}
+											width="700"
+											height="460"
+										/>
+									)}
+									<div class="carousel-caption">
+										<h4>{project.data.title}</h4>
+										<p>
+											{getExcerptText(
+												getEntryExcerpt(project.data),
+												getEntryContent(project.data),
+											)}{" "}
+											<a
+												href={`/${projectPath(project.data.slug || project.id)}/`}
+											>
+												Continue reading <span class="meta-nav">&rarr;</span>
+											</a>
+										</p>
+									</div>
+								</div>
+							))}
+						</div>
+						<button
+							class="carousel-control-prev"
+							type="button"
+							data-bs-target="#projects_carousel"
+							data-bs-slide="prev"
+						>
+							<span class="carousel-control-prev-icon" aria-hidden="true" />
+							<span class="visually-hidden">Previous</span>
+						</button>
+						<button
+							class="carousel-control-next"
+							type="button"
+							data-bs-target="#projects_carousel"
+							data-bs-slide="next"
+						>
+							<span class="carousel-control-next-icon" aria-hidden="true" />
+							<span class="visually-hidden">Next</span>
+						</button>
+					</div>
+					<div class="col-lg-3">
+						<div class="lead-home" {...(home?.edit.content ?? {})}>
+							<RichContent
+								value={home ? getEntryContent(home.data) : undefined}
+							/>
+						</div>
+					</div>
+				</div>
+				<div class="row mt-4">
+					{homeBoxes.map((box) => (
+						<div class="col-lg-4 mb-4">
+							{box.title && home && (
+								<h2 {...(home.edit[box.titleField] ?? {})}>{box.title}</h2>
+							)}
+							<div {...(home?.edit[box.htmlField] ?? {})}>
+								<RichContent value={box.html} />
+							</div>
+						</div>
+					))}
+				</div>
+			</main>
+		</section>
+	)}
 </Base>

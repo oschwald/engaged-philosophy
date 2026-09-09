@@ -14,16 +14,14 @@ const [{ entries: recentPosts }, settings] = await Promise.all([
 	<aside id="recent-posts-2" class="widget card mb-4 widget_recent_entries">
 		<h2 class="widget-title card-header h5 mb-0">Recent Interviews</h2>
 		<ul>
-			{
-				recentPosts.map((post) => (
-					<li>
-						<a href={`/${post.data.path}/`}>{post.data.title}</a>{" "}
-						<span class="post-date">
-							{formatPublicationDate(post.data.publishedAt, settings)}
-						</span>
-					</li>
-				))
-			}
+			{recentPosts.map((post) => (
+				<li>
+					<a href={`/${post.data.path}/`}>{post.data.title}</a>{" "}
+					<span class="post-date">
+						{formatPublicationDate(post.data.publishedAt, settings)}
+					</span>
+				</li>
+			))}
 		</ul>
 	</aside>
 </section>

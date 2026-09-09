@@ -51,95 +51,93 @@ const nextHref =
 	<div class="row">
 		<section id="primary" class="col-lg-8 p-4">
 			<div id="content" role="main">
-				{
-					results.length > 0 ? (
-						<>
-							<header class="page-header mb-4 pb-3 border-bottom">
-								<h1 class="page-title h2 mb-0">
-									Search Results for: <span>{query}</span>
-								</h1>
-							</header>
+				{results.length > 0 ? (
+					<>
+						<header class="page-header mb-4 pb-3 border-bottom">
+							<h1 class="page-title h2 mb-0">
+								Search Results for: <span>{query}</span>
+							</h1>
+						</header>
 
-							{results.map((result) => (
-								<EntrySummary
-									articleClass={`mb-5 pb-4 border-bottom ${result.kind} type-${result.kind}`}
-									title={result.title}
-									continueHref={`/${result.path}/`}
-									excerpt={result.excerpt}
-									image={{ src: result.imageSrc, alt: result.title }}
-									showContinueWithoutExcerpt={false}
-								/>
-							))}
+						{results.map((result) => (
+							<EntrySummary
+								articleClass={`mb-5 pb-4 border-bottom ${result.kind} type-${result.kind}`}
+								title={result.title}
+								continueHref={`/${result.path}/`}
+								excerpt={result.excerpt}
+								image={{ src: result.imageSrc, alt: result.title }}
+								showContinueWithoutExcerpt={false}
+							/>
+						))}
 
-							{(previousHref || nextHref) && (
-								<nav aria-label="Search result pages">
-									<ul class="pagination justify-content-center">
-										<li class:list={["page-item", !previousHref && "disabled"]}>
-											{previousHref ? (
-												<a class="page-link" href={previousHref}>
-													Previous &laquo;
-												</a>
-											) : (
-												<span class="page-link">Previous &laquo;</span>
-											)}
-										</li>
-										<li class="page-item active">
-											<span aria-current="page" class="page-link">
-												{page}
-											</span>
-										</li>
-										<li class:list={["page-item", !nextHref && "disabled"]}>
-											{nextHref ? (
-												<a class="page-link" href={nextHref}>
-													Next &raquo;
-												</a>
-											) : (
-												<span class="page-link">Next &raquo;</span>
-											)}
-										</li>
-									</ul>
-								</nav>
-							)}
-						</>
-					) : (
-						<article class="post no-results not-found">
-							<header class="page-header">
-								<h1 class="entry-title">Nothing Found</h1>
-							</header>
+						{(previousHref || nextHref) && (
+							<nav aria-label="Search result pages">
+								<ul class="pagination justify-content-center">
+									<li class:list={["page-item", !previousHref && "disabled"]}>
+										{previousHref ? (
+											<a class="page-link" href={previousHref}>
+												Previous &laquo;
+											</a>
+										) : (
+											<span class="page-link">Previous &laquo;</span>
+										)}
+									</li>
+									<li class="page-item active">
+										<span aria-current="page" class="page-link">
+											{page}
+										</span>
+									</li>
+									<li class:list={["page-item", !nextHref && "disabled"]}>
+										{nextHref ? (
+											<a class="page-link" href={nextHref}>
+												Next &raquo;
+											</a>
+										) : (
+											<span class="page-link">Next &raquo;</span>
+										)}
+									</li>
+								</ul>
+							</nav>
+						)}
+					</>
+				) : (
+					<article class="post no-results not-found">
+						<header class="page-header">
+							<h1 class="entry-title">Nothing Found</h1>
+						</header>
 
-							<div class="entry-content">
-								<p>
-									Sorry, but nothing matched your search criteria. Please try
-									again with some different keywords.
-								</p>
-								<form method="get" id="searchform" class="d-flex" action="/">
-									<label for="search-results-query" class="visually-hidden">
-										Search
-									</label>
-									<div class="input-group">
-										<input
-											id="search-results-query"
-											class="form-control"
-											type="search"
-											name="s"
-											value={query}
-											placeholder="Search"
-										/>
-										<button
-											class="btn btn-primary"
-											name="submit"
-											id="searchsubmit"
-											type="submit"
-											aria-label="Submit search"
-										>
-											<i class="bi bi-search" />
-										</button>
-									</div>
-								</form>
-							</div>
-						</article>
-					)
-				}
+						<div class="entry-content">
+							<p>
+								Sorry, but nothing matched your search criteria. Please try
+								again with some different keywords.
+							</p>
+							<form method="get" id="searchform" class="d-flex" action="/">
+								<label for="search-results-query" class="visually-hidden">
+									Search
+								</label>
+								<div class="input-group">
+									<input
+										id="search-results-query"
+										class="form-control"
+										type="search"
+										name="s"
+										value={query}
+										placeholder="Search"
+									/>
+									<button
+										class="btn btn-primary"
+										name="submit"
+										id="searchsubmit"
+										type="submit"
+										aria-label="Submit search"
+									>
+										<i class="bi bi-search" />
+									</button>
+								</div>
+							</form>
+						</div>
+					</article>
+				)}
 			</div>
 		</section>
 

@@ -50,26 +50,24 @@ const maxCount = counts.length ? Math.max(...counts) : 0;
 				<div class="row">
 					<div class="col-12">
 						<div class="tag-cloud-projects">
-							{
-								visibleTopics.map((topic) => {
-									const count = topic.count ?? 0;
-									const scale =
-										maxCount > minCount
-											? (count - minCount) / (maxCount - minCount)
-											: 0;
-									const fontSize = 13 + scale * (32 - 13);
-									const fontSizeClass = `tag-link-size-${Math.round(fontSize)}`;
+							{visibleTopics.map((topic) => {
+								const count = topic.count ?? 0;
+								const scale =
+									maxCount > minCount
+										? (count - minCount) / (maxCount - minCount)
+										: 0;
+								const fontSize = 13 + scale * (32 - 13);
+								const fontSizeClass = `tag-link-size-${Math.round(fontSize)}`;
 
-									return (
-										<a
-											href={`/topic/${topic.slug}/`}
-											class={`tag-link ${fontSizeClass}`}
-										>
-											{topic.label}
-										</a>
-									);
-								})
-							}
+								return (
+									<a
+										href={`/topic/${topic.slug}/`}
+										class={`tag-link ${fontSizeClass}`}
+									>
+										{topic.label}
+									</a>
+								);
+							})}
 						</div>
 					</div>
 				</div>

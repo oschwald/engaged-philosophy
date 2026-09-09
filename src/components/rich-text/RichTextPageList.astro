@@ -14,11 +14,9 @@ const pages = (await getPublishedPages())
 ---
 
 <ul class="legacy-page-list">
-	{
-		pages.map((page) => (
-			<li>
-				<a href={`/${page.path}/`}>{page.title}</a>
-			</li>
-		))
-	}
+	{pages.map((page) => (
+		<li>
+			<a href={`/${page.path}/`}>{page.title}</a>
+		</li>
+	))}
 </ul>

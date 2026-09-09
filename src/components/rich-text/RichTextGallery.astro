@@ -40,9 +40,7 @@ const galleryNode =
 	]}
 >
 	<EmDashGallery node={galleryNode} />
-	{
-		hasSeparateCaption && (
-			<p class="legacy-gallery-compat__caption">{node.caption}</p>
-		)
-	}
+	{hasSeparateCaption && (
+		<p class="legacy-gallery-compat__caption">{node.caption}</p>
+	)}
 </div>

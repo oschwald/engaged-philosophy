@@ -39,27 +39,23 @@ const shouldShowSummary = Boolean(excerpt || showContinueWithoutExcerpt);
 	</header>
 
 	<div class="entry-content text-muted lh-base">
-		{
-			image?.src && (
-				<img
-					src={image.src}
-					class={imageClass}
-					alt={image.alt || title}
-					width="150"
-					height="150"
-				/>
-			)
-		}
-		{
-			shouldShowSummary && (
-				<p>
-					{excerpt}
-					{excerpt && " "}
-					<a href={continueHref}>
-						Continue reading <span class="meta-nav">&rarr;</span>
-					</a>
-				</p>
-			)
-		}
+		{image?.src && (
+			<img
+				src={image.src}
+				class={imageClass}
+				alt={image.alt || title}
+				width="150"
+				height="150"
+			/>
+		)}
+		{shouldShowSummary && (
+			<p>
+				{excerpt}
+				{excerpt && " "}
+				<a href={continueHref}>
+					Continue reading <span class="meta-nav">&rarr;</span>
+				</a>
+			</p>
+		)}
 	</div>
 </article>
