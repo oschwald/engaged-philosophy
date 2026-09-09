@@ -75,12 +75,12 @@ test.describe("public not-found responses", () => {
 				"pages",
 				"posts",
 				"projects",
-				"taxonomy:category",
-				"taxonomy:topic",
-				"taxonomy:schools",
-				"taxonomy:professors",
-				"taxonomy:courses",
-				"taxonomy:semesters",
+				"emdash:taxonomy:category",
+				"emdash:taxonomy:topic",
+				"emdash:taxonomy:schools",
+				"emdash:taxonomy:professors",
+				"emdash:taxonomy:courses",
+				"emdash:taxonomy:semesters",
 			]),
 		);
 

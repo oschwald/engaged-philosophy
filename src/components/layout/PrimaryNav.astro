@@ -36,56 +36,54 @@ function isCurrentUrl(url: string) {
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<div class="menu-main-menu-container">
 				<ul id="menu-main-menu" class="navbar-nav ms-auto">
-					{
-						menuItems.map((item) => {
-							const hasChildren = item.children.length > 0;
-							const isActive = isCurrentUrl(item.url);
-							const isBranchActive =
-								hasChildren &&
-								item.children.some((child) => isCurrentUrl(child.url));
+					{menuItems.map((item) => {
+						const hasChildren = item.children.length > 0;
+						const isActive = isCurrentUrl(item.url);
+						const isBranchActive =
+							hasChildren &&
+							item.children.some((child) => isCurrentUrl(child.url));
 
-							return (
-								<li
-									class:list={[
-										"menu-item",
-										"nav-item",
-										hasChildren && "dropdown",
-										(isActive || isBranchActive) && "active",
-									]}
+						return (
+							<li
+								class:list={[
+									"menu-item",
+									"nav-item",
+									hasChildren && "dropdown",
+									(isActive || isBranchActive) && "active",
+								]}
+							>
+								<a
+									class:list={["nav-link", hasChildren && "dropdown-toggle"]}
+									href={hasChildren ? "#" : item.url}
+									target={item.target}
+									{...(hasChildren
+										? {
+												"data-bs-toggle": "dropdown",
+												"aria-expanded": "false",
+												"aria-haspopup": "true",
+											}
+										: {})}
 								>
-									<a
-										class:list={["nav-link", hasChildren && "dropdown-toggle"]}
-										href={hasChildren ? "#" : item.url}
-										target={item.target}
-										{...(hasChildren
-											? {
-													"data-bs-toggle": "dropdown",
-													"aria-expanded": "false",
-													"aria-haspopup": "true",
-												}
-											: {})}
-									>
-										{item.label}
-									</a>
-									{hasChildren && (
-										<ul class="dropdown-menu">
-											{item.children.map((child) => (
-												<li class="menu-item nav-item">
-													<a
-														class="dropdown-item"
-														href={child.url}
-														target={child.target}
-													>
-														{child.label}
-													</a>
-												</li>
-											))}
-										</ul>
-									)}
-								</li>
-							);
-						})
-					}
+									{item.label}
+								</a>
+								{hasChildren && (
+									<ul class="dropdown-menu">
+										{item.children.map((child) => (
+											<li class="menu-item nav-item">
+												<a
+													class="dropdown-item"
+													href={child.url}
+													target={child.target}
+												>
+													{child.label}
+												</a>
+											</li>
+										))}
+									</ul>
+								)}
+							</li>
+						);
+					})}
 				</ul>
 			</div>
 			<form
@@ -96,7 +94,9 @@ function isCurrentUrl(url: string) {
 				role="search"
 				aria-label="Search the site"
 			>
-				<label for="s" class="visually-hidden">Search</label>
+				<label for="s" class="visually-hidden">
+					Search
+				</label>
 				<input
 					type="search"
 					class="form-control"

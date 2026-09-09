@@ -2,6 +2,7 @@ import {
 	getEmDashCollection,
 	getEmDashEntry,
 	getTaxonomyTerms as getEmDashTaxonomyTerms,
+	getTerm,
 	type ContentEntry as EmDashContentEntry,
 } from "emdash";
 
@@ -249,9 +250,6 @@ export async function getTaxonomyTerms(taxonomy: string) {
  * counts for every term in the taxonomy. Archive templates only render the
  * selected term's label, so computing counts here is unnecessary D1 work.
  */
-export async function getTaxonomyTerm(taxonomy: string, slug: string) {
-	const terms = flattenTerms(
-		await getEmDashTaxonomyTerms(taxonomy, { includeCounts: false }),
-	);
-	return terms.find((term) => term.slug === slug) ?? null;
+export function getTaxonomyTerm(taxonomy: string, slug: string) {
+	return getTerm(taxonomy, slug, { includeCounts: false });
 }

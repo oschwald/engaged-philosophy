@@ -12,33 +12,31 @@ const embedUrl = safeUrlForIframeSrc(node.embedUrl);
 const linkUrl = safeUrlForHref(node.url);
 ---
 
-{
-	embedUrl ? (
-		<figure
-			class:list={[
-				"legacy-embed",
-				node.provider && `legacy-embed--${node.provider}`,
-			]}
-		>
-			<div class="legacy-embed__frame">
-				<iframe
-					src={embedUrl}
-					title={title}
-					loading="lazy"
-					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-					allowfullscreen
-					referrerpolicy="strict-origin-when-cross-origin"
-				/>
-			</div>
-		</figure>
-	) : (
-		linkUrl && (
-			<p>
-				<a href={linkUrl}>{title}</a>
-			</p>
-		)
+{embedUrl ? (
+	<figure
+		class:list={[
+			"legacy-embed",
+			node.provider && `legacy-embed--${node.provider}`,
+		]}
+	>
+		<div class="legacy-embed__frame">
+			<iframe
+				src={embedUrl}
+				title={title}
+				loading="lazy"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+				allowfullscreen
+				referrerpolicy="strict-origin-when-cross-origin"
+			></iframe>
+		</div>
+	</figure>
+) : (
+	linkUrl && (
+		<p>
+			<a href={linkUrl}>{title}</a>
+		</p>
 	)
-}
+)}
 
 <style>
 	.legacy-embed {

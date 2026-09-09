@@ -365,6 +365,9 @@ export async function createAndPublishContentViaAdmin(
 		})
 		.first()
 		.click();
+	await page
+		.getByRole("menuitem", { name: "Publish now", exact: true })
+		.click();
 	const publishedBody = await expectJsonResponse(
 		await publishResponsePromise,
 		`publish ${collection}`,

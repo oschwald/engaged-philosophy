@@ -11,24 +11,22 @@ const safeSrc = safeUrlForMediaSrc(node.url);
 const src = safeSrc.startsWith("https://") ? safeSrc : "";
 ---
 
-{
-	src && (
-		<figure class="legacy-video">
-			<video
-				controls
-				preload="metadata"
-				playsinline
-				width={node.width}
-				height={node.height}
-				aria-label={node.title || undefined}
-			>
-				<source src={src} type={node.mimeType || undefined} />
-				<a href={src}>{node.title || src}</a>
-			</video>
-			{node.title && <figcaption>{node.title}</figcaption>}
-		</figure>
-	)
-}
+{src && (
+	<figure class="legacy-video">
+		<video
+			controls
+			preload="metadata"
+			playsinline
+			width={node.width}
+			height={node.height}
+			aria-label={node.title || undefined}
+		>
+			<source src={src} type={node.mimeType || undefined} />
+			<a href={src}>{node.title || src}</a>
+		</video>
+		{node.title && <figcaption>{node.title}</figcaption>}
+	</figure>
+)}
 
 <style>
 	.legacy-video {

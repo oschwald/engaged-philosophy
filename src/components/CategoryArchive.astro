@@ -38,32 +38,30 @@ function pageHref(pageNumber: number) {
 			</h1>
 		</header>
 
-		{
-			posts.length > 0 ? (
-				posts.map((post) => (
-					<EntrySummary
-						articleClass="mb-5 pb-4 border-bottom post"
-						title={post.data.title ?? ""}
-						titleHref={`/${post.data.path}/`}
-						meta={formatPublicationDate(post.data.publishedAt, settings)}
-						continueHref={`/${post.data.path}/`}
-						excerpt={getExcerptText(
-							getEntryExcerpt(post.data),
-							getEntryContent(post.data),
-						)}
-					/>
-				))
-			) : (
-				<article class="post no-results not-found">
-					<header class="page-header">
-						<h1 class="entry-title">Nothing Found</h1>
-					</header>
-					<div class="entry-content">
-						<p>No posts were found for this category.</p>
-					</div>
-				</article>
-			)
-		}
+		{posts.length > 0 ? (
+			posts.map((post) => (
+				<EntrySummary
+					articleClass="mb-5 pb-4 border-bottom post"
+					title={post.data.title ?? ""}
+					titleHref={`/${post.data.path}/`}
+					meta={formatPublicationDate(post.data.publishedAt, settings)}
+					continueHref={`/${post.data.path}/`}
+					excerpt={getExcerptText(
+						getEntryExcerpt(post.data),
+						getEntryContent(post.data),
+					)}
+				/>
+			))
+		) : (
+			<article class="post no-results not-found">
+				<header class="page-header">
+					<h1 class="entry-title">Nothing Found</h1>
+				</header>
+				<div class="entry-content">
+					<p>No posts were found for this category.</p>
+				</div>
+			</article>
+		)}
 
 		<Pagination
 			currentPage={page}

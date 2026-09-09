@@ -28,21 +28,19 @@ if (validRequest) {
 if (!search?.results.length) Astro.response.status = 404;
 ---
 
-{
-	search && search.results.length > 0 ? (
-		<Base
-			title={`Search Results for: ${query}${pageNumber > 1 ? ` – Page ${pageNumber}` : ""}`}
-			bodyClass={`search search-results${pageNumber > 1 ? ` paged paged-${pageNumber}` : ""} wp-theme-engaged-philosophy-20 content-sidebar`}
-		>
-			<SearchResults
-				query={query}
-				search={search}
-				page={pageNumber}
-				cursor={cursor}
-				history={history}
-			/>
-		</Base>
-	) : (
-		<NotFound />
-	)
-}
+{search && search.results.length > 0 ? (
+	<Base
+		title={`Search Results for: ${query}${pageNumber > 1 ? ` – Page ${pageNumber}` : ""}`}
+		bodyClass={`search search-results${pageNumber > 1 ? ` paged paged-${pageNumber}` : ""} wp-theme-engaged-philosophy-20 content-sidebar`}
+	>
+		<SearchResults
+			query={query}
+			search={search}
+			page={pageNumber}
+			cursor={cursor}
+			history={history}
+		/>
+	</Base>
+) : (
+	<NotFound />
+)}

@@ -9,14 +9,39 @@ do not reimport from WordPress.
    - `pnpm run ci`
 2. Deploy the Worker:
    - `pnpm run deploy`
-3. After the EmDash 0.36 deploy, verify that the admin dashboard reports a
-   healthy scheduler heartbeat. Open **Settings -> Media usage tracking**,
-   enable tracking if needed, and keep the page open until it reports **Ready**.
+3. After the EmDash 0.37 deploy, verify that the admin dashboard reports a
+   healthy scheduler heartbeat and that migration
+   `074_content_deleted_scheduled_index` has completed. Open **Settings ->
+   Media usage tracking**, enable tracking if needed, and keep the page open
+   until it reports **Ready**.
 4. Run deployed smoke checks against the canonical hostname:
    - `LIVE_BASE_URL=https://www.engagedphilosophy.com pnpm run smoke:live`
    - `LIVE_BASE_URL=https://www.engagedphilosophy.com pnpm run smoke:live:sitemap`
 
 Use `LIVE_SMOKE_PATH_FILE` with `pnpm run smoke:live` for one-off path lists.
+
+## Media Editing
+
+Use a cropped copy when the original should remain available. Replacing an
+original preserves its media ID and URL but overwrites its bytes without
+keeping history. EmDash writes revalidation metadata on replacements, but
+does not purge existing CDN entries on the site's separate public media
+hostname or copies already cached by browsers. Check that delivery path and
+purge the affected CDN URL if immediate visibility is needed. Existing browser
+copies may still require revalidation; use a new copy and URL when that delay
+is unacceptable.
+
+Saved legacy display dimensions do not automatically follow a replacement's
+new aspect ratio. Check affected pages after cropping or replacing an image.
+Public media continues to use direct R2 delivery; Astro's existing default
+`IMAGES` binding is adapter-managed.
+
+## MCP Content Changes
+
+EmDash's `content_update`, `content_publish`, `content_unpublish`, and
+`content_discard_draft` MCP tools require `_rev`. Read with `content_get`, pass
+the token back unchanged, and reread/reconcile after a conflict. Repository
+automation does not currently call these tools.
 
 ## Post-Migration Maintenance
 

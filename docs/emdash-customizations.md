@@ -30,9 +30,11 @@ Cloudflare constraints.
 - Page cache tags describe the content entry, collection lists, site settings,
   primary menu, and taxonomy data actually rendered. EmDash already invalidates
   entry and collection tags, and EmDash 0.32 avoids purging them for draft-only
-  revision saves that cannot change public HTML. Site middleware adds settings,
-  primary-menu, and taxonomy invalidation, batching every affected tag into one
-  purge request. This keeps the additional purge load small on Workers Free.
+  revision saves that cannot change public HTML. EmDash 0.37 also invalidates
+  settings, menus, and taxonomy definitions/terms using its native `emdash:*`
+  tags. Site middleware only covers content-term assignments, whose upstream
+  route still clears the object cache without purging edge HTML. It batches
+  the collection, entry, and taxonomy tags into one purge request.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
   controls wait for pending inline saves. EmDash 0.31 flushes edits when the
   browser navigates away, but its toolbar can still publish before a Portable
@@ -61,10 +63,12 @@ Cloudflare constraints.
 - `wrangler.jsonc` runs general EmDash maintenance every five minutes. This
   keeps the fixed-cost cleanup scans proportionate to a low-traffic site;
   scheduled publications can appear up to five minutes after their target
-  time. EmDash 0.36
-  removed the separate Media Usage schedule; activation and repair now advance
-  in bounded batches while an administrator keeps Settings -> Media usage
-  tracking open.
+  time. EmDash 0.37 adds the scheduled-content index migration
+  `074_content_deleted_scheduled_index` and bounds media-usage cleanup reads.
+  Keep the five-minute cadence to limit the remaining fixed maintenance cost.
+  EmDash 0.36 removed the separate Media Usage schedule; activation and repair
+  now advance in bounded batches while an administrator keeps Settings ->
+  Media usage tracking open.
 - Core database migrations remain in EmDash's default automatic runtime mode.
   EmDash 0.35 and newer also emit the ignored `.emdash/migrations.json` build
   artifact for a future deployment-managed migration job; switching to check or
@@ -104,9 +108,10 @@ backend failures degrade to D1 reads rather than failing the request.
 - Collection query types come from EmDash's generated `emdash-env.d.ts`.
   Starting `pnpm run dev` regenerates the file from the local database; run it
   after changing the checked-in seed schema and include the generated update in
-  the same commit. `pnpm run check:emdash-types` starts an isolated local
-  instance and fails when the committed declarations differ from the seed
-  schema; the full CI command includes this check.
+  the same commit. EmDash 0.37 also refreshes these declarations when the schema
+  changes while the development server is running. `pnpm run check:emdash-types`
+  starts an isolated local instance and fails when the committed declarations
+  differ from the seed schema; the full CI command includes this check.
 - Search uses EmDash full-text search, then batch-hydrates only the entries on
   the current result page. EmDash 0.34 indexes visible Portable Text prose
   instead of its JSON representation and avoids rewriting the FTS index for
@@ -120,10 +125,12 @@ backend failures degrade to D1 reads rather than failing the request.
   and menu order as native custom columns. These settings live in the seed for
   fresh databases and must be applied through Content Types once on an existing
   deployment because EmDash does not reapply seeds to live schemas.
-- EmDash avoids computing taxonomy usage counts during ordinary layout and
-  editor prefetches. The project index still requests counts intentionally for
-  its topic cloud; EmDash 0.32 drives that aggregate from the taxonomy pivot to
-  avoid near-quadratic D1 row reads as the site grows.
+- Archive labels use EmDash 0.37's `getTerm(..., { includeCounts: false })`,
+  replacing the site's full taxonomy-list lookup. EmDash also avoids computing
+  taxonomy usage counts during ordinary layout and editor prefetches. The
+  project index still requests counts intentionally for its topic cloud;
+  EmDash 0.32 drives that aggregate from the taxonomy pivot to avoid
+  near-quadratic D1 row reads as the site grows.
 - EmDash 0.33 persists manual taxonomy ordering. The upgrade migration keeps
   the existing English term order, and editors can reorder terms afterwards.
   The project topic cloud still applies its deliberate daily shuffle.
@@ -220,15 +227,16 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 - The upstream audit-log descriptor runs through EmDash's standard-format
   adapter for trusted in-process execution, so it works without Dynamic Worker
-  loaders on the current Cloudflare plan. Audit-log 0.2.0 under-declares the
-  capabilities required by its hooks, so `astro.config.mjs` adds
-  `content:write` and `media:read`; otherwise EmDash skips the before-save
-  snapshot and media-upload hooks. EmDash 0.33 also materializes the plugin's
-  storage index instead of scanning the audit table for dashboard queries.
+  loaders on the current Cloudflare plan. Audit-log 0.2.1 declares the required
+  capabilities itself, so the local descriptor override is removed. EmDash 0.37
+  supplies the existing content ID to its before-save hook, allowing the plugin
+  to record the previous state as well as the new state.
 - The upstream embeds plugin registers and renders the enabled YouTube and Vimeo
-  blocks directly. Its `astro-embed` dependency is overridden to 0.13.1, which
+  blocks directly. Its `astro-embed` dependency is overridden to 0.14.0, which
   is API-compatible with the plugin and declares support for the site's Astro 7
   runtime; the plugin's 0.12 dependency otherwise leaves an invalid peer graph.
+  This version also uses Astro-compatible `astro-auto-import` directly, so the
+  nested auto-import override is removed.
 - `src/plugins/legacy-content-blocks.ts` preserves edit controls for imported
   WordPress-only Portable Text blocks such as playlist videos, remaining legacy
   embeds, and page lists. Its registered plugin ID remains
@@ -236,8 +244,21 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Build Compatibility
 
-- `astro.config.mjs` keeps the Vite chunk-size warning limit aligned with the
-  admin bundle size while leaving upstream build warnings visible.
+- `astro.config.mjs` sets the Vite chunk-size warning limit to 4096 kB. The
+  upstream admin application still exceeds it; ordinary public pages do not
+  load that bundle. EmDash's plugin-navigation icon fallback dynamically
+  imports the full Phosphor export namespace, retaining all browser icons and
+  its re-exported server icon namespace. Reducing that payload needs an
+  upstream import change; splitting it into chunks alone does not remove the
+  unused icons.
+  [Upstream icon resolver](https://github.com/emdash-cms/emdash/blob/emdash%400.37.0/packages/admin/src/components/admin-navigation-icons.ts)
+- TypeScript remains at 6.0.3 because typescript-eslint 8.70 requires a version
+  below 6.1. Check the parser's peer dependency before advancing TypeScript.
+- `pnpm-workspace.yaml` overrides Sharp versions below 0.35.4 because Miniflare
+  pins vulnerable 0.35.2. Remove this override when Miniflare selects a patched
+  version itself. The Undici override remains aligned with Miniflare's 7.29.0
+  requirement.
+  [Sharp advisory](https://github.com/advisories/GHSA-rgj7-g3m4-5g8c)
 - Media uploads retain EmDash's safer default allowlist, which accepts AVIF and
   other raster image formats but not SVG. Site-owned SVG icons remain versioned
   static assets.
@@ -247,20 +268,14 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Removal Candidates
 
-- Remove the audit-log capability override when a published
-  `@emdash-cms/plugin-audit-log` descriptor includes both `content:write` and
-  `media:read`. The upstream fix landed after the EmDash 0.34 release, but
-  audit-log 0.2.0 is still the published package (tracked by
-  [EmDash #1263](https://github.com/emdash-cms/emdash/issues/1263) and
-  [PR #1897](https://github.com/emdash-cms/emdash/pull/1897)). Restore direct
-  descriptor registration and keep the hook-registration test to confirm
-  EmDash no longer skips either hook.
 - Remove the `astro-embed` override when the embeds plugin depends on 0.13.1 or
   newer directly.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
-  waits for Portable Text saves before publishing or leaving edit mode.
+  waits for Portable Text saves before publishing or leaving edit mode. The
+  0.37 publish-before-save fix applies to the admin content editor; the inline
+  toolbar still needs this gate.
 - Remove the local cache-provider wrapper when Wrangler exposes
-  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.128
+  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.130
   still lacks it locally.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a

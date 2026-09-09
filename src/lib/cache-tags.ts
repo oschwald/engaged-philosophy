@@ -1,6 +1,7 @@
-export const SITE_SETTINGS_CACHE_TAG = "site-settings";
-export const PRIMARY_MENU_CACHE_TAG = "menu:primary";
+// Match EmDash's public cache hints and native admin-route invalidation.
+export const SITE_SETTINGS_CACHE_TAG = "emdash:settings";
+export const PRIMARY_MENU_CACHE_TAG = "emdash:menu:primary";
 
 export function taxonomyCacheTag(taxonomy: string) {
-	return `taxonomy:${taxonomy}`;
+	return `emdash:taxonomy:${taxonomy}`;
 }

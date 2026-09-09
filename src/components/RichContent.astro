@@ -16,20 +16,18 @@ interface Props {
 const { value, class: className = "" } = Astro.props;
 ---
 
-{
-	isPortableTextValue(value) && (
-		<div class:list={["legacy-content", className]}>
-			<PortableText
-				value={value}
-				components={{
-					type: {
-						legacyEmbed: RichTextEmbed,
-						gallery: RichTextGallery,
-						legacyPageList: RichTextPageList,
-						legacyVideo: RichTextVideo,
-					},
-				}}
-			/>
-		</div>
-	)
-}
+{isPortableTextValue(value) && (
+	<div class:list={["legacy-content", className]}>
+		<PortableText
+			value={value}
+			components={{
+				type: {
+					legacyEmbed: RichTextEmbed,
+					gallery: RichTextGallery,
+					legacyPageList: RichTextPageList,
+					legacyVideo: RichTextVideo,
+				},
+			}}
+		/>
+	</div>
+)}

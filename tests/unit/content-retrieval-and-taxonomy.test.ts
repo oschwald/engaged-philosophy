@@ -1,16 +1,16 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const { getEmDashCollection, getEmDashEntry, getEmDashTaxonomyTerms } =
-	vi.hoisted(() => ({
-		getEmDashCollection: vi.fn(),
-		getEmDashEntry: vi.fn(),
-		getEmDashTaxonomyTerms: vi.fn(),
-	}));
+const { getEmDashCollection, getEmDashEntry, getTerm } = vi.hoisted(() => ({
+	getEmDashCollection: vi.fn(),
+	getEmDashEntry: vi.fn(),
+	getTerm: vi.fn(),
+}));
 
 vi.mock("emdash", () => ({
 	getEmDashCollection,
 	getEmDashEntry,
-	getTaxonomyTerms: getEmDashTaxonomyTerms,
+	getTaxonomyTerms: vi.fn(),
+	getTerm,
 }));
 
 import {
@@ -216,19 +216,17 @@ describe("content retrieval and taxonomy", () => {
 	});
 
 	test("resolves archive terms without aggregating usage counts", async () => {
-		getEmDashTaxonomyTerms.mockResolvedValue([
-			{
-				slug: "parent",
-				label: "Parent",
-				children: [{ slug: "ethics", label: "Ethics", children: [] }],
-			},
-		]);
+		getTerm.mockResolvedValue({
+			slug: "ethics",
+			label: "Ethics",
+			children: [],
+		});
 
 		await expect(getTaxonomyTerm("topic", "ethics")).resolves.toMatchObject({
 			slug: "ethics",
 			label: "Ethics",
 		});
-		expect(getEmDashTaxonomyTerms).toHaveBeenCalledWith("topic", {
+		expect(getTerm).toHaveBeenCalledWith("topic", "ethics", {
 			includeCounts: false,
 		});
 	});
