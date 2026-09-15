@@ -23,12 +23,6 @@ function isContentSaveRequest(input, init) {
 	);
 }
 
-function isKeepaliveRequest(input, init) {
-	return Boolean(
-		init?.keepalive ?? (input instanceof Request ? input.keepalive : false),
-	);
-}
-
 function trackContentSave(promise) {
 	lastSaveError = null;
 	const tracked = promise
@@ -57,15 +51,6 @@ function installFetchTracker() {
 	const originalFetch = window.fetch.bind(window);
 	window.fetch = (input, init) => {
 		const isContentSave = isContentSaveRequest(input, init);
-		if (
-			isContentSave &&
-			isKeepaliveRequest(input, init) &&
-			!hasUnsavedInlineChanges &&
-			pendingContentSaves.size === 0
-		) {
-			return Promise.resolve(new Response(null, { status: 204 }));
-		}
-
 		const responsePromise = originalFetch(input, init);
 		return isContentSave ? trackContentSave(responsePromise) : responsePromise;
 	};
@@ -113,17 +98,13 @@ async function waitForPendingContentSaves() {
 
 async function flushInlineSaves() {
 	const expectedSave = hasUnsavedInlineChanges;
-	lastSaveError = null;
+	// Only a new save can clear a failure: no request may also mean a refused
+	// blur save already settled. EmDash does not acknowledge clean undo state.
 	blurActiveEditor();
 	await waitForSaveToStart();
 
 	if (expectedSave && pendingContentSaves.size === 0) {
 		await sleep(250);
-	}
-
-	if (expectedSave && pendingContentSaves.size === 0) {
-		hasUnsavedInlineChanges = false;
-		return;
 	}
 
 	await waitForPendingContentSaves();
