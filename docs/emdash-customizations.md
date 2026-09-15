@@ -36,11 +36,21 @@ Cloudflare constraints.
   route still clears the object cache without purging edge HTML. It batches
   the collection, entry, and taxonomy tags into one purge request.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
-  controls wait for pending inline saves. EmDash 0.31 flushes edits when the
-  browser navigates away, but its toolbar can still publish before a Portable
-  Text blur save finishes. The gate also ignores redundant keepalive saves when
-  EmDash reports no unsaved changes, while retaining the unload protection for
-  real edits.
+  controls wait for pending inline saves. EmDash 0.38 avoids saving unchanged
+  Portable Text documents, so the local keepalive suppression is removed.
+  Its toolbar can still publish before a Portable Text blur save finishes.
+  The remaining gate preserves failed saves, including `409 ENTRY_LOCKED`,
+  until a new save succeeds; a fast failure cannot be treated as an unchanged
+  document and followed by publication or navigation. EmDash does not signal
+  a clean document after undo, so undo alone cannot clear a previous failure;
+  retry an edit successfully before using those toolbar controls.
+- EmDash edit locks are enabled by default. Admin editors acquire a
+  seven-minute lease, renewed every two minutes and on saves. Other users and
+  API tokens can receive `409 ENTRY_LOCKED` on updates, publication,
+  scheduling, draft discard, and deletion; same-user writes can proceed.
+  Maintenance scripts should respect the lock or explicitly request
+  `overrideLock`. The site's save gate does not bypass locks. EmDash 0.38's MCP
+  content tools do not enforce them yet.
 - `src/worker.ts` rejects the two high-volume archival crawlers identified in
   production analytics before Astro or EmDash initializes, then logs selected
   admin/signed-in request metadata and slow observed requests without
@@ -73,7 +83,11 @@ Cloudflare constraints.
   EmDash 0.35 and newer also emit the ignored `.emdash/migrations.json` build
   artifact for a future deployment-managed migration job; switching to check or
   manual mode should wait until such a job applies and verifies that exact
-  manifest before every deploy.
+  manifest before every deploy. EmDash 0.38 includes `075_entry_edit_locks`,
+  `076_collection_nav_group`, and `077_plugin_storage_revisions`. The last
+  migration adds revision triggers to `options` and `_plugin_storage` without
+  backfilling existing records. Monitor D1 writes after deployment and retain
+  the five-minute maintenance cadence.
 
 EmDash's backup page works with the existing R2 storage adapter and scheduled
 Worker handler. Administrators can enable daily archives under Settings ->
@@ -104,7 +118,8 @@ backend failures degrade to D1 reads rather than failing the request.
 ## Public Rendering
 
 - Public entry annotations come directly from EmDash's `ContentEntry.edit`
-  proxy; there is no site-level editing adapter.
+  proxy; there is no site-level editing adapter. EmDash 0.38 also supplies
+  working edit proxies for collection results.
 - Collection query types come from EmDash's generated `emdash-env.d.ts`.
   Starting `pnpm run dev` regenerates the file from the local database; run it
   after changing the checked-in seed schema and include the generated update in
@@ -144,12 +159,22 @@ backend failures degrade to D1 reads rather than failing the request.
   redirect-cache reads on Workers Free.
 - The base layout uses `EmDashHead`, `EmDashBodyStart`, and `EmDashBodyEnd` so
   EmDash SEO settings and plugin page contributions are rendered through the
-  standard pipeline.
+  standard pipeline. EmDash 0.38 also overlays the SEO panel automatically on
+  single-entry pages. `createSitePageContext()` still uses `getSeoMeta()` for
+  the document title and collection-query fallbacks, which the overlay does
+  not cover. The checked-in seed leaves collection SEO disabled; editors can
+  opt in through Content Types. To enable it for fresh databases as well, add
+  `"seo"` to the collection's seed supports. The SEO browser test enables it
+  temporarily and checks metadata and JSON-LD across repeated visits.
 - The sitemap remains site-specific because imported WordPress pages and posts
   use stored nested paths, such as `2022/05/31/post-slug`. EmDash collection URL
-  patterns can interpolate an entry slug or ID, but cannot interpolate these
-  custom paths. Projects use their native URL pattern in the custom sitemap,
-  which still honors EmDash noindex and canonical settings.
+  patterns can now interpolate date tokens, but EmDash 0.38 uses UTC dates;
+  14 of the 76 published post URLs audited on September 15, 2026 use a different
+  calendar date. Nested page paths also remain unsupported. See the
+  [post URL migration](#post-url-migration)
+  before enabling native post patterns or removing stored paths. Projects use
+  their native URL pattern in the custom sitemap, which still honors EmDash
+  noindex and canonical settings.
 - Portable Text images use the EmDash renderer. A narrow CSS compatibility
   layer preserves imported float dimensions, centers images when long captions
   widen their figures, and retains left/right placement when floats stack on
@@ -169,6 +194,13 @@ backend failures degrade to D1 reads rather than failing the request.
   classes replace EmDash's inline `--columns` property because the production
   policy intentionally rejects inline styles. This avoids both Worker media
   proxy requests and Cloudflare image transformations on the Free plan.
+  EmDash 0.38's responsive gallery sizes improve image selection without
+  requiring Cloudflare image transformations.
+- Native Portable Text tables preserve semantic headers and spans. Their
+  inline width and alignment styles are blocked by the anonymous-page CSP,
+  although the admin and inline editor allow those styles. Verify public
+  presentation before relying on the editor's table sizing and alignment
+  controls.
 - Imported numbered headings use EmDash's native Portable Text list and heading
   rendering. Their imported segments share one stable EmDash 0.33 `listId` and
   base, so EmDash emits semantic continuation starts across intervening answers.
@@ -229,8 +261,9 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   adapter for trusted in-process execution, so it works without Dynamic Worker
   loaders on the current Cloudflare plan. Audit-log 0.2.1 declares the required
   capabilities itself, so the local descriptor override is removed. EmDash 0.37
-  supplies the existing content ID to its before-save hook, allowing the plugin
-  to record the previous state as well as the new state.
+  supplies the existing content ID to its before-save hook. EmDash 0.38 and
+  audit-log 0.2.2 also attribute content saves to the authenticated actor while
+  preserving the entry owner.
 - The upstream embeds plugin registers and renders the enabled YouTube and Vimeo
   blocks directly. Its `astro-embed` dependency is overridden to 0.14.0, which
   is API-compatible with the plugin and declares support for the site's Astro 7
@@ -241,6 +274,10 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   WordPress-only Portable Text blocks such as playlist videos, remaining legacy
   embeds, and page lists. Its registered plugin ID remains
   `legacy-image-blocks` for compatibility with existing plugin state.
+- EmDash 0.38 validates plugin outbound requests through DNS lookups at
+  `cloudflare-dns.com`. The Cloudflare Access invite integration uses its own
+  fetch path. Configured plugins still run without paid Worker Loaders; the
+  sandbox changes do not require enabling that binding.
 
 ## Build Compatibility
 
@@ -253,11 +290,11 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   unused icons.
   [Upstream icon resolver](https://github.com/emdash-cms/emdash/blob/emdash%400.37.0/packages/admin/src/components/admin-navigation-icons.ts)
 - TypeScript remains at 6.0.3 because typescript-eslint 8.70 requires a version
-  below 6.1. Check the parser's peer dependency before advancing TypeScript.
-- `pnpm-workspace.yaml` overrides Sharp versions below 0.35.4 because Miniflare
-  pins vulnerable 0.35.2. Remove this override when Miniflare selects a patched
-  version itself. The Undici override remains aligned with Miniflare's 7.29.0
-  requirement.
+  below 6.1, and `@astrojs/check` 0.9.10 supports TypeScript 5 and 6. The current
+  TypeScript 7 release is outside both peer ranges.
+- Miniflare 5.20260911.1-alpha pins patched Sharp 0.35.4, so the local Sharp
+  override is removed. The Undici override remains aligned with Miniflare's
+  7.29.0 requirement.
   [Sharp advisory](https://github.com/advisories/GHSA-rgj7-g3m4-5g8c)
 - Media uploads retain EmDash's safer default allowlist, which accepts AVIF and
   other raster image formats but not SVG. Site-owned SVG icons remain versioned
@@ -273,11 +310,67 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   waits for Portable Text saves before publishing or leaving edit mode. The
   0.37 publish-before-save fix applies to the admin content editor; the inline
-  toolbar still needs this gate.
+  toolbar still needs this gate in 0.38.
 - Remove the local cache-provider wrapper when Wrangler exposes
-  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.130
+  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.131.2
   still lacks it locally.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a
   Cloudflare Email Sending plugin, but that only handles email delivery; this
   site still needs invitees appended to the Cloudflare Access EMAIL list.
+
+## Post URL Migration
+
+EmDash 0.38 supports `/{year}/{month}/{day}/{slug}` collection URL patterns,
+using the entry's UTC publication date for menus, sitemaps, and slug-change
+redirects. Tokens remain literal without a valid publication date.
+[Upstream date-token implementation](https://github.com/emdash-cms/emdash/blob/emdash%400.38.0/packages/core/src/i18n/resolve.ts)
+
+The September 15, 2026 public audit found date mismatches in 14 of 76 published
+post URLs. For example,
+[/2022/05/31/jason-swartwood/](https://www.engagedphilosophy.com/2022/05/31/jason-swartwood/)
+reports `2022-06-01T00:12:21.000Z`, which would produce
+`/2022/06/01/jason-swartwood/` with native UTC tokens. Preserve the existing
+URLs until a migration is ready; do not alter publication timestamps to make
+the tokens reproduce historical URL dates.
+
+The live D1 audit was denied with Cloudflare error 7403. The public comparison
+therefore excludes drafts, trashed entries, revisions, custom canonical
+overrides, and posts omitted from the sitemap. Complete these steps before
+removing custom post-path support:
+
+1. **Audit and back up the database.** Once D1 access is restored, export the
+   schema, posts, revisions, SEO settings, and redirects to an ignored
+   location. Compare stored dates and slugs with the intended native pattern
+   across all locales and unpublished entries. This query identifies missing
+   dates and date mismatches in content rows:
+
+   ```sql
+   SELECT id, slug, status, path, published_at
+   FROM ec_posts
+   WHERE published_at IS NULL
+      OR strftime('%Y/%m/%d', published_at) IS NULL
+      OR (path IS NOT NULL AND path != ''
+          AND substr(trim(path, '/'), 1, 10)
+              != strftime('%Y/%m/%d', published_at));
+   ```
+
+2. **Choose the URL rules.** Preserving existing URLs requires timezone-aware
+   native resolution that matches the complete audit. Alternatively, adopt UTC
+   URLs with exact permanent redirects for every changed public URL, checking
+   collisions and redirect chains. Keep the historical publication dates.
+3. **Enable the pattern while retaining compatibility.** Update Posts through
+   Content Types or the schema API and in `.emdash/seed.json` in the same
+   rollout; seeds are not reapplied to existing databases. Keep old paths and
+   routes until old/new URLs, menus, canonical tags, feeds, sitemaps, slug/date
+   edits, and signed previews pass on a production-like snapshot. Undated
+   drafts need a working preview route because date tokens remain unresolved.
+4. **Remove persisted post paths.** Remove the Posts `path` field and its
+   generated declaration, the stored-path branch in `derivePostPath()`, and
+   the path-query fallback in `getPostByPath()`. EmDash's `resolveEmDashPath()`
+   does not validate captured dates, and there is no exported forward URL
+   builder in 0.38; a small theme URL/date validation helper may remain.
+5. **Reassess the sitemap separately.** Native post and project patterns can
+   replace those parts after migration, but nested page paths still need
+   custom handling. Keep the page hierarchy adapter and verify retained
+   redirects after cache refresh.

@@ -49,6 +49,44 @@ function collectEditingPageErrors(page: Page) {
 }
 
 test.describe("visual editing", () => {
+	test("does not create a draft when an unchanged body loses focus or unloads", async ({
+		authedRequest,
+		page,
+	}, testInfo) => {
+		const title = uniqueTitle("E2E Unchanged Visual Editing", testInfo.testId);
+		const { publicPath, published } = await createAndPublishContentViaApi(
+			authedRequest,
+			"pages",
+			{ title },
+		);
+		await page.goto("/_emdash/admin", { waitUntil: "domcontentloaded" });
+		await dismissWelcome(page);
+		await page.goto(publicPath, { waitUntil: "domcontentloaded" });
+		await toggleEditMode(page, true);
+		const editor = page
+			.locator('.emdash-inline-editor[contenteditable="true"]')
+			.first();
+		await expect(editor).toContainText(title);
+
+		const saves: string[] = [];
+		page.on("request", (request) => {
+			if (
+				request.method() === "PUT" &&
+				new URL(request.url()).pathname ===
+					contentApiPath("pages", published.id)
+			) {
+				saves.push(request.url());
+			}
+		});
+		await editor.click();
+		await page.locator("h1").click();
+		await toggleEditMode(page, false);
+		await page.goto(publicPath, { waitUntil: "domcontentloaded" });
+		await toggleEditMode(page, true);
+		await expect(page.locator("#emdash-tb-status")).toHaveText("Published");
+		expect(saves).toEqual([]);
+	});
+
 	test("saves portable text before leaving edit mode and publishing", async ({
 		authedRequest,
 		page,

@@ -68,42 +68,6 @@ test.describe("custom EmDash save gate", () => {
 		expect(eventTypes(events)).not.toContain("save-start");
 	});
 
-	test("suppresses only redundant unload saves", async ({
-		page,
-		staticServer,
-	}) => {
-		staticServer.resetEvents();
-		await page.goto("/emdash-save-gate/", { waitUntil: "domcontentloaded" });
-
-		const unchangedStatus = await page.evaluate(async () => {
-			const response = await fetch("/_emdash/api/content/pages/about", {
-				method: "PUT",
-				keepalive: true,
-			});
-			return response.status;
-		});
-
-		expect(unchangedStatus).toBe(204);
-		expect(eventTypes(staticServer.getEvents())).not.toContain("save-start");
-
-		const changedStatus = await page.evaluate(async () => {
-			document.dispatchEvent(
-				new CustomEvent("emdash:save", { detail: { state: "unsaved" } }),
-			);
-			const response = await fetch("/_emdash/api/content/pages/about", {
-				method: "PUT",
-				keepalive: true,
-			});
-			return response.status;
-		});
-
-		expect(changedStatus).toBe(200);
-		const events = await waitForFixtureEvent(staticServer, (nextEvents) =>
-			nextEvents.some((event) => event.type === "save-finish"),
-		);
-		expectEventOrder(events, ["save-start", "save-finish"]);
-	});
-
 	test("waits for an active inline save before publishing", async ({
 		page,
 		staticServer,
@@ -120,6 +84,119 @@ test.describe("custom EmDash save gate", () => {
 		);
 		expectEventOrder(events, ["save-start", "save-finish", "publish-start"]);
 	});
+
+	test("forwards unload saves even without an unsaved-state event", async ({
+		page,
+		staticServer,
+	}) => {
+		staticServer.resetEvents();
+		await page.goto("/emdash-save-gate/", { waitUntil: "domcontentloaded" });
+		const status = await page.evaluate(async () => {
+			const response = await fetch("/_emdash/api/content/pages/about", {
+				method: "PUT",
+				keepalive: true,
+			});
+			return response.status;
+		});
+		expect(status).toBe(200);
+		expectEventOrder(staticServer.getEvents(), ["save-start", "save-finish"]);
+	});
+
+	for (const action of ["publish", "leave edit mode"] as const) {
+		test(`stops ${action} when the inline save is refused by an entry lock`, async ({
+			page,
+			staticServer,
+		}) => {
+			staticServer.resetEvents();
+			await page.goto("/emdash-save-gate/", { waitUntil: "domcontentloaded" });
+			await page.route("**/_emdash/api/content/pages/about", (route) =>
+				route.fulfill({
+					status: 409,
+					json: { success: false, error: { code: "ENTRY_LOCKED" } },
+				}),
+			);
+			await page.evaluate(() => {
+				document.addEventListener("emdash:save", (event) => {
+					document.documentElement.dataset.saveState = (
+						event as CustomEvent<{ state: string }>
+					).detail.state;
+				});
+			});
+			await page.locator("#editor").click();
+			await page.keyboard.type(" changed");
+			const control = page.locator(
+				action === "publish" ? "#emdash-tb-publish" : "#emdash-edit-toggle",
+			);
+			await control.click();
+			await expect(page.locator("html")).toHaveAttribute(
+				"data-save-state",
+				"error",
+			);
+			await expect(control).toBeEnabled();
+			await expect(page.locator("#emdash-edit-toggle")).toBeChecked();
+			expect(eventTypes(staticServer.getEvents())).toEqual(["page"]);
+		});
+
+		test(`requires a successful retry before ${action} after a completed save failure`, async ({
+			page,
+			staticServer,
+		}) => {
+			staticServer.resetEvents();
+			await page.goto("/emdash-save-gate/", { waitUntil: "domcontentloaded" });
+			let locked = true;
+			await page.route("**/_emdash/api/content/pages/about", (route) =>
+				route.fulfill({
+					status: locked ? 409 : 200,
+					json: { success: !locked },
+				}),
+			);
+			const editor = page.locator("#editor");
+			await editor.fill("An edit that will fail");
+			const failure = page.waitForResponse(
+				(response) => response.status() === 409,
+			);
+			await editor.evaluate((element) => element.blur());
+			await failure;
+			await page.evaluate(() => {
+				document.addEventListener("emdash:save", (event) => {
+					document.documentElement.dataset.saveState = (
+						event as CustomEvent<{ state: string }>
+					).detail.state;
+				});
+			});
+
+			const control = page.locator(
+				action === "publish" ? "#emdash-tb-publish" : "#emdash-edit-toggle",
+			);
+			await control.click();
+			await expect(page.locator("html")).toHaveAttribute(
+				"data-save-state",
+				"error",
+			);
+			await expect(control).toBeEnabled();
+			expect(eventTypes(staticServer.getEvents())).toEqual(["page"]);
+
+			// Undo to the stored document starts no request. Without an upstream
+			// clean-state acknowledgment, the gate retains the previous failure.
+			await editor.fill("Original content");
+			await control.click();
+			await expect(page.locator("html")).toHaveAttribute(
+				"data-save-state",
+				"error",
+			);
+			await expect(control).toBeEnabled();
+			expect(eventTypes(staticServer.getEvents())).toEqual(["page"]);
+
+			locked = false;
+			await editor.fill("A successful retry");
+			await control.click();
+			await waitForFixtureEvent(staticServer, (events) =>
+				action === "publish"
+					? eventTypes(events).includes("publish-start")
+					: events.filter((event) => event.type === "page").length === 2,
+			);
+		});
+	}
 
 	test("waits for an active inline save before leaving edit mode", async ({
 		page,
