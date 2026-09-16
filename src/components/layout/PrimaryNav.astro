@@ -1,5 +1,6 @@
 ---
 import type { MenuItem } from "emdash";
+import SearchIcon from "../SearchIcon.astro";
 
 interface Props {
 	menuItems: MenuItem[];
@@ -110,7 +111,7 @@ function isCurrentUrl(url: string) {
 					class="btn btn-outline-secondary ms-1"
 					aria-label="Submit search"
 				>
-					<i class="bi bi-search"></i>
+					<SearchIcon />
 				</button>
 			</form>
 		</div>
