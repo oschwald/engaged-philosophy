@@ -63,9 +63,9 @@ site skipped the EmDash 0.34 schema follow-up, apply those same settings once
 under **Content Types**; the public queries remain compatible while this
 metadata is being updated.
 
-Posts now use native date paths. Follow the staged
-[post URL migration](emdash-customizations.md#post-url-migration) before
-removing the legacy Posts `path` field from an existing database.
+The [post URL migration](emdash-customizations.md#post-url-migration) is
+complete: posts use native date paths and the stored Posts `path` field is
+removed. The linked audit includes backup locations and rollback requirements.
 
 ## Post-Launch State
 

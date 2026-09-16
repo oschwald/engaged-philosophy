@@ -1,13 +1,10 @@
 import { test, expect } from "../../fixtures/worker";
-import { POST_PATH_REVISION_CLEANUP_SQL } from "../../../scripts/prepare-post-paths.mjs";
 import {
 	createAndPublishContentViaApi,
 	createContentViaApi,
 	deleteContentViaApi,
 	expectPublicContent,
 	getPreviewUrlViaApi,
-	portableTextParagraph,
-	publishContentViaApi,
 	uniqueTitle,
 	updateContentViaApi,
 } from "../../support/content";
@@ -96,44 +93,6 @@ test("uses native post dates in links and redirects and rejects incorrect dates"
 			title,
 			bodyText,
 		);
-	} finally {
-		await deleteContentViaApi(authedRequest, "posts", published.id);
-	}
-});
-
-test("publishes an old draft revision after removing the stored post path", async ({
-	authedRequest,
-	publicPage,
-	workerServer,
-}, testInfo) => {
-	const fieldsUrl = "/_emdash/api/schema/collections/posts/fields";
-	const field = await authedRequest.post(fieldsUrl, {
-		data: { slug: "path", label: "Path", type: "string" },
-	});
-	expect(field.ok()).toBe(true);
-	const title = uniqueTitle("E2E Migrated Revision", testInfo.testId);
-	const { published, publicPath } = await createAndPublishContentViaApi(
-		authedRequest,
-		"posts",
-		{
-			title,
-			publishedAt: "2022-05-31T23:59:59.999Z",
-			data: { path: "2022/05/31/legacy-slug" },
-		},
-	);
-	const revised = `${title} revised body`;
-	try {
-		await updateContentViaApi(authedRequest, "posts", published.id, {
-			data: {
-				content: portableTextParagraph(revised),
-				path: "2022/05/31/legacy-slug",
-			},
-		});
-		workerServer.executeSql(POST_PATH_REVISION_CLEANUP_SQL);
-		const removed = await authedRequest.delete(`${fieldsUrl}/path`);
-		expect(removed.ok()).toBe(true);
-		await publishContentViaApi(authedRequest, "posts", published.id);
-		await expectPublicContent(publicPage, publicPath, title, revised);
 	} finally {
 		await deleteContentViaApi(authedRequest, "posts", published.id);
 	}
