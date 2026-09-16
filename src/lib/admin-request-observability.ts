@@ -1,18 +1,8 @@
+import { getCookieNames, STATEFUL_COOKIE_NAMES } from "./request-state";
+
 export const OBSERVED_REQUEST_SLOW_MS = 10_000;
 
-const OBSERVED_COOKIE_NAMES = [
-	"astro-session",
-	"CF_Authorization",
-	"CF_AppSession",
-	"CF_Session",
-	"emdash-edit-mode",
-	"emdash_preview",
-	"emdash_preview_params",
-	"emdash_wp_auth",
-	"__em_d1_bookmark",
-];
-
-const OBSERVED_COOKIE_SET = new Set(OBSERVED_COOKIE_NAMES);
+const OBSERVED_COOKIE_SET = new Set(STATEFUL_COOKIE_NAMES);
 
 export interface ObservedRequestInfo {
 	requestId: string;
@@ -27,14 +17,6 @@ export interface ObservedRequestInfo {
 		d1Bookmark: boolean;
 		preview: boolean;
 	};
-}
-
-export function getCookieNames(cookieHeader: string | null): string[] {
-	if (!cookieHeader) return [];
-	return cookieHeader
-		.split(";")
-		.map((cookie) => cookie.trim().split("=", 1)[0])
-		.filter(Boolean);
 }
 
 function getQueryKeys(url: URL): string[] {

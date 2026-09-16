@@ -10,7 +10,7 @@ export const STATEFUL_COOKIE_NAMES = [
 	"__em_d1_bookmark",
 ];
 
-function getCookieNames(cookieHeader: string): string[] {
+export function getCookieNames(cookieHeader: string | null): string[] {
 	if (!cookieHeader) return [];
 	return cookieHeader
 		.split(";")
@@ -19,7 +19,7 @@ function getCookieNames(cookieHeader: string): string[] {
 }
 
 export function hasStatefulCookie(cookieHeader: string | null): boolean {
-	const names = getCookieNames(cookieHeader ?? "");
+	const names = getCookieNames(cookieHeader);
 	return names.some((name) => STATEFUL_COOKIE_NAMES.includes(name));
 }
 
