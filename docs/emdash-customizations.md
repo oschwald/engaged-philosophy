@@ -326,131 +326,64 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Post URL Migration
 
-### URL policy and audit
+### Completed migration
 
-Preserve the existing post URLs and displayed Pacific dates by adjusting only
-publication times whose UTC date differs from the stored URL date. The user
-approved these historical timestamp changes; exact times are not displayed.
-RSS and machine-readable publication metadata do use the adjusted timestamps.
-EmDash's native date tokens use UTC.
-[Upstream implementation](https://github.com/emdash-cms/emdash/blob/emdash%400.38.0/packages/core/src/i18n/resolve.ts)
+[PR #171](https://github.com/oschwald/engaged-philosophy/pull/171) migrated posts
+to EmDash's native UTC date pattern on September 15, 2026. The audit found 80
+posts: 76 published and four undated drafts. Fourteen publication timestamps
+were moved into the final milliseconds of their existing URL's UTC day,
+preserving all published URLs, displayed Pacific dates, and publication order.
+The approved time changes also affect RSS and machine-readable metadata;
+exact publication times are not displayed. Undated drafts remain undated.
 
-The September 15, 2026 database audit found 80 posts: 76 published and four
-undated drafts. Fourteen published timestamps needed adjustment. The migration
-moves those times into the final milliseconds of the existing URL's UTC day,
-checking that every displayed date and the complete publication ordering are
-preserved. Undated drafts stay undated. Page paths and project URLs do not
-change.
+SQL cleanup removed `path` from all 131 post revisions before EmDash's schema
+registry removed the stored Posts `path` field. Editing was paused across both
+steps and then resumed. Every other post value, all page records, and all
+redirects were unchanged; media usage tracking returned to Ready.
 
-The live migration is complete. [PR #171](https://github.com/oschwald/engaged-philosophy/pull/171)
-deployed the native post routes after adjusting those 14 timestamps. After SQL
-cleanup removed `path` properties from all 131 post revisions, EmDash's schema
-registry removed the stored Posts `path` field. Post editing was briefly paused
-during cleanup; it is enabled again and media usage tracking is Ready.
-Database readback confirmed every other post value, all page records, and all
-redirects are unchanged. All 76 post URLs and the full publication order are
-preserved.
+The migrated database copy passed all 1,047 inventoried paths: 419 pages and
+628 permanent redirects. All 244 content canonical URLs matched the live
+baseline, the final live sitemap retained those URLs, and all 419 public paths
+passed the final sequential production smoke check.
 
-The fully migrated local database copy passed all 1,047 inventoried paths:
-419 pages and 628 permanent redirects. All 244 content canonical URLs matched
-the live baseline; the live preparation recheck also passed all 244 URLs.
+### Audit records and recovery
 
-Local records are under the ignored `.migration/post-paths/` directory:
+Keep the private backups and full path inventory under the ignored
+`.migration/post-paths/` directory:
 
-- `before.sql`: export of the regular database tables. D1 cannot export the
-  full database with FTS5 virtual tables included; their definitions and other
-  schema objects are saved separately in
-  `schema-revisions-redirects-before.json`. Restore the indexes/triggers and
-  rebuild the derived full-text indexes when restoring this backup.
-- `posts-before.json` and `backup.json`: original posts, schema, revisions, and
-  redirects. Keep these private; do not commit database exports.
-- `before-field-removal.sql`, `before-field-removal-audit.json`, and
-  `after-field-removal-audit.json`: backup and comparison around the final
-  cleanup. `production-deployment.json` records the verified production
-  version; `cleanup-live-result.json` records the completed schema cleanup.
-- `content-paths.txt`: all 244 published content paths, reconciled exactly with
-  the pre-migration sitemap.
-- `public-paths.txt`: 419 content, index, and archive paths.
-- `all-html-paths.txt` and `path-inventory.json`: 1,047 paths including aliases
-  and exact enabled redirects, with collection/entry references where known.
+- `before.sql` and `before-field-removal.sql`: regular-table database exports.
+  FTS5 definitions, indexes, and triggers are saved separately in
+  `schema-revisions-redirects-before.json` and the audit files. Restore these
+  schema objects and rebuild the derived full-text indexes when recovering.
+- `posts-before.json`, `backup.json`, `before-field-removal-audit.json`, and
+  `after-field-removal-audit.json`: original data and cleanup comparisons.
+- `production-deployment.json`, `cleanup-live-result.json`, and
+  `migration-status.json`: deployment, cleanup, and final verification records.
+- `content-paths.txt`: all 244 published content paths; `public-paths.txt`: 419
+  content, index, and archive paths; `all-html-paths.txt` and
+  `path-inventory.json`: 1,047 paths including aliases and exact redirects.
 - `sitemap-before.xml` and `checks-before.json`: original sitemap and live
-  status/canonical checks for the 244 content URLs.
+  status/canonical baseline. `smoke-final-sequential.log` records the final
+  production smoke check.
 
-### Rollout order
+The retired migration tools and full rollout procedure remain available in
+[the migration commit](https://github.com/oschwald/engaged-philosophy/tree/9761d37b5f1b219eaf9c66044d729dd402238363).
+Rolling back to code that queries stored post paths requires restoring the
+field and its backed-up values. EmDash 0.38 replays revision properties as
+column assignments, so revisions containing `path` must be cleaned before
+removing that field again. Direct database restores also require invalidating
+the relevant KV object-cache namespaces; Worker deployment only clears its
+version-specific HTML cache.
 
-1. **Prepare data before deploying the new Worker.** Export a fresh post
-   snapshot with `id`, `slug`, `path`, `status`, `published_at`, `version`,
-   `updated_at`, and `deleted_at` using Wrangler's `--json` output. Generate the
-   reviewable plan and SQL; this command does not modify the database:
+Use the saved public path list for future deployed checks:
 
-   ```sh
-   pnpm exec node scripts/prepare-post-paths.mjs \
-     .migration/post-paths/posts-before.json .migration/post-paths
-   ```
+```sh
+LIVE_SMOKE_PATH_FILE=.migration/post-paths/public-paths.txt \
+  LIVE_SMOKE_CONCURRENCY=1 LIVE_SMOKE_DELAY_MS=1300 pnpm run smoke:live
+```
 
-   Inspect `dates-plan.json`, then apply `dates.sql` to D1. It updates only the
-   planned timestamps, advances revision versions, and refuses to update any
-   rows if the snapshot changed, a post was inserted, or a post edit lock is
-   active. Use Wrangler's query mode (`--command`) to retain `RETURNING` rows,
-   then check the returned IDs against the plan. Its `--file` import mode
-   reports aggregate statistics instead, so always re-export and compare every
-   post against the plan. Successful SQL execution alone does not prove that
-   the guard allowed an update. If no posts changed, investigate the snapshot
-   or active locks instead of forcing a stale plan.
-
-   Re-audit all published URLs and ordering. Enable the Posts
-   `/{year}/{month}/{day}/{slug}` URL pattern through Content Types/the schema
-   API, or a guarded database update after verifying all dates match. Retain
-   the stored field and revision data during this step. The checked-in seed
-   configures fresh databases; it is not reapplied to production.
-
-2. **Invalidate cached metadata before deployment.** Direct D1 writes bypass
-   EmDash's normal cache invalidation. Bump the following KV keys in `SESSION`
-   to a new millisecond timestamp, without an expiration:
-
-   ```text
-   ep:object-cache:epoch:content:v2:posts
-   ep:object-cache:epoch:content:posts
-   ep:object-cache:last-content-write-at
-   ep:object-cache:epoch:schema
-   ep:object-cache:epoch:menus
-   ```
-
-   Allow KV propagation and verify fresh reads. Worker deployment clears its
-   version-specific HTML cache but does not invalidate KV object-cache data.
-   Do not deploy while cached old publication dates could generate moved URLs.
-
-3. **Deploy and verify the Worker.** Run `pnpm run ci`, wait for PR checks and
-   feedback, then deploy through the normal merge workflow. Use the saved
-   content and archive lists for post-deployment checks, for example:
-
-   ```sh
-   LIVE_SMOKE_PATH_FILE=.migration/post-paths/public-paths.txt \
-     LIVE_SMOKE_CONCURRENCY=1 LIVE_SMOKE_DELAY_MS=1300 pnpm run smoke:live
-   ```
-
-   Compare canonical URLs against the saved sitemap and test aliases,
-   dateless/datetime previews, wrong-date 404s, feeds, search, and slug changes.
-   The path inventory also includes XML endpoints; check those separately from
-   the HTML smoke list.
-
-4. **Remove persisted paths after deployment.** Take another backup and pause
-   post editing until revision cleanup and field removal are both complete.
-   Apply the generated `revisions.sql` to remove
-   `path` from all post revision JSON, including old live and draft revisions.
-   EmDash 0.38 replays revision properties as column assignments when publishing;
-   dropping the column without cleaning revisions breaks later restoration.
-   Confirm no post revision contains `path` immediately before removing the
-   Posts `path` field through Content Types/the schema API, and
-   refresh the post/schema object-cache epochs after direct revision writes.
-   Confirm that old revisions can still be restored and published. The page
-   `path` field and page revisions must remain intact.
-
-Before step 4, the previous Worker remains compatible because the old paths
-are retained and the adjusted dates reproduce them. After dropping the field,
-rolling back to code that queries it requires restoring the field and its
-backed-up values as well. Keep the full backup and path inventory until final
-verification is complete.
+The JSON inventory also records XML endpoints; check those separately from the
+HTML path list.
 
 ### Ongoing behavior
 
