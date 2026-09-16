@@ -342,13 +342,18 @@ checking that every displayed date and the complete publication ordering are
 preserved. Undated drafts stay undated. Page paths and project URLs do not
 change.
 
-Live preparation is complete: those 14 timestamps are adjusted and the native
-Posts URL pattern is enabled. Database readback confirmed all 76 post URLs and
-the full publication order are unchanged. The stored field and all 131 post
-revisions remain for compatibility with the current Worker; remove them only
-after deploying the code in this migration. The fully migrated local database
-copy passed all 1,047 inventoried paths: 419 pages and 628 permanent redirects.
-All 244 content canonical URLs matched the live baseline.
+The live migration is complete. [PR #171](https://github.com/oschwald/engaged-philosophy/pull/171)
+deployed the native post routes after adjusting those 14 timestamps. After SQL
+cleanup removed `path` properties from all 131 post revisions, EmDash's schema
+registry removed the stored Posts `path` field. Post editing was briefly paused
+during cleanup; it is enabled again and media usage tracking is Ready.
+Database readback confirmed every other post value, all page records, and all
+redirects are unchanged. All 76 post URLs and the full publication order are
+preserved.
+
+The fully migrated local database copy passed all 1,047 inventoried paths:
+419 pages and 628 permanent redirects. All 244 content canonical URLs matched
+the live baseline; the live preparation recheck also passed all 244 URLs.
 
 Local records are under the ignored `.migration/post-paths/` directory:
 
@@ -359,6 +364,10 @@ Local records are under the ignored `.migration/post-paths/` directory:
   rebuild the derived full-text indexes when restoring this backup.
 - `posts-before.json` and `backup.json`: original posts, schema, revisions, and
   redirects. Keep these private; do not commit database exports.
+- `before-field-removal.sql`, `before-field-removal-audit.json`, and
+  `after-field-removal-audit.json`: backup and comparison around the final
+  cleanup. `production-deployment.json` records the verified production
+  version; `cleanup-live-result.json` records the completed schema cleanup.
 - `content-paths.txt`: all 244 published content paths, reconciled exactly with
   the pre-migration sitemap.
 - `public-paths.txt`: 419 content, index, and archive paths.
