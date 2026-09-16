@@ -56,12 +56,16 @@ reports failed work that cannot be retried from the admin.
 
 ## Legacy Schema Follow-up
 
-The checked-in seed enables indexes for the page and post `path` fields and the
+The checked-in seed enables indexes for the page `path` field and the
 project `highlight` and `menu_order` fields, and shows the two project fields as
 admin list columns. A seed initializes fresh databases only. If the existing
 site skipped the EmDash 0.34 schema follow-up, apply those same settings once
 under **Content Types**; the public queries remain compatible while this
 metadata is being updated.
+
+Posts now use native date paths. Follow the staged
+[post URL migration](emdash-customizations.md#post-url-migration) before
+removing the legacy Posts `path` field from an existing database.
 
 ## Post-Launch State
 

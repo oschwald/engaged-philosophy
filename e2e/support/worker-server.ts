@@ -18,6 +18,7 @@ const WORKER_ERROR_PATTERN =
 
 export interface WorkerServer {
 	baseURL: string;
+	executeSql: (sql: string) => void;
 	assertNoErrors: () => void;
 	getOutput: () => string;
 	stop: () => Promise<void>;
@@ -332,6 +333,32 @@ export async function startWorkerServer(
 
 	return {
 		baseURL: `http://127.0.0.1:${port}`,
+		executeSql: (sql) => {
+			const result = spawnSync(
+				"pnpm",
+				[
+					"exec",
+					"wrangler",
+					"d1",
+					"execute",
+					"DB",
+					"--config",
+					DIST_WRANGLER_CONFIG,
+					"--local",
+					"--persist-to",
+					persistDir,
+					"--command",
+					sql,
+					"--json",
+				],
+				{ cwd: ROOT, encoding: "utf8", env: childProcessEnv() },
+			);
+			assert.equal(
+				result.status,
+				0,
+				`Local D1 query failed: ${result.stderr}\n${result.stdout}`,
+			);
+		},
 		getOutput: () => output,
 		assertNoErrors: () => {
 			assert.equal(

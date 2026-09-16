@@ -1,14 +1,15 @@
 ---
-import NotFound from "../../components/NotFound.astro";
+import PostPage from "../../components/content/PostPage.astro";
 import { getPostBySlug } from "../../lib/content";
 
 const { slug = "" } = Astro.params;
 const post = await getPostBySlug(slug);
 
-if (post) {
-	return Astro.redirect(`/${post.data.path}/`, 301);
+if (post?.data.path) {
+	const status = Astro.url.searchParams.has("_preview") ? 302 : 301;
+	return Astro.redirect(`/${post.data.path}/${Astro.url.search}`, status);
 }
-Astro.response.status = 404;
+if (!post) Astro.response.status = 404;
 ---
 
-<NotFound />
+<PostPage post={post} />
