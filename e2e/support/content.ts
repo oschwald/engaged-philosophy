@@ -117,8 +117,8 @@ export function publicPathForItem(
 		return `/project/${slug}/`;
 	}
 
-	const parts = dateParts(item.publishedAt) ?? dateParts(item.createdAt);
-	return `/${storedPath || [...(parts ?? []), slug].join("/")}/`;
+	const parts = dateParts(item.publishedAt);
+	return parts ? `/${[...parts, slug].join("/")}/` : `/posts/${item.id}/`;
 }
 
 export function canonicalAliasForItem(

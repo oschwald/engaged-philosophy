@@ -32,7 +32,6 @@ export interface Post {
   slug: string | null;
   status: string;
   title: string;
-  path?: string;
   excerpt?: PortableTextBlock[];
   content?: PortableTextBlock[];
   featured_image?: { id: string; src?: string; alt?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; provider?: string; previewUrl?: string; meta?: Record<string, unknown>; darkVariant?: { id: string; src?: string; alt?: string; width?: number; height?: number; filename?: string; mimeType?: string; blurhash?: string; dominantColor?: string; provider?: string; previewUrl?: string; meta?: Record<string, unknown> } };

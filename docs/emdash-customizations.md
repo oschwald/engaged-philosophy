@@ -134,8 +134,8 @@ backend failures degrade to D1 reads rather than failing the request.
   to 1024 characters, and 20 pages of cursor history. Archives use database
   limit/offset queries capped at 100 public pages, and exhaustive jobs such as
   the sitemap walk collection cursors.
-- Page and post `path` fields and the project `highlight` and `menu_order`
-  fields opt into EmDash 0.34's scalar-field indexes because public collection
+- The page `path` field and project `highlight` and `menu_order` fields
+  opt into EmDash 0.34's scalar-field indexes because public collection
   queries filter or sort on them. The project content list also shows highlight
   and menu order as native custom columns. These settings live in the seed for
   fresh databases and must be applied through Content Types once on an existing
@@ -166,15 +166,20 @@ backend failures degrade to D1 reads rather than failing the request.
   opt in through Content Types. To enable it for fresh databases as well, add
   `"seo"` to the collection's seed supports. The SEO browser test enables it
   temporarily and checks metadata and JSON-LD across repeated visits.
-- The sitemap remains site-specific because imported WordPress pages and posts
-  use stored nested paths, such as `2022/05/31/post-slug`. EmDash collection URL
-  patterns can now interpolate date tokens, but EmDash 0.38 uses UTC dates;
-  14 of the 76 published post URLs audited on September 15, 2026 use a different
-  calendar date. Nested page paths also remain unsupported. See the
-  [post URL migration](#post-url-migration)
-  before enabling native post patterns or removing stored paths. Projects use
-  their native URL pattern in the custom sitemap, which still honors EmDash
-  noindex and canonical settings.
+- Posts declare `/{year}/{month}/{day}/{slug}` and derive theme links from
+  the UTC publication date. `getPostByPath()` checks the complete date path
+  after a slug lookup, so arbitrary dates cannot serve duplicate content.
+  EmDash 0.38 has no exported forward URL builder, so `postPath()` mirrors its
+  date interpolation, including offsetless SQLite timestamps. The theme no
+  longer reads stored post paths or falls back to creation dates.
+- `/posts/{id-or-slug}` preserves signed preview tokens. Dated entries redirect
+  to their canonical route (302 for preview, 301 otherwise); undated drafts
+  render directly through EmDash's authorized preview context. The shared
+  `PostPage.astro` keeps preview and published rendering consistent.
+- The sitemap remains site-specific because nested page paths still need the
+  page hierarchy adapter and the seed does not enable collection SEO. Posts
+  and projects use their native date/slug patterns in the custom sitemap,
+  which continues to honor EmDash noindex and canonical settings.
 - Portable Text images use the EmDash renderer. A narrow CSS compatibility
   layer preserves imported float dimensions, centers images when long captions
   widen their figures, and retains left/right placement when floats stack on
@@ -321,56 +326,128 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Post URL Migration
 
-EmDash 0.38 supports `/{year}/{month}/{day}/{slug}` collection URL patterns,
-using the entry's UTC publication date for menus, sitemaps, and slug-change
-redirects. Tokens remain literal without a valid publication date.
-[Upstream date-token implementation](https://github.com/emdash-cms/emdash/blob/emdash%400.38.0/packages/core/src/i18n/resolve.ts)
+### URL policy and audit
 
-The September 15, 2026 public audit found date mismatches in 14 of 76 published
-post URLs. For example,
-[/2022/05/31/jason-swartwood/](https://www.engagedphilosophy.com/2022/05/31/jason-swartwood/)
-reports `2022-06-01T00:12:21.000Z`, which would produce
-`/2022/06/01/jason-swartwood/` with native UTC tokens. Preserve the existing
-URLs until a migration is ready; do not alter publication timestamps to make
-the tokens reproduce historical URL dates.
+Preserve the existing post URLs and displayed Pacific dates by adjusting only
+publication times whose UTC date differs from the stored URL date. The user
+approved these historical timestamp changes; exact times are not displayed.
+RSS and machine-readable publication metadata do use the adjusted timestamps.
+EmDash's native date tokens use UTC.
+[Upstream implementation](https://github.com/emdash-cms/emdash/blob/emdash%400.38.0/packages/core/src/i18n/resolve.ts)
 
-The live D1 audit was denied with Cloudflare error 7403. The public comparison
-therefore excludes drafts, trashed entries, revisions, custom canonical
-overrides, and posts omitted from the sitemap. Complete these steps before
-removing custom post-path support:
+The September 15, 2026 database audit found 80 posts: 76 published and four
+undated drafts. Fourteen published timestamps needed adjustment. The migration
+moves those times into the final milliseconds of the existing URL's UTC day,
+checking that every displayed date and the complete publication ordering are
+preserved. Undated drafts stay undated. Page paths and project URLs do not
+change.
 
-1. **Audit and back up the database.** Once D1 access is restored, export the
-   schema, posts, revisions, SEO settings, and redirects to an ignored
-   location. Compare stored dates and slugs with the intended native pattern
-   across all locales and unpublished entries. This query identifies missing
-   dates and date mismatches in content rows:
+Live preparation is complete: those 14 timestamps are adjusted and the native
+Posts URL pattern is enabled. Database readback confirmed all 76 post URLs and
+the full publication order are unchanged. The stored field and all 131 post
+revisions remain for compatibility with the current Worker; remove them only
+after deploying the code in this migration. The fully migrated local database
+copy passed all 1,047 inventoried paths: 419 pages and 628 permanent redirects.
+All 244 content canonical URLs matched the live baseline.
 
-   ```sql
-   SELECT id, slug, status, path, published_at
-   FROM ec_posts
-   WHERE published_at IS NULL
-      OR strftime('%Y/%m/%d', published_at) IS NULL
-      OR (path IS NOT NULL AND path != ''
-          AND substr(trim(path, '/'), 1, 10)
-              != strftime('%Y/%m/%d', published_at));
+Local records are under the ignored `.migration/post-paths/` directory:
+
+- `before.sql`: export of the regular database tables. D1 cannot export the
+  full database with FTS5 virtual tables included; their definitions and other
+  schema objects are saved separately in
+  `schema-revisions-redirects-before.json`. Restore the indexes/triggers and
+  rebuild the derived full-text indexes when restoring this backup.
+- `posts-before.json` and `backup.json`: original posts, schema, revisions, and
+  redirects. Keep these private; do not commit database exports.
+- `content-paths.txt`: all 244 published content paths, reconciled exactly with
+  the pre-migration sitemap.
+- `public-paths.txt`: 419 content, index, and archive paths.
+- `all-html-paths.txt` and `path-inventory.json`: 1,047 paths including aliases
+  and exact enabled redirects, with collection/entry references where known.
+- `sitemap-before.xml` and `checks-before.json`: original sitemap and live
+  status/canonical checks for the 244 content URLs.
+
+### Rollout order
+
+1. **Prepare data before deploying the new Worker.** Export a fresh post
+   snapshot with `id`, `slug`, `path`, `status`, `published_at`, `version`,
+   `updated_at`, and `deleted_at` using Wrangler's `--json` output. Generate the
+   reviewable plan and SQL; this command does not modify the database:
+
+   ```sh
+   pnpm exec node scripts/prepare-post-paths.mjs \
+     .migration/post-paths/posts-before.json .migration/post-paths
    ```
 
-2. **Choose the URL rules.** Preserving existing URLs requires timezone-aware
-   native resolution that matches the complete audit. Alternatively, adopt UTC
-   URLs with exact permanent redirects for every changed public URL, checking
-   collisions and redirect chains. Keep the historical publication dates.
-3. **Enable the pattern while retaining compatibility.** Update Posts through
-   Content Types or the schema API and in `.emdash/seed.json` in the same
-   rollout; seeds are not reapplied to existing databases. Keep old paths and
-   routes until old/new URLs, menus, canonical tags, feeds, sitemaps, slug/date
-   edits, and signed previews pass on a production-like snapshot. Undated
-   drafts need a working preview route because date tokens remain unresolved.
-4. **Remove persisted post paths.** Remove the Posts `path` field and its
-   generated declaration, the stored-path branch in `derivePostPath()`, and
-   the path-query fallback in `getPostByPath()`. EmDash's `resolveEmDashPath()`
-   does not validate captured dates, and there is no exported forward URL
-   builder in 0.38; a small theme URL/date validation helper may remain.
-5. **Reassess the sitemap separately.** Native post and project patterns can
-   replace those parts after migration, but nested page paths still need
-   custom handling. Keep the page hierarchy adapter and verify retained
-   redirects after cache refresh.
+   Inspect `dates-plan.json`, then apply `dates.sql` to D1. It updates only the
+   planned timestamps, advances revision versions, and refuses to update any
+   rows if the snapshot changed, a post was inserted, or a post edit lock is
+   active. Use Wrangler's query mode (`--command`) to retain `RETURNING` rows,
+   then check the returned IDs against the plan. Its `--file` import mode
+   reports aggregate statistics instead, so always re-export and compare every
+   post against the plan. Successful SQL execution alone does not prove that
+   the guard allowed an update. If no posts changed, investigate the snapshot
+   or active locks instead of forcing a stale plan.
+
+   Re-audit all published URLs and ordering. Enable the Posts
+   `/{year}/{month}/{day}/{slug}` URL pattern through Content Types/the schema
+   API, or a guarded database update after verifying all dates match. Retain
+   the stored field and revision data during this step. The checked-in seed
+   configures fresh databases; it is not reapplied to production.
+
+2. **Invalidate cached metadata before deployment.** Direct D1 writes bypass
+   EmDash's normal cache invalidation. Bump the following KV keys in `SESSION`
+   to a new millisecond timestamp, without an expiration:
+
+   ```text
+   ep:object-cache:epoch:content:v2:posts
+   ep:object-cache:epoch:content:posts
+   ep:object-cache:last-content-write-at
+   ep:object-cache:epoch:schema
+   ep:object-cache:epoch:menus
+   ```
+
+   Allow KV propagation and verify fresh reads. Worker deployment clears its
+   version-specific HTML cache but does not invalidate KV object-cache data.
+   Do not deploy while cached old publication dates could generate moved URLs.
+
+3. **Deploy and verify the Worker.** Run `pnpm run ci`, wait for PR checks and
+   feedback, then deploy through the normal merge workflow. Use the saved
+   content and archive lists for post-deployment checks, for example:
+
+   ```sh
+   LIVE_SMOKE_PATH_FILE=.migration/post-paths/public-paths.txt \
+     LIVE_SMOKE_CONCURRENCY=1 LIVE_SMOKE_DELAY_MS=1300 pnpm run smoke:live
+   ```
+
+   Compare canonical URLs against the saved sitemap and test aliases,
+   dateless/datetime previews, wrong-date 404s, feeds, search, and slug changes.
+   The path inventory also includes XML endpoints; check those separately from
+   the HTML smoke list.
+
+4. **Remove persisted paths after deployment.** Take another backup and pause
+   post editing until revision cleanup and field removal are both complete.
+   Apply the generated `revisions.sql` to remove
+   `path` from all post revision JSON, including old live and draft revisions.
+   EmDash 0.38 replays revision properties as column assignments when publishing;
+   dropping the column without cleaning revisions breaks later restoration.
+   Confirm no post revision contains `path` immediately before removing the
+   Posts `path` field through Content Types/the schema API, and
+   refresh the post/schema object-cache epochs after direct revision writes.
+   Confirm that old revisions can still be restored and published. The page
+   `path` field and page revisions must remain intact.
+
+Before step 4, the previous Worker remains compatible because the old paths
+are retained and the adjusted dates reproduce them. After dropping the field,
+rolling back to code that queries it requires restoring the field and its
+backed-up values as well. Keep the full backup and path inventory until final
+verification is complete.
+
+### Ongoing behavior
+
+Ordinary content edits keep the publication date and URL. Slug edits use
+EmDash's native permanent redirects. Changing an already-published post's
+publication date can move its URL; EmDash 0.38 does not create a redirect for a
+date-only edit, so add an exact redirect as part of that change. Upstream
+preview-pattern support remains a separate follow-up; undated drafts continue
+to need the `/posts/{id}` preview route.

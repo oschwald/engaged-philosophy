@@ -106,13 +106,6 @@
 					"searchable": true
 				},
 				{
-					"slug": "path",
-					"label": "Path",
-					"type": "string",
-					"unique": true,
-					"indexed": true
-				},
-				{
 					"slug": "excerpt",
 					"label": "Excerpt",
 					"type": "portableText",
@@ -131,7 +124,8 @@
 					"label": "Featured Image",
 					"type": "image"
 				}
-			]
+			],
+			"urlPattern": "/{year}/{month}/{day}/{slug}"
 		},
 		{
 			"slug": "projects",

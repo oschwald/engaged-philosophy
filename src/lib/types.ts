@@ -30,7 +30,7 @@ export type CollectionData<C extends SiteCollection> = Omit<
 };
 
 export type PageData = CollectionData<"pages">;
-export type PostData = CollectionData<"posts">;
+export type PostData = CollectionData<"posts"> & { path?: string };
 export type ProjectData = CollectionData<"projects">;
 
 export type ContentEntry<T> = EmDashContentEntry<T>;

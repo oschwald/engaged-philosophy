@@ -8,7 +8,7 @@ import {
 
 import {
 	derivePagePath,
-	derivePostPath,
+	postPath,
 	normalizeContentPath,
 	slugFromPath,
 } from "./content-paths";
@@ -67,18 +67,12 @@ function normalizeEntry<T extends { featured_image?: RawMediaField | null }>(
 		path?: string;
 		slug?: string;
 		publishedAt?: Date | null;
-		createdAt?: Date | null;
 	};
 
 	if (collection === "pages") {
 		data.path = derivePagePath(data.path, data.slug || entry.id);
 	} else if (collection === "posts") {
-		data.path = derivePostPath(
-			data.path,
-			data.slug || entry.id,
-			data.publishedAt,
-			data.createdAt,
-		);
+		data.path = postPath(data.slug || entry.id, data.publishedAt);
 	}
 
 	return {
@@ -215,18 +209,14 @@ export async function getPageByPath(path: string) {
 
 export async function getPostByPath(path: string) {
 	const normalizedPath = normalizeContentPath(path);
-	const slug = slugFromPath(normalizedPath);
+	let slug: string;
+	try {
+		slug = decodeURIComponent(slugFromPath(normalizedPath));
+	} catch {
+		return null;
+	}
 	const post = slug ? await getPostBySlug(slug) : null;
-	if (post?.data.path === normalizedPath) return post;
-
-	const { entries } = await getEmDashCollection("posts", {
-		status: "published",
-		limit: 1,
-		where: { path: normalizedPath },
-	});
-	const entry = entries[0];
-	if (!entry) return null;
-	return normalizeEntry(entry, "posts");
+	return post?.data.path === normalizedPath ? post : null;
 }
 
 export async function getPostBySlug(slug: string) {

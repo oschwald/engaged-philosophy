@@ -37,7 +37,8 @@ describe("content retrieval and taxonomy", () => {
 			entries: [
 				entry("post-1", {
 					slug: "first-post",
-					path: "2026/01/02/first-post",
+					path: "1999/01/01/obsolete-path",
+					publishedAt: new Date("2026-01-02T12:00:00Z"),
 					title: "First post",
 				}),
 			],
@@ -190,7 +191,8 @@ describe("content retrieval and taxonomy", () => {
 		getEmDashEntry.mockResolvedValue({
 			entry: entry("post-1", {
 				slug: "first-post",
-				path: "2026/01/02/first-post",
+				path: "1999/01/01/obsolete-path",
+				publishedAt: new Date("2026-01-02T12:00:00Z"),
 				title: "First post",
 				terms: {
 					category: [
@@ -213,6 +215,19 @@ describe("content retrieval and taxonomy", () => {
 				},
 			},
 		);
+	});
+
+	test("rejects dates that do not match a post without querying stored paths", async () => {
+		getEmDashEntry.mockResolvedValue({
+			entry: entry("post-1", {
+				slug: "first-post",
+				path: "1999/01/01/first-post",
+				publishedAt: new Date("2026-01-02T12:00:00Z"),
+			}),
+		});
+		await expect(getPostByPath("1999/01/01/first-post")).resolves.toBeNull();
+		await expect(getPostByPath("2026/01/03/first-post")).resolves.toBeNull();
+		expect(getEmDashCollection).not.toHaveBeenCalled();
 	});
 
 	test("resolves archive terms without aggregating usage counts", async () => {

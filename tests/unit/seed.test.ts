@@ -79,10 +79,17 @@ describe("checked-in EmDash seed", () => {
 		expect(projects?.fields?.map((field) => field.slug)).not.toContain("path");
 	});
 
+	test("uses publication dates for post URLs without a stored path", () => {
+		const posts = seed.collections?.find(
+			(collection) => collection.slug === "posts",
+		);
+		expect(posts?.urlPattern).toBe("/{year}/{month}/{day}/{slug}");
+		expect(posts?.fields?.map((field) => field.slug)).not.toContain("path");
+	});
+
 	test("indexes the custom fields used by public collection queries", () => {
 		for (const [collectionSlug, expectedFields] of [
 			["pages", ["path"]],
-			["posts", ["path"]],
 			["projects", ["highlight", "menu_order"]],
 		] as const) {
 			const collection = seed.collections?.find(

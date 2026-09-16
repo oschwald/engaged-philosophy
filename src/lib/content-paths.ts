@@ -1,5 +1,3 @@
-const DATE_PATH_RE = /^(\d{4})\/(\d{2})\/(\d{2})(?:\/|$)/;
-
 type DateValue = Date | string | number | null | undefined;
 
 // Canonical URL rules mirror the migrated WordPress shape:
@@ -20,14 +18,15 @@ function prefixFromPath(path?: string | null) {
 	return segments;
 }
 
-function datePartsFromPath(path?: string | null) {
-	const match = DATE_PATH_RE.exec(normalizeContentPath(path));
-	return match ? [match[1], match[2], match[3]] : null;
-}
-
 function datePartsFromValue(value: DateValue) {
-	if (!value) return null;
-	const date = value instanceof Date ? value : new Date(value);
+	if (value === null || value === undefined || value === "") return null;
+	// EmDash treats offsetless SQLite datetimes as UTC on every host.
+	const utcValue =
+		typeof value === "string" &&
+		/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?$/.test(value)
+			? `${value.replace(" ", "T")}Z`
+			: value;
+	const date = utcValue instanceof Date ? utcValue : new Date(utcValue);
 	if (Number.isNaN(date.getTime())) return null;
 
 	return [
@@ -46,22 +45,11 @@ export function derivePagePath(path?: string | null, slug?: string | null) {
 	return [...prefixFromPath(normalizedPath), pageSlug].join("/");
 }
 
-export function derivePostPath(
-	path?: string | null,
-	slug?: string | null,
-	publishedAt?: DateValue,
-	createdAt?: DateValue,
-) {
-	const normalizedPath = normalizeContentPath(path);
-	const postSlug = slugFromPath(slug) || slugFromPath(normalizedPath);
-	if (!postSlug) return normalizedPath;
-
-	const dateParts =
-		datePartsFromPath(normalizedPath) ??
-		datePartsFromValue(publishedAt) ??
-		datePartsFromValue(createdAt);
-
-	return dateParts ? [...dateParts, postSlug].join("/") : postSlug;
+export function postPath(slug?: string | null, publishedAt?: DateValue) {
+	const dateParts = datePartsFromValue(publishedAt);
+	return slug && dateParts
+		? [...dateParts, encodeURIComponent(slug)].join("/")
+		: "";
 }
 
 export function projectPath(slug?: string | null) {
