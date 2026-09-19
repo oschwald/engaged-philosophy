@@ -106,6 +106,16 @@ eventually consistent, another location can remain stale for about 60 seconds
 (or occasionally longer), plus EmDash's default one-second isolate-local
 `revalidate` window.
 
+Nested public page lookups share a compact path-to-ID index under the fixed
+`ep:page-paths:v1` query key. Its `contentNamespaces("pages")` epochs invalidate
+it with the rest of the page collection. Unknown paths return 404 without
+creating one KV query entry per URL; matched entries still use EmDash's normal
+hydration and visibility checks. Stored path aliases remain available for
+canonical redirects. Preview, visual editing, locale-specific requests, and
+isolated database contexts retain the live lookup so drafts and locale
+fallbacks are not restricted to the published index. Failed collection loads
+never cache a partial index.
+
 This deliberately trades a modest number of KV operations for much larger D1
 row-read savings. Production D1 Insights showed a single topic-count query
 scanning about 80,000 rows and route caching cannot share the result across

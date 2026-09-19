@@ -1,12 +1,23 @@
 import { beforeEach, describe, expect, test, vi } from "vitest";
 
-const { getEmDashCollection, getEmDashEntry, getTerm } = vi.hoisted(() => ({
+const {
+	cachedQuery,
+	getRequestContext,
+	getEmDashCollection,
+	getEmDashEntry,
+	getTerm,
+} = vi.hoisted(() => ({
+	cachedQuery: vi.fn(),
+	getRequestContext: vi.fn(),
 	getEmDashCollection: vi.fn(),
 	getEmDashEntry: vi.fn(),
 	getTerm: vi.fn(),
 }));
 
 vi.mock("emdash", () => ({
+	cachedQuery,
+	contentNamespaces: (collection: string) => [`content:${collection}`],
+	getRequestContext,
 	getEmDashCollection,
 	getEmDashEntry,
 	getTaxonomyTerms: vi.fn(),
@@ -29,7 +40,8 @@ function entry(id: string, data: Record<string, unknown>) {
 
 describe("content retrieval and taxonomy", () => {
 	beforeEach(() => {
-		vi.clearAllMocks();
+		vi.resetAllMocks();
+		cachedQuery.mockImplementation(({ load }) => load());
 	});
 
 	test("queries only the requested archive page", async () => {
@@ -164,28 +176,145 @@ describe("content retrieval and taxonomy", () => {
 		});
 	});
 
-	test("uses a targeted path query when a slug lookup does not match", async () => {
-		getEmDashEntry.mockResolvedValue({ entry: null });
-		getEmDashCollection.mockResolvedValue({
-			entries: [
-				entry("page-1", {
-					slug: "child",
-					path: "parent/child",
-					title: "Child",
-				}),
-			],
-			cacheHint: {},
+	test("resolves a published nested path before fetching its entry", async () => {
+		const child = entry("page-1", {
+			slug: "child",
+			path: "parent/child",
+			title: "Child",
 		});
+		getEmDashCollection.mockResolvedValue({ entries: [child] });
+		getEmDashEntry.mockResolvedValue({ entry: child });
 
-		await expect(getPageByPath("parent/child")).resolves.toMatchObject({
+		await expect(getPageByPath("/parent/child/")).resolves.toMatchObject({
 			id: "page-1",
 		});
+		expect(getEmDashEntry).toHaveBeenCalledWith("pages", "page-1");
 		expect(getEmDashCollection).toHaveBeenCalledWith("pages", {
 			status: "published",
-			limit: 1,
-			where: { path: "parent/child" },
+			limit: 1000,
+			cursor: undefined,
 		});
 	});
+
+	test("does not query arbitrary slugs or paths for missing nested pages", async () => {
+		getEmDashCollection.mockResolvedValue({ entries: [] });
+		for (const path of ["missing/one", "missing/two", "constructor/toString"]) {
+			await expect(getPageByPath(path)).resolves.toBeNull();
+		}
+		expect(getEmDashEntry).not.toHaveBeenCalled();
+		for (const [, filter] of getEmDashCollection.mock.calls) {
+			expect(filter.where).toBeUndefined();
+		}
+		expect(
+			new Set(cachedQuery.mock.calls.map(([options]) => options.key)).size,
+		).toBe(1);
+	});
+
+	test("indexes all pages and uses the canonical path after a slug rename", async () => {
+		const child = entry("page-2", { slug: "renamed", path: "parent/old" });
+		getEmDashCollection
+			.mockResolvedValueOnce({
+				entries: [entry("page-1", { slug: "about" })],
+				nextCursor: "next",
+			})
+			.mockResolvedValueOnce({ entries: [child] });
+		getEmDashEntry.mockResolvedValue({ entry: child });
+		await expect(getPageByPath("parent/renamed")).resolves.toMatchObject({
+			id: "page-2",
+			data: { path: "parent/renamed" },
+		});
+		expect(getEmDashCollection).toHaveBeenLastCalledWith("pages", {
+			status: "published",
+			limit: 1000,
+			cursor: "next",
+		});
+	});
+
+	test("preserves stored-path aliases for canonical redirects", async () => {
+		const child = entry("page-1", { slug: "renamed", path: "parent/old" });
+		getEmDashCollection.mockResolvedValue({ entries: [child] });
+		getEmDashEntry.mockResolvedValue({ entry: child });
+		await expect(getPageByPath("parent/old")).resolves.toMatchObject({
+			id: "page-1",
+			data: { path: "parent/renamed" },
+		});
+	});
+
+	test("prefers a canonical path over another page's stored alias", async () => {
+		const canonical = entry("page-2", { slug: "old", path: "parent/old" });
+		getEmDashCollection.mockResolvedValue({
+			entries: [
+				entry("page-1", { slug: "renamed", path: "parent/old" }),
+				canonical,
+			],
+		});
+		getEmDashEntry.mockResolvedValue({ entry: canonical });
+		await expect(getPageByPath("parent/old")).resolves.toMatchObject({
+			id: "page-2",
+		});
+		expect(getEmDashEntry).toHaveBeenCalledWith("pages", "page-2");
+	});
+
+	test("does not turn a failed index load into a missing page", async () => {
+		getEmDashCollection
+			.mockResolvedValueOnce({
+				entries: [entry("page-1", { slug: "child", path: "parent/child" })],
+				nextCursor: "next",
+			})
+			.mockResolvedValueOnce({
+				entries: [],
+				error: { message: "Database unavailable" },
+			});
+		await expect(getPageByPath("parent/child")).rejects.toThrow(
+			"Database unavailable",
+		);
+		expect(getEmDashEntry).not.toHaveBeenCalled();
+	});
+
+	test("rejects a stale path index when an entry moves or disappears", async () => {
+		cachedQuery.mockResolvedValue([{ path: "parent/old", id: "page-1" }]);
+		getEmDashEntry
+			.mockResolvedValueOnce({
+				entry: entry("page-1", { slug: "new", path: "other/new" }),
+			})
+			.mockResolvedValueOnce({ entry: null });
+		await expect(getPageByPath("parent/old")).resolves.toBeNull();
+		await expect(getPageByPath("parent/old")).resolves.toBeNull();
+		expect(getEmDashCollection).not.toHaveBeenCalled();
+	});
+
+	test.each([
+		{ editMode: true },
+		{ editMode: false, preview: { collection: "pages", id: "page-1" } },
+		{ editMode: false, locale: "fr" },
+		{ editMode: false, dbIsIsolated: true },
+	])(
+		"retains live nested-page lookup for request context %j",
+		async (context) => {
+			getRequestContext.mockReturnValue(context);
+			getEmDashEntry.mockResolvedValue({ entry: null });
+			getEmDashCollection.mockResolvedValue({
+				entries: [
+					entry("page-1", {
+						slug: "child",
+						path: "parent/child",
+						title: "Child",
+					}),
+				],
+				cacheHint: {},
+			});
+
+			await expect(getPageByPath("parent/child")).resolves.toMatchObject({
+				id: "page-1",
+			});
+			expect(getEmDashCollection).toHaveBeenCalledWith("pages", {
+				status: "published",
+				limit: 1,
+				where: { path: "parent/child" },
+			});
+			expect(cachedQuery).not.toHaveBeenCalled();
+		},
+	);
 
 	test("preserves taxonomy terms hydrated by EmDash", async () => {
 		getEmDashEntry.mockResolvedValue({
