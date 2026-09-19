@@ -46,3 +46,16 @@ emulate production tag purging or `CF-Cache-Status`. The Worker-backed cache
 tests therefore verify cache policy, tags, stateful/query bypasses, and content
 refresh behavior locally; `pnpm run smoke:live` is the production cache-hit
 check after deployment.
+
+## Local KV Measurement
+
+Run `mise exec -- node scripts/measure-kv-usage.mjs` to build a test-auth Worker,
+initialize isolated local bindings, and request 100 distinct missing nested
+paths after warming the homepage and a 404. The script reports object-cache
+key growth, database query counts from `Server-Timing`, and response latency.
+Key growth measures new entries, not repeated writes to existing keys; query
+counts are not D1 rows read, and local timings are not production CPU usage.
+
+The measurement resets only `.wrangler/e2e-state/worker-9000`. It uses local
+Wrangler bindings and never targets a deployed site. Its build uses test auth;
+run a normal `pnpm run build` before any deployment.
