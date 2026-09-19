@@ -176,7 +176,7 @@ describe("content retrieval and taxonomy", () => {
 		});
 	});
 
-	test("resolves a published nested path before fetching its entry", async () => {
+	test("resolves a published nested path", async () => {
 		const child = entry("page-1", {
 			slug: "child",
 			path: "parent/child",
@@ -196,7 +196,7 @@ describe("content retrieval and taxonomy", () => {
 		});
 	});
 
-	test("does not query arbitrary slugs or paths for missing nested pages", async () => {
+	test("returns null for missing nested pages", async () => {
 		getEmDashCollection.mockResolvedValue({ entries: [] });
 		for (const path of ["missing/one", "missing/two", "constructor/toString"]) {
 			await expect(getPageByPath(path)).resolves.toBeNull();
@@ -210,7 +210,7 @@ describe("content retrieval and taxonomy", () => {
 		).toBe(1);
 	});
 
-	test("indexes all pages and uses the canonical path after a slug rename", async () => {
+	test("resolves the canonical path after a slug rename", async () => {
 		const child = entry("page-2", { slug: "renamed", path: "parent/old" });
 		getEmDashCollection
 			.mockResolvedValueOnce({
@@ -271,7 +271,7 @@ describe("content retrieval and taxonomy", () => {
 		expect(getEmDashEntry).not.toHaveBeenCalled();
 	});
 
-	test("rejects a stale path index when an entry moves or disappears", async () => {
+	test("does not serve moved or deleted pages", async () => {
 		cachedQuery.mockResolvedValue([{ path: "parent/old", id: "page-1" }]);
 		getEmDashEntry
 			.mockResolvedValueOnce({
@@ -288,33 +288,30 @@ describe("content retrieval and taxonomy", () => {
 		{ editMode: false, preview: { collection: "pages", id: "page-1" } },
 		{ editMode: false, locale: "fr" },
 		{ editMode: false, dbIsIsolated: true },
-	])(
-		"retains live nested-page lookup for request context %j",
-		async (context) => {
-			getRequestContext.mockReturnValue(context);
-			getEmDashEntry.mockResolvedValue({ entry: null });
-			getEmDashCollection.mockResolvedValue({
-				entries: [
-					entry("page-1", {
-						slug: "child",
-						path: "parent/child",
-						title: "Child",
-					}),
-				],
-				cacheHint: {},
-			});
+	])("resolves nested pages for request context %j", async (context) => {
+		getRequestContext.mockReturnValue(context);
+		getEmDashEntry.mockResolvedValue({ entry: null });
+		getEmDashCollection.mockResolvedValue({
+			entries: [
+				entry("page-1", {
+					slug: "child",
+					path: "parent/child",
+					title: "Child",
+				}),
+			],
+			cacheHint: {},
+		});
 
-			await expect(getPageByPath("parent/child")).resolves.toMatchObject({
-				id: "page-1",
-			});
-			expect(getEmDashCollection).toHaveBeenCalledWith("pages", {
-				status: "published",
-				limit: 1,
-				where: { path: "parent/child" },
-			});
-			expect(cachedQuery).not.toHaveBeenCalled();
-		},
-	);
+		await expect(getPageByPath("parent/child")).resolves.toMatchObject({
+			id: "page-1",
+		});
+		expect(getEmDashCollection).toHaveBeenCalledWith("pages", {
+			status: "published",
+			limit: 1,
+			where: { path: "parent/child" },
+		});
+		expect(cachedQuery).not.toHaveBeenCalled();
+	});
 
 	test("preserves taxonomy terms hydrated by EmDash", async () => {
 		getEmDashEntry.mockResolvedValue({
