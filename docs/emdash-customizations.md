@@ -51,12 +51,13 @@ Cloudflare constraints.
   Maintenance scripts should respect the lock or explicitly request
   `overrideLock`. The site's save gate does not bypass locks. EmDash 0.38's MCP
   content tools do not enforce them yet.
-- `src/worker.ts` rejects the two high-volume archival crawlers identified in
-  production analytics before Astro or EmDash initializes, then logs selected
-  admin/signed-in request metadata and slow observed requests without
-  serializing cookie values. `public/robots.txt` advertises the same policy;
-  the Worker check is the enforcement layer because robots directives are
-  voluntary.
+- Zone WAF rules reject the two high-volume archival crawlers identified in
+  production analytics. `src/worker.ts` retains the same check for preview URLs
+  outside the zone, then logs selected admin/signed-in request metadata and
+  slow observed requests without serializing cookie values.
+  `public/robots.txt` advertises the same policy; robots directives alone do
+  not enforce it. The [Free plan guardrails](cloudflare-free-plan-guardrails.md)
+  describe the edge rules and remaining Worker checks.
 - The outer Worker also applies a public request budget before Astro or EmDash
   initializes. It rejects unsupported methods and pathological URL shapes,
   validates preview-token syntax, bounds search queries and cursor history,
@@ -105,6 +106,16 @@ cached values with content and taxonomy epochs. Because Workers KV is
 eventually consistent, another location can remain stale for about 60 seconds
 (or occasionally longer), plus EmDash's default one-second isolate-local
 `revalidate` window.
+
+Nested public page lookups share a compact path-to-ID index under the fixed
+`ep:page-paths:v1` query key. Its `contentNamespaces("pages")` epochs invalidate
+it with the rest of the page collection. Unknown paths return 404 without
+creating one KV query entry per URL; matched entries still use EmDash's normal
+hydration and visibility checks. Stored path aliases remain available for
+canonical redirects. Preview, visual editing, locale-specific requests, and
+isolated database contexts retain the live lookup so drafts and locale
+fallbacks are not restricted to the published index. Failed collection loads
+never cache a partial index.
 
 This deliberately trades a modest number of KV operations for much larger D1
 row-read savings. Production D1 Insights showed a single topic-count query

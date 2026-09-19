@@ -1,0 +1,35 @@
+http.host in {"engagedphilosophy.com" "www.engagedphilosophy.com"}
+and (
+  lower(http.user_agent) contains "mj12bot"
+  or lower(http.user_agent) contains "velenpublicwebcrawler"
+  or (
+    not cf.client.bot
+    and not (lower(url_decode(http.request.uri.path)) in {"/_emdash" "/_image"} or starts_with(lower(url_decode(http.request.uri.path)), "/_emdash/"))
+    and (
+      lower(http.user_agent) contains "go-http-client"
+      or (url_decode(http.request.uri.path) wildcard "*/.aws" or url_decode(http.request.uri.path) wildcard "*/.aws/*")
+      or (url_decode(http.request.uri.path) wildcard "*/.docker" or url_decode(http.request.uri.path) wildcard "*/.docker/*")
+      or (url_decode(http.request.uri.path) wildcard "*/.git" or url_decode(http.request.uri.path) wildcard "*/.git/*")
+      or (url_decode(http.request.uri.path) wildcard "*/.hg" or url_decode(http.request.uri.path) wildcard "*/.hg/*")
+      or (url_decode(http.request.uri.path) wildcard "*/.kube" or url_decode(http.request.uri.path) wildcard "*/.kube/*")
+      or (url_decode(http.request.uri.path) wildcard "*/.svn" or url_decode(http.request.uri.path) wildcard "*/.svn/*")
+      or (url_decode(http.request.uri.path) wildcard "*/.terraform" or url_decode(http.request.uri.path) wildcard "*/.terraform/*")
+      or (url_decode(http.request.uri.path) wildcard "*/.vscode" or url_decode(http.request.uri.path) wildcard "*/.vscode/*")
+      or (url_decode(http.request.uri.path) wildcard "*/.env" or url_decode(http.request.uri.path) wildcard "*/.env/*")
+      or url_decode(http.request.uri.path) wildcard "*/.env.*"
+      or url_decode(http.request.uri.path) wildcard "*/.env~*"
+      or lower(url_decode(http.request.uri.path)) in {
+      "/.boto" "/.boto/" "/.my.cnf" "/.my.cnf/" "/_environment" "/_environment/" "/api/graphql" "/api/graphql/" "/appsettings.development.json" "/appsettings.development.json/" "/file-manager/initialize" "/file-manager/initialize/" "/graphql" "/graphql/" "/phpinfo" "/phpinfo/" "/s3.properties" "/s3.properties/" "/sftp-config.json" "/sftp-config.json/" "/terraform.tfstate" "/terraform.tfstate/" "/terraform.tfstate.backup" "/terraform.tfstate.backup/" "/v1/graphql" "/v1/graphql/" "/wordpress" "/wordpress/" "/wp" "/wp/"
+    }
+      or (url_decode(http.request.uri.path) wildcard "/_environment" or url_decode(http.request.uri.path) wildcard "/_environment/*")
+      or (url_decode(http.request.uri.path) wildcard "/_profiler" or url_decode(http.request.uri.path) wildcard "/_profiler/*")
+      or (url_decode(http.request.uri.path) wildcard "/vendor/phpunit" or url_decode(http.request.uri.path) wildcard "/vendor/phpunit/*")
+      or (url_decode(http.request.uri.path) wildcard "/wordpress" or url_decode(http.request.uri.path) wildcard "/wordpress/*")
+      or (url_decode(http.request.uri.path) wildcard "/wp" or url_decode(http.request.uri.path) wildcard "/wp/*")
+      or (url_decode(http.request.uri.path) wildcard "/cgi-bin" or url_decode(http.request.uri.path) wildcard "/cgi-bin/*")
+      or (url_decode(http.request.uri.path) wildcard "/actuator" or url_decode(http.request.uri.path) wildcard "/actuator/*")
+      or (url_decode(http.request.uri.path) wildcard "/server-status" or url_decode(http.request.uri.path) wildcard "/server-status/*")
+      or (starts_with(lower(url_decode(http.request.uri.path)), "/wp-") and not starts_with(lower(url_decode(http.request.uri.path)), "/wp-content/uploads/"))
+    )
+  )
+)

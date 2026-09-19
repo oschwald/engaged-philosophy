@@ -16,22 +16,31 @@ const PREVIEW_TOKEN_PATTERN = /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]{43}$/;
 const SEARCH_PAGE_PATTERN = /^\/page\/([1-9]\d*)\/?$/;
 const CONTROL_CHARACTERS = /[\u0000-\u001f\u007f]/;
 const PHP_PROBE_PATH = /(?:^|\/)[^/]*\.php\d*~?(?:\/|$)/i;
+const ENV_PROBE_PATH = /(?:^|\/)\.env(?:[./~]|$)/;
+const CREDENTIAL_DIRECTORY_PATH =
+	/(?:^|\/)\.(?:aws|docker|git|hg|kube|svn|terraform|vscode)(?:\/|$)/;
+const UPLOAD_EXPLOIT_PATH =
+	/(?:^|\/)(?:(?:blueimp-)?jquery-file-upload\/server\/php|jquery\.filer\/php|alfacgiapi\/perl\.alfa)(?:\/|$)/;
 const SCANNER_PROBE_PATHS = new Set([
-	"/.env",
-	"/.git",
+	"/.boto",
+	"/.my.cnf",
 	"/_environment",
 	"/_profiler/phpinfo",
 	"/api/graphql",
+	"/appsettings.development.json",
+	"/file-manager/initialize",
 	"/graphql",
 	"/phpinfo",
+	"/s3.properties",
+	"/sftp-config.json",
+	"/terraform.tfstate",
+	"/terraform.tfstate.backup",
 	"/v1/graphql",
 	"/webroot/index.php/_environment",
 	"/wordpress",
 	"/wp",
 ]);
 const SCANNER_PROBE_PREFIXES = [
-	"/.env.",
-	"/.git/",
 	"/_environment/",
 	"/_profiler/",
 	"/vendor/phpunit/",
@@ -101,6 +110,8 @@ function validPreviewToken(params: URLSearchParams) {
 	);
 }
 
+// Zone WAF handles public hosts first. Keep this fallback for Worker preview
+// URLs, verified-bot exemptions, and patterns beyond the Free WAF expression.
 function isScannerProbePath(pathname: string) {
 	let normalized: string;
 	try {
@@ -113,7 +124,10 @@ function isScannerProbePath(pathname: string) {
 	return (
 		SCANNER_PROBE_PATHS.has(normalized) ||
 		SCANNER_PROBE_PREFIXES.some((prefix) => normalized.startsWith(prefix)) ||
-		PHP_PROBE_PATH.test(normalized)
+		PHP_PROBE_PATH.test(normalized) ||
+		ENV_PROBE_PATH.test(normalized) ||
+		CREDENTIAL_DIRECTORY_PATH.test(normalized) ||
+		UPLOAD_EXPLOIT_PATH.test(normalized)
 	);
 }
 

@@ -1,0 +1,8 @@
+http.host in {"engagedphilosophy.com" "www.engagedphilosophy.com"}
+and not cf.client.bot
+and not (lower(url_decode(http.request.uri.path)) in {"/_emdash" "/_image"} or starts_with(lower(url_decode(http.request.uri.path)), "/_emdash/"))
+and (
+  not http.request.method in {"GET" "HEAD" "OPTIONS"}
+  or len(http.request.uri.path) > 2048
+  or len(http.request.uri.query) > 2048
+)

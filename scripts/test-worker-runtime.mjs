@@ -162,6 +162,22 @@ try {
 	assert.equal(crawlerResponse.status, 403);
 	assert.equal(crawlerResponse.headers.get("x-blocked-crawler"), "MJ12bot");
 	assert.equal(crawlerResponse.headers.get("server-timing"), null);
+
+	for (const path of [
+		"/api/.env",
+		"/.docker/config.json",
+		"/.kube/config",
+		"/.terraform/credentials.tfrc.json",
+		"/.vscode/sftp.json",
+		"/assets/plugins/jquery-file-upload/server/php",
+	]) {
+		const probeResponse = await fetchWithTimeout(
+			`http://127.0.0.1:${port}${path}`,
+		);
+		assert.equal(probeResponse.status, 404, path);
+		assert.equal(await probeResponse.text(), "Not found.\n", path);
+		assert.equal(probeResponse.headers.get("server-timing"), null, path);
+	}
 } finally {
 	await stopProcess(child);
 }

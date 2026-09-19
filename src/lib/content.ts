@@ -1,6 +1,9 @@
 import {
+	cachedQuery,
+	contentNamespaces,
 	getEmDashCollection,
 	getEmDashEntry,
+	getRequestContext,
 	getTaxonomyTerms as getEmDashTaxonomyTerms,
 	getTerm,
 	type ContentEntry as EmDashContentEntry,
@@ -193,6 +196,34 @@ export async function getPageBySlug(slug: string) {
 
 export async function getPageByPath(path: string) {
 	const normalizedPath = normalizeContentPath(path);
+	const context = getRequestContext();
+	// Draft paths and locale fallbacks must resolve through EmDash's live lookup.
+	if (
+		!context?.editMode &&
+		!context?.preview &&
+		!context?.locale &&
+		!context?.dbIsIsolated
+	) {
+		const paths = await cachedQuery({
+			namespace: contentNamespaces("pages"),
+			key: "ep:page-paths:v1",
+			load: loadPublishedPagePaths,
+		});
+		const match =
+			paths.find((page) => page.path === normalizedPath) ??
+			paths.find((page) => page.storedPath === normalizedPath);
+		if (!match) return null;
+
+		const { entry } = await getEmDashEntry("pages", match.id);
+		if (!entry) return null;
+		const page = normalizeEntry(entry, "pages");
+		// Keep stored-path aliases available to the route's canonical redirect.
+		return page.data.path === normalizedPath ||
+			entry.data.path === normalizedPath
+			? page
+			: null;
+	}
+
 	const slug = slugFromPath(normalizedPath);
 	const page = slug ? await getPageBySlug(slug) : null;
 	if (page?.data.path === normalizedPath) return page;
@@ -205,6 +236,34 @@ export async function getPageByPath(path: string) {
 	const entry = entries[0];
 	if (!entry) return null;
 	return normalizeEntry(entry, "pages");
+}
+
+async function loadPublishedPagePaths() {
+	const paths: Array<{ path: string; id: string; storedPath?: string }> = [];
+	let cursor: string | undefined;
+	do {
+		const result = await getEmDashCollection("pages", {
+			status: "published",
+			limit: COLLECTION_PAGE_SIZE,
+			cursor,
+		});
+		// A partial index would turn valid pages into cached 404s.
+		if (result.error) {
+			throw new Error(
+				`Unable to load published page paths: ${result.error.message}`,
+			);
+		}
+		for (const entry of result.entries) {
+			const path = derivePagePath(entry.data.path, entry.data.slug || entry.id);
+			paths.push({
+				path,
+				id: entry.id,
+				storedPath: entry.data.path !== path ? entry.data.path : undefined,
+			});
+		}
+		cursor = result.nextCursor;
+	} while (cursor);
+	return paths;
 }
 
 export async function getPostByPath(path: string) {

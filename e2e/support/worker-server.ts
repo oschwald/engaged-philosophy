@@ -1,9 +1,15 @@
 import assert from "node:assert/strict";
-import { spawn, spawnSync, type ChildProcess } from "node:child_process";
+import {
+	execFile,
+	spawn,
+	spawnSync,
+	type ChildProcess,
+} from "node:child_process";
 import { existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
+import { promisify } from "node:util";
 
 export const TEST_AUTH_HEADER = "X-EmDash-Test-Auth";
 
@@ -18,6 +24,7 @@ const WORKER_ERROR_PATTERN =
 
 export interface WorkerServer {
 	baseURL: string;
+	listObjectCacheKeys: () => Promise<string[]>;
 	assertNoErrors: () => void;
 	getOutput: () => string;
 	stop: () => Promise<void>;
@@ -332,6 +339,30 @@ export async function startWorkerServer(
 
 	return {
 		baseURL: `http://127.0.0.1:${port}`,
+		listObjectCacheKeys: async () => {
+			const { stdout } = await promisify(execFile)(
+				"pnpm",
+				[
+					"exec",
+					"wrangler",
+					"kv",
+					"key",
+					"list",
+					"--config",
+					DIST_WRANGLER_CONFIG,
+					"--binding",
+					"SESSION",
+					"--prefix",
+					"ep:object-cache:",
+					"--local",
+					"--persist-to",
+					persistDir,
+				],
+				{ cwd: ROOT, env: childProcessEnv(), maxBuffer: 4 * 1024 * 1024 },
+			);
+			const keys: Array<{ name: string }> = JSON.parse(stdout);
+			return keys.map(({ name }) => name);
+		},
 		getOutput: () => output,
 		assertNoErrors: () => {
 			assert.equal(
