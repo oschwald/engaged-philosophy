@@ -53,7 +53,6 @@
 		"@emdash-cms/plugin-embeds": "^0.1.46",
 		"astro": "^7.3.2",
 		"bootstrap": "^5.3.8",
-		"bootstrap-icons": "1.13.1",
 		"date-fns": "^4.4.0",
 		"emdash": "^0.38.0",
 		"jose": "^6.2.12",

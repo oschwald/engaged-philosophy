@@ -3,6 +3,7 @@ import Base from "../layouts/Base.astro";
 import { taxonomyCacheTag } from "../lib/cache-tags";
 import { PROJECT_TAXONOMIES } from "../lib/taxonomy-utils";
 import ThemeSidebar from "./ThemeSidebar.astro";
+import SearchIcon from "./SearchIcon.astro";
 
 const cacheTags = [
 	"pages",
@@ -51,7 +52,7 @@ const cacheTags = [
 								type="submit"
 								aria-label="Submit search"
 							>
-								<i class="bi bi-search"></i>
+								<SearchIcon />
 							</button>
 						</div>
 					</form>

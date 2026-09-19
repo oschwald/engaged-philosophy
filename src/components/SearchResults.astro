@@ -1,6 +1,7 @@
 ---
 import EntrySummary from "./content/EntrySummary.astro";
 import ThemeSidebar from "./ThemeSidebar.astro";
+import SearchIcon from "./SearchIcon.astro";
 import {
 	searchCursorHistoryForNextPage,
 	type SiteSearchResponse,
@@ -131,7 +132,7 @@ const nextHref =
 										type="submit"
 										aria-label="Submit search"
 									>
-										<i class="bi bi-search" />
+										<SearchIcon />
 									</button>
 								</div>
 							</form>
