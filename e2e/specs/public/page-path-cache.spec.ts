@@ -16,6 +16,7 @@ test("bounds KV growth for distinct missing nested pages", async ({
 	test.setTimeout(120_000);
 	const measurement = await measureMissingPaths(workerServer);
 	expect(measurement.addedKeys).toEqual([]);
+	expect(measurement.dbQueries).toBe(0);
 });
 
 test("refreshes a cached missing path through publication, rename, unpublish, and deletion", async ({
