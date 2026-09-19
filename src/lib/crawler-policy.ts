@@ -1,3 +1,4 @@
+// Also enforced at the zone WAF; preview URLs do not pass through that zone.
 const BLOCKED_CRAWLERS = ["MJ12bot", "VelenPublicWebCrawler"] as const;
 
 export function getBlockedCrawler(request: Request): string | null {

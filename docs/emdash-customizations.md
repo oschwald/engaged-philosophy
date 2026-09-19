@@ -51,12 +51,13 @@ Cloudflare constraints.
   Maintenance scripts should respect the lock or explicitly request
   `overrideLock`. The site's save gate does not bypass locks. EmDash 0.38's MCP
   content tools do not enforce them yet.
-- `src/worker.ts` rejects the two high-volume archival crawlers identified in
-  production analytics before Astro or EmDash initializes, then logs selected
-  admin/signed-in request metadata and slow observed requests without
-  serializing cookie values. `public/robots.txt` advertises the same policy;
-  the Worker check is the enforcement layer because robots directives are
-  voluntary.
+- Zone WAF rules reject the two high-volume archival crawlers identified in
+  production analytics. `src/worker.ts` retains the same check for preview URLs
+  outside the zone, then logs selected admin/signed-in request metadata and
+  slow observed requests without serializing cookie values.
+  `public/robots.txt` advertises the same policy; robots directives alone do
+  not enforce it. The [Free plan guardrails](cloudflare-free-plan-guardrails.md)
+  describe the edge rules and remaining Worker checks.
 - The outer Worker also applies a public request budget before Astro or EmDash
   initializes. It rejects unsupported methods and pathological URL shapes,
   validates preview-token syntax, bounds search queries and cursor history,

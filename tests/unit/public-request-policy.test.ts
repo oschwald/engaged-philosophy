@@ -58,6 +58,29 @@ describe("public request policy", () => {
 			"/WP/",
 			"/wordpress/wp-admin/install.php",
 			"/vendor/phpunit/src/Util/PHP/eval-stdin.php",
+			"/api/.env",
+			"/api/shared/.env.production",
+			"/staging/.env~",
+			"/api%2F.%65nv",
+			"/config/.AWS/credentials",
+			"/.DOCKER/config.json/",
+			"/.kube/config",
+			"/.terraform/credentials.tfrc.json",
+			"/.vscode/sftp.json",
+			"/backup/.git/config",
+			"/backup/.hg/hgrc",
+			"/backup/.svn/entries",
+			"/.boto",
+			"/.my.cnf",
+			"/terraform.tfstate.backup",
+			"/appsettings.Development.json",
+			"/s3.properties",
+			"/sftp-config.json",
+			"/assets/plugins/jQuery-File-Upload/server/php/",
+			"/blueimp-jQuery-File-Upload/server/php",
+			"/assets/vendor/jquery.filer/php/readme.txt",
+			"/ALFA_DATA/alfacgiapi/perl.alfa",
+			"/file-manager/initialize",
 		]) {
 			const { response } = apply(path);
 			expect(response?.status, path).toBe(404);
@@ -74,6 +97,25 @@ describe("public request policy", () => {
 		expect(
 			apply("/_emdash/api/graphql", { method: "POST" }).response,
 		).toBeUndefined();
+		for (const path of [
+			"/.well-known/traffic-advice",
+			"/.well-known/acme-challenge/token",
+			"/project/environmental-ethics/",
+			"/project/.environment/",
+			"/project/terraforming/",
+			"/wp-content/uploads/2026/09/configuration.pdf",
+			"/wp-content/uploads/2026/09/environment.php.jpg",
+			"/_astro/site.js",
+			"/_emdash/api/media/file/.env",
+		]) {
+			expect(apply(path).response, path).toBeUndefined();
+		}
+	});
+
+	test("returns a bodyless response for HEAD probes", async () => {
+		const { response } = apply("/api/.env", { method: "HEAD" });
+		expect(response?.status).toBe(404);
+		await expect(response?.text()).resolves.toBe("");
 	});
 
 	test("rejects oversized and malformed request targets", () => {

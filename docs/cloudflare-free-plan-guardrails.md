@@ -13,7 +13,9 @@ Workers Free quotas:
 
 The zone rules for `engagedphilosophy.com` must preserve these invariants:
 
-- Verified bots are excluded from scanner and rate-limit rules.
+- Verified bots are excluded from generic scanner and rate-limit rules. The
+  explicit `MJ12bot` and `VelenPublicWebCrawler` denylist applies regardless
+  of verified-bot status, matching the site's crawler policy.
 - `media.engagedphilosophy.com/wp-content/uploads/` remains reachable because
   it contains legitimate migrated media.
 - Requests carrying any stateful cookie named in
@@ -22,8 +24,9 @@ The zone rules for `engagedphilosophy.com` must preserve these invariants:
   into anonymous cache entries.
 - Query strings may be ignored in the cache key only where the application
   does not use them to render a different response.
-- Known PHP, environment, GraphQL, and WordPress-installation probes are
-  rejected by the outer Worker before Astro or EmDash can initialize. Keep
+- Known PHP, credential, environment, GraphQL, WordPress-installation, and
+  upload-exploit probes are rejected by zone WAF rules before the Worker runs.
+  The Worker retains a fallback for requests outside that coverage. Keep
   legitimate legacy content and `wp-content/uploads` paths out of this list.
 - The public dynamic-page rate limit is 10 requests per 10 seconds per IP and
   Cloudflare location. It excludes verified bots, `/_emdash`, `/_astro`, the
@@ -34,6 +37,37 @@ Install the stateful-cookie bypass Cache Rule before deploying code that omits
 `Vary: Cookie`. Set `CACHE_STATEFUL_COOKIE_BYPASS_ACTIVE` to `"true"` only
 after validating that rule. The default retains cookie variance, so preview,
 local, and incompletely configured production deployments fail safely.
+
+### Edge rejection and Worker fallbacks
+
+The deployed custom rules use these expressions, in order, with action Block:
+
+| Expression                                                       | Purpose                                                                                          |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [scanner-rule.txt](../cloudflare/scanner-rule.txt)               | Credential/configuration probes, obsolete framework endpoints, and the explicit crawler denylist |
+| [php-upload-rule.txt](../cloudflare/php-upload-rule.txt)         | PHP scripts, backup/version suffixes, and known upload exploits                                  |
+| [public-request-rule.txt](../cloudflare/public-request-rule.txt) | Unsupported public methods and oversized URLs                                                    |
+
+All three scope requests to apex/www. Path comparisons decode percent escapes
+and respect component boundaries; a legitimate `environment.php.jpg` is not
+a PHP script. EmDash API and image-optimization endpoints are exempt from the
+generic path and method checks. The media hostname is outside these rules.
+The explicit crawler denylist also covers admin and image requests.
+
+Wrangler deployments do not install these zone rules. When changing an
+expression, save the current ruleset for rollback and validate the replacement
+with the Rulesets API's `dry_run=true` option before applying it. Use Cloudflare
+Trace with `skip_response: true` to test custom-rule matches without invoking
+the Worker, then run `smoke:live`. Trace also reports rate-limit expression
+matches; those are separate from the custom-rule block assertions.
+
+Worker preview URLs remain enabled and share production bindings, but the
+site's zone WAF does not cover them. The cheap Worker scanner/crawler checks
+protect those entrypoints and requests exempted by the verified-bot rules.
+The Worker also handles exact Unicode/path-segment limits, malformed encoding,
+and uncommon multi-digit PHP suffixes that the Free-plan WAF expressions do
+not reproduce. Preview authorization, search/cursor validation, and deciding
+whether a content path exists remain application responsibilities.
 
 ## Usage Review
 
