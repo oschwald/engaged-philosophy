@@ -51,7 +51,7 @@
 		"@emdash-cms/cloudflare": "^0.38.0",
 		"@emdash-cms/plugin-audit-log": "^0.2.2",
 		"@emdash-cms/plugin-embeds": "^0.1.46",
-		"astro": "^7.3.2",
+		"astro": "^7.3.3",
 		"bootstrap": "^5.3.8",
 		"date-fns": "^4.4.0",
 		"emdash": "^0.38.0",
