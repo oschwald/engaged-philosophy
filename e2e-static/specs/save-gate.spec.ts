@@ -83,6 +83,43 @@ test.describe("custom EmDash save gate", () => {
 			nextEvents.some((event) => event.type === "publish-start"),
 		);
 		expectEventOrder(events, ["save-start", "save-finish", "publish-start"]);
+		expect(
+			await page.evaluate(() =>
+				Reflect.get(window, "__originalPublishHandlerRan"),
+			),
+		).toBe(true);
+	});
+
+	test("shows a publish network failure after a successful save and allows retry", async ({
+		page,
+		staticServer,
+	}) => {
+		staticServer.resetEvents();
+		await page.goto("/emdash-save-gate/", { waitUntil: "domcontentloaded" });
+		const publishUrl =
+			"**/_emdash/api/visual-editing/content/pages/about/publish";
+		await page.route(publishUrl, (route) => route.abort("failed"));
+		await page.evaluate(() => {
+			document.addEventListener("emdash:save", (event) => {
+				document.documentElement.dataset.saveState = (
+					event as CustomEvent<{ state: string }>
+				).detail.state;
+			});
+		});
+		await page.locator("#editor").fill("Changed content to publish");
+		await page.locator("#emdash-tb-publish").click();
+		await expect(page.locator("html")).toHaveAttribute(
+			"data-save-state",
+			"error",
+		);
+		expectEventOrder(staticServer.getEvents(), ["save-start", "save-finish"]);
+		expect(eventTypes(staticServer.getEvents())).not.toContain("publish-start");
+
+		await page.unroute(publishUrl);
+		await page.locator("#emdash-tb-publish").click();
+		await waitForFixtureEvent(staticServer, (events) =>
+			eventTypes(events).includes("publish-start"),
+		);
 	});
 
 	test("forwards unload saves even without an unsaved-state event", async ({

@@ -47,6 +47,27 @@ tests therefore verify cache policy, tags, stateful/query bypasses, and content
 refresh behavior locally; `pnpm run smoke:live` is the production cache-hit
 check after deployment.
 
+## Branch Previews
+
+Workers Builds currently publishes branch and commit previews as aliased Worker
+Version URLs. These versions bind to the same D1 database, R2 bucket, and KV
+namespace as production; a different hostname does not isolate data. EmDash's
+automatic runtime migrations can change that shared database when a preview
+initializes, including on a read request. Use isolated local bindings for test
+writes and migration rehearsals. Changes to shared live data need explicit
+authorization.
+
+Cloudflare Access protects preview admin routes. The local e2e test-auth build
+does not validate that Access configuration. If admin APIs return `401` after
+an upgrade, check database migration status as well as authentication: a failed
+runtime initialization can leave EmDash without a resolved user and surface as
+`Authentication required`.
+
+Cloudflare does not provide Workers Logs, Wrangler tail, or Logpush for
+[Version URLs](https://developers.cloudflare.com/workers/versions-and-deployments/version-urls/#limitations).
+Use browser response details and an isolated local reproduction to diagnose
+preview failures; production logs do not show these requests.
+
 ## Local KV Measurement
 
 Run `mise exec -- node scripts/measure-kv-usage.mjs` to build a test-auth Worker,

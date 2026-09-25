@@ -32,13 +32,18 @@ Cloudflare constraints.
   entry and collection tags, and EmDash 0.32 avoids purging them for draft-only
   revision saves that cannot change public HTML. EmDash 0.37 also invalidates
   settings, menus, and taxonomy definitions/terms using its native `emdash:*`
-  tags. Site middleware only covers content-term assignments, whose upstream
-  route still clears the object cache without purging edge HTML. It batches
+  tags. MCP writes also invalidate the native route-cache tags. Site middleware
+  only covers content-term assignments, whose upstream route still clears the
+  object cache without purging edge HTML. It batches
   the collection, entry, and taxonomy tags into one purge request.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
   controls wait for pending inline saves. EmDash 0.38 avoids saving unchanged
   Portable Text documents, so the local keepalive suppression is removed.
   Its toolbar can still publish before a Portable Text blur save finishes.
+  After saves settle, the gate resumes EmDash's own publish button so 0.39's
+  visual-action token, policy origin, error recovery, and reload stay upstream.
+  The fetch tracker retains visible error feedback for rejected publish
+  requests, which the upstream toolbar currently only logs to the console.
   The remaining gate preserves failed saves, including `409 ENTRY_LOCKED`,
   until a new save succeeds; a fast failure cannot be treated as an unchanged
   document and followed by publication or navigation. EmDash does not signal
@@ -51,6 +56,9 @@ Cloudflare constraints.
   Maintenance scripts should respect the lock or explicitly request
   `overrideLock`. The site's save gate does not bypass locks. EmDash 0.38's MCP
   content tools do not enforce them yet.
+- Restoring trashed content creates an unscheduled draft, even if the entry
+  was previously published. Editors must publish it again. Unpublishing also
+  cancels any pending publication schedule.
 - Zone WAF rules reject the two high-volume archival crawlers identified in
   production analytics. `src/worker.ts` retains the same check for preview URLs
   outside the zone, then logs selected admin/signed-in request metadata and
@@ -74,7 +82,8 @@ Cloudflare constraints.
 - `wrangler.jsonc` runs general EmDash maintenance every five minutes. This
   keeps the fixed-cost cleanup scans proportionate to a low-traffic site;
   scheduled publications can appear up to five minutes after their target
-  time. EmDash 0.37 adds the scheduled-content index migration
+  time. EmDash 0.39 loads the scheduled handler lazily to reduce Worker startup
+  work. EmDash 0.37 adds the scheduled-content index migration
   `074_content_deleted_scheduled_index` and bounds media-usage cleanup reads.
   Keep the five-minute cadence to limit the remaining fixed maintenance cost.
   EmDash 0.36 removed the separate Media Usage schedule; activation and repair
@@ -89,11 +98,18 @@ Cloudflare constraints.
   migration adds revision triggers to `options` and `_plugin_storage` without
   backfilling existing records. Monitor D1 writes after deployment and retain
   the five-minute maintenance cadence.
+- D1 migrations serialize through a database lock that does not expire
+  automatically. If a migration is interrupted, confirm no migrator is still
+  running before following EmDash's
+  [lock recovery procedure](https://docs.emdashcms.com/deployment/core-migrations/#release-a-stuck-migration-lock).
+  Before deploying schema changes, retain a recovery point and rehearse against
+  an isolated copy of current D1; fresh-database tests do not cover legacy data.
 
 EmDash's backup page works with the existing R2 storage adapter and scheduled
 Worker handler. Administrators can enable daily archives under Settings ->
 Backups; archives contain content and media metadata, not media binaries, user
-accounts, or secrets.
+accounts, or secrets. Backup API calls require an API token with `admin` scope.
+Keep a separate backup of media binaries.
 
 The upstream Cloudflare route-cache provider is used with response safeguards
 for Cloudflare Access, preview, visual-editing, and other cookies. EmDash's
@@ -180,9 +196,12 @@ backend failures degrade to D1 reads rather than failing the request.
 - Posts declare `/{year}/{month}/{day}/{slug}` and derive theme links from
   the UTC publication date. `getPostByPath()` checks the complete date path
   after a slug lookup, so arbitrary dates cannot serve duplicate content.
-  EmDash 0.38 has no exported forward URL builder, so `postPath()` mirrors its
-  date interpolation, including offsetless SQLite timestamps. The theme no
+  EmDash 0.39 adds plugin-context URL discovery, but no standalone forward URL
+  builder for the theme, so `postPath()` still mirrors its date interpolation.
+  Its UTC handling of offsetless input remains for compatibility; migration 079
+  instead interprets stored offsetless values in the site timezone. The theme no
   longer reads stored post paths or falls back to creation dates.
+  API, MCP, and CLI datetime writes must include `Z` or an explicit UTC offset.
 - `/posts/{id-or-slug}` preserves signed preview tokens. Dated entries redirect
   to their canonical route (302 for preview, 301 otherwise); undated drafts
   render directly through EmDash's authorized preview context. The shared
@@ -210,6 +229,7 @@ backend failures degrade to D1 reads rather than failing the request.
   classes replace EmDash's inline `--columns` property because the production
   policy intentionally rejects inline styles. This avoids both Worker media
   proxy requests and Cloudflare image transformations on the Free plan.
+  Gallery image references participate in EmDash's media usage tracking.
   EmDash 0.38's responsive gallery sizes improve image selection without
   requiring Cloudflare image transformations.
 - Native Portable Text tables preserve semantic headers and spans. Their
@@ -308,9 +328,11 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 - TypeScript remains at 6.0.3 because typescript-eslint 8.70 requires a version
   below 6.1, and `@astrojs/check` 0.9.10 supports TypeScript 5 and 6. The current
   TypeScript 7 release is outside both peer ranges.
-- Miniflare 5.20260911.1-alpha pins patched Sharp 0.35.4, so the local Sharp
-  override is removed. The Undici override remains aligned with Miniflare's
-  7.29.0 requirement.
+- `@astrojs/react` 7 uses Oxc for JSX and Fast Refresh. The site uses plain
+  `react()` without custom Babel options, so no configuration change is needed.
+- Miniflare pins patched Sharp, so no local Sharp override is needed.
+  The global Undici override is also removed: Miniflare selects patched 7.29.0
+  itself, while Astro's font loader requires Undici 8.
   [Sharp advisory](https://github.com/advisories/GHSA-rgj7-g3m4-5g8c)
 - Media uploads retain EmDash's safer default allowlist, which accepts AVIF and
   other raster image formats but not SVG. Site-owned SVG icons remain versioned
@@ -326,9 +348,9 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   waits for Portable Text saves before publishing or leaving edit mode. The
   0.37 publish-before-save fix applies to the admin content editor; the inline
-  toolbar still needs this gate in 0.38.
+  toolbar still needs this gate in 0.39.1.
 - Remove the local cache-provider wrapper when Wrangler exposes
-  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.131.2
+  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.137.0
   still lacks it locally.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a

@@ -99,11 +99,11 @@ function saveGateFixtureShell() {
 
 			document.getElementById("emdash-tb-publish").onclick = () => {
 				window.__originalPublishHandlerRan = true;
-				fetch("/_emdash/api/content/pages/about/publish", {
+				fetch("/_emdash/api/visual-editing/content/pages/about/publish", {
 					method: "POST",
 					credentials: "same-origin",
 					headers: { "X-EmDash-Request": "1" },
-				});
+				}).catch((error) => console.error("Publish failed:", error));
 			};
 
 			document.getElementById("emdash-edit-toggle").addEventListener("change", () => {
@@ -214,7 +214,8 @@ async function createStaticServer() {
 
 			if (
 				request.method === "POST" &&
-				requestUrl.pathname === "/_emdash/api/content/pages/about/publish"
+				requestUrl.pathname ===
+					"/_emdash/api/visual-editing/content/pages/about/publish"
 			) {
 				events.push({ type: "publish-start", time: Date.now() });
 				consumeRequest(request, () => {

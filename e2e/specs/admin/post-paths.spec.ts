@@ -51,7 +51,7 @@ for (const publishedAt of [undefined, "2022-05-31T23:59:59.999Z"]) {
 	});
 }
 
-test("uses native post dates in links and redirects and rejects incorrect dates", async ({
+test("normalizes offset publication dates and preserves canonical links and redirects", async ({
 	authedRequest,
 	publicPage,
 }, testInfo) => {
@@ -60,9 +60,10 @@ test("uses native post dates in links and redirects and rejects incorrect dates"
 	const { published, publicPath } = await createAndPublishContentViaApi(
 		authedRequest,
 		"posts",
-		{ title, content: bodyText, publishedAt: "2022-05-31T23:59:59.999Z" },
+		{ title, content: bodyText, publishedAt: "2022-06-01T01:59:59.999+02:00" },
 	);
 	try {
+		expect(published.publishedAt).toBe("2022-05-31T23:59:59.999Z");
 		expect(publicPath).toBe(`/2022/05/31/${published.slug}/`);
 		await expectPublicContent(publicPage, publicPath, title, bodyText);
 		await expect(publicPage.locator(".entry-meta").first()).toHaveText(
