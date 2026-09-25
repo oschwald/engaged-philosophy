@@ -52,6 +52,14 @@ commit scoped to one fix type. PRs should describe behavior changes, list test
 commands run, link related issues, and include screenshots for visible UI
 changes.
 
+## Documentation Guidelines
+
+Keep checked-in documentation relevant to ongoing development and operation of
+the site. Update existing guides when behavior or procedures change. Put
+release-specific upgrade reviews, task summaries, validation results, and
+one-time rollout notes in PR descriptions or issues, not new repository
+documents. Preserve lasting guidance in the appropriate existing guide.
+
 ## Security & Configuration Tips
 
 Do not commit secrets, Cloudflare tokens, generated migration data, or local
