@@ -104,3 +104,7 @@ Playwright reports out of commits, along with the generated
 `.emdash/migrations.json` manifest. The live site runs on Cloudflare Workers
 Free, so keep new Worker features within Free request/CPU limits and avoid
 paid-only features unless the account plan is explicitly changed.
+
+Current branch/commit previews share production bindings, and their runtime
+migrations can write to the live database even on read requests. See
+[Branch Previews](docs/testing.md#branch-previews) before using them for testing.
