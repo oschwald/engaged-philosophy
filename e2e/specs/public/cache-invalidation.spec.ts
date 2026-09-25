@@ -2,6 +2,9 @@ import { readFile } from "node:fs/promises";
 import { test, expect } from "../../fixtures/worker";
 import {
 	createAndPublishContentViaApi,
+	createTaxonomyTermViaApi,
+	deleteContentViaApi,
+	deleteTaxonomyTermViaApi,
 	expectPublicContent,
 	portableTextParagraph,
 	publishContentViaApi,
@@ -14,6 +17,53 @@ import { PUBLIC_MEDIA_URL } from "../../../src/lib/site-config";
 const UPLOAD_FIXTURE = new URL("../../../public/img/logo.png", import.meta.url);
 
 test.describe("public page cache", () => {
+	test("updates public taxonomy assignments without publishing pending edits", async ({
+		authedRequest,
+		publicPage,
+	}, testInfo) => {
+		const title = uniqueTitle("E2E Immediate Terms", testInfo.testId);
+		const body = `${title} published body.`;
+		const draftBody = `${title} pending body.`;
+		const term = await createTaxonomyTermViaApi(authedRequest, "topic", {
+			slug: "e2e-immediate-topic",
+			label: "E2E Immediate Topic",
+		});
+		const { published, publicPath } = await createAndPublishContentViaApi(
+			authedRequest,
+			"projects",
+			{ title, content: body },
+		);
+		try {
+			await expectPublicContent(publicPage, publicPath, title, body);
+			await updateContentViaApi(authedRequest, "projects", published.id, {
+				data: { content: portableTextParagraph(draftBody) },
+			});
+			for (const assigned of [true, false]) {
+				const response = await authedRequest.post(
+					`/_emdash/api/content/projects/${published.id}/terms/topic`,
+					{ data: { termIds: assigned ? [term.id] : [] } },
+				);
+				expect(response.ok(), await response.text()).toBe(true);
+				await expectPublicContent(publicPage, publicPath, title, body);
+				await expect(publicPage.getByText(draftBody)).toHaveCount(0);
+				await expect(
+					publicPage.locator(
+						'.entry-content a[href="/topic/e2e-immediate-topic/"]',
+					),
+				).toHaveCount(assigned ? 1 : 0);
+				await publicPage.goto("/topic/e2e-immediate-topic/", {
+					waitUntil: "domcontentloaded",
+				});
+				await expect(
+					publicPage.getByRole("heading", { name: title, exact: true }),
+				).toHaveCount(assigned ? 1 : 0);
+			}
+		} finally {
+			await deleteContentViaApi(authedRequest, "projects", published.id);
+			await deleteTaxonomyTermViaApi(authedRequest, "topic", term.slug);
+		}
+	});
+
 	test("caches generated metadata with its data dependencies", async ({
 		publicPage,
 	}) => {

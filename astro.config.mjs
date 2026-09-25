@@ -77,6 +77,11 @@ export default defineConfig({
 		},
 	},
 	vite: {
+		define: {
+			// EmDash's preview URL resolver does not supply dates for date tokens.
+			"import.meta.env.EMDASH_PREVIEW_PATH_PATTERN":
+				JSON.stringify("/{collection}/{id}"),
+		},
 		css: {
 			preprocessorOptions: {
 				scss: {

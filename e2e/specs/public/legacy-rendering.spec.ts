@@ -30,6 +30,49 @@ async function expectPageTextNotToContain(page: Page, text: string) {
 }
 
 test.describe("public migrated content rendering", () => {
+	test("renders imported and native image links with safe targets", async ({
+		authedRequest,
+		publicPage,
+	}, testInfo) => {
+		const title = uniqueTitle("E2E Image Links", testInfo.testId);
+		const links = [
+			"https://example.com/imported",
+			{ href: "https://example.com/native", blank: true },
+			{ href: "javascript:alert(1)", blank: true },
+		];
+		const { publicPath } = await createAndPublishContentViaApi(
+			authedRequest,
+			"pages",
+			{
+				title,
+				data: {
+					content: links.map((link, index) => ({
+						_type: "image",
+						_key: `linked-image-${index}`,
+						asset: { url: `${MEDIA_BASE}${NATIVE_IMAGE_PATH}` },
+						alt: `Linked image ${index}`,
+						width: 120,
+						link,
+					})),
+				},
+			},
+		);
+		await publicPage.goto(publicPath, { waitUntil: "domcontentloaded" });
+		const imported = publicPage.getByRole("link", { name: "Linked image 0" });
+		await expect(imported).toHaveAttribute(
+			"href",
+			"https://example.com/imported",
+		);
+		const native = publicPage.getByRole("link", { name: "Linked image 1" });
+		await expect(native).toHaveAttribute("href", "https://example.com/native");
+		await expect(native).toHaveAttribute("target", "_blank");
+		await expect(native).toHaveAttribute("rel", "noopener noreferrer");
+		await expect(publicPage.getByAltText("Linked image 2")).toHaveCount(1);
+		const rejected = publicPage.getByRole("link", { name: "Linked image 2" });
+		await expect(rejected).toHaveAttribute("href", "#");
+		await expect(rejected).not.toHaveAttribute("target");
+	});
+
 	test("renders native images and embeds alongside remaining legacy media", async ({
 		authedRequest,
 		publicPage,
