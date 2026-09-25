@@ -10,6 +10,7 @@ import {
 	expectPublicContent,
 	getPreviewUrlViaApi,
 	portableTextParagraph,
+	publishContentViaApi,
 	uniqueTitle,
 	updateContentViaApi,
 } from "../../support/content";
@@ -25,6 +26,41 @@ interface SavedContentResponse {
 }
 
 test.describe("admin content workflows", () => {
+	test("restores trashed published content as a private draft until republished", async ({
+		authedRequest,
+		publicPage,
+	}, testInfo) => {
+		const title = uniqueTitle("E2E Restored Project", testInfo.testId);
+		const bodyText = `${title} body restored from Trash.`;
+		const { published, publicPath } = await createAndPublishContentViaApi(
+			authedRequest,
+			"projects",
+			{ title, content: bodyText },
+		);
+
+		try {
+			await expectPublicContent(publicPage, publicPath, title, bodyText);
+			await deleteContentViaApi(authedRequest, "projects", published.id);
+			const response = await authedRequest.post(
+				`/_emdash/api/content/projects/${published.id}/restore`,
+			);
+			expect(response.ok(), await response.text()).toBe(true);
+			const body = await response.json();
+			expect(body.data.item).toMatchObject({
+				id: published.id,
+				status: "draft",
+				scheduledAt: null,
+			});
+			const draftResponse = await publicPage.request.get(publicPath);
+			expect(draftResponse.status()).toBe(404);
+
+			await publishContentViaApi(authedRequest, "projects", published.id);
+			await expectPublicContent(publicPage, publicPath, title, bodyText);
+		} finally {
+			await deleteContentViaApi(authedRequest, "projects", published.id);
+		}
+	});
+
 	test("creates and publishes a page from the admin editor", async ({
 		page,
 		publicPage,

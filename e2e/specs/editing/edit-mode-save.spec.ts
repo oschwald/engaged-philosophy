@@ -145,12 +145,28 @@ test.describe("visual editing", () => {
 		await toggleEditMode(page, true);
 		await expect(editor).toContainText(editedText);
 		await expect(page.locator("#emdash-tb-publish")).toBeVisible();
+		const finalText = `${editedText} then published directly`;
+		await page.route(
+			`**${contentApiPath("pages", published.id)}`,
+			async (route) => {
+				if (route.request().method() === "PUT") {
+					await new Promise((resolve) => setTimeout(resolve, 250));
+				}
+				await route.continue();
+			},
+		);
+		await editor.click();
+		await page.keyboard.press("End");
+		await page.keyboard.type(" then published directly");
+		await expect(page.locator("#emdash-tb-save-status")).toContainText(
+			"Unsaved",
+		);
 
 		const publishResponsePromise = page.waitForResponse((response) =>
 			responseMatches(
 				response,
 				"POST",
-				`${contentApiPath("pages", published.id)}/publish`,
+				`/_emdash/api/visual-editing/content/pages/${published.id}/publish`,
 			),
 		);
 		await page.locator("#emdash-tb-publish").click();
@@ -167,7 +183,7 @@ test.describe("visual editing", () => {
 		await expect(page.locator("#emdash-tb-status")).toContainText("Published", {
 			timeout: 15_000,
 		});
-		await expectPublicContent(publicPage, publicPath, title, editedText);
+		await expectPublicContent(publicPage, publicPath, title, finalText);
 
 		pageErrors.expectNone();
 	});
@@ -240,7 +256,7 @@ test.describe("visual editing", () => {
 			responseMatches(
 				response,
 				"POST",
-				`${contentApiPath("pages", published.id)}/publish`,
+				`/_emdash/api/visual-editing/content/pages/${published.id}/publish`,
 			),
 		);
 		await page.locator("#emdash-tb-publish").click();

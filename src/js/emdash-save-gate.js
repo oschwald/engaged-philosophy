@@ -1,4 +1,6 @@
 const CONTENT_SAVE_PATH_RE = /^\/_emdash\/api\/content\/[^/]+\/[^/]+$/;
+const VISUAL_PUBLISH_PATH_RE =
+	/^\/_emdash\/api\/visual-editing\/content\/[^/]+\/[^/]+\/publish$/;
 const SAVE_SETTLE_TIMEOUT_MS = 15000;
 
 const pendingContentSaves = new Set();
@@ -9,17 +11,16 @@ function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isContentSaveRequest(input, init) {
+function isContentRequest(input, init, expectedMethod, pathPattern) {
 	const method = (
 		init?.method || (input instanceof Request ? input.method : "GET")
 	).toUpperCase();
-	if (method !== "PUT") return false;
+	if (method !== expectedMethod) return false;
 
 	const rawUrl = input instanceof Request ? input.url : String(input);
 	const url = new URL(rawUrl, window.location.href);
 	return (
-		url.origin === window.location.origin &&
-		CONTENT_SAVE_PATH_RE.test(url.pathname)
+		url.origin === window.location.origin && pathPattern.test(url.pathname)
 	);
 }
 
@@ -50,8 +51,20 @@ function installFetchTracker() {
 
 	const originalFetch = window.fetch.bind(window);
 	window.fetch = (input, init) => {
-		const isContentSave = isContentSaveRequest(input, init);
+		const isContentSave = isContentRequest(
+			input,
+			init,
+			"PUT",
+			CONTENT_SAVE_PATH_RE,
+		);
 		const responsePromise = originalFetch(input, init);
+		if (isContentRequest(input, init, "POST", VISUAL_PUBLISH_PATH_RE)) {
+			return responsePromise.catch((error) => {
+				// EmDash surfaces HTTP failures, but only logs rejected publish fetches.
+				dispatchSaveState("error");
+				throw error;
+			});
+		}
 		return isContentSave ? trackContentSave(responsePromise) : responsePromise;
 	};
 }
@@ -110,26 +123,6 @@ async function flushInlineSaves() {
 	await waitForPendingContentSaves();
 }
 
-function getCurrentEntryRef() {
-	const annotated = document.querySelector("[data-emdash-ref]");
-	if (!annotated) return null;
-
-	try {
-		const ref = JSON.parse(annotated.getAttribute("data-emdash-ref") || "{}");
-		return ref.collection && ref.id ? ref : null;
-	} catch {
-		return null;
-	}
-}
-
-function reloadPage() {
-	if (document.startViewTransition) {
-		document.startViewTransition(() => location.reload());
-	} else {
-		location.reload();
-	}
-}
-
 function replacePage() {
 	if (document.startViewTransition) {
 		document.startViewTransition(() => location.replace(location.href));
@@ -139,28 +132,16 @@ function replacePage() {
 }
 
 async function publishAfterSave(button) {
-	const ref = getCurrentEntryRef();
-	if (!ref) return;
-
 	const previousText = button.textContent;
 	button.disabled = true;
 	button.textContent = "Saving...";
 
 	try {
 		await flushInlineSaves();
-		button.textContent = "Publishing...";
-
-		const response = await fetch(
-			`/_emdash/api/content/${encodeURIComponent(ref.collection)}/${encodeURIComponent(ref.id)}/publish`,
-			{
-				method: "POST",
-				credentials: "same-origin",
-				headers: { "X-EmDash-Request": "1" },
-			},
-		);
-
-		if (!response.ok) throw new Error(`Publish failed: ${response.status}`);
-		reloadPage();
+		button.disabled = false;
+		button.textContent = previousText;
+		// The gate is now clear. Let EmDash own the action token, errors, and reload.
+		button.click();
 	} catch (error) {
 		button.disabled = false;
 		button.textContent = previousText || "Publish";

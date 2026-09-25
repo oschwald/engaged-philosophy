@@ -360,13 +360,14 @@ export async function createAndPublishContentViaAdmin(
 	);
 	await page
 		.getByRole("button", {
-			name: "Publish",
+			name: "Publish now",
 			exact: true,
 		})
 		.first()
 		.click();
 	await page
-		.getByRole("menuitem", { name: "Publish now", exact: true })
+		.getByRole("dialog", { name: "Publish now?", exact: true })
+		.getByRole("button", { name: "Publish now", exact: true })
 		.click();
 	const publishedBody = await expectJsonResponse(
 		await publishResponsePromise,
