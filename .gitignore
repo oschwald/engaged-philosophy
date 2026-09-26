@@ -38,6 +38,7 @@ pids
 seed/seed.json
 engagedphilosophy.WordPress*.xml
 engaged-philosophy-*.zip
+*.emdash
 debug-crawl-parity.js
 
 # Local tool state

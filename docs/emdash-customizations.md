@@ -32,10 +32,10 @@ Cloudflare constraints.
   entry and collection tags, and EmDash 0.32 avoids purging them for draft-only
   revision saves that cannot change public HTML. EmDash 0.37 also invalidates
   settings, menus, and taxonomy definitions/terms using its native `emdash:*`
-  tags. MCP writes also invalidate the native route-cache tags. Site middleware
-  only covers content-term assignments, whose upstream route still clears the
-  object cache without purging edge HTML. It batches
-  the collection, entry, and taxonomy tags into one purge request.
+  tags. MCP writes also invalidate the native route-cache tags. Content-term
+  assignments invalidate the collection, entry (including translations), and
+  taxonomy tags upstream as well, so no site middleware is needed. Term changes
+  take effect immediately without publishing other pending draft edits.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
   controls wait for pending inline saves. EmDash 0.38 avoids saving unchanged
   Portable Text documents, so the local keepalive suppression is removed.
@@ -86,6 +86,8 @@ Cloudflare constraints.
   work. EmDash 0.37 adds the scheduled-content index migration
   `074_content_deleted_scheduled_index` and bounds media-usage cleanup reads.
   Keep the five-minute cadence to limit the remaining fixed maintenance cost.
+  System cleanup also trims the 404 log to its 10,000 most recently seen paths;
+  public 404 requests no longer perform that table-wide maintenance.
   EmDash 0.36 removed the separate Media Usage schedule; activation and repair
   now advance in bounded batches while an administrator keeps Settings ->
   Media usage tracking open.
@@ -110,6 +112,21 @@ Worker handler. Administrators can enable daily archives under Settings ->
 Backups; archives contain content and media metadata, not media binaries, user
 accounts, or secrets. Backup API calls require an API token with `admin` scope.
 Keep a separate backup of media binaries.
+
+For a complete move to an empty site, EmDash's `site export` and `site import`
+commands transfer content, revisions, schema, settings, and media files in a
+`.emdash` package. Keep these private exports out of git. Analyze the import
+first, review its principal mappings and plan digest, and require a verified
+receipt before sending visitors to the destination. An import blocks writes
+while running; failed or cancelled imports that started writing remain blocked
+until resumed or abandoned. This is separate from the scheduled metadata
+backups above. Transfer tokens can use the narrower `transfer:export`,
+`transfer:analyze`, and `transfer:execute` scopes instead of `admin`.
+
+Taxonomy hierarchy and collection assignments are shared across locales;
+labels remain localized. Change taxonomy structure through EmDash's API, MCP,
+or seed tooling. Direct writes to the old per-locale definition columns do not
+update the shared structure.
 
 The upstream Cloudflare route-cache provider is used with response safeguards
 for Cloudflare Access, preview, visual-editing, and other cookies. EmDash's
@@ -180,8 +197,8 @@ backend failures degrade to D1 reads rather than failing the request.
   instead of persisting an identical imported `path` field. EmDash can
   therefore generate project references and automatic redirects after slug
   changes. The Astro `/projects/{id-or-slug}` compatibility route remains
-  because EmDash preview URLs use it and the signed `_preview` query parameter
-  must survive the redirect. The legacy root-slug alias also remains; replacing
+  because preview links use it and the signed `_preview` query parameter must
+  survive the redirect. The legacy root-slug alias also remains; replacing
   either route with one exact redirect row per project would increase cold
   redirect-cache reads on Workers Free.
 - The base layout uses `EmDashHead`, `EmDashBodyStart`, and `EmDashBodyEnd` so
@@ -206,11 +223,17 @@ backend failures degrade to D1 reads rather than failing the request.
   to their canonical route (302 for preview, 301 otherwise); undated drafts
   render directly through EmDash's authorized preview context. The shared
   `PostPage.astro` keeps preview and published rendering consistent.
+  `astro.config.mjs` sets `EMDASH_PREVIEW_PATH_PATTERN` to `/{collection}/{id}`
+  at build time. EmDash's default preview resolver uses the collection URL
+  pattern but leaves date placeholders unresolved, even for dated posts.
+  Retain this override until it supplies the publication date and handles
+  undated drafts; published permalink patterns are unchanged.
 - The sitemap remains site-specific because nested page paths still need the
   page hierarchy adapter and the seed does not enable collection SEO. Posts
   and projects use their native date/slug patterns in the custom sitemap,
   which continues to honor EmDash noindex and canonical settings.
-- Portable Text images use the EmDash renderer. A narrow CSS compatibility
+- Portable Text images use the EmDash renderer, including sanitized image links
+  and imported links stored as strings. A narrow CSS compatibility
   layer preserves imported float dimensions, centers images when long captions
   widen their figures, and retains left/right placement when floats stack on
   small screens. Migrated images keep their reliable source width but omit
@@ -347,11 +370,9 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   newer directly.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   waits for Portable Text saves before publishing or leaving edit mode. The
-  0.37 publish-before-save fix applies to the admin content editor; the inline
-  toolbar still needs this gate in 0.39.1.
+  native admin editor's save ordering does not cover the inline toolbar.
 - Remove the local cache-provider wrapper when Wrangler exposes
-  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.137.0
-  still lacks it locally.
+  `cache.purge()` for its local Workers Cache implementation.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a
   Cloudflare Email Sending plugin, but that only handles email delivery; this
@@ -423,6 +444,5 @@ HTML path list.
 Ordinary content edits keep the publication date and URL. Slug edits use
 EmDash's native permanent redirects. Changing an already-published post's
 publication date can move its URL; EmDash 0.38 does not create a redirect for a
-date-only edit, so add an exact redirect as part of that change. Upstream
-preview-pattern support remains a separate follow-up; undated drafts continue
-to need the `/posts/{id}` preview route.
+date-only edit, so add an exact redirect as part of that change. Undated drafts
+continue to need the `/posts/{id}` preview route.

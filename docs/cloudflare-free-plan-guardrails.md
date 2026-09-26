@@ -81,10 +81,11 @@ limits:
 - R2, logs, and traces: investigate when the Cloudflare dashboard reports 50%
   of the applicable monthly or daily allowance.
 
-Keep roughly 14 days of `_emdash_404_log` diagnostic history. Prune older rows
-with EmDash's supported 404-log management operation when reviewing usage; the
-table-wide cap check runs after each recorded 404, so shorter useful retention
-also bounds D1 row reads from scanner misses.
+EmDash records 404s without counting or trimming the log on public requests.
+Scheduled system cleanup retains the 10,000 most recently seen paths. The log
+can temporarily exceed that count between cleanup runs, so keep the five-minute
+maintenance trigger working and monitor its failures. Request-policy and WAF
+checks still prevent scanner traffic from reaching the CMS in the first place.
 
 Keep Workers trace sampling at 5% unless measured observability events approach
 their allowance. Exhausting the logs or traces allowance reduces diagnostics;
