@@ -2,11 +2,13 @@ import { readFile } from "node:fs/promises";
 import { test, expect } from "../../fixtures/worker";
 import {
 	createAndPublishContentViaApi,
+	createContentViaApi,
 	createTaxonomyTermViaApi,
 	deleteContentViaApi,
 	deleteTaxonomyTermViaApi,
 	expectPublicContent,
 	portableTextParagraph,
+	publicPathForItem,
 	publishContentViaApi,
 	updateContentViaApi,
 	uploadMediaViaApi,
@@ -28,12 +30,19 @@ test.describe("public page cache", () => {
 			slug: "e2e-immediate-topic",
 			label: "E2E Immediate Topic",
 		});
-		const { published, publicPath } = await createAndPublishContentViaApi(
-			authedRequest,
-			"projects",
-			{ title, content: body },
-		);
+		let contentId: string | undefined;
 		try {
+			const created = await createContentViaApi(authedRequest, "projects", {
+				title,
+				content: body,
+			});
+			contentId = created.id;
+			const published = await publishContentViaApi(
+				authedRequest,
+				"projects",
+				contentId,
+			);
+			const publicPath = publicPathForItem("projects", published);
 			await expectPublicContent(publicPage, publicPath, title, body);
 			await updateContentViaApi(authedRequest, "projects", published.id, {
 				data: { content: portableTextParagraph(draftBody) },
@@ -59,8 +68,13 @@ test.describe("public page cache", () => {
 				).toHaveCount(assigned ? 1 : 0);
 			}
 		} finally {
-			await deleteContentViaApi(authedRequest, "projects", published.id);
-			await deleteTaxonomyTermViaApi(authedRequest, "topic", term.slug);
+			try {
+				if (contentId) {
+					await deleteContentViaApi(authedRequest, "projects", contentId);
+				}
+			} finally {
+				await deleteTaxonomyTermViaApi(authedRequest, "topic", term.slug);
+			}
 		}
 	});
 
