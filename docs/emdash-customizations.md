@@ -86,6 +86,8 @@ Cloudflare constraints.
   work. EmDash 0.37 adds the scheduled-content index migration
   `074_content_deleted_scheduled_index` and bounds media-usage cleanup reads.
   Keep the five-minute cadence to limit the remaining fixed maintenance cost.
+  System cleanup also trims the 404 log to its 10,000 most recently seen paths;
+  public 404 requests no longer perform that table-wide maintenance.
   EmDash 0.36 removed the separate Media Usage schedule; activation and repair
   now advance in bounded batches while an administrator keeps Settings ->
   Media usage tracking open.
@@ -368,11 +370,9 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   newer directly.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   waits for Portable Text saves before publishing or leaving edit mode. The
-  0.37 publish-before-save fix applies to the admin content editor; the inline
-  toolbar still needs this gate in 0.39.1.
+  native admin editor's save ordering does not cover the inline toolbar.
 - Remove the local cache-provider wrapper when Wrangler exposes
-  `cache.purge()` for its local Workers Cache implementation. Wrangler 4.137.0
-  still lacks it locally.
+  `cache.purge()` for its local Workers Cache implementation.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a
   Cloudflare Email Sending plugin, but that only handles email delivery; this

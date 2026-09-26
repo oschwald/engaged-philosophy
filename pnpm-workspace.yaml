@@ -7,21 +7,21 @@ minimumReleaseAgeExclude:
   - "@astrojs/cloudflare@14.3.3"
   - "@astrojs/markdown-satteri@0.4.2"
   - "@astrojs/react@7.0.0"
-  - "@cloudflare/workers-types@5.20260925.1"
-  - "@emdash-cms/admin@0.40.0"
-  - "@emdash-cms/auth@0.40.0"
-  - "@emdash-cms/blocks@0.40.0"
-  - "@emdash-cms/cloudflare@0.40.0"
-  - "@emdash-cms/gutenberg-to-portable-text@0.40.0"
+  - "@cloudflare/workers-types@5.20260926.1"
+  - "@emdash-cms/admin@0.40.1"
+  - "@emdash-cms/auth@0.40.1"
+  - "@emdash-cms/blocks@0.40.1"
+  - "@emdash-cms/cloudflare@0.40.1"
+  - "@emdash-cms/gutenberg-to-portable-text@0.40.1"
   - "@emdash-cms/plugin-audit-log@0.2.2"
-  - "@emdash-cms/plugin-embeds@0.1.49"
+  - "@emdash-cms/plugin-embeds@0.1.50"
   - "@emdash-cms/plugin-types@0.4.0"
   - "@emdash-cms/registry-client@0.6.1"
   - "@emdash-cms/registry-lexicons@0.6.0"
   - "@emdash-cms/registry-moderation@0.2.0"
   - "@emdash-cms/registry-verification@0.3.2"
   - "@playwright/test@1.63.0"
-  - "@types/node@26.6.2"
+  - "@types/node@26.6.3"
   - "@typescript-eslint/eslint-plugin@8.70.1"
   - "@typescript-eslint/parser@8.70.1"
   - "@typescript-eslint/project-service@8.70.1"
@@ -35,11 +35,11 @@ minimumReleaseAgeExclude:
   - "@vitest/mocker@5.0.2"
   - "@vitest/spy@5.0.2"
   - astro@7.3.5
-  - emdash@0.40.0
+  - emdash@0.40.1
   - eslint-plugin-astro@3.2.1
   - eslint@10.11.0
   - jose@6.2.12
-  - miniflare@5.20260923.0-alpha
+  - miniflare@5.20260925.0-alpha
   - nanoid@3.3.19
   - playwright@1.63.0
   - prettier-plugin-astro@1.1.0
@@ -50,7 +50,7 @@ minimumReleaseAgeExclude:
   - stylelint@17.15.0
   - vite@8.3.1
   - vitest@5.0.2
-  - wrangler@4.140.0
+  - wrangler@4.141.0
 overrides:
   astro-embed: 0.14.0
   nanoid@<3.3.18: 3.3.18

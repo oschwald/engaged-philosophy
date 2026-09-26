@@ -47,14 +47,14 @@
 		"@astrojs/react": "^7.0.0",
 		"@astrojs/rss": "^4.0.19",
 		"@date-fns/tz": "^1.5.0",
-		"@emdash-cms/auth": "^0.40.0",
-		"@emdash-cms/cloudflare": "^0.40.0",
+		"@emdash-cms/auth": "^0.40.1",
+		"@emdash-cms/cloudflare": "^0.40.1",
 		"@emdash-cms/plugin-audit-log": "^0.2.2",
-		"@emdash-cms/plugin-embeds": "^0.1.49",
+		"@emdash-cms/plugin-embeds": "^0.1.50",
 		"astro": "^7.3.5",
 		"bootstrap": "^5.3.8",
 		"date-fns": "^4.4.0",
-		"emdash": "^0.40.0",
+		"emdash": "^0.40.1",
 		"jose": "^6.2.12",
 		"kysely": "^0.29.6",
 		"react": "^19.3.0",
@@ -63,9 +63,9 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
-		"@cloudflare/workers-types": "^5.20260925.1",
+		"@cloudflare/workers-types": "^5.20260926.1",
 		"@playwright/test": "^1.63.0",
-		"@types/node": "^26.6.2",
+		"@types/node": "^26.6.3",
 		"@typescript-eslint/eslint-plugin": "^8.70.1",
 		"@typescript-eslint/parser": "^8.70.1",
 		"eslint": "^10.11.0",
@@ -78,6 +78,6 @@
 		"typescript": "^6.0.3",
 		"vite": "^8.3.1",
 		"vitest": "^5.0.2",
-		"wrangler": "^4.140.0"
+		"wrangler": "^4.141.0"
 	}
 }
