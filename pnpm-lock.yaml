@@ -184,8 +184,8 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0
       '@emdash-cms/auth':
-        specifier: ^0.40.1
-        version: 0.40.1(astro@7.3.5(@types/node@26.6.3)(sass@1.105.0)(yaml@2.9.1))(kysely@0.29.6)
+        specifier: ^0.41.0
+        version: 0.41.0(astro@7.3.5(@types/node@26.6.3)(sass@1.105.0)(yaml@2.9.1))(kysely@0.29.6)
       '@emdash-cms/cloudflare':
         specifier: ^0.40.1
         version: 0.40.1(2509b4f8800107668f1bb3c720f1f2e0)
@@ -894,6 +894,15 @@ packages:
 
   '@emdash-cms/auth@0.40.1':
     resolution: {integrity: sha512-ie6/7udv7bKBrBfIRSyfdT8vX0J7wNiq+Xcq/1A03ZR0rWtnYCEaPQzENlDv8jnZ/I7ypbCo6Q2ukuiKTZTkfg==}
+    peerDependencies:
+      astro: '>=6.0.0-beta.0'
+      kysely: ^0.29.0
+    peerDependenciesMeta:
+      kysely:
+        optional: true
+
+  '@emdash-cms/auth@0.41.0':
+    resolution: {integrity: sha512-JTVcstAwzVo7c9Hvdr9qiD5fsyc2yDgADsd5uigdRuA5uOyQmUxeMVTrCrKbIKb3eILoZAJy2m0FSGNNkSlTqw==}
     peerDependencies:
       astro: '>=6.0.0-beta.0'
       kysely: ^0.29.0
@@ -5771,6 +5780,17 @@ snapshots:
       - zod
 
   '@emdash-cms/auth@0.40.1(astro@7.3.5(@types/node@26.6.3)(sass@1.105.0)(yaml@2.9.1))(kysely@0.29.6)':
+    dependencies:
+      '@oslojs/crypto': 1.0.1
+      '@oslojs/encoding': 1.1.0
+      '@oslojs/webauthn': 1.0.0
+      astro: 7.3.5(@types/node@26.6.3)(sass@1.105.0)(yaml@2.9.1)
+      ulidx: 2.4.1
+      zod: 4.5.4
+    optionalDependencies:
+      kysely: 0.29.6
+
+  '@emdash-cms/auth@0.41.0(astro@7.3.5(@types/node@26.6.3)(sass@1.105.0)(yaml@2.9.1))(kysely@0.29.6)':
     dependencies:
       '@oslojs/crypto': 1.0.1
       '@oslojs/encoding': 1.1.0

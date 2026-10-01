@@ -47,7 +47,7 @@
 		"@astrojs/react": "^7.0.0",
 		"@astrojs/rss": "^4.0.19",
 		"@date-fns/tz": "^1.5.0",
-		"@emdash-cms/auth": "^0.40.1",
+		"@emdash-cms/auth": "^0.41.0",
 		"@emdash-cms/cloudflare": "^0.40.1",
 		"@emdash-cms/plugin-audit-log": "^0.2.2",
 		"@emdash-cms/plugin-embeds": "^0.1.50",
