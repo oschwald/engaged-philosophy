@@ -24,14 +24,12 @@ function getInternalMediaKey(value?: string | null) {
 }
 
 export function getMediaUrlPrefix(
-	runtimeEnv?: { PUBLIC_MEDIA_URL?: string } | null,
+	runtimeEnv?: { SITE_PREVIEW?: string } | null,
 ) {
-	const workerEnv = cloudflareEnv as { PUBLIC_MEDIA_URL?: string };
-	return (
-		runtimeEnv?.PUBLIC_MEDIA_URL ||
-		workerEnv.PUBLIC_MEDIA_URL ||
-		PUBLIC_MEDIA_URL
-	).replace(/\/+$/, "");
+	const workerEnv = cloudflareEnv as { SITE_PREVIEW?: string };
+	return (runtimeEnv ?? workerEnv).SITE_PREVIEW === "true"
+		? EMDASH_MEDIA_FILE_PREFIX.replace(/\/$/, "")
+		: PUBLIC_MEDIA_URL;
 }
 
 export function getPublicMediaStorageUrl(

@@ -62,7 +62,7 @@ const faviconSizes =
 const logo = settings?.logo;
 const logoSrc = logo?.url
 	? rewriteInternalMediaFileUrl(logo.url, mediaUrlPrefix)
-	: `${mediaUrlPrefix}/img/logo.png`;
+	: "/img/logo.png";
 const logoAlt = logo?.alt || `${siteTitle} Logo`;
 const page = createSitePageContext({
 	url: Astro.url,

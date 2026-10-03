@@ -8,6 +8,20 @@ import {
 } from "../../src/lib/favicon";
 
 describe("favicon helpers", () => {
+	test("allows only the native relative preview media endpoint", () => {
+		expect(
+			getConfiguredFaviconHref(
+				{ favicon: { url: "/_emdash/api/media/file/icon.png" } },
+				"/_emdash/api/media/file",
+			),
+		).toBe("/_emdash/api/media/file/icon.png");
+		expect(
+			getConfiguredFaviconHref(
+				{ favicon: { url: "/_emdash/api/media/file/../../auth" } },
+				"/_emdash/api/media/file",
+			),
+		).toBe("");
+	});
 	test("rewrites configured EmDash media file URLs", () => {
 		expect(
 			getConfiguredFaviconHref(

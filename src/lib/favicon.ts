@@ -48,6 +48,11 @@ function isSameRequestTarget(value: string, requestUrl?: string | URL) {
 
 function isAllowedMediaUrl(value: string, mediaUrlPrefix: string) {
 	try {
+		if (mediaUrlPrefix === "/_emdash/api/media/file") {
+			if (!value.startsWith(`${mediaUrlPrefix}/`)) return false;
+			const url = new URL(value, "https://preview.invalid");
+			return url.pathname.startsWith(`${mediaUrlPrefix}/`);
+		}
 		const url = new URL(value);
 		const mediaUrl = new URL(mediaUrlPrefix);
 		return url.origin === mediaUrl.origin;

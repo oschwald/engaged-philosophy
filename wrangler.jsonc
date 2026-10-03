@@ -33,9 +33,6 @@
 			"invocation_logs": false,
 		},
 	},
-	"vars": {
-		"PUBLIC_MEDIA_URL": "https://media.engagedphilosophy.com",
-	},
 	"kv_namespaces": [
 		{
 			"binding": "SESSION",
@@ -55,30 +52,20 @@
 			"bucket_name": "engaged-philosophy-media",
 		},
 	],
-	"env": {
-		"production": {
-			"name": "engaged-philosophy",
-			"kv_namespaces": [
-				{
-					"binding": "SESSION",
-					"id": "933be9ebf8f14f78934b855dc054f7f8",
-				},
-			],
-			"d1_databases": [
-				{
-					"binding": "DB",
-					"database_name": "engaged-philosophy",
-					"database_id": "4fdc5af5-10a0-4aca-9e5f-54db71066fbd",
-				},
-			],
-			"r2_buckets": [
-				{
-					"binding": "MEDIA",
-					"bucket_name": "engaged-philosophy-media",
-				},
-			],
-		},
-		// Add a staging env here after creating separate staging D1, R2, and KV
-		// resources. Do not point staging at production content or sessions.
+	"previews": {
+		"vars": { "SITE_PREVIEW": "true" },
+		"kv_namespaces": [
+			{ "binding": "SESSION", "id": "493953d8fd1c4d85a1dac523013d6d4d" },
+		],
+		"d1_databases": [
+			{
+				"binding": "DB",
+				"database_name": "engaged-philosophy-preview",
+				"database_id": "0d0c311a-1b53-47d0-a7f7-adcc04918479",
+			},
+		],
+		"r2_buckets": [
+			{ "binding": "MEDIA", "bucket_name": "engaged-philosophy-preview-media" },
+		],
 	},
 }
