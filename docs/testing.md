@@ -41,6 +41,12 @@ browser timing in `e2e-static/`, and admin/public workflows in `e2e/`.
 - `pnpm run ci` runs linting, fast tests, typecheck, build, Worker checks, and
   Worker-backed Playwright.
 
+Both Playwright suites use the Chromium version installed by Playwright.
+If it is missing, run `pnpm exec playwright install --with-deps chromium`.
+Set `PLAYWRIGHT_BROWSER_PATH` to an explicit executable path when a different
+browser is required. Both suites honor this override. An invalid path fails
+at launch instead of falling back to a system browser.
+
 Wrangler's local runtime exposes route-cache headers but does not currently
 emulate production tag purging or `CF-Cache-Status`. The Worker-backed cache
 tests therefore verify cache policy, tags, stateful/query bypasses, and content
