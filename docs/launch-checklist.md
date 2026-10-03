@@ -1,4 +1,4 @@
-# Launch Notes
+# Site Operations
 
 The site has launched. EmDash/Cloudflare is now the source of truth for content;
 do not reimport from WordPress.
@@ -9,12 +9,7 @@ do not reimport from WordPress.
    - `pnpm run ci`
 2. Deploy the Worker:
    - `pnpm run deploy`
-3. After the EmDash 0.37 deploy, verify that the admin dashboard reports a
-   healthy scheduler heartbeat and that migration
-   `074_content_deleted_scheduled_index` has completed. Open **Settings ->
-   Media usage tracking**, enable tracking if needed, and keep the page open
-   until it reports **Ready**.
-4. Run deployed smoke checks against the canonical hostname:
+3. Run deployed smoke checks against the canonical hostname:
    - `LIVE_BASE_URL=https://www.engagedphilosophy.com pnpm run smoke:live`
    - `LIVE_BASE_URL=https://www.engagedphilosophy.com pnpm run smoke:live:sitemap`
 
@@ -47,27 +42,25 @@ automation does not currently call these tools.
 
 After a direct content migration or bulk content rewrite that bypasses the
 EmDash content API, open **Settings -> Media usage tracking** and keep the page
-open until the bounded, resumable scan reports **Ready**. EmDash 0.36 no longer
-runs Media Usage reconciliation from a dedicated Cron Trigger.
+open until the bounded, resumable scan reports **Ready**. Media usage
+reconciliation does not use a dedicated Cron Trigger.
 
 The explicit `emdash media repair-usage` command is now a recovery tool rather
 than a routine post-migration step. Use it only when automatic reconciliation
 reports failed work that cannot be retried from the admin.
 
-## Legacy Schema Follow-up
+## Schema and URL Maintenance
 
 The checked-in seed enables indexes for the page `path` field and the
 project `highlight` and `menu_order` fields, and shows the two project fields as
-admin list columns. A seed initializes fresh databases only. If the existing
-site skipped the EmDash 0.34 schema follow-up, apply those same settings once
-under **Content Types**; the public queries remain compatible while this
-metadata is being updated.
+admin list columns. A seed initializes fresh databases only. Apply schema
+changes through **Content Types** on an existing deployment.
 
-The [post URL migration](emdash-customizations.md#post-url-migration) is
-complete: posts use native date paths and the stored Posts `path` field is
-removed. The linked audit includes backup locations and rollback requirements.
+Posts use native date paths. The stored Posts `path` field is removed.
+See [Post URL Recovery](emdash-customizations.md#post-url-recovery) for backup
+locations, rollback requirements, and rules for publication date changes.
 
-## Post-Launch State
+## Repository State
 
 - WordPress migration scripts and parity tooling have been removed.
 - Keep `.emdash/seed.json` checked in as the schema/config seed only.

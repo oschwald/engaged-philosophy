@@ -1,46 +1,31 @@
 # Usage
 
-This file documents repo-specific authoring features that are not part of plain EmDash behavior.
+## Images
 
-## Legacy image block
+Use EmDash's native **Image** block for new images. In the full admin editor,
+type `/` in a rich text field and choose **Image**. Use the image controls to
+set alt text, captions, links, alignment, and display dimensions.
 
-Use **Legacy image** when you need image behavior that standard EmDash images do not support here, especially:
+Imported aligned and linked images also use native image blocks. The theme
+preserves their text wrapping and legacy dimensions. Check the public page
+after changing alignment or replacing an image, especially when the replacement
+has a different aspect ratio.
 
-- left- or right-aligned images with text wrapping
-- centered legacy images
-- images that should link to another URL
+Use a cropped copy when the original must remain available. Replacing media
+preserves its ID and URL but overwrites its bytes without history. See
+[Media Editing](docs/launch-checklist.md#media-editing) for cache behavior.
 
-Standard EmDash images should still be the default choice when you do not need those behaviors.
+## Remaining custom blocks
 
-## Where to create it
+The full EmDash admin editor provides these blocks in the slash menu:
 
-Create and edit **Legacy image** blocks in the **full EmDash admin editor**.
+- **Legacy video**, in **Media**, preserves imported playlist video URLs,
+  titles, MIME types, and intrinsic width and height.
+- **Legacy embed**, in **Media**, preserves imported embeds such as Animoto.
+  Its fields include the source URL, embed URL, provider, and title.
+- **Legacy page list**, in **Content**, renders the dynamic page list and has
+  no editable fields.
 
-The inline edit overlay preserves these blocks, but it does not provide the full custom editing UI for them.
-
-## How to insert one
-
-1. Open the full EmDash admin editor for the page or post.
-2. Click inside the rich text field.
-3. Type `/` to open the slash menu.
-4. Choose **Legacy image** from the **Media** group.
-
-## Fields
-
-- **Image**: choose an image from the image picker
-- **Alt text**: accessibility text for the image
-- **Caption**: optional visible caption
-- **Link URL**: optional URL to wrap the image in a link
-- **Alignment**: `None`, `Left`, `Right`, or `Center`
-- **Width** and **Height**: optional dimensions for legacy sizing
-
-## When to use it
-
-- Use a standard image block for normal inline content.
-- Use **Legacy image** only when you need wrapped text or linked-image behavior that must survive future EmDash edits.
-
-## Notes
-
-- Existing legacy content may still render correctly without manual edits.
-- To make old imported aligned or linked images durable through future edits, they need to exist in content as `legacyImage` blocks rather than standard image blocks.
-- The slash menu appears when you type `/` in the rich text editor.
+Use native blocks for new content when they provide the needed behavior.
+Edit the remaining custom blocks in the full admin editor. The inline overlay
+preserves them but does not provide their full custom editing controls.
