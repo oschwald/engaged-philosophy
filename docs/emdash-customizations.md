@@ -21,12 +21,16 @@ Cloudflare constraints.
   Caching path recommended by EmDash 0.33; the deprecated EmDash
   `cloudflareCache()` provider is not used here. EmDash 0.34 also makes route
   validators build-aware, so a browser cannot retain HTML that refers to assets
-  from an earlier deployment.
+  from an earlier deployment. Tag-only cache hints do not emit a build-time
+  `Last-Modified` value, so browser revalidation cannot hide a content publish.
 - Public responses are fresh at the edge for one day and may be served stale
   for one hour while they revalidate. Browsers receive `max-age=0` and
   revalidate instead of retaining HTML or generated metadata independently.
   Cookie-bearing and query-string HTML responses are `no-store`; public HTML
   varies on `Cookie` so a cached anonymous response cannot hide that bypass.
+- EmDash keeps 404 responses out of the route cache, including missing content
+  rendered through `Astro.rewrite("/404")`. The error page needs no site-level
+  invalidation tags, and a newly published entry can serve immediately.
 - Page cache tags describe the content entry, collection lists, site settings,
   primary menu, and taxonomy data actually rendered. EmDash already invalidates
   entry and collection tags, and EmDash 0.32 avoids purging them for draft-only
@@ -54,8 +58,8 @@ Cloudflare constraints.
   API tokens can receive `409 ENTRY_LOCKED` on updates, publication,
   scheduling, draft discard, and deletion; same-user writes can proceed.
   Maintenance scripts should respect the lock or explicitly request
-  `overrideLock`. The site's save gate does not bypass locks. EmDash 0.38's MCP
-  content tools do not enforce them yet.
+  `overrideLock`. MCP content writes and revision restoration enforce the same
+  locks. The site's save gate does not bypass locks.
 - Restoring trashed content creates an unscheduled draft, even if the entry
   was previously published. Editors must publish it again. Unpublishing also
   cancels any pending publication schedule.
@@ -91,15 +95,22 @@ Cloudflare constraints.
   EmDash 0.36 removed the separate Media Usage schedule; activation and repair
   now advance in bounded batches while an administrator keeps Settings ->
   Media usage tracking open.
+- The admin Calendar shows published entries, scheduled entries, and scheduled
+  updates in the site timezone. Editors can reschedule entries there, but the
+  five-minute Worker schedule still determines when they go live.
 - Core database migrations remain in EmDash's default automatic runtime mode.
   EmDash 0.35 and newer also emit the ignored `.emdash/migrations.json` build
   artifact for a future deployment-managed migration job; switching to check or
   manual mode should wait until such a job applies and verifies that exact
-  manifest before every deploy. EmDash 0.38 includes `075_entry_edit_locks`,
-  `076_collection_nav_group`, and `077_plugin_storage_revisions`. The last
-  migration adds revision triggers to `options` and `_plugin_storage` without
-  backfilling existing records. Monitor D1 writes after deployment and retain
-  the five-minute maintenance cadence.
+  manifest before every deploy. Migrations can change stored relations,
+  reference fields, and scheduled task timestamps, and add redirect validation
+  and revision triggers. Monitor D1 writes after deployment and retain the
+  five-minute maintenance cadence.
+- Redirect matching uses upstream published redirect snapshots. After an
+  upgrade or a damaged snapshot, EmDash serves the redirect table while it
+  rebuilds the snapshot in the background. Redirect destinations must be
+  site-relative, and enabling a rule that closes a loop is rejected. If pattern
+  rules overlap, the earliest-created rule wins.
 - D1 migrations serialize through a database lock that does not expire
   automatically. If a migration is interrupted, confirm no migrator is still
   running before following EmDash's
@@ -130,30 +141,33 @@ update the shared structure.
 
 The upstream Cloudflare route-cache provider is used with response safeguards
 for Cloudflare Access, preview, visual-editing, and other cookies. EmDash's
-supported KV object cache is also enabled so expensive taxonomy aggregates and
-content queries are shared across Worker isolates and Cloudflare locations.
+supported KV object cache is also enabled for requests that can reuse cached
+taxonomy aggregates and content queries across Worker isolates and locations.
 It uses the existing `SESSION` namespace with the distinct
 `ep:object-cache` key prefix; session and cached-content keys cannot collide.
 The one-day cache TTL is only a cleanup backstop because EmDash invalidates
 cached values with content and taxonomy epochs. Because Workers KV is
 eventually consistent, another location can remain stale for about 60 seconds
 (or occasionally longer), plus EmDash's default one-second isolate-local
-`revalidate` window.
+`revalidate` window. EmDash bypasses object-cache reads and writes when filling
+Astro's route cache, so stale KV values cannot repopulate purged public HTML.
+Those renders query D1 directly; an edge-cache hit still avoids the Worker.
 
-Nested public page lookups share a compact path-to-ID index under the fixed
+Nested page lookups use the live slug lookup and indexed `path` fallback during
+route-cache fills. Loading the full page-path index there would rescan the
+collection on every request because EmDash bypasses KV. Outside those fills,
+ordinary published lookups share a compact path-to-ID index under the fixed
 `ep:page-paths:v1` query key. Its `contentNamespaces("pages")` epochs invalidate
-it with the rest of the page collection. Unknown paths return 404 without
-creating one KV query entry per URL; matched entries still use EmDash's normal
-hydration and visibility checks. Stored path aliases remain available for
-canonical redirects. Preview, visual editing, locale-specific requests, and
-isolated database contexts retain the live lookup so drafts and locale
-fallbacks are not restricted to the published index. Failed collection loads
-never cache a partial index.
+it with the collection. Both paths avoid one KV query entry per unknown URL and
+preserve stored aliases for canonical redirects. Preview, visual editing,
+locale-specific requests, and isolated databases also use the live lookup so
+drafts and locale fallbacks are not restricted to the published index. Failed
+index loads never cache partial results.
 
-This deliberately trades a modest number of KV operations for much larger D1
-row-read savings. Production D1 Insights showed a single topic-count query
-scanning about 80,000 rows and route caching cannot share the result across
-locations. The [KV free allowance](https://developers.cloudflare.com/kv/platform/limits/)
+The cache's D1 savings now depend on which requests can use it. Earlier
+production D1 Insights showed a single topic-count query scanning about 80,000
+rows; public cache fills no longer share that result through KV. The
+[KV free allowance](https://developers.cloudflare.com/kv/platform/limits/)
 is 100,000 reads and 1,000 writes per day, while the
 [D1 free allowance](https://developers.cloudflare.com/workers/platform/pricing/#d1)
 is 5 million rows read per day. Monitor both metrics after deployment; cache
@@ -260,6 +274,12 @@ backend failures degrade to D1 reads rather than failing the request.
   although the admin and inline editor allow those styles. Verify public
   presentation before relying on the editor's table sizing and alignment
   controls.
+- New HTML blocks default to sandboxed iframes. The anonymous-page CSP blocks
+  their inline CSS, JavaScript, and automatic height script; signed-in previews
+  can therefore look different. Use Inline mode for sanitized HTML that should
+  inherit the theme. The native iframe block also works only with hosts in
+  `frame-src`, and its inline custom sizing is blocked on anonymous pages.
+  Existing imported HTML blocks retain their inline rendering.
 - Imported numbered headings use EmDash's native Portable Text list and heading
   rendering. Their imported segments share one stable EmDash 0.33 `listId` and
   base, so EmDash emits semantic continuation starts across intervening answers.
@@ -348,14 +368,15 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   upstream import change; splitting it into chunks alone does not remove the
   unused icons.
   [Upstream icon resolver](https://github.com/emdash-cms/emdash/blob/emdash%400.37.0/packages/admin/src/components/admin-navigation-icons.ts)
-- TypeScript remains at 6.0.3 because typescript-eslint 8.70 requires a version
+- TypeScript remains at 6.0.3 because typescript-eslint 8.71 requires a version
   below 6.1, and `@astrojs/check` 0.9.10 supports TypeScript 5 and 6. The current
   TypeScript 7 release is outside both peer ranges.
 - `@astrojs/react` 7 uses Oxc for JSX and Fast Refresh. The site uses plain
   `react()` without custom Babel options, so no configuration change is needed.
 - Miniflare pins patched Sharp, so no local Sharp override is needed.
-  The global Undici override is also removed: Miniflare selects patched 7.29.0
-  itself, while Astro's font loader requires Undici 8.
+  `miniflare>undici` requires patched Undici 7.29.1 because the Miniflare version
+  pinned by Astro's Cloudflare Vite plugin still selects 7.29.0. Keep this
+  override scoped to Miniflare; Astro's font loader requires Undici 8.
   [Sharp advisory](https://github.com/advisories/GHSA-rgj7-g3m4-5g8c)
 - Media uploads retain EmDash's safer default allowlist, which accepts AVIF and
   other raster image formats but not SVG. Site-owned SVG icons remain versioned
@@ -373,6 +394,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   native admin editor's save ordering does not cover the inline toolbar.
 - Remove the local cache-provider wrapper when Wrangler exposes
   `cache.purge()` for its local Workers Cache implementation.
+- Remove the scoped Undici override when all installed Miniflare versions
+  require Undici 7.29.1 or newer.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a
   Cloudflare Email Sending plugin, but that only handles email delivery; this
