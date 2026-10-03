@@ -5,6 +5,8 @@ import { rm } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
 
+import { hasWorkerErrors } from "./worker-errors.mjs";
+
 const ROOT = path.resolve(new URL("..", import.meta.url).pathname);
 const DIST_WRANGLER_CONFIG = path.join(ROOT, "dist", "server", "wrangler.json");
 const PERSIST_DIR = path.join(ROOT, ".wrangler", "worker-runtime-smoke-state");
@@ -71,9 +73,7 @@ async function waitForWorker(port, child, getOutput) {
 
 function assertNoRuntimeErrors(output) {
 	assert.equal(
-		/ReferenceError|Cannot access .* before initialization|Unhandled|\\[ERROR\\]|✘ \\[ERROR\\]/.test(
-			output,
-		),
+		hasWorkerErrors(output),
 		false,
 		`Worker runtime smoke test logged an error\n${output}`,
 	);

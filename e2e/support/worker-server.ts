@@ -11,6 +11,8 @@ import net from "node:net";
 import path from "node:path";
 import { promisify } from "node:util";
 
+import { hasWorkerErrors } from "../../scripts/worker-errors.mjs";
+
 export const TEST_AUTH_HEADER = "X-EmDash-Test-Auth";
 
 const ROOT = path.resolve(new URL("../..", import.meta.url).pathname);
@@ -19,8 +21,6 @@ const STARTUP_TIMEOUT_MS = 30_000;
 const REQUEST_TIMEOUT_MS = 15_000;
 const SETUP_RETRY_COUNT = 3;
 const WORKER_RESTART_MID_REQUEST_PATTERN = /Your worker restarted mid-request/;
-const WORKER_ERROR_PATTERN =
-	/EmDash middleware error|Cannot read properties of undefined \(reading 'every'\)|ReferenceError|Cannot access .* before initialization|Unhandled|\[ERROR\]|✘ \[ERROR\]/;
 
 export interface WorkerServer {
 	baseURL: string;
@@ -366,7 +366,7 @@ export async function startWorkerServer(
 		getOutput: () => output,
 		assertNoErrors: () => {
 			assert.equal(
-				WORKER_ERROR_PATTERN.test(output),
+				hasWorkerErrors(output),
 				false,
 				`Worker e2e logged an error\n${output}`,
 			);
