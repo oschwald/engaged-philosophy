@@ -105,6 +105,7 @@ Playwright reports out of commits, along with the generated
 Free, so keep new Worker features within Free request/CPU limits and avoid
 paid-only features unless the account plan is explicitly changed.
 
-Current branch/commit previews share production bindings, and their runtime
-migrations can write to the live database even on read requests. See
-[Branch Previews](docs/testing.md#branch-previews) before using them for testing.
+Until the deliberate native Workers Previews switch, branch/commit Version URLs
+share production bindings. Runtime migrations can write to the live database
+even on read requests. Native previews use separate shared staging bindings. See
+[Branch Previews](docs/testing.md#branch-previews) before using either flow for testing.
