@@ -2,6 +2,7 @@ import { getSeoMeta, type PublicPageContext } from "emdash";
 import { createPublicPageContext } from "emdash/page";
 
 import { PRIMARY_MENU_CACHE_TAG, SITE_SETTINGS_CACHE_TAG } from "./cache-tags";
+import { PUBLIC_SITE_URL } from "./site-config";
 import type { ContentEntry, PageData, PostData, ProjectData } from "./types";
 
 type SiteContentData = PageData | PostData | ProjectData;
@@ -29,7 +30,6 @@ interface CreateSitePageContextOptions {
 	url: URL;
 	siteTitle: string;
 	siteDescription: string;
-	siteUrl?: string | null;
 	title?: string;
 	description?: string;
 	content?: SiteContentContext;
@@ -57,12 +57,11 @@ export function createSitePageContext({
 	url,
 	siteTitle,
 	siteDescription,
-	siteUrl,
 	title,
 	description,
 	content,
 }: CreateSitePageContextOptions): PublicPageContext {
-	const publicSiteUrl = (siteUrl || url.origin).replace(/\/$/, "");
+	const publicSiteUrl = PUBLIC_SITE_URL;
 	const isHome = url.pathname === "/" && !url.searchParams.has("s");
 	const defaultPageTitle =
 		title && title !== "Home" ? title : `${siteTitle} – ${siteDescription}`;

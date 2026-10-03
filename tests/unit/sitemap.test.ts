@@ -3,35 +3,17 @@ import { describe, expect, test } from "vitest";
 import {
 	renderSitemapXml,
 	sitemapEntryLastmod,
-	sitemapOrigin,
 	sitemapPathToUrl,
 } from "../../src/lib/sitemap";
 
 describe("sitemap helpers", () => {
 	test("builds canonical URLs from migrated content paths", () => {
-		expect(sitemapPathToUrl("https://www.engagedphilosophy.com/", "")).toBe(
-			"https://www.engagedphilosophy.com/",
+		expect(sitemapPathToUrl("")).toBe("https://www.engagedphilosophy.com/");
+		expect(sitemapPathToUrl("2022/05/31/jason-swartwood")).toBe(
+			"https://www.engagedphilosophy.com/2022/05/31/jason-swartwood/",
 		);
-		expect(
-			sitemapPathToUrl(
-				"https://www.engagedphilosophy.com",
-				"2022/05/31/jason-swartwood",
-			),
-		).toBe("https://www.engagedphilosophy.com/2022/05/31/jason-swartwood/");
-		expect(
-			sitemapPathToUrl("https://www.engagedphilosophy.com", " about/ "),
-		).toBe("https://www.engagedphilosophy.com/about/");
-	});
-
-	test("prefers a valid configured site origin", () => {
-		expect(
-			sitemapOrigin(
-				"https://www.engagedphilosophy.com/site/",
-				"https://worker.example",
-			),
-		).toBe("https://www.engagedphilosophy.com");
-		expect(sitemapOrigin("not a URL", "https://worker.example/path")).toBe(
-			"https://worker.example",
+		expect(sitemapPathToUrl(" about/ ")).toBe(
+			"https://www.engagedphilosophy.com/about/",
 		);
 	});
 
@@ -59,7 +41,7 @@ describe("sitemap helpers", () => {
 	});
 
 	test("renders unique XML sitemap URLs with escaped values", () => {
-		const xml = renderSitemapXml("https://www.engagedphilosophy.com", [
+		const xml = renderSitemapXml([
 			{
 				id: "home",
 				data: { path: "", updatedAt: "2026-06-07T00:00:00Z" },
@@ -96,7 +78,7 @@ describe("sitemap helpers", () => {
 	});
 
 	test("honors EmDash indexing and canonical settings", () => {
-		const xml = renderSitemapXml("https://www.example.com", [
+		const xml = renderSitemapXml([
 			{
 				id: "canonical",
 				data: {
@@ -124,7 +106,9 @@ describe("sitemap helpers", () => {
 			},
 		]);
 
-		expect(xml).toContain("<loc>https://www.example.com/preferred/</loc>");
+		expect(xml).toContain(
+			"<loc>https://www.engagedphilosophy.com/preferred/</loc>",
+		);
 		expect(xml).not.toContain("private");
 		expect(xml).not.toContain("duplicate");
 		expect(xml.match(/<url>/g)).toHaveLength(1);

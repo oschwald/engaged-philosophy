@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { getSeoMeta, getSiteSettings, type ContentSeo } from "emdash";
+import { getSeoMeta, type ContentSeo } from "emdash";
 
 import {
 	getPublishedPages,
@@ -9,14 +9,11 @@ import {
 import { projectPath } from "../lib/content-paths";
 import { SITE_SETTINGS_CACHE_TAG } from "../lib/cache-tags";
 import {
+	PUBLIC_SITE_URL,
 	PUBLIC_EDGE_CACHE_MAX_AGE_SECONDS,
 	PUBLIC_EDGE_CACHE_SWR_SECONDS,
 } from "../lib/site-config";
-import {
-	renderSitemapXml,
-	sitemapOrigin,
-	type SitemapInputEntry,
-} from "../lib/sitemap";
+import { renderSitemapXml, type SitemapInputEntry } from "../lib/sitemap";
 
 interface SitemapSourceEntry {
 	id: string;
@@ -28,12 +25,11 @@ interface SitemapSourceEntry {
 
 function toSitemapEntry(
 	entry: SitemapSourceEntry,
-	siteUrl: string,
 	path = entry.data.path,
 ): SitemapInputEntry {
 	return {
 		id: entry.id,
-		image: getSeoMeta(entry, { siteUrl }).ogImage,
+		image: getSeoMeta(entry, { siteUrl: PUBLIC_SITE_URL }).ogImage,
 		data: {
 			path,
 			updatedAt: entry.data.updatedAt,
@@ -46,24 +42,22 @@ function toSitemapEntry(
 
 export const prerender = false;
 
-export const GET: APIRoute = async ({ cache, site, url }) => {
+export const GET: APIRoute = async ({ cache }) => {
 	cache.set({
 		maxAge: PUBLIC_EDGE_CACHE_MAX_AGE_SECONDS,
 		swr: PUBLIC_EDGE_CACHE_SWR_SECONDS,
 		tags: [SITE_SETTINGS_CACHE_TAG, "pages", "posts", "projects"],
 	});
-	const [settings, pages, posts, projects] = await Promise.all([
-		getSiteSettings(),
+	const [pages, posts, projects] = await Promise.all([
 		getPublishedPages(),
 		getPublishedPosts(),
 		getPublishedProjects(),
 	]);
-	const origin = sitemapOrigin(settings?.url || site?.origin, url.origin);
-	const body = renderSitemapXml(origin, [
-		...pages.map((entry) => toSitemapEntry(entry, origin)),
-		...posts.map((entry) => toSitemapEntry(entry, origin)),
+	const body = renderSitemapXml([
+		...pages.map((entry) => toSitemapEntry(entry)),
+		...posts.map((entry) => toSitemapEntry(entry)),
 		...projects.map((entry) =>
-			toSitemapEntry(entry, origin, projectPath(entry.data.slug || entry.id)),
+			toSitemapEntry(entry, projectPath(entry.data.slug || entry.id)),
 		),
 	]);
 

@@ -1,3 +1,5 @@
+import { PUBLIC_SITE_URL } from "./site-config";
+
 const AMP_RE = /&/g;
 const LT_RE = /</g;
 const GT_RE = />/g;
@@ -19,46 +21,22 @@ export interface SitemapInputEntry {
 	};
 }
 
-export function canonicalSitemapOrigin(origin: string) {
-	return origin.replace(/\/+$/, "");
-}
-
-export function sitemapPathToUrl(origin: string, path?: string | null) {
+export function sitemapPathToUrl(path?: string | null) {
 	const normalizedPath = (path ?? "").trim().replace(/^\/+|\/+$/g, "");
 	const pathname = normalizedPath ? `/${normalizedPath}/` : "/";
-	return `${canonicalSitemapOrigin(origin)}${pathname}`;
+	return `${PUBLIC_SITE_URL}${pathname}`;
 }
 
-export function sitemapOrigin(
-	configuredUrl: string | null | undefined,
-	requestOrigin: string,
-) {
-	if (configuredUrl) {
-		try {
-			const url = new URL(configuredUrl);
-			if (url.protocol === "http:" || url.protocol === "https:") {
-				return url.origin;
-			}
-		} catch {
-			// Fall back to the request origin when the saved setting is malformed.
-		}
-	}
-	return new URL(requestOrigin).origin;
-}
-
-function sitemapEntryUrl(origin: string, entry: SitemapInputEntry) {
+function sitemapEntryUrl(entry: SitemapInputEntry) {
 	const configuredCanonical = entry.data.seo?.canonical;
-	if (!configuredCanonical) return sitemapPathToUrl(origin, entry.data.path);
+	if (!configuredCanonical) return sitemapPathToUrl(entry.data.path);
 
 	try {
-		const canonical = new URL(
-			configuredCanonical,
-			`${canonicalSitemapOrigin(origin)}/`,
-		);
-		if (canonical.origin !== new URL(origin).origin) return null;
-		return sitemapPathToUrl(origin, canonical.pathname);
+		const canonical = new URL(configuredCanonical, `${PUBLIC_SITE_URL}/`);
+		if (canonical.origin !== PUBLIC_SITE_URL) return null;
+		return sitemapPathToUrl(canonical.pathname);
 	} catch {
-		return sitemapPathToUrl(origin, entry.data.path);
+		return sitemapPathToUrl(entry.data.path);
 	}
 }
 
@@ -103,7 +81,7 @@ export function escapeSitemapXml(value: string) {
 		.replace(APOS_RE, "&apos;");
 }
 
-export function renderSitemapXml(origin: string, entries: SitemapInputEntry[]) {
+export function renderSitemapXml(entries: SitemapInputEntry[]) {
 	const urls = new Map<string, { lastmod: string; image: string | null }>();
 	const lines = [
 		'<?xml version="1.0" encoding="UTF-8"?>',
@@ -112,7 +90,7 @@ export function renderSitemapXml(origin: string, entries: SitemapInputEntry[]) {
 
 	for (const entry of entries) {
 		if (entry.data.seo?.noIndex) continue;
-		const loc = sitemapEntryUrl(origin, entry);
+		const loc = sitemapEntryUrl(entry);
 		if (!loc) continue;
 		const current = urls.get(loc);
 		urls.set(loc, {
