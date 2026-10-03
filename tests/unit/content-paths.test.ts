@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 
 import {
 	derivePagePath,
+	pageRedirect,
 	postPath,
 	projectPath,
 } from "../../src/lib/content-paths";
@@ -47,4 +48,20 @@ describe("content path derivation", () => {
 		);
 		expect(projectPath(null)).toBe("project");
 	});
+});
+
+test("page redirects retain query state and use temporary preview redirects", () => {
+	expect(
+		pageRedirect(
+			"parent/child",
+			new URL("https://example.test/pages/id?_preview=token&_edit=1"),
+		),
+	).toEqual(["/parent/child/?_preview=token&_edit=1", 302]);
+	expect(
+		pageRedirect("parent/child", new URL("https://example.test/parent/old/")),
+	).toEqual(["/parent/child/", 301]);
+	expect(pageRedirect("", new URL("https://example.test/home/"))).toEqual([
+		"/",
+		301,
+	]);
 });

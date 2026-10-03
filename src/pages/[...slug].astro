@@ -1,11 +1,9 @@
 ---
 import NotFound from "../components/NotFound.astro";
-import RichContent from "../components/RichContent.astro";
-import Base from "../layouts/Base.astro";
+import PagePage from "../components/content/PagePage.astro";
 import { getPageByPath, getPageBySlug, getProjectBySlug } from "../lib/content";
-import { projectPath } from "../lib/content-paths";
+import { pageRedirect, projectPath } from "../lib/content-paths";
 import { joinPath } from "../lib/path-utils";
-import { getEntryContent } from "../lib/rich-text";
 
 const slugParts = Astro.params.slug?.split("/").filter(Boolean) ?? [];
 const path = joinPath(slugParts);
@@ -27,73 +25,10 @@ if (!page) {
 }
 
 if (page && page.data.path !== path) {
-	return Astro.redirect(page.data.path ? `/${page.data.path}/` : "/");
+	return Astro.redirect(...pageRedirect(page.data.path, Astro.url));
 }
 
 if (!page) Astro.response.status = 404;
-
-const useFullWidthTemplate =
-	page?.data.template === "templates/_full_width.php" &&
-	page.data.path !== "faq";
-const bodyClass = page
-	? [
-			"wp-singular",
-			...(useFullWidthTemplate
-				? [
-						"page-template",
-						"page-template-templates_full_width",
-						"page-template-templates_full_width-php",
-					]
-				: ["page-template-default", "content-sidebar"]),
-			"page",
-			page.data.id ? `page-id-${page.data.id}` : null,
-			"wp-theme-engaged-philosophy-20",
-		]
-			.filter(Boolean)
-			.join(" ")
-	: "";
 ---
 
-{page ? (
-	<Base
-		title={page.data.title}
-		bodyClass={bodyClass}
-		content={{ collection: "pages", entry: page }}
-	>
-		{useFullWidthTemplate ? (
-			<section id="primary" class="col-12 px-4">
-				<main id="content">
-					<article {...page.edit}>
-						<header class="page-header">
-							<h1 class="entry-title" {...page.edit.title}>
-								{page.data.title}
-							</h1>
-						</header>
-						<div class="entry-content" {...page.edit.content}>
-							<RichContent value={getEntryContent(page.data)} />
-						</div>
-					</article>
-				</main>
-			</section>
-		) : (
-			<div class="container-fluid">
-				<section id="primary" class="p-4">
-					<div id="content" role="main">
-						<article {...page.edit}>
-							<header class="page-header">
-								<h1 class="entry-title" {...page.edit.title}>
-									{page.data.title}
-								</h1>
-							</header>
-							<div class="entry-content" {...page.edit.content}>
-								<RichContent value={getEntryContent(page.data)} />
-							</div>
-						</article>
-					</div>
-				</section>
-			</div>
-		)}
-	</Base>
-) : (
-	<NotFound />
-)}
+{page ? <PagePage page={page} /> : <NotFound />}

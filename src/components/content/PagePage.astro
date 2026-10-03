@@ -1,0 +1,69 @@
+---
+import RichContent from "../RichContent.astro";
+import Base from "../../layouts/Base.astro";
+import { getEntryContent } from "../../lib/rich-text";
+import type { ContentEntry, PageData } from "../../lib/types";
+
+interface Props {
+	page: ContentEntry<PageData>;
+}
+const { page } = Astro.props;
+const useFullWidthTemplate =
+	page.data.template === "templates/_full_width.php" &&
+	page.data.path !== "faq";
+const bodyClass = [
+	"wp-singular",
+	...(useFullWidthTemplate
+		? [
+				"page-template",
+				"page-template-templates_full_width",
+				"page-template-templates_full_width-php",
+			]
+		: ["page-template-default", "content-sidebar"]),
+	"page",
+	page.data.id ? `page-id-${page.data.id}` : null,
+	"wp-theme-engaged-philosophy-20",
+]
+	.filter(Boolean)
+	.join(" ");
+---
+
+<Base
+	title={page.data.title}
+	bodyClass={bodyClass}
+	content={{ collection: "pages", entry: page }}
+>
+	{useFullWidthTemplate ? (
+		<section id="primary" class="col-12 px-4">
+			<main id="content">
+				<article {...page.edit}>
+					<header class="page-header">
+						<h1 class="entry-title" {...page.edit.title}>
+							{page.data.title}
+						</h1>
+					</header>
+					<div class="entry-content" {...page.edit.content}>
+						<RichContent value={getEntryContent(page.data)} />
+					</div>
+				</article>
+			</main>
+		</section>
+	) : (
+		<div class="container-fluid">
+			<section id="primary" class="p-4">
+				<div id="content" role="main">
+					<article {...page.edit}>
+						<header class="page-header">
+							<h1 class="entry-title" {...page.edit.title}>
+								{page.data.title}
+							</h1>
+						</header>
+						<div class="entry-content" {...page.edit.content}>
+							<RichContent value={getEntryContent(page.data)} />
+						</div>
+					</article>
+				</div>
+			</section>
+		</div>
+	)}
+</Base>

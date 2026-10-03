@@ -56,3 +56,13 @@ export function projectPath(slug?: string | null) {
 	const projectSlug = slugFromPath(slug);
 	return projectSlug ? `project/${projectSlug}` : "project";
 }
+
+export function pageRedirect(
+	path: string | undefined,
+	url: URL,
+): [string, 301 | 302] {
+	return [
+		`${path ? `/${path}/` : "/"}${url.search}`,
+		url.searchParams.has("_preview") ? 302 : 301,
+	];
+}

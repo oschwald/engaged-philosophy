@@ -51,7 +51,7 @@ test("resolves a missing path through publication, rename, unpublish, and deleti
 		await publishContentViaApi(authedRequest, "pages", created.id);
 		expect((await publicPage.request.get(renamedPath)).status()).toBe(200);
 		const oldPath = await publicPage.request.get(path, { maxRedirects: 0 });
-		expect([301, 302]).toContain(oldPath.status());
+		expect(oldPath.status()).toBe(301);
 		expect(oldPath.headers().location).toBe(renamedPath);
 
 		const unpublished = await authedRequest.post(
@@ -94,9 +94,17 @@ test("previews and edits a nested draft absent from the public path index", asyn
 			"https://example.test",
 		).searchParams.get("_preview");
 		expect(previewToken).toBeTruthy();
-		const response = await publicPage.request.get(
-			`${path}?_preview=${previewToken}`,
-		);
+		const redirect = await publicPage.request.get(preview.url, {
+			maxRedirects: 0,
+		});
+		expect(redirect.status()).toBe(302);
+		expect(
+			new URL(
+				redirect.headers().location,
+				"https://example.test",
+			).searchParams.get("_preview"),
+		).toBe(previewToken);
+		const response = await publicPage.request.get(preview.url);
 		expect(response.status()).toBe(200);
 		expect(response.headers()["cache-control"]).toContain("no-store");
 		expect(await response.text()).toContain(title);
@@ -114,3 +122,43 @@ test("previews and edits a nested draft absent from the public path index", asyn
 		await deleteContentViaApi(authedRequest, "pages", created.id);
 	}
 });
+
+for (const parent of ["alias-tests", "alias-tests/deep"]) {
+	test(`redirects renamed ${parent} pages and preserves their template`, async ({
+		authedRequest,
+		publicPage,
+	}, testInfo) => {
+		const slug = `alias-${Date.now()}`;
+		const title = uniqueTitle("E2E Page Alias", testInfo.testId);
+		const created = await createContentViaApi(authedRequest, "pages", {
+			title,
+			slug,
+			data: {
+				path: `${parent}/${slug}`,
+				template: "templates/_full_width.php",
+			},
+		});
+		try {
+			await publishContentViaApi(authedRequest, "pages", created.id);
+			await publicPage.goto(`/${parent}/${slug}/`);
+			await expect(publicPage.locator("body")).toHaveClass(
+				/page-template-templates_full_width/,
+			);
+			await updateContentViaApi(authedRequest, "pages", created.id, {
+				slug: `${slug}-renamed`,
+			});
+			await publishContentViaApi(authedRequest, "pages", created.id);
+			const response = await publicPage.request.get(`/${parent}/${slug}/`, {
+				maxRedirects: 0,
+			});
+			expect(response.status()).toBe(301);
+			expect(response.headers().location).toBe(`/${parent}/${slug}-renamed/`);
+			await publicPage.goto(`/${parent}/${slug}/`);
+			await expect(publicPage.locator("body")).toHaveClass(
+				/page-template-templates_full_width/,
+			);
+		} finally {
+			await deleteContentViaApi(authedRequest, "pages", created.id);
+		}
+	});
+}
