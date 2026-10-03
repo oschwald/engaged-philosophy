@@ -16,10 +16,11 @@ test("bounds KV growth for distinct missing nested pages", async ({
 	test.setTimeout(120_000);
 	const measurement = await measureMissingPaths(workerServer);
 	expect(measurement.addedKeys).toEqual([]);
-	expect(measurement.dbQueries).toBe(0);
+	// Allow periodic redirect snapshot revalidation alongside the live lookups.
+	expect(measurement.dbQueries).toBeLessThanOrEqual(measurement.requests * 4);
 });
 
-test("refreshes a cached missing path through publication, rename, unpublish, and deletion", async ({
+test("resolves a missing path through publication, rename, unpublish, and deletion", async ({
 	authedRequest,
 	publicPage,
 }, testInfo) => {
@@ -28,7 +29,7 @@ test("refreshes a cached missing path through publication, rename, unpublish, an
 	const title = uniqueTitle("E2E Nested Cache", testInfo.testId);
 	const missing = await publicPage.request.get(path);
 	expect(missing.status()).toBe(404);
-	expect(missing.headers()["cache-tag"]).toContain("pages");
+	expect(missing.headers()["cloudflare-cdn-cache-control"]).toBe("no-store");
 	const created = await createContentViaApi(authedRequest, "pages", {
 		title,
 		slug,

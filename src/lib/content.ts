@@ -189,7 +189,8 @@ export async function getPublishedProjects() {
 }
 
 export async function getPageBySlug(slug: string) {
-	const { entry } = await getEmDashEntry("pages", slug);
+	const { entry, error } = await getEmDashEntry("pages", slug);
+	if (error) throw new Error(`Unable to load page: ${error.message}`);
 	if (!entry) return null;
 	return normalizeEntry(entry, "pages");
 }
@@ -198,11 +199,13 @@ export async function getPageByPath(path: string) {
 	const normalizedPath = normalizeContentPath(path);
 	const context = getRequestContext();
 	// Draft paths and locale fallbacks must resolve through EmDash's live lookup.
+	// Route-cache fills bypass KV, so avoid rebuilding the full path index there.
 	if (
 		!context?.editMode &&
 		!context?.preview &&
 		!context?.locale &&
-		!context?.dbIsIsolated
+		!context?.dbIsIsolated &&
+		!context?.routeCacheFill
 	) {
 		const paths = await cachedQuery({
 			namespace: contentNamespaces("pages"),
@@ -228,11 +231,12 @@ export async function getPageByPath(path: string) {
 	const page = slug ? await getPageBySlug(slug) : null;
 	if (page?.data.path === normalizedPath) return page;
 
-	const { entries } = await getEmDashCollection("pages", {
+	const { entries, error } = await getEmDashCollection("pages", {
 		status: "published",
 		limit: 1,
 		where: { path: normalizedPath },
 	});
+	if (error) throw new Error(`Unable to load page path: ${error.message}`);
 	const entry = entries[0];
 	if (!entry) return null;
 	return normalizeEntry(entry, "pages");

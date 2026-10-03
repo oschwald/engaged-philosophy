@@ -288,6 +288,7 @@ describe("content retrieval and taxonomy", () => {
 		{ editMode: false, preview: { collection: "pages", id: "page-1" } },
 		{ editMode: false, locale: "fr" },
 		{ editMode: false, dbIsIsolated: true },
+		{ editMode: false, routeCacheFill: true },
 	])("resolves nested pages for request context %j", async (context) => {
 		getRequestContext.mockReturnValue(context);
 		getEmDashEntry.mockResolvedValue({ entry: null });
@@ -311,6 +312,77 @@ describe("content retrieval and taxonomy", () => {
 			where: { path: "parent/child" },
 		});
 		expect(cachedQuery).not.toHaveBeenCalled();
+	});
+
+	test("resolves a fresh canonical page without loading the path index", async () => {
+		getRequestContext.mockReturnValue({
+			editMode: false,
+			routeCacheFill: true,
+		});
+		getEmDashEntry.mockResolvedValue({
+			entry: entry("page-1", { slug: "renamed", path: "parent/old" }),
+		});
+		getEmDashCollection.mockResolvedValue({ entries: [] });
+
+		await expect(getPageByPath("parent/renamed")).resolves.toMatchObject({
+			id: "page-1",
+			data: { path: "parent/renamed" },
+		});
+		expect(getEmDashCollection).not.toHaveBeenCalled();
+	});
+
+	test("resolves a stored alias with a bounded lookup during a cache fill", async () => {
+		getRequestContext.mockReturnValue({
+			editMode: false,
+			routeCacheFill: true,
+		});
+		getEmDashEntry.mockResolvedValue({ entry: null });
+		getEmDashCollection.mockResolvedValue({
+			entries: [entry("page-1", { slug: "renamed", path: "parent/old" })],
+		});
+
+		await expect(getPageByPath("parent/old")).resolves.toMatchObject({
+			id: "page-1",
+			data: { path: "parent/renamed" },
+		});
+		expect(getEmDashCollection).toHaveBeenCalledExactlyOnceWith("pages", {
+			status: "published",
+			limit: 1,
+			where: { path: "parent/old" },
+		});
+	});
+
+	test("does not turn a failed slug lookup into a missing page during a cache fill", async () => {
+		getRequestContext.mockReturnValue({
+			editMode: false,
+			routeCacheFill: true,
+		});
+		getEmDashEntry.mockResolvedValue({
+			entry: null,
+			error: { message: "Database unavailable" },
+		});
+		getEmDashCollection.mockResolvedValue({ entries: [] });
+
+		await expect(getPageByPath("parent/child")).rejects.toThrow(
+			"Database unavailable",
+		);
+		expect(getEmDashCollection).not.toHaveBeenCalled();
+	});
+
+	test("does not turn a failed stored-path lookup into a missing page during a cache fill", async () => {
+		getRequestContext.mockReturnValue({
+			editMode: false,
+			routeCacheFill: true,
+		});
+		getEmDashEntry.mockResolvedValue({ entry: null });
+		getEmDashCollection.mockResolvedValue({
+			entries: [],
+			error: { message: "Database unavailable" },
+		});
+
+		await expect(getPageByPath("parent/child")).rejects.toThrow(
+			"Database unavailable",
+		);
 	});
 
 	test("preserves taxonomy terms hydrated by EmDash", async () => {
