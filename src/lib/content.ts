@@ -97,6 +97,8 @@ async function getPublishedCollection<C extends SiteCollection>(collection: C) {
 			limit: COLLECTION_PAGE_SIZE,
 			cursor,
 		});
+		if (result.error)
+			throw new Error(`Unable to load ${collection}: ${result.error.message}`);
 		entries.push(...result.entries);
 		cursor = result.nextCursor;
 	} while (cursor);
@@ -117,6 +119,8 @@ async function getPublishedCollectionPage<C extends "posts" | "projects">(
 		status: "published",
 		...options,
 	});
+	if (result.error)
+		throw new Error(`Unable to load ${collection}: ${result.error.message}`);
 	return {
 		entries: result.entries.map((entry) => normalizeEntry(entry, collection)),
 		hasMore: result.hasMore ?? false,
@@ -130,11 +134,12 @@ export async function getPublishedEntriesByIds<C extends SiteCollection>(
 ) {
 	if (ids.length === 0) return [];
 
-	const { entries } = await getEmDashCollection(collection, {
+	const { entries, error } = await getEmDashCollection(collection, {
 		status: "published",
 		limit: ids.length,
 		where: { id: ids },
 	});
+	if (error) throw new Error(`Unable to load ${collection}: ${error.message}`);
 	return entries.map((entry) => normalizeEntry(entry, collection));
 }
 
@@ -217,7 +222,8 @@ export async function getPageByPath(path: string) {
 			paths.find((page) => page.storedPath === normalizedPath);
 		if (!match) return null;
 
-		const { entry } = await getEmDashEntry("pages", match.id);
+		const { entry, error } = await getEmDashEntry("pages", match.id);
+		if (error) throw new Error(`Unable to load page: ${error.message}`);
 		if (!entry) return null;
 		const page = normalizeEntry(entry, "pages");
 		// Keep stored-path aliases available to the route's canonical redirect.
@@ -283,13 +289,15 @@ export async function getPostByPath(path: string) {
 }
 
 export async function getPostBySlug(slug: string) {
-	const { entry } = await getEmDashEntry("posts", slug);
+	const { entry, error } = await getEmDashEntry("posts", slug);
+	if (error) throw new Error(`Unable to load posts: ${error.message}`);
 	if (!entry) return null;
 	return normalizeEntry(entry, "posts");
 }
 
 export async function getProjectBySlug(slug: string) {
-	const { entry } = await getEmDashEntry("projects", slug);
+	const { entry, error } = await getEmDashEntry("projects", slug);
+	if (error) throw new Error(`Unable to load projects: ${error.message}`);
 	if (!entry) return null;
 	return normalizeEntry(entry, "projects");
 }

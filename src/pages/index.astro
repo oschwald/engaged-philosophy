@@ -11,9 +11,11 @@ import {
 	getExcerptText,
 } from "../lib/rich-text";
 
-const home = await getPageBySlug("home");
-const { entries: highlightedProjects } = await getHighlightedProjects();
 const query = Astro.url.searchParams.get("s")?.trim() ?? "";
+const home = query ? null : await getPageBySlug("home");
+const { entries: highlightedProjects } = query
+	? { entries: [] }
+	: await getHighlightedProjects();
 const search = query ? await searchSite(query) : null;
 const homeEntryAttrs = home?.edit ?? {};
 const homeBoxes = home

@@ -1,23 +1,9 @@
-import { existsSync } from "node:fs";
-
 import { defineConfig, devices } from "@playwright/test";
 
 delete process.env.FORCE_COLOR;
 delete process.env.NO_COLOR;
 
-function resolveBrowserPath() {
-	const candidates = [
-		process.env.PLAYWRIGHT_BROWSER_PATH,
-		process.env.RENDERED_SMOKE_BROWSER_PATH,
-		"/usr/bin/google-chrome",
-		"/usr/bin/chromium",
-		"/usr/bin/chromium-browser",
-	].filter((candidate): candidate is string => Boolean(candidate));
-
-	return candidates.find((candidate) => existsSync(candidate));
-}
-
-const browserPath = resolveBrowserPath();
+const browserPath = process.env.PLAYWRIGHT_BROWSER_PATH;
 
 export default defineConfig({
 	testDir: "./e2e-static/specs",

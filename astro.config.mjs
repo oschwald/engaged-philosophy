@@ -1,6 +1,6 @@
 import cloudflare from "@astrojs/cloudflare";
 import react from "@astrojs/react";
-import { d1, kvCache, r2 } from "@emdash-cms/cloudflare";
+import { d1, kvCache } from "@emdash-cms/cloudflare";
 import auditLogPlugin from "@emdash-cms/plugin-audit-log";
 import { embedsPlugin } from "@emdash-cms/plugin-embeds";
 import { defineConfig } from "astro/config";
@@ -9,7 +9,6 @@ import { fileURLToPath } from "node:url";
 
 import {
 	CLOUDFLARE_ACCESS_TEAM_DOMAIN,
-	PUBLIC_MEDIA_URL,
 	PUBLIC_SITE_URL,
 } from "./src/lib/site-config.ts";
 
@@ -109,10 +108,12 @@ export default defineConfig({
 				keyPrefix: "ep:object-cache",
 				defaultTtl: 86_400,
 			}),
-			storage: r2({
-				binding: "MEDIA",
-				publicUrl: PUBLIC_MEDIA_URL,
-			}),
+			storage: {
+				entrypoint: fileURLToPath(
+					new URL("./src/lib/media-storage.ts", import.meta.url),
+				),
+				config: { binding: "MEDIA" },
+			},
 			auth: useTestAuth
 				? {
 						type: "test",

@@ -4,6 +4,8 @@ import { getSiteSettings } from "emdash";
 import { getRecentPosts } from "../lib/content";
 import { formatPublicationDate } from "../lib/publication-date";
 
+Astro.cache.set({ tags: ["posts"] });
+
 const [{ entries: recentPosts }, settings] = await Promise.all([
 	getRecentPosts(),
 	getSiteSettings(),

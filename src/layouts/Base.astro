@@ -45,6 +45,8 @@ Astro.cache.set({
 	swr: PUBLIC_EDGE_CACHE_SWR_SECONDS,
 	...(routeCacheTags.length > 0 ? { tags: routeCacheTags } : {}),
 });
+// Render content before streaming so nested components can add cache tags.
+const contentHtml = await Astro.slots.render("default");
 const settings = await getSiteSettings();
 const siteTitle = settings?.title || SITE_TITLE_FALLBACK;
 const siteDescription = settings?.tagline || SITE_TAGLINE_FALLBACK;
@@ -60,13 +62,12 @@ const faviconSizes =
 const logo = settings?.logo;
 const logoSrc = logo?.url
 	? rewriteInternalMediaFileUrl(logo.url, mediaUrlPrefix)
-	: `${mediaUrlPrefix}/img/logo.png`;
+	: "/img/logo.png";
 const logoAlt = logo?.alt || `${siteTitle} Logo`;
 const page = createSitePageContext({
 	url: Astro.url,
 	siteTitle,
 	siteDescription,
-	siteUrl: settings?.url || Astro.site?.origin,
 	title,
 	description,
 	content,
@@ -95,7 +96,7 @@ const page = createSitePageContext({
 			<PrimaryNav menuItems={menuItems} currentPath={currentPath} />
 
 			<div id="page" class="hfeed row">
-				<slot />
+				<Fragment set:html={contentHtml} />
 				<SiteFooter siteTitle={siteTitle} />
 			</div>
 		</div>

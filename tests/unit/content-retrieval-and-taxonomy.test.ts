@@ -27,6 +27,9 @@ vi.mock("emdash", () => ({
 import {
 	getHighlightedProjects,
 	getPageByPath,
+	getPostBySlug,
+	getProjectBySlug,
+	getPublishedEntriesByIds,
 	getPostByPath,
 	getPostsPageByCategory,
 	getPublishedPages,
@@ -42,6 +45,54 @@ describe("content retrieval and taxonomy", () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
 		cachedQuery.mockImplementation(({ load }) => load());
+	});
+
+	test.each([0, 1])("rejects a collection error in batch %i", async (batch) => {
+		if (batch)
+			getEmDashCollection.mockResolvedValueOnce({
+				entries: [],
+				nextCursor: "next",
+			});
+		getEmDashCollection.mockResolvedValueOnce({
+			entries: [],
+			error: { message: "Database unavailable" },
+		});
+		await expect(getPublishedPages()).rejects.toThrow("Database unavailable");
+	});
+
+	test.each([
+		["archive page", () => getRecentPosts()],
+		["selected entries", () => getPublishedEntriesByIds("pages", ["page-1"])],
+	] as const)("rejects returned errors for %s", async (_name, load) => {
+		getEmDashCollection.mockResolvedValue({
+			entries: [],
+			error: { message: "Database unavailable" },
+		});
+		await expect(load()).rejects.toThrow("Database unavailable");
+	});
+
+	test.each([getPostBySlug, getProjectBySlug])(
+		"rejects entry errors instead of reporting missing content",
+		async (load) => {
+			getEmDashEntry.mockResolvedValue({
+				entry: null,
+				error: { message: "Database unavailable" },
+			});
+			await expect(load("missing")).rejects.toThrow("Database unavailable");
+			getEmDashEntry.mockResolvedValue({ entry: null });
+			await expect(load("missing")).resolves.toBeNull();
+		},
+	);
+
+	test("rejects entry errors after a cached page-path match", async () => {
+		cachedQuery.mockResolvedValue([{ path: "parent/child", id: "page-1" }]);
+		getEmDashEntry.mockResolvedValue({
+			entry: null,
+			error: { message: "Database unavailable" },
+		});
+		await expect(getPageByPath("parent/child")).rejects.toThrow(
+			"Database unavailable",
+		);
 	});
 
 	test("queries only the requested archive page", async () => {

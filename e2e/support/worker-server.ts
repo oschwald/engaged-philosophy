@@ -6,10 +6,12 @@ import {
 	type ChildProcess,
 } from "node:child_process";
 import { existsSync } from "node:fs";
-import { rm } from "node:fs/promises";
+import { rm, writeFile } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
 import { promisify } from "node:util";
+
+import { hasWorkerErrors } from "../../scripts/worker-errors.mjs";
 
 export const TEST_AUTH_HEADER = "X-EmDash-Test-Auth";
 
@@ -19,12 +21,11 @@ const STARTUP_TIMEOUT_MS = 30_000;
 const REQUEST_TIMEOUT_MS = 15_000;
 const SETUP_RETRY_COUNT = 3;
 const WORKER_RESTART_MID_REQUEST_PATTERN = /Your worker restarted mid-request/;
-const WORKER_ERROR_PATTERN =
-	/EmDash middleware error|Cannot read properties of undefined \(reading 'every'\)|ReferenceError|Cannot access .* before initialization|Unhandled|\[ERROR\]|✘ \[ERROR\]/;
 
 export interface WorkerServer {
 	baseURL: string;
 	listObjectCacheKeys: () => Promise<string[]>;
+	clearObjectCacheKeys: () => Promise<void>;
 	assertNoErrors: () => void;
 	getOutput: () => string;
 	stop: () => Promise<void>;
@@ -279,6 +280,7 @@ export async function completeSetup(baseURL: string) {
 
 export async function startWorkerServer(
 	workerIndex: number,
+	options: { preview?: boolean } = {},
 ): Promise<WorkerServer> {
 	ensureWorkerBuild();
 
@@ -309,6 +311,7 @@ export async function startWorkerServer(
 			"--inspector-port",
 			String(inspectorPort),
 			"--local",
+			...(options.preview ? ["--var", "SITE_PREVIEW:true"] : []),
 			"--persist-to",
 			persistDir,
 			"--log-level",
@@ -337,36 +340,69 @@ export async function startWorkerServer(
 
 	await waitForWorker(port, child, () => output);
 
+	const listObjectCacheKeys = async () => {
+		const { stdout } = await promisify(execFile)(
+			"pnpm",
+			[
+				"exec",
+				"wrangler",
+				"kv",
+				"key",
+				"list",
+				"--config",
+				DIST_WRANGLER_CONFIG,
+				"--binding",
+				"SESSION",
+				"--prefix",
+				"ep:object-cache:",
+				"--local",
+				"--persist-to",
+				persistDir,
+			],
+			{ cwd: ROOT, env: childProcessEnv(), maxBuffer: 4 * 1024 * 1024 },
+		);
+		const keys: Array<{ name: string }> = JSON.parse(stdout);
+		return keys.map(({ name }) => name);
+	};
+
 	return {
 		baseURL: `http://127.0.0.1:${port}`,
-		listObjectCacheKeys: async () => {
-			const { stdout } = await promisify(execFile)(
-				"pnpm",
-				[
-					"exec",
-					"wrangler",
-					"kv",
-					"key",
-					"list",
-					"--config",
-					DIST_WRANGLER_CONFIG,
-					"--binding",
-					"SESSION",
-					"--prefix",
-					"ep:object-cache:",
-					"--local",
-					"--persist-to",
-					persistDir,
-				],
-				{ cwd: ROOT, env: childProcessEnv(), maxBuffer: 4 * 1024 * 1024 },
-			);
-			const keys: Array<{ name: string }> = JSON.parse(stdout);
-			return keys.map(({ name }) => name);
+		listObjectCacheKeys,
+
+		clearObjectCacheKeys: async () => {
+			const keys = await listObjectCacheKeys();
+			if (!keys.length) return;
+			const file = path.join(persistDir, "measurement-cache-keys.json");
+			await writeFile(file, JSON.stringify(keys));
+			try {
+				await promisify(execFile)(
+					"pnpm",
+					[
+						"exec",
+						"wrangler",
+						"kv",
+						"bulk",
+						"delete",
+						file,
+						"--config",
+						DIST_WRANGLER_CONFIG,
+						"--binding",
+						"SESSION",
+						"--local",
+						"--persist-to",
+						persistDir,
+						"--force",
+					],
+					{ cwd: ROOT, env: childProcessEnv() },
+				);
+			} finally {
+				await rm(file, { force: true });
+			}
 		},
 		getOutput: () => output,
 		assertNoErrors: () => {
 			assert.equal(
-				WORKER_ERROR_PATTERN.test(output),
+				hasWorkerErrors(output),
 				false,
 				`Worker e2e logged an error\n${output}`,
 			);

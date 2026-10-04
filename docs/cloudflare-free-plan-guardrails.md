@@ -61,8 +61,10 @@ Trace with `skip_response: true` to test custom-rule matches without invoking
 the Worker, then run `smoke:live`. Trace also reports rate-limit expression
 matches; those are separate from the custom-rule block assertions.
 
-Worker preview URLs remain enabled and share production bindings, but the
-site's zone WAF does not cover them. The cheap Worker scanner/crawler checks
+Worker preview URLs remain enabled. Old Version URLs share production bindings.
+Native previews use separate shared staging bindings after the deliberate
+[Builds switch](testing.md#one-time-activation). The site's zone WAF does not cover
+preview hostnames. The cheap Worker scanner/crawler checks
 protect those entrypoints and requests exempted by the verified-bot rules.
 The Worker also handles exact Unicode/path-segment limits, malformed encoding,
 and uncommon multi-digit PHP suffixes that the Free-plan WAF expressions do
@@ -94,3 +96,14 @@ it is not a reason to trade away useful production evidence preemptively.
 If KV writes remain unsafe after edge and request-policy changes, test EmDash's
 supported bounded in-isolate `memoryCache()` backend in a separate deployment.
 Do not parse or filter EmDash's serialized cache values in site code.
+
+Use `scripts/measure-kv-usage.mjs` for representative local query counts and
+TTFB/full-response timings. A query count is not a count of D1 rows read. KV
+key growth does not measure read/write operations, and local wall time is not
+Worker CPU. For production evidence, record the same UTC interval and deployed
+version in the PR or issue. Compare Worker request/CPU metrics, D1 rows read and
+written, and KV read/write totals in Cloudflare Analytics against the prior
+interval. Account for traffic volume and exclude snapshot/import or admin work
+from public-request comparisons. Inspect sampled Worker traces for slow routes
+and keep the existing production edge-hit smoke check. Do not infer billed
+operation counts from local cache keys or extrapolate fixture timings as CPU.

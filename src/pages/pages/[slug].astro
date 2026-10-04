@@ -1,12 +1,13 @@
 ---
 import NotFound from "../../components/NotFound.astro";
+import { pageRedirect } from "../../lib/content-paths";
 import { getPageBySlug } from "../../lib/content";
 
 const { slug = "" } = Astro.params;
 const page = await getPageBySlug(slug);
 
 if (page) {
-	return Astro.redirect(page.data.path ? `/${page.data.path}/` : "/", 301);
+	return Astro.redirect(...pageRedirect(page.data.path, Astro.url));
 }
 Astro.response.status = 404;
 ---

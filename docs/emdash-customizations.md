@@ -7,7 +7,9 @@ Cloudflare constraints.
 ## Runtime
 
 - `src/lib/site-config.ts` is the shared source for non-secret site constants
-  used by both the theme and Astro/EmDash configuration.
+  used by both the theme and Astro/EmDash configuration. Public metadata, RSS,
+  and sitemap URLs use `PUBLIC_SITE_URL`. Site settings still control the title,
+  tagline, logo, and date format. Editorial per-entry canonicals remain supported.
 - `src/lib/cloudflare-access-auth.ts` authenticates EmDash users from Cloudflare
   Access JWTs. EmDash users still need to exist in the EmDash auth tables.
 - `src/emdash-routes/cloudflare-access-invite.ts` replaces the default email
@@ -229,8 +231,7 @@ backend failures degrade to D1 reads rather than failing the request.
   after a slug lookup, so arbitrary dates cannot serve duplicate content.
   EmDash 0.39 adds plugin-context URL discovery, but no standalone forward URL
   builder for the theme, so `postPath()` still mirrors its date interpolation.
-  Its UTC handling of offsetless input remains for compatibility; migration 079
-  instead interprets stored offsetless values in the site timezone. The theme no
+  Its UTC handling of offsetless input remains for compatibility. The theme no
   longer reads stored post paths or falls back to creation dates.
   API, MCP, and CLI datetime writes must include `Z` or an explicit UTC offset.
 - `/posts/{id-or-slug}` preserves signed preview tokens. Dated entries redirect
@@ -401,29 +402,9 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   Cloudflare Email Sending plugin, but that only handles email delivery; this
   site still needs invitees appended to the Cloudflare Access EMAIL list.
 
-## Post URL Migration
+## Post URL Recovery
 
-### Completed migration
-
-[PR #171](https://github.com/oschwald/engaged-philosophy/pull/171) migrated posts
-to EmDash's native UTC date pattern on September 15, 2026. The audit found 80
-posts: 76 published and four undated drafts. Fourteen publication timestamps
-were moved into the final milliseconds of their existing URL's UTC day,
-preserving all published URLs, displayed Pacific dates, and publication order.
-The approved time changes also affect RSS and machine-readable metadata;
-exact publication times are not displayed. Undated drafts remain undated.
-
-SQL cleanup removed `path` from all 131 post revisions before EmDash's schema
-registry removed the stored Posts `path` field. Editing was paused across both
-steps and then resumed. Every other post value, all page records, and all
-redirects were unchanged; media usage tracking returned to Ready.
-
-The migrated database copy passed all 1,047 inventoried paths: 419 pages and
-628 permanent redirects. All 244 content canonical URLs matched the live
-baseline, the final live sitemap retained those URLs, and all 419 public paths
-passed the final sequential production smoke check.
-
-### Audit records and recovery
+### Backups and recovery
 
 Keep the private backups and full path inventory under the ignored
 `.migration/post-paths/` directory:
@@ -462,7 +443,7 @@ LIVE_SMOKE_PATH_FILE=.migration/post-paths/public-paths.txt \
 The JSON inventory also records XML endpoints; check those separately from the
 HTML path list.
 
-### Ongoing behavior
+### Publication dates and URLs
 
 Ordinary content edits keep the publication date and URL. Slug edits use
 EmDash's native permanent redirects. Changing an already-published post's

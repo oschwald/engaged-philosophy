@@ -1,6 +1,8 @@
 ---
 import { getPublishedPages } from "../../lib/content";
 
+Astro.cache.set({ tags: ["pages"] });
+
 const pages = (await getPublishedPages())
 	.flatMap((page) => {
 		const { path, title } = page.data;

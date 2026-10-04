@@ -233,3 +233,36 @@ test.describe("public page cache", () => {
 		await expect(publicPage.getByText(initialText)).toHaveCount(0);
 	});
 });
+
+test("tags taxonomy sidebars and project page lists with their collection dependencies", async ({
+	authedRequest,
+	publicPage,
+}, testInfo) => {
+	const term = await createTaxonomyTermViaApi(authedRequest, "schools", {
+		slug: `sidebar-${Date.now()}`,
+		label: "Sidebar cache dependencies",
+	});
+	let contentId: string | undefined;
+	try {
+		const archive = await publicPage.request.get(`/schools/${term.slug}/`);
+		expect(archive.status()).toBe(200);
+		expect(archive.headers()["cache-tag"]).toContain("posts");
+		const { published, publicPath } = await createAndPublishContentViaApi(
+			authedRequest,
+			"projects",
+			{
+				title: uniqueTitle("E2E Page List Cache", testInfo.testId),
+				data: { content: [{ _type: "legacyPageList", _key: "page-list" }] },
+			},
+		);
+		contentId = published.id;
+		const response = await publicPage.request.get(publicPath);
+		expect(response.status()).toBe(200);
+		expect(await response.text()).toContain('class="legacy-page-list"');
+		expect(response.headers()["cache-tag"]).toContain("pages");
+	} finally {
+		if (contentId)
+			await deleteContentViaApi(authedRequest, "projects", contentId);
+		await deleteTaxonomyTermViaApi(authedRequest, "schools", term.slug);
+	}
+});

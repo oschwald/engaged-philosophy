@@ -65,16 +65,15 @@ describe("site page context", () => {
 			url: new URL("https://worker.example/blog/?utm_source=test"),
 			siteTitle: "Engaged Philosophy",
 			siteDescription: "Philosophy in practice",
-			siteUrl: "https://www.example.com/",
 			title: "Blog",
 		});
 
 		expect(page).toMatchObject({
 			title: "Blog – Engaged Philosophy",
 			description: "Philosophy in practice",
-			canonical: "https://www.example.com/blog/",
+			canonical: "https://www.engagedphilosophy.com/blog/",
 			pageType: "website",
-			siteUrl: "https://www.example.com",
+			siteUrl: "https://www.engagedphilosophy.com",
 		});
 	});
 
@@ -109,7 +108,6 @@ describe("site page context", () => {
 			url: new URL("https://worker.example/2026/07/01/an-essay/"),
 			siteTitle: "Engaged Philosophy",
 			siteDescription: "Philosophy in practice",
-			siteUrl: "https://www.example.com",
 			title: entry.data.title,
 			content: { collection: "posts", entry },
 		});
@@ -117,8 +115,8 @@ describe("site page context", () => {
 		expect(page).toMatchObject({
 			title: "A better title – Engaged Philosophy",
 			description: "A concise description",
-			canonical: "https://www.example.com/essays/canonical/",
-			image: "https://www.example.com/media/essay.jpg",
+			canonical: "https://www.engagedphilosophy.com/essays/canonical/",
+			image: "https://www.engagedphilosophy.com/media/essay.jpg",
 			pageType: "article",
 			content: {
 				collection: "posts",
@@ -132,5 +130,26 @@ describe("site page context", () => {
 				author: "A. Philosopher",
 			},
 		});
+	});
+
+	test("preserves an editorial canonical on another site", () => {
+		const entry = postEntry({
+			seo: {
+				canonical: "https://elsewhere.example/original/",
+				title: null,
+				description: null,
+				image: null,
+				noIndex: false,
+			},
+		});
+		const page = createSitePageContext({
+			url: new URL("https://preview.example/post/"),
+			siteTitle: "Editable title",
+			siteDescription: "Editable tagline",
+			content: { collection: "posts", entry },
+		});
+		expect(page.canonical).toBe("https://elsewhere.example/original/");
+		expect(page.siteUrl).toBe("https://www.engagedphilosophy.com");
+		expect(page.siteName).toBe("Editable title");
 	});
 });
