@@ -85,15 +85,13 @@ Cloudflare constraints.
   still emits `no-store` for every recognized session, Access, preview, and
   edit request. The default retains `Vary: Cookie`, so deployments without the
   zone rule fail safely.
-- `wrangler.jsonc` runs general EmDash maintenance every five minutes. This
-  keeps the fixed-cost cleanup scans proportionate to a low-traffic site;
-  scheduled publications can appear up to five minutes after their target
-  time. EmDash 0.39 loads the scheduled handler lazily to reduce Worker startup
-  work. EmDash 0.37 adds the scheduled-content index migration
-  `074_content_deleted_scheduled_index` and bounds media-usage cleanup reads.
-  Keep the five-minute cadence to limit the remaining fixed maintenance cost.
-  System cleanup also trims the 404 log to its 10,000 most recently seen paths;
-  public 404 requests no longer perform that table-wide maintenance.
+- `wrangler.jsonc` invokes EmDash's scheduler every five minutes. Scheduled
+  publications can appear up to five minutes after their target time.
+  EmDash 1.2 runs system cleanup only at the top of the hour, independently of
+  publication polling. Keep a trigger at minute zero so cleanup runs even on
+  a fresh Worker isolate. The 404-log cleanup first counts at most 10,001 rows
+  and skips deletion when the log is within its 10,000-path cap. Public 404
+  requests record the path without counting or trimming the log.
   EmDash 0.36 removed the separate Media Usage schedule; activation and repair
   now advance in bounded batches while an administrator keeps Settings ->
   Media usage tracking open.

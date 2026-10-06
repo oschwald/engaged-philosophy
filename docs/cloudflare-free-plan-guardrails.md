@@ -84,10 +84,12 @@ limits:
   of the applicable monthly or daily allowance.
 
 EmDash records 404s without counting or trimming the log on public requests.
-Scheduled system cleanup retains the 10,000 most recently seen paths. The log
-can temporarily exceed that count between cleanup runs, so keep the five-minute
-maintenance trigger working and monitor its failures. Request-policy and WAF
-checks still prevent scanner traffic from reaching the CMS in the first place.
+EmDash 1.2 runs system cleanup at the top of the hour. Its 404-log cap check
+counts at most 10,001 rows and deletes older paths only above the 10,000-path
+cap. The log can exceed that count between cleanup runs. Keep the five-minute
+scheduler trigger, including minute zero, and monitor its failures. Publication
+polling still runs every five minutes. Request-policy and WAF checks prevent
+scanner traffic from reaching the CMS in the first place.
 
 Keep Workers trace sampling at 5% unless measured observability events approach
 their allowance. Exhausting the logs or traces allowance reduces diagnostics;
