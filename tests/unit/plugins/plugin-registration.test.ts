@@ -17,21 +17,10 @@ describe("EmDash plugin registration", () => {
 			expect(block, `Expected ${type} block to be registered`).toBeDefined();
 			return block!;
 		};
-		const getField = (blockType: string, actionId: string) => {
-			const block = getBlock(blockType);
-			const field = block.fields.find((item) => item.action_id === actionId);
-			expect(
-				field,
-				`Expected ${blockType}.${actionId} field to be registered`,
-			).toBeDefined();
-			return field!;
-		};
-
-		expect(blocks.map(({ type }) => type)).not.toContain("legacyImage");
-		expect(getField("legacyVideo", "url")).toMatchObject({
-			type: "text_input",
-			label: "Video URL",
-		});
+		expect(blocks.map(({ type }) => type)).toEqual([
+			"legacyEmbed",
+			"legacyPageList",
+		]);
 		expect(getBlock("legacyEmbed").label).toBe("Legacy embed");
 		expect(getBlock("legacyPageList").label).toBe("Legacy page list");
 	});

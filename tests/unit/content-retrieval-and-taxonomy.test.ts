@@ -14,15 +14,19 @@ const {
 	getTerm: vi.fn(),
 }));
 
-vi.mock("emdash", () => ({
-	cachedQuery,
-	contentNamespaces: (collection: string) => [`content:${collection}`],
-	getRequestContext,
-	getEmDashCollection,
-	getEmDashEntry,
-	getTaxonomyTerms: vi.fn(),
-	getTerm,
-}));
+vi.mock("emdash", async (importOriginal) => {
+	const { decodeSlug } = await importOriginal<typeof import("emdash")>();
+	return {
+		cachedQuery,
+		contentNamespaces: (collection: string) => [`content:${collection}`],
+		decodeSlug,
+		getRequestContext,
+		getEmDashCollection,
+		getEmDashEntry,
+		getTaxonomyTerms: vi.fn(),
+		getTerm,
+	};
+});
 
 import {
 	getHighlightedProjects,
@@ -477,6 +481,11 @@ describe("content retrieval and taxonomy", () => {
 		await expect(getPostByPath("1999/01/01/first-post")).resolves.toBeNull();
 		await expect(getPostByPath("2026/01/03/first-post")).resolves.toBeNull();
 		expect(getEmDashCollection).not.toHaveBeenCalled();
+	});
+
+	test("rejects malformed post slugs without querying content", async () => {
+		await expect(getPostByPath("2026/01/02/bad%ZZ")).resolves.toBeNull();
+		expect(getEmDashEntry).not.toHaveBeenCalled();
 	});
 
 	test("resolves archive terms without aggregating usage counts", async () => {
