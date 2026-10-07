@@ -294,12 +294,15 @@ backend failures degrade to D1 reads rather than failing the request.
   `data.bylines`. Imported WordPress author values were migrated to native
   byline profiles and credits, so there is no separate author field adapter.
   EmDash 0.34 exposes explicit credits directly from live-loader results.
-- Legacy renderers remain for Animoto embeds, playlist videos, and dynamic page
-  lists. EmDash does not support Animoto or the page-list behavior. EmDash 1.2's
-  native video block supports intrinsic dimensions, `playsinline`, captions,
-  and public R2 URLs. The legacy video renderer remains until stored blocks
-  and revisions are converted to native video assets. That migration must
-  preserve URL validation, accessible labels, and the imported presentation.
+- Imported playlist videos use EmDash's native video blocks and editor. Media
+  Library videos retain their media references and public R2 URLs. The external
+  CloudFront video retains its URL with an empty media reference. The small
+  `RichTextVideo.astro` wrapper validates source URLs, labels the player group,
+  and preserves the imported sizing and caption styles. Playback uses EmDash's
+  `Video` component. Local upload URLs use EmDash's internal file route until
+  the component resolves them to the configured public media URL.
+- Legacy renderers remain for Animoto embeds and dynamic page lists, which
+  EmDash does not support.
 
 ## Imported Field Names
 
@@ -349,9 +352,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   This version also uses Astro-compatible `astro-auto-import` directly, so the
   nested auto-import override is removed.
 - `src/plugins/legacy-content-blocks.ts` preserves edit controls for imported
-  WordPress-only Portable Text blocks such as playlist videos, remaining legacy
-  embeds, and page lists. Its registered plugin ID remains
-  `legacy-image-blocks` for compatibility with existing plugin state.
+  WordPress-only Portable Text blocks for remaining legacy embeds and page
+  lists. Its registered plugin ID remains `legacy-image-blocks` for compatibility with existing plugin state.
 - EmDash 0.38 validates plugin outbound requests through DNS lookups at
   `cloudflare-dns.com`. The Cloudflare Access invite integration uses its own
   fetch path. Configured plugins still run without paid Worker Loaders; the
@@ -395,8 +397,6 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   blocks publication after failed saves and waits before leaving edit mode.
   The native publish wait alone does not replace these protections.
-- Remove the legacy video renderer and plugin fields after migrating stored
-  blocks and revisions to native video assets and verifying public rendering.
 - Remove the local cache-provider wrapper when Wrangler exposes
   `cache.purge()` for its local Workers Cache implementation.
 - Remove the scoped Undici override when all installed Miniflare versions
