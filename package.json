@@ -63,7 +63,7 @@
 	},
 	"devDependencies": {
 		"@astrojs/check": "^0.9.10",
-		"@cloudflare/workers-types": "^5.20261002.1",
+		"@cloudflare/workers-types": "^5.20261004.1",
 		"@playwright/test": "^1.63.0",
 		"@types/node": "^26.6.4",
 		"@typescript-eslint/eslint-plugin": "^8.71.0",
