@@ -28,10 +28,14 @@ The zone rules for `engagedphilosophy.com` must preserve these invariants:
   upload-exploit probes are rejected by zone WAF rules before the Worker runs.
   The Worker retains a fallback for requests outside that coverage. Keep
   legitimate legacy content and `wp-content/uploads` paths out of this list.
-- The public dynamic-page rate limit is 10 requests per 10 seconds per IP and
-  Cloudflare location. It excludes verified bots, `/_emdash`, `/_astro`, the
-  image endpoint, and paths with file extensions. Full-sitemap smoke checks run
+- The public rate limit is 10 requests per 10 seconds per IP and Cloudflare
+  location. [public-rate-limit-rule.txt](../cloudflare/public-rate-limit-rule.txt)
+  excludes verified bots, EmDash, Astro assets, image optimization, static image
+  and media directories, favicon/robots/manifest endpoints, `.well-known`, and `cdn-cgi`.
+  Other paths count even when they have a file extension. Full-sitemap smoke checks run
   sequentially with a 1.25-second delay so they remain below this limit.
+  The Free-plan rate-limit expression uses path matching without `url_decode`.
+  Credential-probe custom rules and the Worker fallback decode percent escapes.
 
 Install the stateful-cookie bypass Cache Rule before deploying code that omits
 `Vary: Cookie`. Set `CACHE_STATEFUL_COOKIE_BYPASS_ACTIVE` to `"true"` only
@@ -42,13 +46,14 @@ local, and incompletely configured production deployments fail safely.
 
 The deployed custom rules use these expressions, in order, with action Block:
 
-| Expression                                                       | Purpose                                                                                          |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| [scanner-rule.txt](../cloudflare/scanner-rule.txt)               | Credential/configuration probes, obsolete framework endpoints, and the explicit crawler denylist |
-| [php-upload-rule.txt](../cloudflare/php-upload-rule.txt)         | PHP scripts, backup/version suffixes, and known upload exploits                                  |
-| [public-request-rule.txt](../cloudflare/public-request-rule.txt) | Unsupported public methods and oversized URLs                                                    |
+| Expression                                                           | Purpose                                                                                          |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [scanner-rule.txt](../cloudflare/scanner-rule.txt)                   | Credential/configuration probes, obsolete framework endpoints, and the explicit crawler denylist |
+| [php-upload-rule.txt](../cloudflare/php-upload-rule.txt)             | PHP scripts, backup/version suffixes, and known upload exploits                                  |
+| [public-request-rule.txt](../cloudflare/public-request-rule.txt)     | Unsupported public methods and oversized URLs                                                    |
+| [credential-probe-rule.txt](../cloudflare/credential-probe-rule.txt) | Root configuration files, Vault and container secrets, and credential probes                     |
 
-All three scope requests to apex/www. Path comparisons decode percent escapes
+All four scope requests to apex/www. Path comparisons decode percent escapes
 and respect component boundaries; a legitimate `environment.php.jpg` is not
 a PHP script. EmDash API and image-optimization endpoints are exempt from the
 generic path and method checks. The media hostname is outside these rules.
@@ -72,6 +77,14 @@ not reproduce. Preview authorization, search/cursor validation, and deciding
 whether a content path exists remain application responsibilities.
 
 ## Usage Review
+
+The public 404 template keeps search and navigation but omits the recent-posts
+sidebar. Missing paths must not load a post collection. They still incur CMS
+routing and layout queries. Do not cache arbitrary 404s without publication
+invalidation, because a newly published page must become visible immediately.
+The missing-page tests cover the response layout, bound query counts, and inspect
+SQL logs through body streaming to reject post-collection queries.
+The scanner policy also rejects known probes before EmDash runs.
 
 Review three complete UTC days after a cache or bot-policy deployment. Use
 these investigation thresholds rather than treating them as additional hard

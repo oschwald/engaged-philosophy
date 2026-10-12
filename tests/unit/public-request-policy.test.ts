@@ -81,6 +81,20 @@ describe("public request policy", () => {
 			"/assets/vendor/jquery.filer/php/readme.txt",
 			"/ALFA_DATA/alfacgiapi/perl.alfa",
 			"/file-manager/initialize",
+			"/config%2etxt",
+			"/CONFIG.ini~",
+			"/env%2ejson%2ebak",
+			"/env.tmp",
+			"/vault",
+			"/vault-init",
+			"/vault/secrets",
+			"/run/secrets/",
+			"/run/secrets/kubernetes.io/serviceaccount/token",
+			"/var/run/secrets/kubernetes.io/serviceaccount/namespace",
+			"/pgpass",
+			"/stripe-secret-key",
+			"/stripe-webhook-secret/",
+			"/stripe_api_key",
 		]) {
 			const { response } = apply(path);
 			expect(response?.status, path).toBe(404);
@@ -107,6 +121,13 @@ describe("public request policy", () => {
 			"/wp-content/uploads/2026/09/environment.php.jpg",
 			"/_astro/site.js",
 			"/_emdash/api/media/file/.env",
+			"/_emdash/api/media/file/config.json",
+			"/project/vault/",
+			"/project/stripe-patterns/",
+			"/wp-content/uploads/2026/09/config.txt",
+			"/environment/",
+			"/configuration/",
+			"/vaulting/",
 		]) {
 			expect(apply(path).response, path).toBeUndefined();
 		}

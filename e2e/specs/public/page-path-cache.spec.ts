@@ -1,5 +1,6 @@
 import { test, expect } from "../../fixtures/worker";
-import { measureMissingPaths } from "../../support/cache-usage";
+import { measureMissingPaths, measureRequest } from "../../support/cache-usage";
+import { completeSetup, startWorkerServer } from "../../support/worker-server";
 import {
 	createContentViaApi,
 	deleteContentViaApi,
@@ -9,6 +10,38 @@ import {
 	uniqueTitle,
 	updateContentViaApi,
 } from "../../support/content";
+
+test("missing pages do not query the posts collection during rendering", async ({}, testInfo) => {
+	const server = await startWorkerServer(10_000 + testInfo.workerIndex, {
+		queryLog: true,
+	});
+	try {
+		await completeSetup(server.baseURL);
+		const outputStart = server.getOutput().length;
+		expect(
+			(await measureRequest(server, "/query-budget-missing/")).status,
+		).toBe(404);
+		await expect
+			.poll(() => server.getOutput().slice(outputStart))
+			.toContain("[emdash-stream-end]");
+		const queries = server
+			.getOutput()
+			.slice(outputStart)
+			.split("\n")
+			.filter((line) => line.startsWith("[emdash-query-log] "))
+			.map(
+				(line) =>
+					JSON.parse(line.slice("[emdash-query-log] ".length)) as {
+						sql: string;
+					},
+			);
+		expect(queries.length).toBeGreaterThan(0);
+		expect(queries.some(({ sql }) => sql.includes('"ec_posts"'))).toBe(false);
+		server.assertNoErrors();
+	} finally {
+		await server.stop();
+	}
+});
 
 test("bounds KV growth for distinct missing nested pages", async ({
 	workerServer,
