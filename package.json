@@ -43,7 +43,7 @@
 		"typecheck:tests": "tsc --noEmit -p tsconfig.test.json"
 	},
 	"dependencies": {
-		"@astrojs/cloudflare": "^14.3.3",
+		"@astrojs/cloudflare": "^14.3.4",
 		"@astrojs/react": "^7.0.0",
 		"@astrojs/rss": "^4.0.19",
 		"@date-fns/tz": "^1.5.0",
