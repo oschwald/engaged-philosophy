@@ -1,5 +1,6 @@
 import { test, expect } from "../../fixtures/worker";
-import { measureMissingPaths } from "../../support/cache-usage";
+import { measureMissingPaths, measureRequest } from "../../support/cache-usage";
+import { completeSetup, startWorkerServer } from "../../support/worker-server";
 import {
 	createContentViaApi,
 	deleteContentViaApi,
@@ -9,6 +10,50 @@ import {
 	uniqueTitle,
 	updateContentViaApi,
 } from "../../support/content";
+
+test("missing pages do not query the posts collection during rendering", async ({}, testInfo) => {
+	const server = await startWorkerServer(10_000 + testInfo.workerIndex, {
+		queryLog: true,
+	});
+	try {
+		await completeSetup(server.baseURL);
+		const path = "/query-budget-missing/";
+		expect((await measureRequest(server, path)).status).toBe(404);
+		let queries: string[] = [];
+		await expect(() => {
+			// Setup logs can arrive after its response has finished.
+			const lines = server.getOutput().split("\n").slice(0, -1);
+			const streamEnd = lines
+				.filter((line) => line.startsWith("[emdash-stream-end] "))
+				.map(
+					(line) =>
+						JSON.parse(line.slice("[emdash-stream-end] ".length)) as {
+							route: string;
+							dbCount: number;
+						},
+				)
+				.find(({ route }) => route === path);
+			expect(streamEnd).toBeDefined();
+			queries = lines
+				.filter((line) => line.startsWith("[emdash-query-log] "))
+				.map(
+					(line) =>
+						JSON.parse(line.slice("[emdash-query-log] ".length)) as {
+							route: string;
+							sql: string;
+						},
+				)
+				.filter(({ route }) => route === path)
+				.map(({ sql }) => sql);
+			expect(queries.length).toBeGreaterThan(0);
+			expect(queries).toHaveLength(streamEnd?.dbCount ?? 0);
+		}).toPass({ timeout: 7500 });
+		expect(queries.filter((sql) => sql.includes('"ec_posts"'))).toEqual([]);
+		server.assertNoErrors();
+	} finally {
+		await server.stop();
+	}
+});
 
 test("bounds KV growth for distinct missing nested pages", async ({
 	workerServer,

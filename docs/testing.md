@@ -189,6 +189,9 @@ client. Full-response time includes consuming the response body.
 The 404 group warms the home route, measures a first missing path and five repeats,
 then requests 100 distinct missing nested paths. It reports database query counts
 from `Server-Timing`, TTFB/full-response timing, and new object-cache key deltas.
+The header query count excludes queries issued during body streaming. The
+missing-page regression test uses EmDash's SQL log through stream completion
+to catch expensive post-collection queries that those headers can miss.
 Key deltas do not count repeated writes to existing keys. Anonymous route-cache
 fills can deliberately bypass object-cache writes, so zero key growth is valid.
 These local checks do not measure D1 rows read, KV read/write operations, Worker
