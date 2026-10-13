@@ -17,26 +17,38 @@ test("missing pages do not query the posts collection during rendering", async (
 	});
 	try {
 		await completeSetup(server.baseURL);
-		const outputStart = server.getOutput().length;
-		expect(
-			(await measureRequest(server, "/query-budget-missing/")).status,
-		).toBe(404);
-		await expect
-			.poll(() => server.getOutput().slice(outputStart))
-			.toContain("[emdash-stream-end]");
-		const queries = server
-			.getOutput()
-			.slice(outputStart)
-			.split("\n")
-			.filter((line) => line.startsWith("[emdash-query-log] "))
-			.map(
-				(line) =>
-					JSON.parse(line.slice("[emdash-query-log] ".length)) as {
-						sql: string;
-					},
-			);
-		expect(queries.length).toBeGreaterThan(0);
-		expect(queries.some(({ sql }) => sql.includes('"ec_posts"'))).toBe(false);
+		const path = "/query-budget-missing/";
+		expect((await measureRequest(server, path)).status).toBe(404);
+		let queries: string[] = [];
+		await expect(() => {
+			// Setup logs can arrive after its response has finished.
+			const lines = server.getOutput().split("\n").slice(0, -1);
+			const streamEnd = lines
+				.filter((line) => line.startsWith("[emdash-stream-end] "))
+				.map(
+					(line) =>
+						JSON.parse(line.slice("[emdash-stream-end] ".length)) as {
+							route: string;
+							dbCount: number;
+						},
+				)
+				.find(({ route }) => route === path);
+			expect(streamEnd).toBeDefined();
+			queries = lines
+				.filter((line) => line.startsWith("[emdash-query-log] "))
+				.map(
+					(line) =>
+						JSON.parse(line.slice("[emdash-query-log] ".length)) as {
+							route: string;
+							sql: string;
+						},
+				)
+				.filter(({ route }) => route === path)
+				.map(({ sql }) => sql);
+			expect(queries.length).toBeGreaterThan(0);
+			expect(queries).toHaveLength(streamEnd?.dbCount ?? 0);
+		}).toPass({ timeout: 7500 });
+		expect(queries.filter((sql) => sql.includes('"ec_posts"'))).toEqual([]);
 		server.assertNoErrors();
 	} finally {
 		await server.stop();
