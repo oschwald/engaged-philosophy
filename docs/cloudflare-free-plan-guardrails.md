@@ -30,9 +30,11 @@ The zone rules for `engagedphilosophy.com` must preserve these invariants:
   legitimate legacy content and `wp-content/uploads` paths out of this list.
 - The public rate limit is 10 requests per 10 seconds per IP and Cloudflare
   location. [public-rate-limit-rule.txt](../cloudflare/public-rate-limit-rule.txt)
-  excludes verified bots, EmDash, Astro assets, image optimization, static image
-  and media directories, favicon/robots/manifest endpoints, `.well-known`, and `cdn-cgi`.
-  Other paths count even when they have a file extension. Full-sitemap smoke checks run
+  excludes verified bots, EmDash, Astro assets, image optimization, `/img/logo.png`,
+  favicon/robots/manifest endpoints, `.well-known`, and `cdn-cgi`.
+  Other paths count even when they have a file extension, including missing paths
+  under `/img/` and `/wp-content/uploads/` on apex/www. Uploaded media uses the
+  separate media hostname, outside this rule. Full-sitemap smoke checks run
   sequentially with a 1.25-second delay so they remain below this limit.
   The Free-plan rate-limit expression uses path matching without `url_decode`.
   Credential-probe custom rules and the Worker fallback decode percent escapes.
