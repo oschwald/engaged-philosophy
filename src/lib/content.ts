@@ -1,6 +1,7 @@
 import {
 	cachedQuery,
 	contentNamespaces,
+	decodeSlug,
 	getEmDashCollection,
 	getEmDashEntry,
 	getRequestContext,
@@ -278,12 +279,7 @@ async function loadPublishedPagePaths() {
 
 export async function getPostByPath(path: string) {
 	const normalizedPath = normalizeContentPath(path);
-	let slug: string;
-	try {
-		slug = decodeURIComponent(slugFromPath(normalizedPath));
-	} catch {
-		return null;
-	}
+	const slug = decodeSlug(slugFromPath(normalizedPath));
 	const post = slug ? await getPostBySlug(slug) : null;
 	return post?.data.path === normalizedPath ? post : null;
 }

@@ -21,7 +21,7 @@ const FIGURE_GALLERY_PATHS = [
 const CENTERED_IMAGE_PATH =
 	"/wp-content/uploads/2026/06/e2e-centered-image.jpg";
 const RIGHT_IMAGE_PATH = "/wp-content/uploads/2026/06/e2e-right-image.jpg";
-const LEGACY_VIDEO_PATH = "/wp-content/uploads/2026/06/e2e-video.mp4";
+const NATIVE_VIDEO_PATH = "/wp-content/uploads/2026/06/e2e-video.mp4";
 const MEDIA_BASE = "https://media.engagedphilosophy.com";
 
 async function expectPageTextNotToContain(page: Page, text: string) {
@@ -197,20 +197,21 @@ test.describe("public migrated content rendering", () => {
 							title: "E2E migrated YouTube embed",
 						},
 						{
-							_type: "legacyVideo",
-							_key: "legacy-video",
-							url: `${MEDIA_BASE}${LEGACY_VIDEO_PATH}`,
-							title: videoTitle,
-							mimeType: "video/mp4",
+							_type: "video",
+							_key: "native-video",
+							asset: {
+								_ref: "imported-video",
+								url: `${MEDIA_BASE}${NATIVE_VIDEO_PATH}`,
+							},
+							caption: videoTitle,
 							width: 640,
 							height: 360,
 						},
 						{
-							_type: "legacyVideo",
-							_key: "legacy-video-relative",
-							url: LEGACY_VIDEO_PATH,
-							title: "Unnormalized imported video",
-							mimeType: "video/mp4",
+							_type: "video",
+							_key: "native-video-relative",
+							asset: { _ref: "", url: NATIVE_VIDEO_PATH },
+							caption: "Unnormalized imported video",
 							width: 640,
 							height: 360,
 						},
@@ -350,15 +351,15 @@ test.describe("public migrated content rendering", () => {
 			"videoid",
 			"dQw4w9WgXcQ",
 		);
-		await expect(publicPage.locator(".legacy-video video")).toHaveAttribute(
+		await expect(publicPage.locator(".content-video")).toHaveAttribute(
 			"aria-label",
 			videoTitle,
 		);
-		await expect(publicPage.locator(".legacy-video source")).toHaveAttribute(
+		await expect(publicPage.locator(".emdash-video video")).toHaveAttribute(
 			"src",
-			`${MEDIA_BASE}${LEGACY_VIDEO_PATH}`,
+			`${MEDIA_BASE}${NATIVE_VIDEO_PATH}`,
 		);
-		await expect(publicPage.locator(".legacy-video")).toHaveCount(1);
+		await expect(publicPage.locator(".emdash-video")).toHaveCount(1);
 		await expect(
 			publicPage.locator(
 				'[src^="/_emdash/api/media/file/wp-content/uploads/"]',
@@ -667,4 +668,42 @@ test.describe("public migrated content rendering", () => {
 				.evaluate((item) => getComputedStyle(item).counterIncrement),
 		).resolves.toBe("none");
 	});
+});
+
+test("resolves native video uploads and rejects unsafe or unnormalized sources", async ({
+	authedRequest,
+	publicPage,
+}, testInfo) => {
+	const title = uniqueTitle("E2E Video Sources", testInfo.testId);
+	const sources = [
+		"/_emdash/api/media/file/uploaded-video.mp4",
+		"javascript:alert(1)",
+		"data:video/mp4;base64,AAAA",
+		"http://example.com/video.mp4",
+		"//example.com/video.mp4",
+		"/wp-content/uploads/video.mp4",
+	];
+	const { publicPath } = await createAndPublishContentViaApi(
+		authedRequest,
+		"pages",
+		{
+			title,
+			data: {
+				content: sources.map((url, index) => ({
+					_type: "video",
+					_key: `video-${index}`,
+					asset: { _ref: `video-${index}`, url },
+				})),
+			},
+		},
+	);
+	await publicPage.goto(publicPath, { waitUntil: "domcontentloaded" });
+	const video = publicPage.locator(".emdash-video video");
+	await expect(video).toHaveCount(1);
+	await expect(video).toHaveAttribute(
+		"src",
+		`${MEDIA_BASE}/uploaded-video.mp4`,
+	);
+	await expect(video).toHaveAttribute("controls", "");
+	await expect(video).toHaveAttribute("preload", "metadata");
 });

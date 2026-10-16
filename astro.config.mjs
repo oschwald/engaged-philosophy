@@ -101,6 +101,7 @@ export default defineConfig({
 		react(),
 		localEmDashRoutes(),
 		emdash({
+			admin: { locales: ["en"] },
 			siteUrl: PUBLIC_SITE_URL,
 			database: d1({ binding: "DB", session: "disabled" }),
 			objectCache: kvCache({
