@@ -51,6 +51,7 @@ function normalizeMediaField(
 	return {
 		src: getPublicMediaStorageUrl(media.meta.storageKey),
 		alt: media.alt,
+		caption: media.caption,
 		filename: media.filename,
 		mimeType: media.mimeType,
 		blurhash: media.blurhash,

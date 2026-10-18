@@ -45,7 +45,9 @@ Cloudflare constraints.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
   controls wait for pending inline saves. EmDash 0.38 avoids saving unchanged
   Portable Text documents, so the local keepalive suppression is removed.
-  Its toolbar can still publish before a Portable Text blur save finishes.
+  The upstream toolbar tracks pending Portable Text saves, but settles failed
+  saves too and reloads immediately when leaving edit mode. The local gate
+  still prevents publication and navigation after a failed save.
   After saves settle, the gate resumes EmDash's own publish button so 0.39's
   visual-action token, policy origin, error recovery, and reload stay upstream.
   The fetch tracker retains visible error feedback for rejected publish
@@ -72,6 +74,8 @@ Cloudflare constraints.
   `public/robots.txt` advertises the same policy; robots directives alone do
   not enforce it. The [Free plan guardrails](cloudflare-free-plan-guardrails.md)
   describe the edge rules and remaining Worker checks.
+  This static file takes precedence over EmDash's generated robots.txt, so
+  Settings -> SEO's AI-training opt-out does not change the site's crawler rules.
 - The outer Worker also applies a public request budget before Astro or EmDash
   initializes. It rejects unsupported methods and pathological URL shapes,
   validates preview-token syntax, bounds search queries and cursor history,
@@ -106,6 +110,9 @@ Cloudflare constraints.
   reference fields, and scheduled task timestamps, and add redirect validation
   and revision triggers. Monitor D1 writes after deployment and retain the
   five-minute maintenance cadence.
+  On deployed Workers, EmDash returns 503 when required migrations cannot
+  finish. Large content migrations, including datetime normalization, require
+  `emdash migrate` from the CLI instead of running inside a request.
 - Redirect matching uses upstream published redirect snapshots. After an
   upgrade or a damaged snapshot, EmDash serves the redirect table while it
   rebuilds the snapshot in the background. Redirect destinations must be
@@ -115,6 +122,9 @@ Cloudflare constraints.
   automatically. If a migration is interrupted, confirm no migrator is still
   running before following EmDash's
   [lock recovery procedure](https://docs.emdashcms.com/deployment/core-migrations/#release-a-stuck-migration-lock).
+  Use `emdash migrate --take-over-lock <id>` after confirming the old migrator
+  has stopped. This avoids releasing the lock for an automatic runtime
+  migrator to claim before the CLI can apply the migration.
   Before deploying schema changes, retain a recovery point and rehearse against
   an isolated copy of current D1; fresh-database tests do not cover legacy data.
 
@@ -152,6 +162,14 @@ eventually consistent, another location can remain stale for about 60 seconds
 `revalidate` window. EmDash bypasses object-cache reads and writes when filling
 Astro's route cache, so stale KV values cannot repopulate purged public HTML.
 Those renders query D1 directly; an edge-cache hit still avoids the Worker.
+Route-cache fills also read site settings directly from D1. Redirect freshness
+checks add one database read before caching a response, preventing an old
+redirect snapshot from repopulating a purged URL.
+
+D1 sessions remain disabled. EmDash supports experimental read coalescing with
+`session: "auto", coalesce: true`, but concurrent reads and writes can run
+write-first. Evaluate that separately with representative queries before
+changing the site's database ordering and bookmark-cookie behavior.
 
 Nested page lookups use the live slug lookup and indexed `path` fallback during
 route-cache fills. Loading the full page-path index there would rescan the
@@ -256,6 +274,10 @@ backend failures degrade to D1 reads rather than failing the request.
   adapter maps each storage key directly to the public R2 domain once, so
   homepage, archive, and search renderers can use the normalized URL without
   retaining older seed-media shapes or repeating WordPress URL rewrites.
+  Native image fields preserve per-use captions in their top-level `caption`
+  property. Existing values with missing captions need an explicit caption
+  edit or image reselection and publication. The theme does not render featured
+  image captions.
 - Portable Text galleries delegate their markup, image loading, and captions to
   EmDash, and EmDash 0.31 keeps those native gallery blocks visible and editable
   in the admin editor. Imported gallery URLs are normalized to the public R2
@@ -372,11 +394,11 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   TypeScript 7 release is outside both peer ranges.
 - `@astrojs/react` 7 uses Oxc for JSX and Fast Refresh. The site uses plain
   `react()` without custom Babel options, so no configuration change is needed.
-- Miniflare pins patched Sharp, so no local Sharp override is needed.
-  `miniflare>undici` requires patched Undici 7.29.1 because the Miniflare version
-  pinned by Astro's Cloudflare Vite plugin still selects 7.29.0. Keep this
-  override scoped to Miniflare; Astro's font loader requires Undici 8.
-  [Sharp advisory](https://github.com/advisories/GHSA-rgj7-g3m4-5g8c)
+- Miniflare pins patched Sharp and Undici, and YAML Language Server pins
+  patched YAML. PostCSS requires patched Nano ID. These packages need no local
+  security overrides. Keep their transitive dependencies updated in the lockfile.
+  Do not globally override Undici: Astro's font loader requires Undici 8 while
+  Miniflare requires Undici 7.
 - Media uploads retain EmDash's safer default allowlist, which accepts AVIF and
   other raster image formats but not SVG. Site-owned SVG icons remain versioned
   static assets.
@@ -389,12 +411,10 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 - Remove the `astro-embed` override when the embeds plugin depends on 0.13.1 or
   newer directly.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
-  waits for Portable Text saves before publishing or leaving edit mode. The
+  blocks failed Portable Text saves and waits before leaving edit mode. The
   native admin editor's save ordering does not cover the inline toolbar.
 - Remove the local cache-provider wrapper when Wrangler exposes
   `cache.purge()` for its local Workers Cache implementation.
-- Remove the scoped Undici override when all installed Miniflare versions
-  require Undici 7.29.1 or newer.
 - Revisit the custom invite route if site email is configured and the default
   EmDash invite flow works with the chosen auth provider. EmDash 0.27 added a
   Cloudflare Email Sending plugin, but that only handles email delivery; this
