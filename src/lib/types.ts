@@ -9,6 +9,7 @@ export type { RichTextValue } from "./rich-text-types";
 export interface MediaField {
 	src?: string;
 	alt?: string;
+	caption?: string;
 	filename?: string;
 	mimeType?: string;
 	blurhash?: string;
