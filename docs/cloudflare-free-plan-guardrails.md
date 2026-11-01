@@ -99,8 +99,12 @@ From the repository root, authenticate to the account containing the site's
 databases. Apply pending migrations to the initialized staging database first:
 
 ```sh
-pnpm exec wrangler d1 migrations apply engaged-philosophy-preview --remote --config wrangler.jsonc
+pnpm exec wrangler d1 migrations apply engaged-philosophy-preview --remote --config wrangler.migrations-preview.jsonc
 ```
+
+The migration config exposes staging under top-level `d1_databases`, as required
+by Wrangler's migration command. Keep its database name and ID aligned with
+`previews.d1_databases` in `wrangler.jsonc`.
 
 After checking staging, apply the same migrations to production:
 

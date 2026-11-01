@@ -1,0 +1,10 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "engaged-philosophy-preview",
+			"database_id": "0d0c311a-1b53-47d0-a7f7-adcc04918479",
+		},
+	],
+}
