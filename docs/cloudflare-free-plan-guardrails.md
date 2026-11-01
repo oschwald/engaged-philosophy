@@ -78,6 +78,48 @@ and uncommon multi-digit PHP suffixes that the Free-plan WAF expressions do
 not reproduce. Preview authorization, search/cursor validation, and deciding
 whether a content path exists remain application responsibilities.
 
+## Public Query Indexes
+
+The site-owned D1 migrations in `migrations/` supplement EmDash's schema:
+
+- `idx_ep_posts_recent` matches the published-post filter and date/title/ID
+  ordering used by the sidebar and feed. D1 can stop after the requested rows
+  instead of sorting the collection and loading related data for discarded rows.
+- `idx_ep_options_name_nocase` supports EmDash's `LIKE 'site:%'` settings lookup.
+  Its collation preserves the existing case-insensitive prefix matching.
+
+These indexes add storage and index writes when their indexed values change.
+They do not change content, query results, or cache invalidation.
+
+Worker deployments do not apply these migrations. Initialize EmDash and the
+site's content types before applying them to a fresh database. Wrangler records
+them in `d1_migrations`, separately from EmDash's core migrations.
+
+From the repository root, authenticate to the account containing the site's
+databases. Apply pending migrations to the initialized staging database first:
+
+```sh
+pnpm exec wrangler d1 migrations apply engaged-philosophy-preview --remote --config wrangler.migrations-preview.jsonc
+```
+
+The migration config exposes staging under top-level `d1_databases`, as required
+by Wrangler's migration command. Keep its database name and ID aligned with
+`previews.d1_databases` in `wrangler.jsonc`.
+
+After checking staging, apply the same migrations to production:
+
+```sh
+pnpm exec wrangler d1 migrations apply engaged-philosophy --remote --config wrangler.jsonc
+```
+
+The explicit database names select the target. Do not use old Version URLs to
+initialize staging, because those URLs share production bindings. See
+[Branch Previews](testing.md#branch-previews).
+
+Confirm the indexes exist and inspect `EXPLAIN QUERY PLAN` for the current
+recent-posts and settings queries. Repeat this check after EmDash schema
+upgrades. Compare D1 rows read using the usage-review procedure below.
+
 ## Usage Review
 
 The public 404 template keeps search and navigation but omits the recent-posts
