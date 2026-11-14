@@ -62,5 +62,7 @@ test.describe("public search", () => {
 		await expect(
 			publicPage.getByRole("link", { name: "Continue reading →" }),
 		).toHaveAttribute("href", publicPath);
+		// Search results render on "/" but must not mark Home as current.
+		await expect(publicPage.locator("#access [aria-current]")).toHaveCount(0);
 	});
 });
