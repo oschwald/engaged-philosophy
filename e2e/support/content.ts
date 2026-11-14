@@ -337,7 +337,7 @@ export async function createAndPublishContentViaAdmin(
 			response.url().includes(`/_emdash/api/content/${collection}`) &&
 			!response.url().includes("/publish"),
 	);
-	await page.getByRole("button", { name: "Save", exact: true }).first().click();
+	await page.getByRole("button", { name: "Save draft", exact: true }).click();
 	const createdBody = await expectJsonResponse(
 		await saveResponsePromise,
 		`save ${collection}`,
@@ -347,10 +347,6 @@ export async function createAndPublishContentViaAdmin(
 	await expect(page).toHaveURL(
 		new RegExp(`/_emdash/admin/content/${collection}/${created.id}(?:\\?.*)?$`),
 	);
-	await expect(
-		page.getByRole("button", { name: "Saved", exact: true }).first(),
-	).toBeVisible();
-
 	const publishResponsePromise = page.waitForResponse(
 		(response) =>
 			response.request().method() === "POST" &&

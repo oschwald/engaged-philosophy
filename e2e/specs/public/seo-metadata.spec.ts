@@ -10,17 +10,26 @@ test("keeps the SEO panel, document title, and structured data in agreement", as
 	publicPage,
 }, testInfo) => {
 	const schemaPath = "/_emdash/api/schema/collections/posts";
+	const settings = await authedRequest.get("/_emdash/api/settings");
+	expect(settings.ok(), await settings.text()).toBe(true);
+	const staging = (await settings.json()).data.staging ?? false;
 	const enableSeo = await authedRequest.put(schemaPath, {
 		data: { hasSeo: true },
 	});
 	expect(enableSeo.ok(), await enableSeo.text()).toBe(true);
 	try {
+		const goLive = await authedRequest.post("/_emdash/api/settings", {
+			data: { staging: false },
+		});
+		expect(goLive.ok(), await goLive.text()).toBe(true);
 		const title = uniqueTitle("E2E SEO Metadata", testInfo.testId);
 		const { publicPath, published } = await createAndPublishContentViaApi(
 			authedRequest,
 			"posts",
 			{ title, publishedAt: "2022-05-31T12:00:00Z" },
 		);
+		await publicPage.goto(publicPath, { waitUntil: "domcontentloaded" });
+		await expect(publicPage.locator('meta[name="robots"]')).toHaveCount(0);
 		const seoTitle = `${title} panel title`;
 		const description = "An editor-provided description.";
 		const canonical = `https://www.engagedphilosophy.com${publicPath}`;
@@ -78,5 +87,9 @@ test("keeps the SEO panel, document title, and structured data in agreement", as
 			data: { hasSeo: false },
 		});
 		expect(restore.ok(), await restore.text()).toBe(true);
+		const restoreStaging = await authedRequest.post("/_emdash/api/settings", {
+			data: { staging },
+		});
+		expect(restoreStaging.ok(), await restoreStaging.text()).toBe(true);
 	}
 });
