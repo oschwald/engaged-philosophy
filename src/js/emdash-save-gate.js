@@ -1,6 +1,4 @@
 const CONTENT_SAVE_PATH_RE = /^\/_emdash\/api\/content\/[^/]+\/[^/]+$/;
-const VISUAL_PUBLISH_PATH_RE =
-	/^\/_emdash\/api\/visual-editing\/content\/[^/]+\/[^/]+\/publish$/;
 const SAVE_SETTLE_TIMEOUT_MS = 15000;
 
 const pendingContentSaves = new Set();
@@ -58,13 +56,6 @@ function installFetchTracker() {
 			CONTENT_SAVE_PATH_RE,
 		);
 		const responsePromise = originalFetch(input, init);
-		if (isContentRequest(input, init, "POST", VISUAL_PUBLISH_PATH_RE)) {
-			return responsePromise.catch((error) => {
-				// EmDash surfaces HTTP failures, but only logs rejected publish fetches.
-				dispatchSaveState("error");
-				throw error;
-			});
-		}
 		return isContentSave ? trackContentSave(responsePromise) : responsePromise;
 	};
 }
