@@ -6,9 +6,11 @@ interface Props {
 	menuItems: MenuItem[];
 	// Undefined when the page is not a menu destination, such as search results
 	currentPath?: string;
+	// Menu URL of the section the page belongs to, such as /project/
+	sectionPath?: string;
 }
 
-const { menuItems, currentPath } = Astro.props;
+const { menuItems, currentPath, sectionPath } = Astro.props;
 
 function isCurrentUrl(url: string) {
 	if (currentPath === undefined) {
@@ -39,6 +41,13 @@ function isCurrentUrl(url: string) {
 					{menuItems.map((item) => {
 						const hasChildren = item.children.length > 0;
 						const isActive = isCurrentUrl(item.url);
+						const isSection = !isActive && item.url === sectionPath;
+						let ariaCurrent: "page" | "true" | undefined;
+						if (isActive) {
+							ariaCurrent = "page";
+						} else if (isSection) {
+							ariaCurrent = "true";
+						}
 						const isBranchActive =
 							hasChildren &&
 							item.children.some((child) => isCurrentUrl(child.url));
@@ -49,14 +58,14 @@ function isCurrentUrl(url: string) {
 									"menu-item",
 									"nav-item",
 									hasChildren && "dropdown",
-									(isActive || isBranchActive) && "active",
+									(isActive || isSection || isBranchActive) && "active",
 								]}
 							>
 								<a
 									class:list={["nav-link", hasChildren && "dropdown-toggle"]}
 									href={hasChildren ? "#" : item.url}
 									target={item.target}
-									aria-current={isActive ? "page" : undefined}
+									aria-current={ariaCurrent}
 									{...(hasChildren
 										? {
 												"data-bs-toggle": "dropdown",
