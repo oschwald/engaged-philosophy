@@ -93,7 +93,13 @@
 	color: #6c757d;
 }
 
+// Linked list titles look like headings until hovered
+article .entry-title a {
+	text-decoration: none;
+}
+
 // Article hover effects - more specific selectors come last
 article .entry-title a:hover {
 	color: $orange;
+	text-decoration: underline;
 }

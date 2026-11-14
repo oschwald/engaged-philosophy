@@ -43,7 +43,6 @@ function pageHref(pageNumber: number) {
 				<EntrySummary
 					articleClass="mb-5 pb-4 border-bottom post"
 					title={post.data.title ?? ""}
-					titleHref={`/${post.data.path}/`}
 					meta={formatPublicationDate(post.data.publishedAt, settings)}
 					continueHref={`/${post.data.path}/`}
 					excerpt={getExcerptText(

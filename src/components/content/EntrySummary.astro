@@ -7,7 +7,6 @@ interface SummaryImage {
 interface Props {
 	articleClass: string;
 	title: string;
-	titleHref?: string;
 	meta?: string;
 	excerpt?: string;
 	continueHref: string;
@@ -19,7 +18,6 @@ interface Props {
 const {
 	articleClass,
 	title,
-	titleHref,
 	meta = "",
 	excerpt = "",
 	continueHref,
@@ -31,9 +29,9 @@ const shouldShowSummary = Boolean(excerpt || showContinueWithoutExcerpt);
 ---
 
 <article class={articleClass}>
-	<header class="page-header mb-3">
-		<h2 class="entry-title h4 mb-0">
-			{titleHref ? <a href={titleHref}>{title}</a> : title}
+	<header class="mb-2">
+		<h2 class="entry-title h3 mb-0">
+			<a href={continueHref}>{title}</a>
 		</h2>
 		{meta && <div class="entry-meta">{meta}</div>}
 	</header>
@@ -52,9 +50,7 @@ const shouldShowSummary = Boolean(excerpt || showContinueWithoutExcerpt);
 			<p>
 				{excerpt}
 				{excerpt && " "}
-				<a href={continueHref}>
-					Continue reading <span class="meta-nav">&rarr;</span>
-				</a>
+				<a href={continueHref}>Continue reading&nbsp;&rarr;</a>
 			</p>
 		)}
 	</div>
