@@ -91,6 +91,11 @@ body > .container {
 	hyphens: auto;
 }
 
+// Keep body text near 80 characters per line
+.entry-content {
+	max-width: 45rem;
+}
+
 #branding hgroup,
 #header-image,
 .entry-content {

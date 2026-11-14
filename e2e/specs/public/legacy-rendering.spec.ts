@@ -315,17 +315,19 @@ test.describe("public migrated content rendering", () => {
 			fontSize: "16px",
 			lineHeight: "27.2px",
 		});
-		const orphanWidths = await blockGallery.evaluate((element) => {
+		// The last row must stretch to the gallery's right edge, however the
+		// items wrap at the current content width.
+		const rightEdges = await blockGallery.evaluate((element) => {
 			const lastItem = element.lastElementChild;
 			return lastItem
 				? {
-						gallery: element.getBoundingClientRect().width,
-						orphan: lastItem.getBoundingClientRect().width,
+						gallery: element.getBoundingClientRect().right,
+						lastItem: lastItem.getBoundingClientRect().right,
 					}
 				: null;
 		});
-		expect(orphanWidths).not.toBeNull();
-		expect(Math.abs(orphanWidths!.gallery - orphanWidths!.orphan)).toBeLessThan(
+		expect(rightEdges).not.toBeNull();
+		expect(Math.abs(rightEdges!.gallery - rightEdges!.lastItem)).toBeLessThan(
 			2,
 		);
 		await expect(blockGallery.locator("a")).toHaveCount(0);
