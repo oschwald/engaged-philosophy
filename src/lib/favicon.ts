@@ -1,4 +1,4 @@
-import { getMediaUrlPrefix, rewriteInternalMediaFileUrl } from "./media";
+import { getMediaUrlPrefix } from "./media";
 import { safeUrlForMediaSrc } from "./url-safety";
 
 export type SiteFaviconSettings = {
@@ -69,9 +69,7 @@ export function getConfiguredFaviconHref(
 	if (!url) return "";
 
 	const resolvedMediaUrlPrefix = mediaUrlPrefix ?? getMediaUrlPrefix();
-	const faviconHref = safeUrlForMediaSrc(
-		rewriteInternalMediaFileUrl(url, resolvedMediaUrlPrefix),
-	);
+	const faviconHref = safeUrlForMediaSrc(url);
 	if (!faviconHref) return "";
 	if (isRootRelativeCompatibilityFaviconPath(faviconHref)) return "";
 
