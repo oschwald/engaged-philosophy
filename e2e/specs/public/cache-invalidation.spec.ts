@@ -95,7 +95,7 @@ test.describe("public page cache", () => {
 		expect(faviconResponse.headers()["cache-tag"]).toContain("emdash:settings");
 	});
 
-	test("advertises the public media URL for the browser favicon", async ({
+	test("uses public media URLs for site identity and the manifest", async ({
 		authedRequest,
 		publicPage,
 	}, testInfo) => {
@@ -115,6 +115,7 @@ test.describe("public page cache", () => {
 				{
 					data: {
 						favicon: { mediaId: media.id },
+						logo: { mediaId: media.id },
 					},
 				},
 			);
@@ -125,13 +126,20 @@ test.describe("public page cache", () => {
 			const publicHref = `${PUBLIC_MEDIA_URL}/${media.storageKey}`;
 			const internalHref = `/_emdash/api/media/file/${media.storageKey}`;
 
-			expect(html).toContain(`href="${internalHref}"`);
-			expect(html).toContain(
-				`href="${publicHref}" type="image/png" sizes="481x102"`,
-			);
-			expect(html.indexOf(`href="${publicHref}"`)).toBeGreaterThan(
-				html.indexOf(`href="${internalHref}"`),
-			);
+			expect(html).not.toContain(internalHref);
+			expect(html.match(/rel="icon"/g)).toHaveLength(1);
+			expect(html).toContain(`href="${publicHref}" type="image/png"`);
+			expect(html).toContain(`src="${publicHref}"`);
+			const manifest = await publicPage.request.get("/site.webmanifest");
+			expect(manifest.ok()).toBe(true);
+			expect((await manifest.json()).icons).toEqual([
+				{ src: publicHref, sizes: "481x102", type: "image/png" },
+			]);
+			const favicon = await publicPage.request.get("/favicon.ico", {
+				maxRedirects: 0,
+			});
+			expect(favicon.status()).toBe(302);
+			expect(favicon.headers().location).toBe(publicHref);
 		} finally {
 			const deleteResponse = await authedRequest.delete(
 				`/_emdash/api/media/${media.id}`,

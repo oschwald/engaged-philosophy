@@ -157,6 +157,7 @@ describe("content retrieval and taxonomy", () => {
 							storageKey: "wp-content/uploads/2026/01/featured.jpg",
 						},
 						alt: "Featured",
+						caption: "Students at the community garden",
 						filename: "featured.jpg",
 						mimeType: "image/jpeg",
 						blurhash: "LKO2?U%2Tw=w]~RBVZRi};RPxuwH",
@@ -167,6 +168,7 @@ describe("content retrieval and taxonomy", () => {
 								storageKey: "wp-content/uploads/2026/01/featured-dark.webp",
 							},
 							alt: "Featured at night",
+							caption: "",
 							filename: "featured-dark.webp",
 							mimeType: "image/webp",
 							blurhash: "LEHV6nWB2yk8pyo0adR*.7kCMdnj",
@@ -193,6 +195,7 @@ describe("content retrieval and taxonomy", () => {
 					featured_image: {
 						src: "https://media.engagedphilosophy.com/wp-content/uploads/2026/01/featured.jpg",
 						alt: "Featured",
+						caption: "Students at the community garden",
 						filename: "featured.jpg",
 						mimeType: "image/jpeg",
 						blurhash: "LKO2?U%2Tw=w]~RBVZRi};RPxuwH",
@@ -200,6 +203,7 @@ describe("content retrieval and taxonomy", () => {
 						darkVariant: {
 							src: "https://media.engagedphilosophy.com/wp-content/uploads/2026/01/featured-dark.webp",
 							alt: "Featured at night",
+							caption: "",
 							filename: "featured-dark.webp",
 							mimeType: "image/webp",
 							blurhash: "LEHV6nWB2yk8pyo0adR*.7kCMdnj",

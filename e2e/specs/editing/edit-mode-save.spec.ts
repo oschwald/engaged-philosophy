@@ -49,6 +49,50 @@ function collectEditingPageErrors(page: Page) {
 }
 
 test.describe("visual editing", () => {
+	test("shows a publish network failure and allows retry", async ({
+		authedRequest,
+		page,
+		publicPage,
+	}, testInfo) => {
+		const title = uniqueTitle("E2E Publish Retry", testInfo.testId);
+		const { publicPath, published } = await createAndPublishContentViaApi(
+			authedRequest,
+			"pages",
+			{ title },
+		);
+		await page.goto("/_emdash/admin", { waitUntil: "domcontentloaded" });
+		await dismissWelcome(page);
+		await page.goto(publicPath, { waitUntil: "domcontentloaded" });
+		await toggleEditMode(page, true);
+		const editor = page
+			.locator('.emdash-inline-editor[contenteditable="true"]')
+			.first();
+		await expect(editor).toBeVisible();
+		await editor.fill("An edit to retry publishing");
+		const saved = page.waitForResponse((response) =>
+			responseMatches(response, "PUT", contentApiPath("pages", published.id)),
+		);
+		await page.locator("h1").click();
+		expect((await saved).ok()).toBe(true);
+		const publishUrl = `**/_emdash/api/visual-editing/content/pages/${published.id}/publish`;
+		await page.route(publishUrl, (route) => route.abort("failed"));
+		await page.locator("#emdash-tb-publish").click();
+		await expect(page.locator("#emdash-tb-status")).toContainText(
+			"Publish failed",
+		);
+		await expect(page.locator("#emdash-tb-publish")).toBeEnabled();
+		await expectEditMode(page, true);
+		await page.unroute(publishUrl);
+		await page.locator("#emdash-tb-publish").click();
+		await expect(page.locator("#emdash-tb-status")).toHaveText("Published");
+		await expectPublicContent(
+			publicPage,
+			publicPath,
+			title,
+			"An edit to retry publishing",
+		);
+	});
+
 	test("does not create a draft when an unchanged body loses focus or unloads", async ({
 		authedRequest,
 		page,

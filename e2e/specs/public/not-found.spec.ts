@@ -45,8 +45,30 @@ test.describe("public not-found responses", () => {
 					name: "This is somewhat embarrassing, isn\u2019t it?",
 				}),
 			).toBeVisible();
+			await expect(
+				publicPage.getByRole("searchbox", { name: "Search", exact: true }),
+			).toBeVisible();
+			await expect(
+				publicPage.getByRole("heading", { name: "Recent Interviews" }),
+			).toHaveCount(0);
 		});
 	}
+
+	test("rejects credential probes before rendering or querying EmDash", async ({
+		publicPage,
+	}) => {
+		for (const path of [
+			"/config%2etxt",
+			"/env%2ejson%2ebak",
+			"/vault/secrets",
+			"/stripe-secret-key",
+		]) {
+			const response = await publicPage.request.get(path);
+			expect(response.status()).toBe(404);
+			expect(await response.text()).toBe("Not found.\n");
+			expect(response.headers()["server-timing"]).toBeUndefined();
+		}
+	});
 
 	test("rejects malformed search pagination without rendering the layout", async ({
 		publicPage,

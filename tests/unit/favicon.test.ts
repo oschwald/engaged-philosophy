@@ -22,24 +22,11 @@ describe("favicon helpers", () => {
 			),
 		).toBe("");
 	});
-	test("rewrites configured EmDash media file URLs", () => {
-		expect(
-			getConfiguredFaviconHref(
-				{
-					favicon: {
-						url: "/_emdash/api/media/file/01KSKNR8NPBFJAV6X4SW70KADX.png",
-					},
-				},
-				"https://media.example",
-			),
-		).toBe("https://media.example/01KSKNR8NPBFJAV6X4SW70KADX.png");
-	});
-
 	test("redirects the SVG compatibility path to the configured favicon", () => {
 		const response = createFaviconResponse(
 			{
 				favicon: {
-					url: "/_emdash/api/media/file/01KSKNR8NPBFJAV6X4SW70KADX.png",
+					url: "https://media.example/01KSKNR8NPBFJAV6X4SW70KADX.png",
 				},
 			},
 			{

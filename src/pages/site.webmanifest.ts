@@ -2,7 +2,6 @@ import type { APIRoute } from "astro";
 import { getSiteSettings } from "emdash";
 
 import { SITE_SETTINGS_CACHE_TAG } from "../lib/cache-tags";
-import { rewriteInternalMediaFileUrl } from "../lib/media";
 import {
 	PUBLIC_EDGE_CACHE_MAX_AGE_SECONDS,
 	PUBLIC_EDGE_CACHE_SWR_SECONDS,
@@ -22,7 +21,7 @@ export const GET: APIRoute = async ({ cache }) => {
 	const icons = favicon?.url
 		? [
 				{
-					src: rewriteInternalMediaFileUrl(favicon.url),
+					src: favicon.url,
 					sizes:
 						favicon.width && favicon.height
 							? `${favicon.width}x${favicon.height}`

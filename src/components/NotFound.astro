@@ -1,11 +1,10 @@
 ---
 import Base from "../layouts/Base.astro";
-import ThemeSidebar from "./ThemeSidebar.astro";
 import SearchIcon from "./SearchIcon.astro";
 ---
 
-<Base title="Not Found" bodyClass="error404 not-found content-sidebar">
-	<section id="primary" class="col-lg-8 px-4">
+<Base title="Not Found" bodyClass="error404 not-found">
+	<section id="primary" class="col-12 px-4">
 		<div id="content" role="main">
 			<article class="post error404 not-found">
 				<header class="page-header">
@@ -15,8 +14,8 @@ import SearchIcon from "./SearchIcon.astro";
 				</header>
 				<div class="entry-content">
 					<p>
-						It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps
-						searching, or one of the links below, can help.
+						We can&rsquo;t find that page. Try searching or use the navigation
+						above.
 					</p>
 
 					<form method="get" id="searchform" class="d-flex" action="/">
@@ -46,5 +45,4 @@ import SearchIcon from "./SearchIcon.astro";
 			</article>
 		</div>
 	</section>
-	<ThemeSidebar />
 </Base>

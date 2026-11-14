@@ -76,7 +76,7 @@ try {
 				representative,
 				missingPaths: { ...measurement, addedCacheKeys: addedKeys.length },
 				limits:
-					"Local TTFB/full-response wall time and SQL query count only. KV key delta excludes writes to existing keys. Worker CPU, D1 rows, KV read/write operations and production edge cache hits are not measured.",
+					"Local TTFB/full-response wall time and SQL query count from response headers only. Query counts exclude work during body streaming. KV key delta excludes writes to existing keys. Worker CPU, D1 rows, KV read/write operations and production edge cache hits are not measured.",
 			},
 			null,
 			2,

@@ -10,19 +10,6 @@ function normalizeMediaHost(value: string) {
 	return value.replace(/\/+$/, "");
 }
 
-function getInternalMediaKey(value?: string | null) {
-	const normalized = value ?? "";
-	if (!normalized.startsWith(EMDASH_MEDIA_FILE_PREFIX)) return "";
-
-	const encodedKey =
-		normalized.replace(EMDASH_MEDIA_FILE_PREFIX, "").split(/[?#]/)[0] ?? "";
-	try {
-		return decodeURIComponent(encodedKey);
-	} catch {
-		return encodedKey;
-	}
-}
-
 export function getMediaUrlPrefix(
 	runtimeEnv?: { SITE_PREVIEW?: string } | null,
 ) {
@@ -40,14 +27,4 @@ export function getPublicMediaStorageUrl(
 	if (!normalizedKey) return "";
 	const encodedKey = normalizedKey.split("/").map(encodeURIComponent).join("/");
 	return `${normalizeMediaHost(mediaUrlPrefix)}/${encodedKey}`;
-}
-
-export function rewriteInternalMediaFileUrl(
-	value?: string | null,
-	mediaUrlPrefix = getMediaUrlPrefix(),
-) {
-	const storageKey = getInternalMediaKey(value);
-	return storageKey
-		? getPublicMediaStorageUrl(storageKey, mediaUrlPrefix)
-		: (value ?? "");
 }

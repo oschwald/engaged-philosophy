@@ -16,7 +16,7 @@ export async function measureRequest(server: WorkerServer, path: string) {
 		status: response.status,
 		ttfbMs,
 		elapsedMs: performance.now() - started,
-		// EmDash omits db.count when the request does not query the database.
+		// Header counters omit queries issued after body streaming starts.
 		dbQueries: queries ? Number(queries[1]) : 0,
 	};
 }

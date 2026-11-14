@@ -280,7 +280,7 @@ export async function completeSetup(baseURL: string) {
 
 export async function startWorkerServer(
 	workerIndex: number,
-	options: { preview?: boolean } = {},
+	options: { preview?: boolean; queryLog?: boolean } = {},
 ): Promise<WorkerServer> {
 	ensureWorkerBuild();
 
@@ -312,10 +312,11 @@ export async function startWorkerServer(
 			String(inspectorPort),
 			"--local",
 			...(options.preview ? ["--var", "SITE_PREVIEW:true"] : []),
+			...(options.queryLog ? ["--var", "EMDASH_QUERY_LOG:1"] : []),
 			"--persist-to",
 			persistDir,
 			"--log-level",
-			"error",
+			options.queryLog ? "log" : "error",
 			"--show-interactive-dev-session=false",
 		],
 		{

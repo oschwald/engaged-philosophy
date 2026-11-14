@@ -1,0 +1,8 @@
+http.host in {"engagedphilosophy.com" "www.engagedphilosophy.com"}
+and not cf.client.bot
+and http.request.method in {"GET" "HEAD"}
+and not (lower(http.request.uri.path) in {"/_emdash" "/_image" "/robots.txt" "/favicon.ico" "/favicon.svg" "/site.webmanifest"} or starts_with(lower(http.request.uri.path), "/_emdash/"))
+and not starts_with(lower(http.request.uri.path), "/_astro/")
+and http.request.uri.path ne "/img/logo.png"
+and not starts_with(lower(http.request.uri.path), "/.well-known/")
+and not starts_with(lower(http.request.uri.path), "/cdn-cgi/")
