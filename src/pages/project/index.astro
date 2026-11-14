@@ -33,45 +33,43 @@ const maxCount = counts.length ? Math.max(...counts) : 0;
 	bodyClass="post-type-archive post-type-archive-project"
 	cacheTags={["projects", taxonomyCacheTag("topic")]}
 >
-	<div class="container-fluid">
-		<section id="primary" class="p-4">
-			<main id="content">
-				<header class="page-header mb-4 pb-3 border-bottom">
-					<h1 class="page-title h2 mb-0">Civic Engagement Projects</h1>
-				</header>
+	<section id="primary" class="col-12 px-4">
+		<main id="content">
+			<header class="page-header mb-4 pb-3 border-bottom">
+				<h1 class="page-title h2 mb-0">Civic Engagement Projects</h1>
+			</header>
 
-				<p>
-					This page provides a list of examples of completed student projects
-					organized by broad themes such as "animals" and "art." Click on one of
-					the themes below to find a list of projects that fit under that theme.
-					The bigger the the word is below, the more examples you will see.
-				</p>
+			<p>
+				This page provides a list of examples of completed student projects
+				organized by broad themes such as "animals" and "art." Click on one of
+				the themes below to find a list of projects that fit under that theme.
+				The bigger the the word is below, the more examples you will see.
+			</p>
 
-				<div class="row">
-					<div class="col-12">
-						<div class="tag-cloud-projects">
-							{visibleTopics.map((topic) => {
-								const count = topic.count ?? 0;
-								const scale =
-									maxCount > minCount
-										? (count - minCount) / (maxCount - minCount)
-										: 0;
-								const fontSize = 13 + scale * (32 - 13);
-								const fontSizeClass = `tag-link-size-${Math.round(fontSize)}`;
+			<div class="row">
+				<div class="col-12">
+					<div class="tag-cloud-projects">
+						{visibleTopics.map((topic) => {
+							const count = topic.count ?? 0;
+							const scale =
+								maxCount > minCount
+									? (count - minCount) / (maxCount - minCount)
+									: 0;
+							const fontSize = 13 + scale * (32 - 13);
+							const fontSizeClass = `tag-link-size-${Math.round(fontSize)}`;
 
-								return (
-									<a
-										href={`/topic/${topic.slug}/`}
-										class={`tag-link ${fontSizeClass}`}
-									>
-										{topic.label}
-									</a>
-								);
-							})}
-						</div>
+							return (
+								<a
+									href={`/topic/${topic.slug}/`}
+									class={`tag-link ${fontSizeClass}`}
+								>
+									{topic.label}
+								</a>
+							);
+						})}
 					</div>
 				</div>
-			</main>
-		</section>
-	</div>
+			</div>
+		</main>
+	</section>
 </Base>

@@ -49,21 +49,19 @@ const bodyClass = [
 			</main>
 		</section>
 	) : (
-		<div class="container-fluid">
-			<section id="primary" class="p-4">
-				<div id="content" role="main">
-					<article {...page.edit}>
-						<header class="page-header">
-							<h1 class="entry-title" {...page.edit.title}>
-								{page.data.title}
-							</h1>
-						</header>
-						<div class="entry-content" {...page.edit.content}>
-							<RichContent value={getEntryContent(page.data)} />
-						</div>
-					</article>
-				</div>
-			</section>
-		</div>
+		<section id="primary" class="col-12 px-4">
+			<div id="content" role="main">
+				<article {...page.edit}>
+					<header class="page-header">
+						<h1 class="entry-title" {...page.edit.title}>
+							{page.data.title}
+						</h1>
+					</header>
+					<div class="entry-content" {...page.edit.content}>
+						<RichContent value={getEntryContent(page.data)} />
+					</div>
+				</article>
+			</div>
+		</section>
 	)}
 </Base>
