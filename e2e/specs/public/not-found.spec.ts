@@ -42,7 +42,7 @@ test.describe("public not-found responses", () => {
 			expect(new URL(publicPage.url()).pathname).toBe(path);
 			await expect(
 				publicPage.getByRole("heading", {
-					name: "This is somewhat embarrassing, isn\u2019t it?",
+					name: "Page not found",
 				}),
 			).toBeVisible();
 			await expect(
@@ -82,7 +82,7 @@ test.describe("public not-found responses", () => {
 		await expect(publicPage.getByText("Search page not found.")).toBeVisible();
 		await expect(
 			publicPage.getByRole("heading", {
-				name: "This is somewhat embarrassing, isn’t it?",
+				name: "Page not found",
 			}),
 		).toHaveCount(0);
 	});
