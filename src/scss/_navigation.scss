@@ -4,9 +4,18 @@
 // Main navigation container
 #access {
 	background-color: #d9d9d9;
-	padding: 0.5rem 0.8rem;
+
+	// Line the menu button and search box up with the page text
+	padding: 0.5rem 1.5rem;
 	margin-bottom: 0;
 	box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
+}
+
+// The links have 1rem side padding, so this lines their text up too
+@media (width >= 992px) {
+	#access {
+		padding-left: 0.5rem;
+	}
 }
 
 .navbar {

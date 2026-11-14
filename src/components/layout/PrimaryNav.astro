@@ -4,12 +4,16 @@ import SearchIcon from "../SearchIcon.astro";
 
 interface Props {
 	menuItems: MenuItem[];
-	currentPath: string;
+	// Undefined when the page is not a menu destination, such as search results
+	currentPath?: string;
 }
 
 const { menuItems, currentPath } = Astro.props;
 
 function isCurrentUrl(url: string) {
+	if (currentPath === undefined) {
+		return false;
+	}
 	return url === currentPath || url === `${currentPath}/`;
 }
 ---

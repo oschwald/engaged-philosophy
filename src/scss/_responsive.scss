@@ -18,23 +18,10 @@
 		padding: 0;
 	}
 
-	#primary {
+	#primary,
+	#secondary {
 		padding-right: 1rem !important;
 		padding-left: 1rem !important;
-	}
-
-	// The carousel column has no gutter, so line the photo up with the text
-	#projects_carousel {
-		padding: 0 0.75rem !important;
-		box-shadow: none;
-	}
-
-	#projects_carousel .carousel-control-prev {
-		left: 0.75rem;
-	}
-
-	#projects_carousel .carousel-control-next {
-		right: 0.75rem;
 	}
 
 	// Fix logo text truncation on mobile
@@ -61,6 +48,10 @@
 	#branding .navbar-brand img {
 		max-width: 320px !important;
 		height: auto !important;
+	}
+
+	#access {
+		padding: 0.5rem 1rem;
 	}
 
 	// Mobile navigation improvements
@@ -213,6 +204,10 @@
 		padding: 0.5rem 0.8rem !important;
 	}
 
+	#access {
+		padding-left: calc(1.5rem - 0.8rem);
+	}
+
 	// Better footer layout on tablets - only if not mobile
 	.footer-custom {
 		padding: 1.5rem !important;
@@ -253,11 +248,6 @@
 
 // Extra large devices (large desktops, 1200px and up)
 @media (width >= 1200px) {
-	#page {
-		margin-right: -30px;
-		padding: 24px 0 10px;
-	}
-
 	.sidebar-content #primary {
 		margin-right: 30px;
 	}

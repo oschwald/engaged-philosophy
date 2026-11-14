@@ -49,7 +49,9 @@ const settings = await getSiteSettings();
 const siteTitle = settings?.title || SITE_TITLE_FALLBACK;
 const siteDescription = settings?.tagline || SITE_TAGLINE_FALLBACK;
 const menuItems = (await getMenu("primary"))?.items ?? [];
-const currentPath = Astro.url.pathname;
+// Search results render on "/", but they are not the home page.
+const isSearch = Boolean(Astro.url.searchParams.get("s")?.trim());
+const currentPath = isSearch ? undefined : Astro.url.pathname;
 const logo = settings?.logo;
 const logoSrc = logo?.url || "/img/logo.png";
 const logoAlt = logo?.alt || `${siteTitle} Logo`;

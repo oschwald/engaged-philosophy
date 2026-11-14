@@ -50,19 +50,19 @@ const nextHref =
 
 <div class="container-fluid">
 	<div class="row">
-		<section id="primary" class="col-lg-8 p-4">
+		<section id="primary" class="col-lg-8 px-4">
 			<div id="content" role="main">
 				{results.length > 0 ? (
 					<>
-						<header class="page-header mb-4 pb-3 border-bottom">
-							<h1 class="page-title h2 mb-0">
+						<header class="page-header">
+							<h1 class="page-title">
 								Search Results for: <span>{query}</span>
 							</h1>
 						</header>
 
 						{results.map((result) => (
 							<EntrySummary
-								articleClass={`mb-5 pb-4 border-bottom ${result.kind} type-${result.kind}`}
+								articleClass={`mb-4 pb-4 border-bottom ${result.kind} type-${result.kind}`}
 								title={result.title}
 								continueHref={`/${result.path}/`}
 								excerpt={result.excerpt}
