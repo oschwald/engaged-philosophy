@@ -7,6 +7,9 @@ import { safeUrlForMediaSrc } from "../../lib/url-safety";
 type Props = ComponentProps<typeof Video>;
 
 const { node } = Astro.props;
+if (node.asset?.url !== undefined && typeof node.asset.url !== "string") {
+	return null;
+}
 const src = safeUrlForMediaSrc(node.asset?.url);
 const validSource =
 	!node.asset?.url ||

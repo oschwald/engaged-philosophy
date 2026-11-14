@@ -670,7 +670,7 @@ test.describe("public migrated content rendering", () => {
 	});
 });
 
-test("resolves native video uploads and rejects unsafe or unnormalized sources", async ({
+test("resolves native video uploads and rejects unsafe or malformed sources", async ({
 	authedRequest,
 	publicPage,
 }, testInfo) => {
@@ -682,6 +682,8 @@ test("resolves native video uploads and rejects unsafe or unnormalized sources",
 		"http://example.com/video.mp4",
 		"//example.com/video.mp4",
 		"/wp-content/uploads/video.mp4",
+		123,
+		{ url: "https://example.com/video.mp4" },
 	];
 	const { publicPath } = await createAndPublishContentViaApi(
 		authedRequest,
