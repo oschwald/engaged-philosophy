@@ -64,6 +64,7 @@
 	// Better mobile spacing
 	.lead-home {
 		height: auto !important;
+		min-height: unset !important;
 		margin-bottom: 1rem;
 		padding: 1rem;
 	}
@@ -159,7 +160,7 @@
 	}
 
 	.lead-home {
-		height: 400px;
+		min-height: 400px;
 		font-size: 100%;
 		max-width: 100%;
 		overflow-wrap: break-word;
