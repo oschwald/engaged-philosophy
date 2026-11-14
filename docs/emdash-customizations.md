@@ -12,6 +12,8 @@ Cloudflare constraints.
   tagline, logo, and date format. Editorial per-entry canonicals remain supported.
 - `src/lib/cloudflare-access-auth.ts` authenticates EmDash users from Cloudflare
   Access JWTs. EmDash users still need to exist in the EmDash auth tables.
+  EmDash writes the session only when the authenticated user data changes,
+  avoiding a Workers KV write on every admin request.
 - `src/emdash-routes/cloudflare-access-invite.ts` replaces the default email
   invite flow with local user creation plus an admin URL, because sign-in is
   protected by Cloudflare Access. If configured, it also appends the invited
@@ -21,10 +23,9 @@ Cloudflare constraints.
   header generation to the upstream provider and only skips tag purges when
   local Wrangler does not expose `cache.purge()`. This is the native Workers
   Caching path recommended by EmDash 0.33; the deprecated EmDash
-  `cloudflareCache()` provider is not used here. EmDash 0.34 also makes route
-  validators build-aware, so a browser cannot retain HTML that refers to assets
-  from an earlier deployment. Tag-only cache hints do not emit a build-time
-  `Last-Modified` value, so browser revalidation cannot hide a content publish.
+  `cloudflareCache()` provider is not used here. EmDash 1.4 removes automatic
+  `Last-Modified` hints because an entry timestamp cannot describe changes to
+  related content. The theme sets browser revalidation headers explicitly.
 - Public responses are fresh at the edge for one day and may be served stale
   for one hour while they revalidate. Browsers receive `max-age=0` and
   revalidate instead of retaining HTML or generated metadata independently.
@@ -50,8 +51,9 @@ Cloudflare constraints.
   still prevents publication and navigation after a failed save.
   After saves settle, the gate resumes EmDash's own publish button so 0.39's
   visual-action token, policy origin, error recovery, and reload stay upstream.
-  The fetch tracker retains visible error feedback for rejected publish
-  requests, which the upstream toolbar currently only logs to the console.
+  EmDash 1.5 publishes every pending annotated entry on the page and displays
+  publish failures, including rejected requests. The fetch tracker now covers
+  content saves only; publication errors and retries stay upstream.
   The remaining gate preserves failed saves, including `409 ENTRY_LOCKED`,
   until a new save succeeds; a fast failure cannot be treated as an unchanged
   document and followed by publication or navigation. EmDash does not signal
@@ -64,6 +66,8 @@ Cloudflare constraints.
   Maintenance scripts should respect the lock or explicitly request
   `overrideLock`. MCP content writes and revision restoration enforce the same
   locks. The site's save gate does not bypass locks.
+  Co-editing remains disabled. Enabling it requires a Durable Object binding,
+  room exports, and WebSocket handling in the site's custom Worker entry point.
 - Restoring trashed content creates an unscheduled draft, even if the entry
   was previously published. Editors must publish it again. Unpublishing also
   cancels any pending publication schedule.
@@ -99,6 +103,8 @@ Cloudflare constraints.
   EmDash 0.36 removed the separate Media Usage schedule; activation and repair
   now advance in bounded batches while an administrator keeps Settings ->
   Media usage tracking open.
+  Upgrades can mark rich-text collections stale when new reference shapes
+  become trackable. Keep that page open until the status returns to Ready.
 - The admin Calendar shows published entries, scheduled entries, and scheduled
   updates in the site timezone. Editors can reschedule entries there, but the
   five-minute Worker schedule still determines when they go live.
@@ -127,6 +133,12 @@ Cloudflare constraints.
   migrator to claim before the CLI can apply the migration.
   Before deploying schema changes, retain a recovery point and rehearse against
   an isolated copy of current D1; fresh-database tests do not cover legacy data.
+  Plugin KV backfills and storage-index repairs can require a coordinated
+  migration with old Workers and scheduled invocations drained. Inspect stored
+  plugin state, including removed plugins, before relying on automatic migration.
+  Follow the [plugin KV upgrade procedure](https://docs.emdashcms.com/plugins/upgrading-sites/#plugin-kv-storage-when-changing-execution-mode)
+  and [storage-index upgrade procedure](https://docs.emdashcms.com/deployment/updating/#fixed-plugin-storage-uniqueness)
+  when those migrations are pending. A package rollback does not undo data changes.
 
 EmDash's backup page works with the existing R2 storage adapter and scheduled
 Worker handler. Administrators can enable daily archives under Settings ->
@@ -165,6 +177,9 @@ Those renders query D1 directly; an edge-cache hit still avoids the Worker.
 Route-cache fills also read site settings directly from D1. Redirect freshness
 checks add one database read before caching a response, preventing an old
 redirect snapshot from repopulating a purged URL.
+EmDash 1.5 usually revalidates object-cache namespaces through one shared KV
+change marker. The saving starts after the first content, menu, or settings
+mutation on the upgraded runtime. KV propagation delays still apply.
 
 D1 sessions remain disabled. EmDash supports experimental read coalescing with
 `session: "auto", coalesce: true`, but concurrent reads and writes can run
@@ -242,6 +257,12 @@ backend failures degrade to D1 reads rather than failing the request.
   opt in through Content Types. To enable it for fresh databases as well, add
   `"seo"` to the collection's seed supports. The SEO browser test enables it
   temporarily and checks metadata and JSON-LD across repeated visits.
+  `EmDashHead` also owns the favicon tag. Site settings resolve logo, favicon,
+  and default social-image URLs through the storage adapter, including the
+  same-origin preview adapter. The theme no longer rewrites those URLs.
+  Fresh setup starts in staging with `noindex, nofollow`; existing sites without
+  a staging setting remain live. Set Site Status to live deliberately at launch.
+  Staging status is not copied by site transfer and does not restrict access.
 - Posts declare `/{year}/{month}/{day}/{slug}` and derive theme links from
   the UTC publication date. `getPostByPath()` checks the complete date path
   after a slug lookup, so arbitrary dates cannot serve duplicate content.
@@ -317,8 +338,7 @@ backend failures degrade to D1 reads rather than failing the request.
 - Legacy renderers remain for Animoto embeds, playlist videos, and dynamic page
   lists. EmDash does not support Animoto or the page-list behavior. Its
   self-hosted embed currently forces videos into 16:9 and omits intrinsic
-  dimensions and `playsinline`, while its media component serves local files
-  through the Worker. Imported legacy-video URLs are normalized to the public R2
+  dimensions and `playsinline`. Imported legacy-video URLs use the public R2
   domain, so the remaining presentation adapter only validates the URL and
   preserves square and portrait videos, intrinsic dimensions, `playsinline`,
   and direct public-R2 delivery on the Cloudflare Free plan.
@@ -365,11 +385,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   audit-log 0.2.2 also attribute content saves to the authenticated actor while
   preserving the entry owner.
 - The upstream embeds plugin registers and renders the enabled YouTube and Vimeo
-  blocks directly. Its `astro-embed` dependency is overridden to 0.14.0, which
-  is API-compatible with the plugin and declares support for the site's Astro 7
-  runtime; the plugin's 0.12 dependency otherwise leaves an invalid peer graph.
-  This version also uses Astro-compatible `astro-auto-import` directly, so the
-  nested auto-import override is removed.
+  blocks directly. It imports provider packages without the `astro-embed`
+  aggregator, so no dependency override is needed.
 - `src/plugins/legacy-content-blocks.ts` preserves edit controls for imported
   WordPress-only Portable Text blocks such as playlist videos, remaining legacy
   embeds, and page lists. Its registered plugin ID remains
@@ -389,8 +406,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   upstream import change; splitting it into chunks alone does not remove the
   unused icons.
   [Upstream icon resolver](https://github.com/emdash-cms/emdash/blob/emdash%400.37.0/packages/admin/src/components/admin-navigation-icons.ts)
-- TypeScript remains at 6.0.3 because typescript-eslint 8.71 requires a version
-  below 6.1, and `@astrojs/check` 0.9.10 supports TypeScript 5 and 6. The current
+- TypeScript remains at 6.0.3 because typescript-eslint 8.72 requires a version
+  below 6.1, and `@astrojs/check` 0.9.12 supports TypeScript 5 and 6. The current
   TypeScript 7 release is outside both peer ranges.
 - `@astrojs/react` 7 uses Oxc for JSX and Fast Refresh. The site uses plain
   `react()` without custom Babel options, so no configuration change is needed.
@@ -408,8 +425,6 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Removal Candidates
 
-- Remove the `astro-embed` override when the embeds plugin depends on 0.13.1 or
-  newer directly.
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
   blocks failed Portable Text saves and waits before leaving edit mode. The
   native admin editor's save ordering does not cover the inline toolbar.

@@ -32,7 +32,10 @@ test("serves preview uploads from local MEDIA and keeps the production canonical
 		await jsonRequest(server.baseURL, "/_emdash/api/settings", {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ favicon: { mediaId: upload.data.item.id } }),
+			body: JSON.stringify({
+				favicon: { mediaId: upload.data.item.id },
+				logo: { mediaId: upload.data.item.id },
+			}),
 		});
 		const favicon = await fetch(`${server.baseURL}/favicon.ico`, {
 			redirect: "manual",
@@ -41,6 +44,13 @@ test("serves preview uploads from local MEDIA and keeps the production canonical
 		expect(favicon.headers.get("location")).toBe(url);
 		const home = await (await fetch(server.baseURL)).text();
 		expect(home).toContain('href="https://www.engagedphilosophy.com/"');
+		expect(home.match(/rel="icon"/g)).toHaveLength(1);
+		expect(home).toContain(`href="${url}" type="image/png"`);
+		expect(home).toContain(`src="${url}"`);
+		expect(home).toContain('name="robots" content="noindex, nofollow"');
+		const manifest = await fetch(`${server.baseURL}/site.webmanifest`);
+		expect(manifest.ok).toBe(true);
+		expect(await manifest.json()).toMatchObject({ icons: [{ src: url }] });
 		server.assertNoErrors();
 	} finally {
 		await server.stop();
