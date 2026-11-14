@@ -91,18 +91,21 @@ test("renders taxonomy terms hydrated onto public entries", async ({
 		await expect(categoryEntry.locator(".entry-meta")).toHaveText(
 			"July 25, 2026",
 		);
-		const recentInterview = publicPage.locator("#recent-posts-2 li").filter({
-			has: publicPage.getByRole("link", {
-				name: postTitle,
-				exact: true,
-			}),
-		});
-		const recentInterviewLink = recentInterview.getByRole("link", {
-			name: postTitle,
-			exact: true,
-		});
+		// Other tests publish newer posts, so this post may not be among the
+		// 8 recent interviews. Check the sidebar's layout on its first entry.
+		const recentInterviews = publicPage.locator("#recent-posts-2 li");
+		expect(await recentInterviews.count()).toBeLessThanOrEqual(8);
+		await expect(
+			publicPage
+				.locator("#recent-posts-2")
+				.getByRole("link", { name: "All interviews" }),
+		).toHaveAttribute("href", "/interviews/");
+		const recentInterview = recentInterviews.first();
+		const recentInterviewLink = recentInterview.getByRole("link");
 		const recentInterviewDate = recentInterview.locator(".post-date");
-		await expect(recentInterview).toContainText(`${postTitle} July 25, 2026`);
+		await expect(recentInterviewDate).toHaveText(
+			/^[A-Z][a-z]+ \d{1,2}, \d{4}$/,
+		);
 		await expect(recentInterviewDate).toHaveCSS("display", "block");
 		const [linkFontSize, dateFontSize] = await Promise.all([
 			recentInterviewLink.evaluate((element) =>
