@@ -78,6 +78,18 @@ body > .container {
 	display: block;
 }
 
+// Show the skip link over the page while it has keyboard focus
+.skip-link a:focus {
+	position: absolute;
+	top: 0.5rem;
+	left: 0.5rem;
+	z-index: 1050;
+	padding: 0.5rem 1rem;
+	color: #333;
+	background-color: #fff;
+	box-shadow: 0 2px 8px rgb(0 0 0 / 20%);
+}
+
 // Sidebar layout
 .sidebar-content #primary {
 	float: right;
