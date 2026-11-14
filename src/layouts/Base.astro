@@ -14,6 +14,7 @@ import {
 	SITE_TAGLINE_FALLBACK,
 	SITE_TITLE_FALLBACK,
 } from "../lib/site-config";
+import { isProjectTaxonomy } from "../lib/taxonomy-utils";
 import { getMenu, getSiteSettings } from "emdash";
 import { EmDashBodyEnd, EmDashBodyStart } from "emdash/ui";
 import "../scss/style.scss";
@@ -52,6 +53,7 @@ const menuItems = (await getMenu("primary"))?.items ?? [];
 // Search results render on "/", but they are not the home page.
 const isSearch = Boolean(Astro.url.searchParams.get("s")?.trim());
 const currentPath = isSearch ? undefined : Astro.url.pathname;
+const sectionPath = getMenuSectionPath(Astro.url.pathname, content);
 const logo = settings?.logo;
 const logoSrc = logo?.url || "/img/logo.png";
 const logoAlt = logo?.alt || `${siteTitle} Logo`;
@@ -63,6 +65,19 @@ const page = createSitePageContext({
 	description,
 	content,
 });
+
+// Menu item for detail pages that belong to a menu section without
+// sharing its URL, such as an interview under "Interviews".
+function getMenuSectionPath(pathname: string, content?: SiteContentContext) {
+	if (content?.collection === "posts") {
+		return "/interviews/";
+	}
+	const firstSegment = pathname.split("/")[1] ?? "";
+	if (firstSegment === "project" || isProjectTaxonomy(firstSegment)) {
+		return "/project/";
+	}
+	return undefined;
+}
 ---
 
 <!doctype html>
@@ -70,6 +85,11 @@ const page = createSitePageContext({
 	<SiteHead page={page} />
 	<body class={bodyClass}>
 		<EmDashBodyStart page={page} />
+		<div class="skip-link">
+			<a class="visually-hidden-focusable" href="#content">
+				Skip to primary content
+			</a>
+		</div>
 		<div class="container">
 			<SiteHeader
 				siteTitle={siteTitle}
@@ -79,7 +99,11 @@ const page = createSitePageContext({
 				logoHeight={logo?.height}
 			/>
 
-			<PrimaryNav menuItems={menuItems} currentPath={currentPath} />
+			<PrimaryNav
+				menuItems={menuItems}
+				currentPath={currentPath}
+				sectionPath={sectionPath}
+			/>
 
 			<div id="page" class="hfeed row">
 				<Fragment set:html={contentHtml} />

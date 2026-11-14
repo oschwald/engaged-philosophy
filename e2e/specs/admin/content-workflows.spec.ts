@@ -195,6 +195,8 @@ test.describe("admin content workflows", () => {
 		page,
 		publicPage,
 	}, testInfo) => {
+		// Detail pages mark their menu section without claiming to be it.
+		const menuSectionUrls = { posts: "/interviews/", projects: "/project/" };
 		for (const collection of ["posts", "projects"] as const) {
 			const title = uniqueTitle(`E2E Admin ${collection}`, testInfo.testId);
 			const bodyText = `${title} body created through the admin editor.`;
@@ -225,6 +227,11 @@ test.describe("admin content workflows", () => {
 				`Expected ${alias} to redirect or load`,
 			).toBeLessThan(400);
 			expect(new URL(publicPage.url()).pathname).toBe(publicPath);
+			await expect(
+				publicPage.locator(
+					`#access a.nav-link[href="${menuSectionUrls[collection]}"]`,
+				),
+			).toHaveAttribute("aria-current", "true");
 
 			if (collection === "projects") {
 				const rootAlias = `/${published.slug}/`;

@@ -8,38 +8,34 @@ import SearchIcon from "./SearchIcon.astro";
 		<div id="content" role="main">
 			<article class="post error404 not-found">
 				<header class="page-header">
-					<h1 class="entry-title">
-						This is somewhat embarrassing, isn&rsquo;t it?
-					</h1>
+					<h1 class="entry-title">Page not found</h1>
 				</header>
 				<div class="entry-content">
 					<p>
-						We can&rsquo;t find that page. Try searching or use the navigation
-						above.
+						This page does not exist or has moved. Search the site, or use the
+						menu above.
 					</p>
 
 					<form method="get" id="searchform" class="d-flex" action="/">
 						<label for="not-found-search" class="visually-hidden">
 							Search
 						</label>
-						<div class="input-group">
-							<input
-								id="not-found-search"
-								class="form-control"
-								type="search"
-								name="s"
-								placeholder="Search"
-							/>
-							<button
-								class="btn btn-primary"
-								name="submit"
-								id="searchsubmit"
-								type="submit"
-								aria-label="Submit search"
-							>
-								<SearchIcon />
-							</button>
-						</div>
+						<input
+							id="not-found-search"
+							class="form-control"
+							type="search"
+							name="s"
+							placeholder="Search"
+						/>
+						<button
+							class="btn btn-outline-secondary ms-1"
+							name="submit"
+							id="searchsubmit"
+							type="submit"
+							aria-label="Submit search"
+						>
+							<SearchIcon />
+						</button>
 					</form>
 				</div>
 			</article>

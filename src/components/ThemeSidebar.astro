@@ -6,8 +6,11 @@ import { formatPublicationDate } from "../lib/publication-date";
 
 Astro.cache.set({ tags: ["posts"] });
 
+// Keep the sidebar shorter than most pages; the full list is on /interviews/.
+const RECENT_INTERVIEW_LIMIT = 8;
+
 const [{ entries: recentPosts }, settings] = await Promise.all([
-	getRecentPosts(),
+	getRecentPosts(RECENT_INTERVIEW_LIMIT),
 	getSiteSettings(),
 ]);
 ---
@@ -29,5 +32,8 @@ const [{ entries: recentPosts }, settings] = await Promise.all([
 				</li>
 			))}
 		</ul>
+		<a class="card-footer bg-transparent px-4 py-3" href="/interviews/">
+			All interviews
+		</a>
 	</aside>
 </section>
