@@ -12,6 +12,31 @@
 		padding: 0 10px;
 	}
 
+	// Let the page fill the screen and keep a 1rem margin around the text
+	body > .container {
+		margin: 0;
+		padding: 0;
+	}
+
+	#primary {
+		padding-right: 1rem !important;
+		padding-left: 1rem !important;
+	}
+
+	// The carousel column has no gutter, so line the photo up with the text
+	#projects_carousel {
+		padding: 0 0.75rem !important;
+		box-shadow: none;
+	}
+
+	#projects_carousel .carousel-control-prev {
+		left: 0.75rem;
+	}
+
+	#projects_carousel .carousel-control-next {
+		right: 0.75rem;
+	}
+
 	// Fix logo text truncation on mobile
 	#branding img {
 		max-width: 100% !important;
