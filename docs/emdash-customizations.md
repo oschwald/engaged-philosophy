@@ -55,7 +55,7 @@ Cloudflare constraints.
   publish failures, including rejected requests. The fetch tracker now covers
   content saves only; publication errors and retries stay upstream.
   The remaining gate preserves failed saves, including `409 ENTRY_LOCKED`,
-  until a new save succeeds; a fast failure cannot be treated as an unchanged
+  until a new save succeeds. A fast failure cannot be treated as an unchanged
   document and followed by publication or navigation. EmDash does not signal
   a clean document after undo, so undo alone cannot clear a previous failure;
   retry an edit successfully before using those toolbar controls.
@@ -266,6 +266,8 @@ backend failures degrade to D1 reads rather than failing the request.
 - Posts declare `/{year}/{month}/{day}/{slug}` and derive theme links from
   the UTC publication date. `getPostByPath()` checks the complete date path
   after a slug lookup, so arbitrary dates cannot serve duplicate content.
+  It uses EmDash's `decodeSlug()` to reject malformed percent escapes before
+  querying content.
   EmDash 0.39 adds plugin-context URL discovery, but no standalone forward URL
   builder for the theme, so `postPath()` still mirrors its date interpolation.
   Its UTC handling of offsetless input remains for compatibility. The theme no
@@ -335,13 +337,15 @@ backend failures degrade to D1 reads rather than failing the request.
   `data.bylines`. Imported WordPress author values were migrated to native
   byline profiles and credits, so there is no separate author field adapter.
   EmDash 0.34 exposes explicit credits directly from live-loader results.
-- Legacy renderers remain for Animoto embeds, playlist videos, and dynamic page
-  lists. EmDash does not support Animoto or the page-list behavior. Its
-  self-hosted embed currently forces videos into 16:9 and omits intrinsic
-  dimensions and `playsinline`. Imported legacy-video URLs use the public R2
-  domain, so the remaining presentation adapter only validates the URL and
-  preserves square and portrait videos, intrinsic dimensions, `playsinline`,
-  and direct public-R2 delivery on the Cloudflare Free plan.
+- Imported playlist videos use EmDash's native video blocks and editor. Media
+  Library videos retain their media references and public R2 URLs. The external
+  CloudFront video retains its URL with an empty media reference. The small
+  `RichTextVideo.astro` wrapper validates source URLs, labels the player group,
+  and preserves the imported sizing and caption styles. Playback uses EmDash's
+  `Video` component. Local upload URLs use EmDash's internal file route until
+  the component resolves them to the configured public media URL.
+- Legacy renderers remain for Animoto embeds and dynamic page lists, which
+  EmDash does not support.
 
 ## Imported Field Names
 
@@ -388,9 +392,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
   blocks directly. It imports provider packages without the `astro-embed`
   aggregator, so no dependency override is needed.
 - `src/plugins/legacy-content-blocks.ts` preserves edit controls for imported
-  WordPress-only Portable Text blocks such as playlist videos, remaining legacy
-  embeds, and page lists. Its registered plugin ID remains
-  `legacy-image-blocks` for compatibility with existing plugin state.
+  WordPress-only Portable Text blocks for remaining legacy embeds and page
+  lists. Its registered plugin ID remains `legacy-image-blocks` for compatibility with existing plugin state.
 - EmDash 0.38 validates plugin outbound requests through DNS lookups at
   `cloudflare-dns.com`. The Cloudflare Access invite integration uses its own
   fetch path. Configured plugins still run without paid Worker Loaders; the
@@ -398,6 +401,10 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 
 ## Build Compatibility
 
+- `astro.config.mjs` sets EmDash's `admin.locales` to `["en"]`. Only English
+  admin translations are bundled and offered to editors. Add languages to
+  this list and rebuild if editors need them. This does not change content
+  locales or public site URLs.
 - `astro.config.mjs` sets the Vite chunk-size warning limit to 4096 kB. The
   upstream admin application still exceeds it; ordinary public pages do not
   load that bundle. EmDash's plugin-navigation icon fallback dynamically
@@ -426,8 +433,8 @@ other required values, the route fails closed with `ACCESS_CONFIG_ERROR`.
 ## Removal Candidates
 
 - Revisit the visual-editing save gate when the upstream toolbar explicitly
-  blocks failed Portable Text saves and waits before leaving edit mode. The
-  native admin editor's save ordering does not cover the inline toolbar.
+  blocks publication after failed saves and waits before leaving edit mode.
+  The native publish wait alone does not replace these protections.
 - Remove the local cache-provider wrapper when Wrangler exposes
   `cache.purge()` for its local Workers Cache implementation.
 - Revisit the custom invite route if site email is configured and the default

@@ -33,15 +33,6 @@ export interface RichTextGalleryNode extends PortableTextBlock {
 	columns?: number;
 }
 
-export interface RichTextVideoNode extends PortableTextBlock {
-	_type: "legacyVideo";
-	url?: string;
-	title?: string;
-	mimeType?: string;
-	width?: number;
-	height?: number;
-}
-
 export interface RichTextEmbedNode extends PortableTextBlock {
 	_type: "legacyEmbed";
 	provider?: string;

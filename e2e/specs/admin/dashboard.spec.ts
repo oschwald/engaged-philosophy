@@ -31,7 +31,6 @@ test.describe("admin worker integration", () => {
 		const legacyBlocks =
 			plugins["legacy-image-blocks"]?.portableTextBlocks ?? [];
 		expect(legacyBlocks.map((block: { type: string }) => block.type)).toEqual([
-			"legacyVideo",
 			"legacyEmbed",
 			"legacyPageList",
 		]);

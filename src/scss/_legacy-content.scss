@@ -187,3 +187,15 @@
 .legacy-content > ol > li > :is(h1, h2, h3, h4, h5, h6):only-child {
 	margin-bottom: 0;
 }
+
+.legacy-content .content-video figure.emdash-video > video {
+	max-width: 100%;
+	max-height: none;
+	background: #000;
+}
+
+.legacy-content .content-video figure.emdash-video > figcaption {
+	font-size: 0.9rem;
+	color: #666;
+	text-align: start;
+}
