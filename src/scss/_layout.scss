@@ -96,6 +96,16 @@ body > .container {
 	max-width: 45rem;
 }
 
+// Project pages put the essay and the project details side by side in
+// .entry-content, so cap the essay column instead.
+.single-project .entry-content {
+	max-width: none;
+}
+
+.single-project .entry-content .col-lg-9 {
+	max-width: 45rem;
+}
+
 #branding hgroup,
 #header-image,
 .entry-content {
