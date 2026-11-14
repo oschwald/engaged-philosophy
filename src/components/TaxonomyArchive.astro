@@ -43,7 +43,7 @@ function pageHref(pageNumber: number) {
 		{hasResults ? (
 			projects.map((project) => (
 				<EntrySummary
-					articleClass={`mb-5 pb-4 border-bottom ${project.data.featured_image?.src ? "has-post-thumbnail " : ""}project type-project status-publish`}
+					articleClass={`mb-4 pb-4 border-bottom ${project.data.featured_image?.src ? "has-post-thumbnail " : ""}project type-project status-publish`}
 					title={project.data.title ?? ""}
 					continueHref={`/${projectPath(project.data.slug || project.id)}/`}
 					excerpt={getExcerptText(

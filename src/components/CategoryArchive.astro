@@ -41,7 +41,7 @@ function pageHref(pageNumber: number) {
 		{posts.length > 0 ? (
 			posts.map((post) => (
 				<EntrySummary
-					articleClass="mb-5 pb-4 border-bottom post"
+					articleClass="mb-4 pb-4 border-bottom post"
 					title={post.data.title ?? ""}
 					meta={formatPublicationDate(post.data.publishedAt, settings)}
 					continueHref={`/${post.data.path}/`}
