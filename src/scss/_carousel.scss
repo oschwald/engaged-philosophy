@@ -78,5 +78,31 @@
 @media (width <= 767px) {
 	.carousel .carousel-item > img {
 		width: 100%;
+		height: 240px;
+	}
+
+	// The caption covered the whole photo, so show it below the photo
+	.carousel-caption {
+		position: static;
+		padding: 1rem;
+		background: #f8f9fa;
+		border: 1px solid #dee2e6;
+		border-top: none;
+		color: inherit;
+	}
+
+	.carousel-caption h4 {
+		color: $headings-color;
+	}
+
+	.carousel-caption p {
+		color: inherit;
+	}
+
+	// Center the controls on the photo, not on the photo and caption
+	.carousel-control-prev,
+	.carousel-control-next {
+		top: 120px;
+		width: 2.5rem;
 	}
 }
