@@ -57,6 +57,7 @@ function isCurrentUrl(url: string) {
 									class:list={["nav-link", hasChildren && "dropdown-toggle"]}
 									href={hasChildren ? "#" : item.url}
 									target={item.target}
+									aria-current={isActive ? "page" : undefined}
 									{...(hasChildren
 										? {
 												"data-bs-toggle": "dropdown",
@@ -75,6 +76,9 @@ function isCurrentUrl(url: string) {
 													class="dropdown-item"
 													href={child.url}
 													target={child.target}
+													aria-current={
+														isCurrentUrl(child.url) ? "page" : undefined
+													}
 												>
 													{child.label}
 												</a>
