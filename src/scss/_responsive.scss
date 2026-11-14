@@ -63,6 +63,10 @@
 		height: auto !important;
 	}
 
+	#access {
+		padding: 0.5rem 1rem;
+	}
+
 	// Mobile navigation improvements
 	.navbar-toggler {
 		padding: 0.5rem;
@@ -211,6 +215,10 @@
 	// Improved navigation spacing on tablets
 	.navbar-nav .nav-link {
 		padding: 0.5rem 0.8rem !important;
+	}
+
+	#access {
+		padding-left: calc(1.5rem - 0.8rem);
 	}
 
 	// Better footer layout on tablets - only if not mobile
