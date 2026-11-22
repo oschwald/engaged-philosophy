@@ -1,21 +1,18 @@
 ---
-import { getSiteSettings } from "emdash";
-
 import NotFound from "../../components/NotFound.astro";
 import RichContent from "../../components/RichContent.astro";
 import ThemeSidebar from "../../components/ThemeSidebar.astro";
 import Base from "../../layouts/Base.astro";
 import { taxonomyCacheTag } from "../../lib/cache-tags";
 import type { getPostBySlug } from "../../lib/content";
-import { formatPublicationDate } from "../../lib/publication-date";
 import { getEntryContent } from "../../lib/rich-text";
+import PublicationDate from "./PublicationDate.astro";
 
 interface Props {
 	post: Awaited<ReturnType<typeof getPostBySlug>>;
 }
 
 const { post } = Astro.props;
-const settings = await getSiteSettings();
 
 const categories = post?.data.terms?.category ?? [];
 ---
@@ -35,7 +32,7 @@ const categories = post?.data.terms?.category ?? [];
 							{post.data.title}
 						</h1>
 						<div class="entry-meta">
-							{formatPublicationDate(post.data.publishedAt, settings)}
+							<PublicationDate value={post.data.publishedAt} />
 						</div>
 					</header>
 					<div class="entry-content" {...post.edit.content}>
