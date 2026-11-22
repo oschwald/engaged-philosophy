@@ -43,6 +43,9 @@ Cloudflare constraints.
   assignments invalidate the collection, entry (including translations), and
   taxonomy tags upstream as well, so no site middleware is needed. Term changes
   take effect immediately without publishing other pending draft edits.
+- Post pages read site settings inside the layout's slot, through
+  `PublicationDate.astro`. A settings read before `Base.astro` sets route cache
+  options would keep the page out of the route cache.
 - `src/js/emdash-save-gate.js` makes the visual-editing Publish and edit-mode
   controls wait for pending inline saves. EmDash 0.38 avoids saving unchanged
   Portable Text documents, so the local keepalive suppression is removed.

@@ -194,6 +194,28 @@ test.describe("public page cache", () => {
 		);
 	});
 
+	test("caches published post pages at the edge", async ({
+		authedRequest,
+		publicPage,
+	}, testInfo) => {
+		const title = uniqueTitle("E2E Cached Post", testInfo.testId);
+		const { published, publicPath } = await createAndPublishContentViaApi(
+			authedRequest,
+			"posts",
+			{ title, content: `${title} body.` },
+		);
+		try {
+			const response = await publicPage.request.get(publicPath);
+			expect(response.status()).toBe(200);
+			expect(response.headers()["cloudflare-cdn-cache-control"]).toContain(
+				"max-age=86400",
+			);
+			expect(response.headers()["cache-tag"]).toContain("posts");
+		} finally {
+			await deleteContentViaApi(authedRequest, "posts", published.id);
+		}
+	});
+
 	test("refreshes anonymous cached HTML after publishing an edit", async ({
 		authedRequest,
 		publicPage,

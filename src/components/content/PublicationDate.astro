@@ -1,0 +1,15 @@
+---
+import { getSiteSettings } from "emdash";
+
+import { formatPublicationDate } from "../../lib/publication-date";
+
+interface Props {
+	value: Parameters<typeof formatPublicationDate>[0];
+}
+
+// Read site settings inside the layout's slot, after the layout has set route
+// cache options. A settings read before then keeps the page out of the cache.
+const settings = await getSiteSettings();
+---
+
+{formatPublicationDate(Astro.props.value, settings)}
