@@ -1,5 +1,8 @@
 import { test, expect } from "../../fixtures/worker";
 
+const NOT_FOUND_CDN_CACHE_CONTROL =
+	"public, max-age=60, stale-while-revalidate=0";
+
 const MISSING_ROUTES = [
 	{ kind: "page", path: "/e2e-missing-page/" },
 	{ kind: "dated post", path: "/2099/12/31/e2e-missing-post/" },
@@ -35,8 +38,9 @@ test.describe("public not-found responses", () => {
 			});
 
 			expect(response?.status()).toBe(404);
+			// EmDash caches content misses briefly, without stale-while-revalidate.
 			expect(response?.headers()["cloudflare-cdn-cache-control"]).toBe(
-				"no-store",
+				NOT_FOUND_CDN_CACHE_CONTROL,
 			);
 			expect(response?.headers().location).toBeUndefined();
 			expect(new URL(publicPage.url()).pathname).toBe(path);

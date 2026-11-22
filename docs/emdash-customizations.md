@@ -31,9 +31,12 @@ Cloudflare constraints.
   revalidate instead of retaining HTML or generated metadata independently.
   Cookie-bearing and query-string HTML responses are `no-store`; public HTML
   varies on `Cookie` so a cached anonymous response cannot hide that bypass.
-- EmDash keeps 404 responses out of the route cache, including missing content
-  rendered through `Astro.rewrite("/404")`. The error page needs no site-level
-  invalidation tags, and a newly published entry can serve immediately.
+- 404 responses use EmDash's default caching: since EmDash 1.6, a 404 is cached
+  at the edge for up to 60 seconds without stale-while-revalidate. The 404's
+  cache tags do not include the missing content's collection, so an entry
+  published at a URL that recently answered 404 can keep showing the 404 for up
+  to a minute. Cached 404 hits skip the Worker and do not appear in the admin
+  404 log.
 - Page cache tags describe the content entry, collection lists, site settings,
   primary menu, and taxonomy data actually rendered. EmDash already invalidates
   entry and collection tags, and EmDash 0.32 avoids purging them for draft-only
@@ -96,8 +99,10 @@ Cloudflare constraints.
   still emits `no-store` for every recognized session, Access, preview, and
   edit request. The default retains `Vary: Cookie`, so deployments without the
   zone rule fail safely.
-- `wrangler.jsonc` invokes EmDash's scheduler every five minutes. Scheduled
-  publications can appear up to five minutes after their target time.
+- `wrangler.jsonc` invokes EmDash's scheduler every five minutes. Since EmDash
+  1.6, each run also waits up to 70 seconds and publishes entries due in that
+  window at their scheduled time; the wait uses no CPU time. Other scheduled
+  publications can still appear up to five minutes after their target time.
   EmDash 1.2 runs system cleanup only at the top of the hour, independently of
   publication polling. Keep a trigger at minute zero so cleanup runs even on
   a fresh Worker isolate. The 404-log cleanup first counts at most 10,001 rows
