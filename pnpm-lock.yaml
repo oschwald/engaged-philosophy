@@ -168,7 +168,7 @@ importers:
     dependencies:
       '@astrojs/cloudflare':
         specifier: ^14.4.9
-        version: 14.4.9(@types/node@26.6.6)(astro@7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(esbuild@0.28.2)(sass@1.108.2)(workerd@1.20261116.1)(wrangler@4.163.0(@cloudflare/workers-types@5.20261116.1)(@types/node@26.6.6))(yaml@2.9.1)
+        version: 14.4.9(@types/node@26.6.6)(astro@7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(esbuild@0.28.2)(sass@1.108.2)(workerd@1.20261116.1)(wrangler@4.163.0(@cloudflare/workers-types@5.20261121.1)(@types/node@26.6.6))(yaml@2.9.1)
       '@astrojs/react':
         specifier: ^7.1.9
         version: 7.1.9(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))
@@ -183,7 +183,7 @@ importers:
         version: 1.6.0(astro@7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(kysely@0.29.9)
       '@emdash-cms/cloudflare':
         specifier: ^1.6.0
-        version: 1.6.0(6681fdde8dbce97fb7fcebf9afe3b80a)
+        version: 1.6.0(1ada420f6f074b7315bc8612e85f46bb)
       '@emdash-cms/plugin-audit-log':
         specifier: ^0.2.4
         version: 0.2.4(emdash@1.6.0(@astrojs/react@7.1.9(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1)))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@6.0.3))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(astro@7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.13)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@10.2.2)(typescript@6.0.3))
@@ -222,8 +222,8 @@ importers:
         specifier: ^0.9.12
         version: 0.9.12(prettier-plugin-astro@1.1.2(prettier@3.10.1))(prettier@3.10.1)(typescript@6.0.3)
       '@cloudflare/workers-types':
-        specifier: ^5.20261116.1
-        version: 5.20261116.1
+        specifier: ^5.20261121.1
+        version: 5.20261121.1
       '@playwright/test':
         specifier: ^1.65.1
         version: 1.65.1
@@ -268,7 +268,7 @@ importers:
         version: 5.1.0(@types/node@26.6.6)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))
       wrangler:
         specifier: ^4.163.0
-        version: 4.163.0(@cloudflare/workers-types@5.20261116.1)(@types/node@26.6.6)
+        version: 4.163.0(@cloudflare/workers-types@5.20261121.1)(@types/node@26.6.6)
 
 packages:
 
@@ -742,8 +742,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@cloudflare/workers-types@5.20261116.1':
-    resolution: {integrity: sha512-bym4dNT9Hnm+goedLTTTH85T6S4wOJJaOpKgk9MlEGU18/JKsChN+wHvSWUAIy5YVSm6LnuaUu3d3N4K0m8Dtg==}
+  '@cloudflare/workers-types@5.20261121.1':
+    resolution: {integrity: sha512-eLzyhm8/Qn+yshOObNIVsV8YJyWR9BOBCnnuqmrqY5uhsVDlLMdCmOQ34oC3eoVLkav94Dc7MWcfC+FuaxdNjA==}
 
   '@codemirror/autocomplete@6.20.4':
     resolution: {integrity: sha512-yF8RhOf2SXlg00+qtupzLhrglcas61boqaONiNcbPIebHCpJocpqTBA6dyrtUrQO47hqyTdeob/3XnYilT7TaQ==}
@@ -4906,16 +4906,16 @@ snapshots:
       - prettier
       - prettier-plugin-astro
 
-  '@astrojs/cloudflare@14.4.9(@types/node@26.6.6)(astro@7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(esbuild@0.28.2)(sass@1.108.2)(workerd@1.20261116.1)(wrangler@4.163.0(@cloudflare/workers-types@5.20261116.1)(@types/node@26.6.6))(yaml@2.9.1)':
+  '@astrojs/cloudflare@14.4.9(@types/node@26.6.6)(astro@7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(esbuild@0.28.2)(sass@1.108.2)(workerd@1.20261116.1)(wrangler@4.163.0(@cloudflare/workers-types@5.20261121.1)(@types/node@26.6.6))(yaml@2.9.1)':
     dependencies:
       '@astrojs/internal-helpers': 0.13.2
       '@astrojs/underscore-redirects': 1.0.4
-      '@cloudflare/vite-plugin': 1.69.1(@types/node@26.6.6)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(workerd@1.20261116.1)(wrangler@4.163.0(@cloudflare/workers-types@5.20261116.1)(@types/node@26.6.6))
+      '@cloudflare/vite-plugin': 1.69.1(@types/node@26.6.6)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(workerd@1.20261116.1)(wrangler@4.163.0(@cloudflare/workers-types@5.20261121.1)(@types/node@26.6.6))
       astro: 7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1)
       piccolore: 0.1.3
       prismjs: 1.30.0
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1)
-      wrangler: 4.163.0(@cloudflare/workers-types@5.20261116.1)(@types/node@26.6.6)
+      wrangler: 4.163.0(@cloudflare/workers-types@5.20261121.1)(@types/node@26.6.6)
     transitivePeerDependencies:
       - '@types/node'
       - '@vitejs/devtools'
@@ -5339,13 +5339,13 @@ snapshots:
     optionalDependencies:
       workerd: 1.20261116.1
 
-  '@cloudflare/vite-plugin@1.69.1(@types/node@26.6.6)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(workerd@1.20261116.1)(wrangler@4.163.0(@cloudflare/workers-types@5.20261116.1)(@types/node@26.6.6))':
+  '@cloudflare/vite-plugin@1.69.1(@types/node@26.6.6)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(workerd@1.20261116.1)(wrangler@4.163.0(@cloudflare/workers-types@5.20261121.1)(@types/node@26.6.6))':
     dependencies:
       '@cloudflare/unenv-preset': 2.16.2(unenv@2.0.0-rc.24)(workerd@1.20261116.1)
       miniflare: 5.20261110.0-beta(@types/node@26.6.6)
       unenv: 2.0.0-rc.24
       vite: 8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1)
-      wrangler: 4.163.0(@cloudflare/workers-types@5.20261116.1)(@types/node@26.6.6)
+      wrangler: 4.163.0(@cloudflare/workers-types@5.20261121.1)(@types/node@26.6.6)
       ws: 8.22.0
     transitivePeerDependencies:
       - '@types/node'
@@ -5384,7 +5384,7 @@ snapshots:
   '@cloudflare/workerd-windows-64@1.20261116.1':
     optional: true
 
-  '@cloudflare/workers-types@5.20261116.1': {}
+  '@cloudflare/workers-types@5.20261121.1': {}
 
   '@codemirror/autocomplete@6.20.4':
     dependencies:
@@ -5634,11 +5634,11 @@ snapshots:
       - date-fns
       - zod
 
-  '@emdash-cms/cloudflare@1.6.0(6681fdde8dbce97fb7fcebf9afe3b80a)':
+  '@emdash-cms/cloudflare@1.6.0(1ada420f6f074b7315bc8612e85f46bb)':
     dependencies:
-      '@astrojs/cloudflare': 14.4.9(@types/node@26.6.6)(astro@7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(esbuild@0.28.2)(sass@1.108.2)(workerd@1.20261116.1)(wrangler@4.163.0(@cloudflare/workers-types@5.20261116.1)(@types/node@26.6.6))(yaml@2.9.1)
+      '@astrojs/cloudflare': 14.4.9(@types/node@26.6.6)(astro@7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(esbuild@0.28.2)(sass@1.108.2)(workerd@1.20261116.1)(wrangler@4.163.0(@cloudflare/workers-types@5.20261121.1)(@types/node@26.6.6))(yaml@2.9.1)
       '@cloudflare/ai-search-snippet': 0.0.42
-      '@cloudflare/workers-types': 5.20261116.1
+      '@cloudflare/workers-types': 5.20261121.1
       astro: 7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1)
       emdash: 1.6.0(@astrojs/react@7.1.9(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1)))(@atcute/cbor@2.3.8(@atcute/cid@2.5.0))(@atcute/cid@2.5.0)(@atcute/identity@2.0.2(@atcute/lexicons@2.1.1)(typescript@6.0.3))(@date-fns/tz@1.5.0)(@floating-ui/dom@1.8.0)(@tiptap/extensions@3.32.0(@tiptap/core@3.32.0(@tiptap/pm@3.32.0))(@tiptap/pm@3.32.0))(@types/react-dom@19.3.0(@types/react@19.3.0))(@types/react@19.3.0)(astro@7.4.13(@types/node@26.6.6)(esbuild@0.28.2)(sass@1.108.2)(yaml@2.9.1))(date-fns@4.4.0)(echarts@6.1.0)(prosemirror-model@1.25.13)(prosemirror-state@1.4.4)(prosemirror-view@1.42.9)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@10.2.2)(typescript@6.0.3)
       jose: 6.2.18
@@ -5650,7 +5650,7 @@ snapshots:
       '@phosphor-icons/react': 2.1.10(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       pg: 8.23.1
       react: 19.3.1
-      wrangler: 4.163.0(@cloudflare/workers-types@5.20261116.1)(@types/node@26.6.6)
+      wrangler: 4.163.0(@cloudflare/workers-types@5.20261121.1)(@types/node@26.6.6)
 
   '@emdash-cms/gutenberg-to-portable-text@1.6.0':
     dependencies:
@@ -9478,7 +9478,7 @@ snapshots:
       '@cloudflare/workerd-linux-arm64': 1.20261116.1
       '@cloudflare/workerd-windows-64': 1.20261116.1
 
-  wrangler@4.163.0(@cloudflare/workers-types@5.20261116.1)(@types/node@26.6.6):
+  wrangler@4.163.0(@cloudflare/workers-types@5.20261121.1)(@types/node@26.6.6):
     dependencies:
       '@cloudflare/kv-asset-handler': 0.5.0
       '@cloudflare/unenv-preset': 2.16.2(unenv@2.0.0-rc.24)(workerd@1.20261116.1)
@@ -9490,7 +9490,7 @@ snapshots:
       unenv: 2.0.0-rc.24
       workerd: 1.20261116.1
     optionalDependencies:
-      '@cloudflare/workers-types': 5.20261116.1
+      '@cloudflare/workers-types': 5.20261121.1
       fsevents: 2.3.3
     transitivePeerDependencies:
       - '@types/node'
