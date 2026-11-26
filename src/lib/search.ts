@@ -1,7 +1,11 @@
 import { search as searchEmDash } from "emdash";
 
 import { getPublishedEntriesByIds } from "./content";
-import { projectPath } from "./content-paths";
+import {
+	HOME_PAGE_SLUG,
+	normalizeContentPath,
+	projectPath,
+} from "./content-paths";
 import {
 	isValidSearchCursor,
 	isValidSearchQuery,
@@ -96,7 +100,12 @@ export async function searchSite(
 			collection === "projects"
 				? projectPath(entry.data.slug || entry.id)
 				: (entry.data.path?.trim() ?? "");
-		if (!title || !path) return [];
+		// "/" renders the page whose slug is exactly "home", and its canonical
+		// path is empty. Other entries without a path have no public URL.
+		const isHomePage =
+			collection === "pages" &&
+			normalizeContentPath(entry.data.slug || entry.id) === HOME_PAGE_SLUG;
+		if (!title || (!path && !isHomePage)) return [];
 
 		return [
 			{

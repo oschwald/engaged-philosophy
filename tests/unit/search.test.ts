@@ -116,6 +116,80 @@ describe("site search", () => {
 		});
 	});
 
+	test("includes the home page and drops other entries without a path", async () => {
+		emdashSearch.mockResolvedValue({
+			items: [
+				{ collection: "pages", id: "page-home", score: 10 },
+				{ collection: "pages", id: "page-nested-home", score: 9 },
+				{ collection: "pages", id: "page-orphan", score: 8 },
+				{ collection: "posts", id: "post-undated", score: 7 },
+			],
+		});
+		getPublishedEntriesByIds.mockImplementation(
+			async (collection: string, ids: string[]) => {
+				if (ids.length === 0) return [];
+				if (collection === "pages") {
+					return [
+						{
+							id: "01HOMEPAGEULID",
+							edit: {},
+							data: {
+								id: "page-home",
+								slug: "home",
+								title: "Welcome",
+								path: "",
+							},
+						},
+						{
+							id: "01NESTEDHOMEULID",
+							edit: {},
+							data: {
+								id: "page-nested-home",
+								slug: "home",
+								title: "Program Home",
+								path: "programs/home",
+							},
+						},
+						{
+							id: "01ORPHANULID",
+							edit: {},
+							data: {
+								id: "page-orphan",
+								slug: "parent/home",
+								title: "Orphan",
+								path: "",
+							},
+						},
+					];
+				}
+				return [
+					{
+						id: "undated-post",
+						edit: {},
+						data: { id: "post-undated", title: "Undated", path: "" },
+					},
+				];
+			},
+		);
+
+		const result = await searchSite("welcome");
+
+		expect(result.results).toEqual([
+			expect.objectContaining({
+				id: "page-home",
+				kind: "page",
+				title: "Welcome",
+				path: "",
+			}),
+			expect.objectContaining({
+				id: "page-nested-home",
+				kind: "page",
+				title: "Program Home",
+				path: "programs/home",
+			}),
+		]);
+	});
+
 	test("bounds cursor history and requires it to match the page", () => {
 		expect(searchCursorHistoryForNextPage([], undefined)).toEqual([""]);
 		expect(isValidSearchCursorHistory(2, [""])).toBe(true);
