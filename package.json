@@ -12,7 +12,7 @@
 	"scripts": {
 		"dev": "astro dev",
 		"build": "pnpm run test:seed && node scripts/clean-build-output.mjs && astro build",
-		"ci": "pnpm run lint && pnpm run test && pnpm run check:emdash-types && pnpm run typecheck && pnpm run typecheck:tests && pnpm run build && pnpm run test:worker-bundle && pnpm run test:worker-runtime && pnpm run test:e2e",
+		"ci": "pnpm run lint && pnpm run test && pnpm run check:emdash-types && pnpm run typecheck && pnpm run typecheck:tests && pnpm run build && pnpm run test:worker-bundle && pnpm run test:worker-runtime && pnpm run test:e2e && pnpm run test:worker-bundle",
 		"check:emdash-types": "node scripts/check-emdash-types.mjs",
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
@@ -38,7 +38,7 @@
 		"smoke:live": "node scripts/test-smoke-live.mjs",
 		"smoke:live:sitemap": "LIVE_SMOKE_SITEMAP=1 LIVE_SMOKE_REQUIRE_SITEMAP=1 node scripts/test-smoke-live.mjs",
 		"preview": "astro preview",
-		"deploy": "pnpm run build && wrangler deploy",
+		"deploy": "node scripts/check-deploy-env.mjs && pnpm run build && pnpm run test:worker-bundle && wrangler deploy --config dist/server/wrangler.json",
 		"typecheck": "astro check",
 		"typecheck:tests": "tsc --noEmit -p tsconfig.test.json"
 	},

@@ -5,18 +5,31 @@ import {
 	spawnSync,
 	type ChildProcess,
 } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { rm, writeFile } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
+import {
+	deployConfigPath,
+	isInTestAuthOutput,
+	readDeployTargets,
+	TEST_AUTH_HEADER,
+	TEST_AUTH_OUT_DIR,
+} from "../../scripts/test-auth-build.mjs";
 import { hasWorkerErrors } from "../../scripts/worker-errors.mjs";
 
-export const TEST_AUTH_HEADER = "X-EmDash-Test-Auth";
+export { TEST_AUTH_HEADER };
 
-const ROOT = path.resolve(new URL("../..", import.meta.url).pathname);
-const DIST_WRANGLER_CONFIG = path.join(ROOT, "dist", "server", "wrangler.json");
+const ROOT = fileURLToPath(new URL("../..", import.meta.url));
+const TEST_AUTH_WRANGLER_CONFIG = path.join(
+	ROOT,
+	TEST_AUTH_OUT_DIR,
+	"server",
+	"wrangler.json",
+);
 const STARTUP_TIMEOUT_MS = 30_000;
 const REQUEST_TIMEOUT_MS = 15_000;
 const SETUP_RETRY_COUNT = 3;
@@ -181,9 +194,18 @@ export function buildWorkerForE2E() {
 		throw new Error(`Test-auth Worker build failed\n${output}`);
 	}
 
-	if (!existsSync(DIST_WRANGLER_CONFIG)) {
+	if (!existsSync(TEST_AUTH_WRANGLER_CONFIG)) {
 		throw new Error(
-			"Expected test-auth build to create dist/server/wrangler.json.",
+			`Expected test-auth build to create ${path.relative(ROOT, TEST_AUTH_WRANGLER_CONFIG)}.`,
+		);
+	}
+
+	const deployTargets = readDeployTargets(ROOT);
+	if (deployTargets.some((target) => isInTestAuthOutput(ROOT, target))) {
+		// Remove it, so a bare `wrangler deploy` cannot publish that build.
+		rmSync(deployConfigPath(ROOT), { force: true });
+		throw new Error(
+			"Test-auth build left .wrangler/deploy/config.json pointing at its output. It has been removed; run pnpm run build before deploying.",
 		);
 	}
 
@@ -196,7 +218,7 @@ function ensureWorkerBuild() {
 		return;
 	}
 
-	if (!existsSync(DIST_WRANGLER_CONFIG)) {
+	if (!existsSync(TEST_AUTH_WRANGLER_CONFIG)) {
 		buildWorkerForE2E();
 	}
 }
@@ -303,7 +325,7 @@ export async function startWorkerServer(
 			"wrangler",
 			"dev",
 			"--config",
-			DIST_WRANGLER_CONFIG,
+			TEST_AUTH_WRANGLER_CONFIG,
 			"--ip",
 			"127.0.0.1",
 			"--port",
@@ -351,7 +373,7 @@ export async function startWorkerServer(
 				"key",
 				"list",
 				"--config",
-				DIST_WRANGLER_CONFIG,
+				TEST_AUTH_WRANGLER_CONFIG,
 				"--binding",
 				"SESSION",
 				"--prefix",
@@ -386,7 +408,7 @@ export async function startWorkerServer(
 						"delete",
 						file,
 						"--config",
-						DIST_WRANGLER_CONFIG,
+						TEST_AUTH_WRANGLER_CONFIG,
 						"--binding",
 						"SESSION",
 						"--local",

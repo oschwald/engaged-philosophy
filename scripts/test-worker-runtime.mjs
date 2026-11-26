@@ -5,6 +5,7 @@ import { rm } from "node:fs/promises";
 import net from "node:net";
 import path from "node:path";
 
+import { assertNoTestAuthEnv } from "./test-auth-build.mjs";
 import { hasWorkerErrors } from "./worker-errors.mjs";
 
 const ROOT = path.resolve(new URL("..", import.meta.url).pathname);
@@ -12,6 +13,10 @@ const DIST_WRANGLER_CONFIG = path.join(ROOT, "dist", "server", "wrangler.json");
 const PERSIST_DIR = path.join(ROOT, ".wrangler", "worker-runtime-smoke-state");
 const REQUEST_TIMEOUT_MS = 1000;
 const STARTUP_TIMEOUT_MS = 30_000;
+
+// With test-auth variables set, pnpm run build writes to dist-e2e/ and leaves
+// an older build in dist/, so this check would test that.
+assertNoTestAuthEnv();
 
 function sleep(ms) {
 	return new Promise((resolve) => setTimeout(resolve, ms));
