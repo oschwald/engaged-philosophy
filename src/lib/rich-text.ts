@@ -19,6 +19,9 @@ export function getEntryExcerpt(data?: RichTextEntryData | null) {
 	return getRichTextValue(data?.excerpt);
 }
 
+const htmlEntityPattern = /&(#x[0-9a-f]+|#[0-9]+|[a-z]+);/gi;
+const maxCodePoint = 0x10ffff;
+
 export function decodeHtmlEntities(value?: string | null) {
 	const namedEntities: Record<string, string> = {
 		amp: "&",
@@ -34,18 +37,27 @@ export function decodeHtmlEntities(value?: string | null) {
 		rdquo: "”",
 	};
 
-	return (value ?? "").replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (entity, token) => {
+	return (value ?? "").replace(htmlEntityPattern, (entity, token) => {
 		const lowerToken = token.toLowerCase();
 		if (lowerToken.startsWith("#x")) {
-			const codePoint = Number.parseInt(lowerToken.slice(2), 16);
-			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
+			return decodeNumericEntity(entity, lowerToken.slice(2), 16);
 		}
 		if (lowerToken.startsWith("#")) {
-			const codePoint = Number.parseInt(lowerToken.slice(1), 10);
-			return Number.isNaN(codePoint) ? entity : String.fromCodePoint(codePoint);
+			return decodeNumericEntity(entity, lowerToken.slice(1), 10);
 		}
 		return namedEntities[lowerToken] ?? entity;
 	});
+}
+
+// Leave entities that are not Unicode scalar values as written.
+// String.fromCodePoint throws a RangeError above U+10FFFF and returns a lone
+// surrogate for U+D800-U+DFFF.
+function decodeNumericEntity(entity: string, digits: string, radix: number) {
+	const codePoint = Number.parseInt(digits, radix);
+	const isSurrogate = codePoint >= 0xd800 && codePoint <= 0xdfff;
+	return codePoint > maxCodePoint || isSurrogate
+		? entity
+		: String.fromCodePoint(codePoint);
 }
 
 function stripWordPressShortcodes(value: string) {

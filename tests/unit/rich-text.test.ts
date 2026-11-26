@@ -1,6 +1,10 @@
 import { describe, expect, test } from "vitest";
 
-import { getExcerptText, stripHtml } from "../../src/lib/rich-text";
+import {
+	decodeHtmlEntities,
+	getExcerptText,
+	stripHtml,
+} from "../../src/lib/rich-text";
 
 describe("rich text", () => {
 	test("extracts plain text from standard Portable Text blocks", () => {
@@ -123,5 +127,35 @@ describe("rich text", () => {
 				3,
 			),
 		).toBe("One two three");
+	});
+
+	test("decodes numeric entities within the Unicode range", () => {
+		expect(decodeHtmlEntities("&#8217; &#x2014; &#X1F600; &#x10FFFF;")).toBe(
+			"\u2019 \u2014 \u{1F600} \u{10FFFF}",
+		);
+	});
+
+	test("leaves numeric entities outside the Unicode range as written", () => {
+		const value =
+			"zebraentity &#9999999999; &#1114112; &#x110000; &#x7FFFFFFFFFFFFFFFF; title";
+
+		expect(decodeHtmlEntities(value)).toBe(value);
+		expect(decodeHtmlEntities(`&#${"9".repeat(400)};`)).toBe(
+			`&#${"9".repeat(400)};`,
+		);
+		expect(stripHtml("zebraentity &#9999999999; title")).toBe(
+			"zebraentity &#9999999999; title",
+		);
+	});
+
+	test("leaves surrogate code point entities as written", () => {
+		const value = "&#xD800; &#55296; &#xDFFF; &#57343;";
+
+		expect(decodeHtmlEntities(value)).toBe(value);
+		expect(decodeHtmlEntities("&#xD7FF; &#xE000;")).toBe("\uD7FF \uE000");
+	});
+
+	test("leaves decimal entities with hex digits as written", () => {
+		expect(decodeHtmlEntities("&#12ab; &#x12ab;")).toBe("&#12ab; \u12ab");
 	});
 });
