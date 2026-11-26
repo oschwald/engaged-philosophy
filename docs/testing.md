@@ -16,7 +16,9 @@ The project uses four test layers:
 - `e2e/`: Playwright tests against a built Cloudflare Worker with the checked-in
   EmDash seed applied.
 - `scripts/test-worker-bundle.mjs` and `scripts/test-worker-runtime.mjs`: build
-  artifact checks for Worker deployability and production startup.
+  artifact checks for Worker deployability and production startup. The bundle
+  check fails if `.wrangler/deploy/config.json` does not name `dist/`, or if the
+  bundle a bare `wrangler deploy` would publish contains the test-auth header.
 
 Prefer the smallest layer that exercises the behavior from the user's
 perspective. For example, put WordPress transform edge cases in Vitest, save-gate
@@ -26,7 +28,8 @@ browser timing in `e2e-static/`, and admin/public workflows in `e2e/`.
 
 - `pnpm run test` runs Vitest and static Playwright tests.
 - `pnpm run test:seed` runs only the checked-in seed guard.
-- `pnpm run test:e2e` runs the Worker-backed Playwright suite.
+- `pnpm run test:e2e` runs the Worker-backed Playwright suite against a
+  test-auth build in `dist-e2e/`.
 - `pnpm run test:e2e:admin`, `pnpm run test:e2e:editing`, and
   `pnpm run test:e2e:public` run focused Worker-backed Playwright groups.
 - `pnpm run smoke:live` runs lightweight checks against
@@ -198,5 +201,5 @@ These local checks do not measure D1 rows read, KV read/write operations, Worker
 CPU, or production edge hits. Use the [Cloudflare usage review](cloudflare-free-plan-guardrails.md#usage-review) for those.
 
 The measurement resets only `.wrangler/e2e-state/worker-9000`, uses local bindings,
-and never targets deployed URLs. Its build uses test auth. Run a normal
-`pnpm run build` before packaging or deployment.
+and never targets deployed URLs. Its build uses test auth and writes to
+`dist-e2e/`, leaving the deployable build in `dist/` alone.

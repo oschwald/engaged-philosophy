@@ -15,6 +15,7 @@
 		"build",
 		"vendor",
 		"dist",
+		"dist-e2e",
 		"css",
 		"js",
 		"inc",

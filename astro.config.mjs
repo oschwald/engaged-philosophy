@@ -8,6 +8,11 @@ import emdash from "emdash/astro";
 import { fileURLToPath } from "node:url";
 
 import {
+	buildOutDir,
+	isTestAuthBuild,
+	testAuthDeployConfigGuard,
+} from "./scripts/test-auth-build.mjs";
+import {
 	CLOUDFLARE_ACCESS_TEAM_DOMAIN,
 	PUBLIC_SITE_URL,
 } from "./src/lib/site-config.ts";
@@ -27,7 +32,7 @@ const cloudflareCacheProviderEntrypoint = fileURLToPath(
 const cloudflareAccessInviteRouteEntrypoint = fileURLToPath(
 	new URL("./src/emdash-routes/cloudflare-access-invite.ts", import.meta.url),
 );
-const useTestAuth = process.env.EMDASH_TEST_AUTH === "1";
+const useTestAuth = isTestAuthBuild();
 const allowTestAuth = process.env.EMDASH_ALLOW_TEST_AUTH === "1";
 const emdashTypesCheckState = process.env.EMDASH_TYPES_CHECK_STATE;
 
@@ -64,6 +69,8 @@ export const emdashPlugins = [
 export default defineConfig({
 	site: PUBLIC_SITE_URL,
 	output: "server",
+	// Test-auth builds go to dist-e2e/ so they never replace the deployable build.
+	outDir: buildOutDir(),
 	adapter: cloudflare({
 		...(emdashTypesCheckState
 			? { persistState: { path: emdashTypesCheckState } }
@@ -135,6 +142,9 @@ export default defineConfig({
 					},
 			plugins: emdashPlugins,
 		}),
+		// Restores the deploy redirect at build:done, or on exit if the build ends
+		// early.
+		...(useTestAuth ? [testAuthDeployConfigGuard()] : []),
 	],
 	devToolbar: { enabled: false },
 });

@@ -7,6 +7,7 @@ export default [
 		ignores: [
 			"build/**",
 			"dist/**",
+			"dist-e2e/**",
 			".astro/**",
 			".wrangler/**",
 			"node_modules/**",

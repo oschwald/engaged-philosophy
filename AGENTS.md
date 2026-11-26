@@ -73,11 +73,18 @@ media, cache, and visual editing workflows in `e2e/`. Run focused commands while
 working, then `pnpm run ci` before handing off larger changes.
 
 If no supported browser is installed, run
-`pnpm exec playwright install --with-deps chromium`. Worker-backed tests rebuild
-`dist/` with test auth, including when run through `pnpm run ci`. Run a normal
-`pnpm run build` with test-auth flags unset before Worker bundle/runtime smoke
-checks or deployment; `pnpm run deploy` already rebuilds. See [Testing](docs/testing.md)
-for test layers and the limits of local cache validation.
+`pnpm exec playwright install --with-deps chromium`. Worker-backed tests build a
+test-auth Worker into `dist-e2e/`, which trusts the `X-EmDash-Test-Auth` header as
+an admin login. It never replaces the deployable build in `dist/`. When it
+ends, fails, or gets SIGINT, SIGTERM or SIGHUP, it puts back the earlier
+`.wrangler/deploy/config.json` if that named a deployable build, and removes the
+file otherwise, so run `pnpm run build` before a bare `wrangler deploy` or
+`pnpm run test:worker-bundle`. `pnpm run test:worker-bundle` fails if the bundle
+a bare `wrangler deploy` would publish contains that header.
+`pnpm run deploy` refuses to run with `EMDASH_TEST_AUTH` or
+`EMDASH_ALLOW_TEST_AUTH` set, rebuilds, runs that check, and deploys
+`dist/server/wrangler.json` explicitly. See
+[Testing](docs/testing.md) for test layers and the limits of local cache validation.
 
 ## Commit & Pull Request Guidelines
 

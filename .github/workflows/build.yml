@@ -85,6 +85,12 @@ jobs:
           cp -a playwright-report playwright-report-initial || true
           pnpm run test:e2e --last-failed 2>&1 | tee playwright-debug-e2e.log
 
+      # The e2e builds use test auth. The deployable build must still be in
+      # place afterwards, also when the e2e tests fail.
+      - name: Worker bundle check after test-auth builds
+        if: ${{ !cancelled() && steps.worker-browser-tests.outcome != 'skipped' }}
+        run: pnpm run test:worker-bundle
+
       - name: Upload Playwright failure artifacts
         if: failure()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
