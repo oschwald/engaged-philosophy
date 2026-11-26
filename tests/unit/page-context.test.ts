@@ -77,6 +77,29 @@ describe("site page context", () => {
 		});
 	});
 
+	test("uses the slash form as the canonical for either request form", () => {
+		for (const path of ["/2026/11/24/a-post", "/2026/11/24/a-post/"]) {
+			const page = createSitePageContext({
+				url: new URL(`https://worker.example${path}`),
+				siteTitle: "Engaged Philosophy",
+				siteDescription: "Philosophy in practice",
+				title: "A post",
+				content: { collection: "posts", entry: postEntry({}) },
+			});
+			expect(page.canonical, path).toBe(
+				"https://www.engagedphilosophy.com/2026/11/24/a-post/",
+			);
+		}
+
+		const custom = createSitePageContext({
+			url: new URL("https://worker.example/blog"),
+			siteTitle: "Engaged Philosophy",
+			siteDescription: "Philosophy in practice",
+			title: "Blog",
+		});
+		expect(custom.canonical).toBe("https://www.engagedphilosophy.com/blog/");
+	});
+
 	test("keeps the full site title on the homepage", () => {
 		const page = createSitePageContext({
 			url: new URL("https://www.example.com/"),

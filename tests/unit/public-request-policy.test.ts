@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
 
-import { applyPublicRequestPolicy } from "../../src/lib/public-request-policy";
+import {
+	applyPublicRequestPolicy,
+	canonicalizeRedirect,
+} from "../../src/lib/public-request-policy";
 import {
 	MAX_SEARCH_CURSOR_HISTORY,
 	MAX_SEARCH_QUERY_LENGTH,
@@ -157,6 +160,64 @@ describe("public request policy", () => {
 		expect(new URL(request.url).search).toBe("");
 	});
 
+	test("redirects pages to their trailing-slash form", () => {
+		for (const method of ["GET", "HEAD"]) {
+			const page = apply("/2026/11/24/bracket-post", { method });
+			expect(page.response?.status, method).toBe(301);
+			expect(page.response?.headers.get("location"), method).toBe(
+				"/2026/11/24/bracket-post/",
+			);
+			expect(page.response?.headers.get("cache-control"), method).toBe(
+				"public, max-age=300",
+			);
+		}
+
+		for (const slug of ["web-3.0", "notes.v2"]) {
+			expect(
+				apply(`/2026/11/24/${slug}`).response?.headers.get("location"),
+				slug,
+			).toBe(`/2026/11/24/${slug}/`);
+		}
+
+		const withQuery = apply("/about?utm_source=test");
+		expect(withQuery.response?.status).toBe(301);
+		expect(withQuery.response?.headers.get("location")).toBe("/about/");
+
+		expect(apply("/feed").response?.headers.get("location")).toBe("/feed/");
+		expect(apply("/2026/11/24/bracket-post/").response).toBeUndefined();
+	});
+
+	test("keeps file, reserved, and preview paths in their requested form", () => {
+		const token = `payload.${"x".repeat(43)}`;
+		for (const path of [
+			"/",
+			"/sitemap.xml",
+			"/robots.txt",
+			"/favicon.ico",
+			"/site.webmanifest",
+			"/wp-content/uploads/2026/09/example.jpg",
+			"/wp-content/uploads/2014/02/lecture.avi",
+			"/static/js/main.min.js",
+			"/img/sprite",
+			"/IMG/raw.bin",
+			"/wp-includes/js/thing",
+			"/cdn-cgi/local/scheduled",
+			"/2014/02/photo.jpg",
+			"/2026/11/24/old-page.html",
+			"/img/logo.png",
+			"/IMG/logo.png",
+			"/google1234abcd.html",
+			"//evil.example",
+			"/\\evil.example",
+			"/.well-known/traffic-advice",
+			"/_astro/site.js",
+			"/_server-islands/Example",
+			`/projects/project-id?_preview=${token}`,
+		]) {
+			expect(apply(path).response, path).toBeUndefined();
+		}
+	});
+
 	test("canonicalizes search requests and rejects excessive searches", () => {
 		const canonical = apply("/?utm_source=test&s=%20community%20");
 		expect(canonical.response?.status).toBe(308);
@@ -171,6 +232,12 @@ describe("public request policy", () => {
 	test("validates search cursors and page history before rendering", () => {
 		const valid = apply("/page/2/?s=community&cursor=next&before=");
 		expect(valid.response).toBeUndefined();
+
+		const withoutSlash = apply("/page/2?s=community&cursor=next&before=");
+		expect(withoutSlash.response?.status).toBe(308);
+		expect(withoutSlash.response?.headers.get("location")).toBe(
+			"https://www.engagedphilosophy.com/page/2/?s=community&cursor=next&before=",
+		);
 
 		const missingHistory = apply("/page/2/?s=community&cursor=next");
 		expect(missingHistory.response?.status).toBe(404);
@@ -199,9 +266,44 @@ describe("public request policy", () => {
 			"https://www.engagedphilosophy.com/about/?utm_source=test",
 		);
 
+		const slashless = apply("/about?_edit=1");
+		expect(slashless.response?.status).toBe(302);
+		expect(slashless.response?.headers.get("location")).toBe(
+			"https://www.engagedphilosophy.com/about/",
+		);
+
 		const authenticated = apply("/about/?_edit=1", {
 			headers: { cookie: "CF_Authorization=token" },
 		});
 		expect(authenticated.response).toBeUndefined();
+	});
+
+	test("points the app's permanent redirects at the slash form", () => {
+		const redirect = (status: number, location: string) =>
+			canonicalizeRedirect(
+				new Request("https://www.engagedphilosophy.com/2022/05/31/old-slug/"),
+				new Response(null, { status, headers: { Location: location } }),
+			).headers.get("location");
+
+		expect(redirect(301, "/2022/05/31/renamed")).toBe("/2022/05/31/renamed/");
+		expect(redirect(308, "/project/renamed?ref=1#top")).toBe(
+			"/project/renamed/?ref=1#top",
+		);
+		for (const location of [
+			"/project/renamed/",
+			"/papers/lecture.pdf",
+			"/wp-content/uploads/2014/02/paper.pdf",
+			"/_emdash/api/media/file/logo.png",
+			"//evil.example",
+			"/\\evil.example",
+			"/\t/evil.example",
+			"https://example.com/elsewhere",
+		]) {
+			expect(redirect(301, location)).toBe(location);
+		}
+		expect(redirect(302, "/projects/id?_preview=token")).toBe(
+			"/projects/id?_preview=token",
+		);
+		expect(redirect(301, "/\\exa mple")).toBe("/\\exa mple");
 	});
 });

@@ -9,6 +9,24 @@ Workers Free quotas:
 3. The outer Worker rejects or normalizes requests before Astro, EmDash, KV, or
    D1 work begins on a cache miss.
 
+The outer Worker also sends slashless page URLs to their trailing-slash form
+with a cacheable 301 that drops the query string, so each page has one cache
+entry and one canonical URL. Search pages get a 308 that keeps their sanitized
+query, and `_preview` and `_edit` requests are handled before this redirect.
+Paths ending in a common file name such as `sitemap.xml` or `app.js`, `/img/`,
+`/wp-content/`, `/wp-includes/`, `/cdn-cgi/`, and paths starting with `/_` or
+`/.` keep their requested form. A bare legacy URL that EmDash also redirects
+takes both hops, and each counts toward the public rate limit.
+
+Site-relative 301 and 308 redirects that the app returns, such as EmDash's
+slug-change redirects, are rewritten to point at the slash form, with the same
+exemptions and except for targets whose last segment has a dot. Primary menu
+links get the same treatment, since EmDash builds content and taxonomy menu
+links without the slash. EmDash wildcard redirect rules see the slash form too,
+so a `[...path]` capture ends with `/`; end such a rule's destination with the
+capture. An SEO-panel canonical is rendered as the editor entered it, so enter
+page canonicals in the slash form.
+
 ## Production Rules
 
 The zone rules for `engagedphilosophy.com` must preserve these invariants:

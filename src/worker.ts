@@ -12,7 +12,10 @@ import {
 	createBlockedCrawlerResponse,
 	getBlockedCrawler,
 } from "./lib/crawler-policy";
-import { applyPublicRequestPolicy } from "./lib/public-request-policy";
+import {
+	applyPublicRequestPolicy,
+	canonicalizeRedirect,
+} from "./lib/public-request-policy";
 import { applySecurityHeaders } from "./lib/security-headers";
 
 type Env = Record<string, unknown>;
@@ -102,7 +105,10 @@ const observedHandler: ExportedHandler<Env> = {
 
 		const info = getObservedRequestInfo(routedRequest);
 		if (!info) {
-			const response = await astroHandler.fetch(routedRequest, env, ctx);
+			const response = canonicalizeRedirect(
+				routedRequest,
+				await astroHandler.fetch(routedRequest, env, ctx),
+			);
 			return applySecurityHeaders(routedRequest, response, securityOptions);
 		}
 
@@ -123,7 +129,10 @@ const observedHandler: ExportedHandler<Env> = {
 		console.log(requestLog("ep.request.start", info, startedAt));
 
 		try {
-			const response = await astroHandler.fetch(routedRequest, env, ctx);
+			const response = canonicalizeRedirect(
+				routedRequest,
+				await astroHandler.fetch(routedRequest, env, ctx),
+			);
 			completed = true;
 			console.log(responseLog(info, startedAt, response));
 

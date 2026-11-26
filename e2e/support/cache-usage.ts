@@ -26,11 +26,11 @@ export async function measureMissingPaths(server: WorkerServer, count = 100) {
 	const request = (path: string) => measureRequest(server, path);
 
 	assert.equal((await request("/")).status, 200);
-	const cold = await request(`${prefix}/warmup`);
+	const cold = await request(`${prefix}/warmup/`);
 	assert.equal(cold.status, 404);
 	const warm = [];
 	for (let i = 0; i < 5; i++) {
-		const result = await request(`${prefix}/warmup`);
+		const result = await request(`${prefix}/warmup/`);
 		assert.equal(result.status, 404);
 		warm.push(result);
 	}
@@ -39,7 +39,7 @@ export async function measureMissingPaths(server: WorkerServer, count = 100) {
 	const durations: number[] = [];
 	const firstBytes: number[] = [];
 	for (let i = 0; i < count; i++) {
-		const result = await request(`${prefix}/missing-${i}`);
+		const result = await request(`${prefix}/missing-${i}/`);
 		assert.equal(result.status, 404);
 		dbQueries += result.dbQueries;
 		durations.push(result.elapsedMs);

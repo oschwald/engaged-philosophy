@@ -2,6 +2,7 @@ import { getSeoMeta, type PublicPageContext } from "emdash";
 import { createPublicPageContext } from "emdash/page";
 
 import { PRIMARY_MENU_CACHE_TAG, SITE_SETTINGS_CACHE_TAG } from "./cache-tags";
+import { canonicalPagePath } from "./path-utils";
 import { PUBLIC_SITE_URL } from "./site-config";
 import type { ContentEntry, PageData, PostData, ProjectData } from "./types";
 
@@ -66,7 +67,7 @@ export function createSitePageContext({
 	const defaultPageTitle =
 		title && title !== "Home" ? title : `${siteTitle} – ${siteDescription}`;
 	const defaultDescription = description || siteDescription;
-	const canonicalPath = url.pathname;
+	const canonicalPath = canonicalPagePath(url.pathname);
 	const canonical = `${publicSiteUrl}${canonicalPath}`;
 
 	if (!content) {
