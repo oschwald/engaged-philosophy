@@ -87,7 +87,7 @@ test("normalizes offset publication dates and preserves canonical links and redi
 			maxRedirects: 0,
 		});
 		expect(redirect.status()).toBe(301);
-		expect(redirect.headers().location).toBe(`/2022/05/31/${newSlug}`);
+		expect(redirect.headers().location).toBe(`/2022/05/31/${newSlug}/`);
 		await expectPublicContent(
 			publicPage,
 			`/2022/05/31/${newSlug}/`,

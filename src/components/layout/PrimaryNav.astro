@@ -1,5 +1,6 @@
 ---
 import type { MenuItem } from "emdash";
+import { canonicalSiteHref, isCurrentMenuLink } from "../../lib/path-utils";
 import SearchIcon from "../SearchIcon.astro";
 
 interface Props {
@@ -10,13 +11,18 @@ interface Props {
 	sectionPath?: string;
 }
 
-const { menuItems, currentPath, sectionPath } = Astro.props;
+const { currentPath, sectionPath } = Astro.props;
+const menuItems = Astro.props.menuItems.map((item) => ({
+	...item,
+	url: canonicalSiteHref(item.url),
+	children: item.children.map((child) => ({
+		...child,
+		url: canonicalSiteHref(child.url),
+	})),
+}));
 
 function isCurrentUrl(url: string) {
-	if (currentPath === undefined) {
-		return false;
-	}
-	return url === currentPath || url === `${currentPath}/`;
+	return isCurrentMenuLink(url, currentPath);
 }
 ---
 

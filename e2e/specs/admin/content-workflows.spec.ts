@@ -310,7 +310,7 @@ test.describe("admin content workflows", () => {
 				maxRedirects: 0,
 			});
 			expect(redirectResponse.status()).toBe(301);
-			expect(redirectResponse.headers().location).toBe(`/project/${newSlug}`);
+			expect(redirectResponse.headers().location).toBe(`/project/${newSlug}/`);
 
 			await expectPublicContent(
 				publicPage,

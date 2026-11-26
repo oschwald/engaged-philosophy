@@ -1,3 +1,8 @@
+import {
+	canonicalPagePath,
+	canonicalTargetPath,
+	withTrailingSlash,
+} from "./path-utils";
 import { isStatefulRequest } from "./request-state";
 import {
 	isValidSearchCursor,
@@ -95,6 +100,20 @@ function policyResponse(
 	});
 }
 
+// Site-relative and permanent, like EmDash's redirects, and without the query
+// string, which pages ignore, so the Location never carries one visitor's query
+// to another through the cache.
+// Only GET and HEAD reach it, so 301 keeps the method for older clients.
+function trailingSlashRedirect(pathname: string) {
+	return new Response(null, {
+		status: 301,
+		headers: {
+			"Cache-Control": "public, max-age=300",
+			Location: pathname,
+		},
+	});
+}
+
 function requestWithUrl(request: Request, url: URL) {
 	return new Request(url.toString(), request);
 }
@@ -187,6 +206,7 @@ function sanitizeSearchRequest(
 	}
 
 	const sanitized = new URL(url);
+	sanitized.pathname = withTrailingSlash(url.pathname);
 	sanitized.search = "";
 	sanitized.searchParams.set("s", query);
 	if (cursor) sanitized.searchParams.set("cursor", cursor);
@@ -194,7 +214,7 @@ function sanitizeSearchRequest(
 		sanitized.searchParams.append("before", previousCursor);
 	}
 
-	if (sanitized.search !== url.search) {
+	if (sanitized.href !== url.href) {
 		return {
 			request,
 			response: Response.redirect(sanitized, 308),
@@ -257,6 +277,7 @@ export function applyPublicRequestPolicy(
 		if (isStatefulRequest(request)) return { request };
 
 		const canonical = new URL(url);
+		canonical.pathname = canonicalPagePath(url.pathname);
 		canonical.searchParams.delete("_edit");
 		return {
 			request,
@@ -299,9 +320,41 @@ export function applyPublicRequestPolicy(
 		return sanitizeSearchRequest(request, url, pageNumber);
 	}
 
+	const pagePath = canonicalPagePath(url.pathname);
+	if (pagePath !== url.pathname) {
+		return { request, response: trailingSlashRedirect(pagePath) };
+	}
+
 	if (!url.search) return { request };
 
 	const canonical = new URL(url);
 	canonical.search = "";
 	return { request: requestWithUrl(request, canonical) };
+}
+
+// EmDash builds slug-change redirects from collection URL patterns that have no
+// trailing slash. Send every site-relative permanent redirect the app returns
+// straight to the slash form, so a renamed page stays one hop from its old URL.
+export function canonicalizeRedirect(request: Request, response: Response) {
+	if (response.status !== 301 && response.status !== 308) {
+		return response;
+	}
+	const location = response.headers.get("Location");
+	if (!location?.startsWith("/")) {
+		return response;
+	}
+	const origin = new URL(request.url).origin;
+	let target: URL;
+	try {
+		target = new URL(location, origin);
+	} catch {
+		return response;
+	}
+	const pagePath = canonicalTargetPath(target.pathname);
+	if (target.origin !== origin || pagePath === target.pathname) {
+		return response;
+	}
+	const redirect = new Response(response.body, response);
+	redirect.headers.set("Location", `${pagePath}${target.search}${target.hash}`);
+	return redirect;
 }
