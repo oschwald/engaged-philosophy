@@ -82,6 +82,7 @@ export async function authenticate(
 			issuer: `https://${config.teamDomain}`,
 			audience: resolveAudience(config),
 			clockTolerance: 60,
+			requiredClaims: ["exp"],
 		},
 	);
 

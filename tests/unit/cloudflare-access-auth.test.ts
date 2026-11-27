@@ -59,7 +59,8 @@ async function signToken(
 		key?: CryptoKey;
 		issuer?: string;
 		audience?: string | string[];
-		expiresAt?: string | number;
+		// null omits the exp claim.
+		expiresAt?: string | number | null;
 		keyId?: string;
 		notBefore?: string | number;
 	} = {},
@@ -69,8 +70,8 @@ async function signToken(
 		.setIssuer(issuer)
 		.setAudience(audience)
 		.setSubject("access-user-id")
-		.setIssuedAt()
-		.setExpirationTime(expiresAt);
+		.setIssuedAt();
+	if (expiresAt !== null) token.setExpirationTime(expiresAt);
 	if (notBefore !== undefined) token.setNotBefore(notBefore);
 	return token.sign(key);
 }
@@ -361,6 +362,18 @@ describe("Cloudflare Access authenticate", () => {
 		await expect(
 			authenticate(requestWithHeader(jwt), accessConfig()),
 		).rejects.toMatchObject({ code: "ERR_JWT_EXPIRED" });
+	});
+
+	test("rejects a signed token without an expiry", async () => {
+		const jwt = await signToken({}, { expiresAt: null });
+
+		await expect(
+			authenticate(requestWithHeader(jwt), accessConfig()),
+		).rejects.toMatchObject({
+			code: "ERR_JWT_CLAIM_VALIDATION_FAILED",
+			claim: "exp",
+			reason: "missing",
+		});
 	});
 
 	test("accepts a token whose start time is within the clock tolerance", async () => {
