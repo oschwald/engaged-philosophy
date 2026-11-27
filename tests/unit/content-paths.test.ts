@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 
 import {
+	contentHref,
 	derivePagePath,
 	pageRedirect,
 	postPath,
@@ -48,6 +49,13 @@ describe("content path derivation", () => {
 		);
 		expect(projectPath(null)).toBe("project");
 	});
+});
+
+test("links content paths with trailing slashes and the home page to the root", () => {
+	expect(contentHref("about")).toBe("/about/");
+	expect(contentHref("/parent/child/")).toBe("/parent/child/");
+	expect(contentHref("")).toBe("/");
+	expect(contentHref(undefined)).toBe("/");
 });
 
 test("page redirects retain query state and use temporary preview redirects", () => {

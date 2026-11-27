@@ -8,6 +8,14 @@ export function normalizeContentPath(path?: string | null) {
 	return (path ?? "").replace(/^\/+|\/+$/g, "");
 }
 
+// The home page keeps an empty canonical path and is served at "/".
+export const HOME_PAGE_SLUG = "home";
+
+export function contentHref(path?: string | null) {
+	const normalizedPath = normalizeContentPath(path);
+	return normalizedPath ? `/${normalizedPath}/` : "/";
+}
+
 export function slugFromPath(path?: string | null) {
 	return normalizeContentPath(path).split("/").filter(Boolean).at(-1) ?? "";
 }
@@ -40,7 +48,7 @@ export function derivePagePath(path?: string | null, slug?: string | null) {
 	const normalizedPath = normalizeContentPath(path);
 	const pageSlug = slugFromPath(slug) || slugFromPath(normalizedPath);
 	if (!pageSlug) return normalizedPath;
-	if (!normalizedPath && pageSlug === "home") return "";
+	if (!normalizedPath && pageSlug === HOME_PAGE_SLUG) return "";
 
 	return [...prefixFromPath(normalizedPath), pageSlug].join("/");
 }
@@ -62,7 +70,7 @@ export function pageRedirect(
 	url: URL,
 ): [string, 301 | 302] {
 	return [
-		`${path ? `/${path}/` : "/"}${url.search}`,
+		`${contentHref(path)}${url.search}`,
 		url.searchParams.has("_preview") ? 302 : 301,
 	];
 }

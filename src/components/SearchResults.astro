@@ -2,6 +2,7 @@
 import EntrySummary from "./content/EntrySummary.astro";
 import ThemeSidebar from "./ThemeSidebar.astro";
 import SearchIcon from "./SearchIcon.astro";
+import { contentHref } from "../lib/content-paths";
 import {
 	searchCursorHistoryForNextPage,
 	type SiteSearchResponse,
@@ -64,7 +65,7 @@ const nextHref =
 							<EntrySummary
 								articleClass={`mb-4 pb-4 border-bottom ${result.kind} type-${result.kind}`}
 								title={result.title}
-								continueHref={`/${result.path}/`}
+								continueHref={contentHref(result.path)}
 								excerpt={result.excerpt}
 								image={{ src: result.imageSrc, alt: result.title }}
 								showContinueWithoutExcerpt={false}
