@@ -124,4 +124,32 @@ describe("rich text", () => {
 			),
 		).toBe("One two three");
 	});
+
+	test("keeps editorial brackets in excerpt text", () => {
+		const quote =
+			'She said "[W]e think [the students] learn more" [laughs], [sic].';
+
+		expect(
+			stripHtml([
+				{
+					_type: "block",
+					_key: "quote",
+					style: "normal",
+					markDefs: [],
+					children: [
+						{
+							_type: "span",
+							_key: "quote-text",
+							text: quote,
+							marks: [],
+						},
+					],
+				},
+			]),
+		).toBe(quote);
+		expect(stripHtml(`<p>${quote}</p>`)).toBe(quote);
+		expect(stripHtml("[Read the full interview.]")).toBe(
+			"[Read the full interview.]",
+		);
+	});
 });

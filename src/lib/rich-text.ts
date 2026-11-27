@@ -48,10 +48,6 @@ export function decodeHtmlEntities(value?: string | null) {
 	});
 }
 
-function stripWordPressShortcodes(value: string) {
-	return value.replace(/\[(?:\/)?[a-z][\w-]*(?:[^\]]*)\]/gi, " ");
-}
-
 function getImageAlt(block: PortableTextBlock) {
 	return typeof block.alt === "string" ? block.alt : "";
 }
@@ -88,12 +84,10 @@ export function isPortableTextValue(
 
 export function stripHtml(value?: string | PortableTextBlock[] | null) {
 	if (isPortableTextValue(value)) {
-		return stripWordPressShortcodes(portableTextToPlainText(value))
-			.replace(/\s+/g, " ")
-			.trim();
+		return portableTextToPlainText(value).replace(/\s+/g, " ").trim();
 	}
 
-	return stripWordPressShortcodes(decodeHtmlEntities(value))
+	return decodeHtmlEntities(value)
 		.replace(/<script[\s\S]*?<\/script>/gi, " ")
 		.replace(/<style[\s\S]*?<\/style>/gi, " ")
 		.replace(/<!--[\s\S]*?-->/g, " ")
